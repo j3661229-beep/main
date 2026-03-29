@@ -1,6 +1,6 @@
 const axios = require('axios');
 const redis = require('../config/redis');
-const openai = require('../config/openai');
+const { generateWithFallback } = require('./ai.service');
 
 const MOCK_WEATHER = {
     main: { temp: 32, feels_like: 35, humidity: 58, pressure: 1012 },
@@ -49,19 +49,13 @@ const getAdvisory = async ({ lat, lng, district }) => {
     const humidity = weather.main?.humidity || 60;
     const condition = weather.weather?.[0]?.main || 'Clear';
 
-    const prompt = `Give 4 farm advisory tips for a Maharashtra farmer. Weather: ${temp}°C, ${condition}, humidity ${humidity}%. District: ${district || 'Nashik'}. Tips should cover: spray safety, sowing, irrigation, disease risk. Return JSON array of {tip: string, severity: "info"|"warning"|"alert", emoji: string}`;
-
-    const response = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 300,
-    });
+    const prompt = `Give 4 farm advisory tips for a Maharashtra farmer. Weather: ${temp}°C, ${condition}, humidity ${humidity}%. District: ${district || 'Nashik'}. Tips should cover: spray safety, sowing, irrigation, disease risk. Return ONLY a JSON array of {tip: string, severity: "info"|"warning"|"alert", emoji: string}`;
 
     let advisories;
     try {
-        const text = response.choices[0].message.content;
-        const match = text.match(/\[[\s\S]*\]/);
-        advisories = JSON.parse(match ? match[0] : text);
+        const textPayload = await generateWithFallback(prompt);
+        const match = textPayload.match(/\[[\s\S]*\]/);
+        advisories = JSON.parse(match ? match[0] : textPayload);
     } catch {
         advisories = [
             { tip: 'Check local mandi prices before harvesting', severity: 'info', emoji: '📊' },

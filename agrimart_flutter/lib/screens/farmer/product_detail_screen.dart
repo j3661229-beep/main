@@ -7,13 +7,20 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
 
-class ProductDetailScreen extends ConsumerWidget {
+class ProductDetailScreen extends ConsumerStatefulWidget {
   final String productId;
   const ProductDetailScreen({super.key, required this.productId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final product = ref.watch(productDetailProvider(productId));
+  ConsumerState<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
+  int _quantity = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    final product = ref.watch(productDetailProvider(widget.productId));
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -121,26 +128,65 @@ class ProductDetailScreen extends ConsumerWidget {
                 ]),
                 child: SafeArea(
                     child: Row(children: [
-                  Expanded(
-                      child: OutlinedButton(
-                    onPressed: () => context.push('/farmer/cart'),
-                    child: const Text('View Cart'),
-                  )),
+                  // Quantity Selector
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primarySurface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.primaryBorder),
+                    ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove, size: 20),
+                          color: AppColors.primary,
+                          onPressed: () {
+                            if (_quantity > 1) {
+                              setState(() => _quantity--);
+                            }
+                          },
+                        ),
+                        Text('$_quantity', style: AppTextStyles.headingMD),
+                        IconButton(
+                          icon: const Icon(Icons.add, size: 20),
+                          color: AppColors.primary,
+                          onPressed: () {
+                            if (_quantity < (p['stockQuantity'] as int? ?? 99)) {
+                              setState(() => _quantity++);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                       child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
                     onPressed: () async {
-                      await ref
-                          .read(cartProvider.notifier)
-                          .addItem(productId, 1);
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Added to cart ✅'),
-                                backgroundColor: AppColors.primary));
+                      try {
+                        await ref
+                            .read(cartProvider.notifier)
+                            .addItem(widget.productId, _quantity);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text('Added $_quantity to cart ✅'),
+                                  backgroundColor: AppColors.primary));
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text('Failed: $e'),
+                                  backgroundColor: AppColors.error));
+                        }
                       }
                     },
-                    child: const Text('Add to Cart 🛒'),
+                    child: const Text('Add to Cart 🛒', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   )),
                 ])),
               )),

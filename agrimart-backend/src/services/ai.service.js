@@ -1,11 +1,13 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const axios = require('axios');
 const supabase = require('../config/supabase');
 const prisma = require('../config/database');
 const { uploadToSupabase } = require('../middleware/upload');
 const logger = require('../utils/logger');
 
-// Initialize Gemini
+// Initialize Gemini & Cerebras
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const CEREBRAS_API_KEY = process.env.CEREBRAS_API_KEY || "csk-38f84tdc5jxh2ptkd5rycyy5vv45v5ht3fh4f65kyfr5re5f";
 
 const SYSTEM_KISAN = `You are Kisan AI, an expert agricultural assistant for Indian farmers. Detect the user language (Marathi/Hindi/English) and ALWAYS reply in the SAME language. Help with: crop advice, disease identification, mandi prices, government schemes, fertilizer usage, weather-based tips. Use simple words farmers understand. Be practical and specific. Avoid complex jargon. Format answers with clear steps when giving instructions.`;
 
@@ -19,8 +21,36 @@ const parseJSON = (text) => {
 };
 
 const generateWithFallback = async (prompt, imageBase64 = null) => {
-    const modelsToTry = ["gemini-1.5-flash-latest", "gemini-2.5-flash", "gemini-1.5-pro-latest", "gemini-pro"];
     let lastError;
+
+    // 1. Try Cerebras First (Only if no image, since Cerebras Llama is currently text-only)
+    if (!imageBase64) {
+        try {
+            const cerebrasRes = await axios.post("https://api.cerebras.ai/v1/chat/completions", {
+                model: "llama3.1-8b",
+                messages: [
+                    { role: "system", content: "You are an expert agricultural AI assistant. Always return valid JSON when asked." },
+                    { role: "user", content: prompt }
+                ]
+            }, {
+                headers: {
+                    "Authorization": `Bearer ${CEREBRAS_API_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                timeout: 10000 // Ultra-fast inference timeout
+            });
+
+            if (cerebrasRes.data && cerebrasRes.data.choices && cerebrasRes.data.choices[0]) {
+                logger.info('Generation successful using primary Cerebras inference.');
+                return cerebrasRes.data.choices[0].message.content;
+            }
+        } catch (e) {
+            logger.warn(`Cerebras primary generation failed: ${e.message}. Falling back to Gemini...`);
+        }
+    }
+
+    // 2. Fallback to Gemini
+    const modelsToTry = ["gemini-1.5-flash-latest", "gemini-2.5-flash", "gemini-1.5-pro-latest", "gemini-pro"];
     const contents = imageBase64 ? [prompt, { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }] : prompt;
 
     for (const modelName of modelsToTry) {
@@ -33,7 +63,7 @@ const generateWithFallback = async (prompt, imageBase64 = null) => {
             lastError = e;
         }
     }
-    throw lastError || new Error("All Gemini models failed during generation.");
+    throw lastError || new Error("All Gemini fallback models failed during generation.");
 };
 
 const soilAnalysis = async (farmerId, imageBuffer, originalName) => {
@@ -102,6 +132,41 @@ const cropRecommend = async (farmerId, { location, soilType, season, farmSize })
 };
 
 const chat = async (userId, { message, history = [] }) => {
+    let lastError;
+
+    // 1. Try Cerebras first for Chat
+    try {
+        const cerebrasHistory = history.map(msg => ({
+            role: msg.role === 'assistant' ? 'assistant' : (msg.role === 'system' ? 'system' : 'user'),
+            content: msg.content
+        }));
+
+        // Ensure SYSTEM_KISAN is present for persona adherence
+        if (!cerebrasHistory.length || cerebrasHistory[0].role !== 'system') {
+            cerebrasHistory.unshift({ role: "system", content: SYSTEM_KISAN });
+        }
+        cerebrasHistory.push({ role: "user", content: message });
+
+        const cerebrasRes = await axios.post("https://api.cerebras.ai/v1/chat/completions", {
+            model: "llama3.1-70b", // Use 70b for higher Chat intelligence
+            messages: cerebrasHistory
+        }, {
+            headers: {
+                "Authorization": `Bearer ${CEREBRAS_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            timeout: 15000
+        });
+
+        if (cerebrasRes.data && cerebrasRes.data.choices && cerebrasRes.data.choices[0]) {
+            logger.info('Chat handled successfully by primary Cerebras inference.');
+            return { reply: cerebrasRes.data.choices[0].message.content, tokensUsed: null, source: 'cerebras' };
+        }
+    } catch (e) {
+        logger.warn(`Cerebras Chat primary failed: ${e.message}. Falling back to Gemini...`);
+    }
+
+    // 2. Fallback to Gemini
     const geminiHistory = history
         .filter(msg => msg.role !== 'system') // Skip system notes in history
         .map(msg => ({
@@ -110,7 +175,6 @@ const chat = async (userId, { message, history = [] }) => {
         }));
 
     const modelsToTry = ["gemini-1.5-flash-latest", "gemini-2.5-flash", "gemini-1.5-pro-latest", "gemini-pro"];
-    let lastError;
 
     for (const modelName of modelsToTry) {
         try {
@@ -120,22 +184,16 @@ const chat = async (userId, { message, history = [] }) => {
             });
             const chatSession = model.startChat({ history: geminiHistory });
             const result = await chatSession.sendMessage(message);
-            
-            // Log successful fallback if not primary
-            if (modelName !== modelsToTry[0]) {
-                logger.info(`AI Chat successfully used fallback model: ${modelName}`);
-            }
-            
-            return { reply: result.response.text(), tokensUsed: null }; // Gemini response text
+
+            logger.info(`AI Chat successfully used fallback Gemini model: ${modelName}`);
+            return { reply: result.response.text(), tokensUsed: null, source: 'gemini' };
         } catch (e) {
             logger.warn(`Model [${modelName}] failed in Kisan Chat: ${e.message}`);
             lastError = e;
-            // Continue the loop to try the next fallback model...
         }
     }
 
-    // If all models hit 404s or quota issues:
-    throw lastError || new Error("AI Chat unavailable. All Gemini models failed.");
+    throw lastError || new Error("AI Chat unavailable. All fallback models failed.");
 };
 
 const cropCalendar = async ({ month, district, crops }) => {
@@ -146,5 +204,5 @@ const cropCalendar = async ({ month, district, crops }) => {
     return parseJSON(textPayload);
 };
 
-module.exports = { soilAnalysis, diseaseDetection, cropRecommend, chat, cropCalendar };
+module.exports = { generateWithFallback, soilAnalysis, diseaseDetection, cropRecommend, chat, cropCalendar };
 

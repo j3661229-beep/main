@@ -296,13 +296,22 @@ class _ProductCard extends ConsumerWidget {
                                 await ref
                                     .read(cartProvider.notifier)
                                     .addItem(product['id'], 1);
-                                if (context.mounted)
+                                if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content: Text('Added to cart ✅'),
                                           backgroundColor: AppColors.primary,
                                           duration: Duration(seconds: 1)));
-                              } catch (_) {}
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text('Failed: $e'),
+                                          backgroundColor: AppColors.error,
+                                          duration: const Duration(seconds: 2)));
+                                }
+                              }
                             },
                             child: Container(
                                 padding: const EdgeInsets.all(8),

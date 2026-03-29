@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/auth_provider.dart';
+import '../../data/providers/language_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
@@ -12,6 +13,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authProvider);
     final user = auth.user;
+    final lang = ref.watch(languageProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -77,25 +79,44 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 32),
                 _sectionHeader('ACCOUNT MANAGEMENT'),
-                _buildItem(
-                    Icons.language, 'App Language', 'मराठी (Marathi)', () {}),
+                _buildItem(Icons.language, 'App Language', lang, () {
+                  _showLanguagePicker(context, ref, lang);
+                }),
                 _buildItem(Icons.location_on_outlined, 'My Farm Address',
-                    'Manage saved locations', () {}),
+                    'Manage saved locations', () {
+                  _showStubSheet(context, '📍 Farm Locations', 
+                      'Add or edit your village and operational pin codes for seamless order delivery and accurate weather alerts.');
+                }),
                 _buildItem(
                     Icons.notifications_outlined,
                     'Notification Settings',
                     'Manage SMS & WhatsApp alerts',
-                    () {}),
+                    () {
+                  _showStubSheet(context, '🔔 Notification Preferences', 
+                      'Toggle push notifications, Daily Mandi SMS alerts, and WhatsApp updates for your orders.');
+                }),
                 _buildItem(Icons.security, 'Privacy & Security',
-                    'Data controls & permissions', () {}),
+                    'Data controls & permissions', () {
+                  _showStubSheet(context, '🛡️ Privacy & Security', 
+                      'Manage data sharing settings, device permissions, and activity history.');
+                }),
                 const SizedBox(height: 24),
                 _sectionHeader('SUPPORT & LEGAL'),
                 _buildItem(Icons.help_outline, 'Help Center',
-                    'FAQs & Customer Support', () {}),
+                    'FAQs & Customer Support', () {
+                   _showStubSheet(context, '💬 Need Help?', 
+                      'Contact our 24/7 Kisan Helpline at 1800-120-120\nor email support@agrimart.in');
+                }),
                 _buildItem(Icons.article_outlined, 'Terms of Service',
-                    'Platform agreements & legal', () {}),
+                    'Platform agreements & legal', () {
+                  _showStubSheet(context, '📄 Terms of Service', 
+                      'By using AgriMart, you agree to our fair usage policy and zero-commission structure (for first year).');
+                }),
                 _buildItem(Icons.info_outline, 'About AgriMart',
-                    'Version 1.0.0 (Production)', () {}),
+                    'Version 1.0.0 (Production)', () {
+                  _showStubSheet(context, '🌾 About Us', 
+                      'AgriMart v1.0.0\nBuilt for the farmers of India to provide direct market access, AI crop tools, and transparent pricing.');
+                }),
                 const SizedBox(height: 40),
                 SizedBox(
                   width: double.infinity,
@@ -120,6 +141,67 @@ class ProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 64),
               ],
             ),
+    );
+  }
+
+  void _showLanguagePicker(BuildContext context, WidgetRef ref, String currentLang) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Select Language / भाषा निवडा', style: AppTextStyles.headingLG),
+              const SizedBox(height: 16),
+              ...['English', 'मराठी (Marathi)', 'हिंदी (Hindi)'].map((l) {
+                final isSelected = currentLang == l;
+                return ListTile(
+                  title: Text(l, style: isSelected ? AppTextStyles.headingMD.copyWith(color: AppColors.primary) : AppTextStyles.bodyLG),
+                  trailing: isSelected ? const Icon(Icons.check_circle, color: AppColors.primary) : null,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  tileColor: isSelected ? AppColors.primarySurface : null,
+                  onTap: () {
+                    ref.read(languageProvider.notifier).setLanguage(l);
+                    Navigator.pop(ctx);
+                  },
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showStubSheet(BuildContext context, String title, String body) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => SafeArea(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(title, style: AppTextStyles.headingLG, textAlign: TextAlign.center),
+              const SizedBox(height: 24),
+              Text(body, style: AppTextStyles.bodyLG.copyWith(height: 1.5), textAlign: TextAlign.center),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Got it'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
