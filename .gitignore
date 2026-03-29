@@ -1,0 +1,99 @@
+# AgriMart Platform Gitignore
+# Covers Backend, Admin Dashboard, and Flutter App
+
+# --- General / OS ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+desktop.ini
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# --- Node.js / React (Backend & Admin) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+dist/
+build/
+.next/
+.server/
+.client/
+.output/
+.vercel
+.turbo
+coverage/
+.nyc_output/
+.eslintcache
+
+# --- Prisma ---
+/agrimart-backend/prisma/migrations/
+# Keep the schema but ignore local dev db if any
+*.db
+*.db-journal
+
+# --- Flutter / Dart (agrimart_flutter) ---
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Android specific
+agrimart_flutter/android/app/debug/
+agrimart_flutter/android/app/profile/
+agrimart_flutter/android/app/release/
+agrimart_flutter/android/local.properties
+agrimart_flutter/android/**/GeneratedPluginRegistrant.java
+agrimart_flutter/android/agrimart.jks
+agrimart_flutter/android/key.properties
+*.keystore
+*.jks
+
+# iOS specific
+agrimart_flutter/ios/.externalToolBuilders/
+agrimart_flutter/ios/Flutter/App.framework
+agrimart_flutter/ios/Flutter/Flutter.framework
+agrimart_flutter/ios/Flutter/Generated.xcconfig
+agrimart_flutter/ios/Flutter/flutter_export_environment.sh
+agrimart_flutter/ios/Runner/GeneratedPluginRegistrant.h
+agrimart_flutter/ios/Runner/GeneratedPluginRegistrant.m
+agrimart_flutter/ios/Pods/
+agrimart_flutter/ios/Podfile.lock
+agrimart_flutter/ios/.pbxprojsync
+
+# Web specific
+agrimart_flutter/build/web/
+
+# Symbols
+agrimart_flutter/app.*.symbols
+agrimart_flutter/app.*.map.json
+
+# Secrets
+agrimart_flutter/lib/firebase_options.dart
+google-services.json
+GoogleService-Info.plist
+
+# Local HTML previews
+agrimart_all_screens.html
+agrimart_complete_ui.html
