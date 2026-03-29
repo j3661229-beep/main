@@ -77,9 +77,11 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
         if (_analyzing) ...[
           const SizedBox(height: 24),
           Column(children: [
-            const CircularProgressIndicator(color: AppColors.primary),
+            const AppShimmerCard(),
             const SizedBox(height: 12),
-            const Text('🔍 AI is analyzing your soil…', style: AppTextStyles.bodySM),
+            const AppShimmer(width: double.infinity, height: 40),
+            const SizedBox(height: 20),
+            const Text('🔍 AI is analyzing your soil…', style: AppTextStyles.headingSM),
             Text('This takes about 5-10 seconds', style: AppTextStyles.bodyXS.copyWith(color: AppColors.textTertiary)),
           ]),
         ],

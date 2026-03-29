@@ -78,6 +78,21 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
             ]),
           ),
           const SizedBox(height: 16),
+          // Featured / Top Rated
+          const Align(alignment: Alignment.centerLeft, child: Text('🔥 Hot Deals', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 0.5))),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 100,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                _FeaturedItem('🍅', 'Hybrid Seeds', 'Flat 20% OFF'),
+                _FeaturedItem('🧪', 'Soil Test Kit', '₹299 Only'),
+                _FeaturedItem('⚙️', 'Sprayer', 'Bestseller'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
           // Category chips
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -182,4 +197,20 @@ class _ProductCard extends ConsumerWidget {
       ),
     );
   }
+}
+
+class _FeaturedItem extends StatelessWidget {
+  final String icon, title, deal;
+  const _FeaturedItem(this.icon, this.title, this.deal);
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 140, margin: const EdgeInsets.only(right: 10), padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(color: Colors.white.withOpacity(0.12), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white.withOpacity(0.2))),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [Text(icon, style: const TextStyle(fontSize: 18)), const Spacer(), const Icon(Icons.arrow_forward_ios, size: 10, color: Colors.white)]),
+      const Spacer(),
+      Text(title, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+      Text(deal, style: const TextStyle(color: AppColors.amberLight, fontSize: 10, fontWeight: FontWeight.w900)),
+    ]),
+  );
 }

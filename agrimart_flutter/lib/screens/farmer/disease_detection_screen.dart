@@ -58,7 +58,18 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
         ),
         const SizedBox(height: 16),
         if (_image != null) ElevatedButton.icon(icon: const Icon(Icons.biotech), label: const Text('Detect Disease'), onPressed: _analyzing ? null : _analyze),
-        if (_analyzing) ...[const SizedBox(height: 24), const CircularProgressIndicator(color: AppColors.primary), const SizedBox(height: 12), const Text('🔍 Analyzing crop health…', style: AppTextStyles.bodySM)],
+        if (_analyzing) ...[
+          const SizedBox(height: 32),
+          const AppShimmerCard(),
+          const SizedBox(height: 12),
+          const AppShimmer(width: 200, height: 16),
+          const SizedBox(height: 24),
+          const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+            SizedBox(width: 12),
+            Text('🔍 Analyzing crop health…', style: AppTextStyles.headingSM),
+          ]),
+        ],
         if (_result != null) ...[
           const SizedBox(height: 20),
           Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16)),

@@ -8,8 +8,10 @@ const NAV = [
     { to: '/products', icon: '🌿', label: 'Products' },
     { to: '/orders', icon: '📦', label: 'Orders' },
     { to: '/mandi', icon: '📈', label: 'Mandi Prices' },
+    { to: '/analytics', icon: '📊', label: 'Platform Analytics' },
     { to: '/schemes', icon: '🏛️', label: 'Govt Schemes' },
     { to: '/notifications', icon: '🔔', label: 'Notifications' },
+    { to: '/settings', icon: '⚙️', label: 'Settings' },
 ];
 
 const PAGE_TITLES = {
@@ -19,8 +21,10 @@ const PAGE_TITLES = {
     '/products': ['Products', 'Approval & catalog management'],
     '/orders': ['Orders', 'All platform orders'],
     '/mandi': ['Mandi Prices', 'Live crop market prices'],
+    '/analytics': ['Platform Analytics', 'Detailed platform performance metrics'],
     '/schemes': ['Govt Schemes', 'Manage government schemes'],
     '/notifications': ['Notifications', 'Push & WhatsApp broadcasts'],
+    '/settings': ['Settings', 'Platform configuration & maintenance'],
 };
 
 export default function Layout() {

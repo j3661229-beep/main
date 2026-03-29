@@ -42,41 +42,39 @@ class WeatherScreen extends ConsumerWidget {
           ),
 
           const SizedBox(height: 16),
-
           // Farm Advisory
-          advisory.whenOrNull(data: (adv) => Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: AppColors.amberSurface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.amberLight)),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('🌾 Farm Advisory', style: AppTextStyles.headingMD),
-              const SizedBox(height: 8),
-              if (adv['advisories'] is List && (adv['advisories'] as List).isNotEmpty)
-                ...(adv['advisories'] as List).map((a) {
-                  if (a is Map) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(a['emoji']?.toString() ?? '• ', style: const TextStyle(fontSize: 18)),
-                        const SizedBox(width: 8),
-                        Expanded(child: Text(a['tip']?.toString() ?? '', style: AppTextStyles.bodyMD)),
-                      ]),
-                    );
-                  } else {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        const Text('🌱 ', style: TextStyle(fontSize: 18)),
-                        const SizedBox(width: 8),
-                        Expanded(child: Text(a.toString(), style: AppTextStyles.bodyMD)),
-                      ]),
-                    );
-                  }
-                })
-              else
-                const Text('No advisory available today.', style: AppTextStyles.bodyMD),
-            ]),
-          )) ?? const SizedBox.shrink(),
-
+          advisory.when(
+            loading: () => const AppShimmerCard(),
+            error: (e, _) => const SizedBox.shrink(),
+            data: (adv) {
+              if (adv is! Map) return const SizedBox.shrink();
+              final list = adv['advisories'];
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(color: AppColors.amberSurface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.amberLight)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Text('🌾 Farm Advisory', style: AppTextStyles.headingMD),
+                  const SizedBox(height: 12),
+                  if (list is List && list.isNotEmpty)
+                    ...list.map((a) {
+                      final tip = a is Map ? a['tip']?.toString() : a.toString();
+                      final emoji = a is Map ? a['emoji']?.toString() : '🌱';
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(emoji ?? '🌱', style: const TextStyle(fontSize: 18)),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(tip ?? '', style: AppTextStyles.bodyMD)),
+                        ]),
+                      );
+                    })
+                  else
+                    const Text('No advisory available today.', style: AppTextStyles.bodyMD),
+                ]),
+              );
+            },
+          ),
           const SizedBox(height: 16),
 
           // Min/Max temps

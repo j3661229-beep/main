@@ -10,6 +10,8 @@ import Orders from './pages/Orders';
 import MandiPrices from './pages/MandiPrices';
 import Schemes from './pages/Schemes';
 import Notifications from './pages/Notifications';
+import Analytics from './pages/Analytics';
+import Settings from './pages/Settings';
 
 const PrivateRoute = ({ children }) => {
   const { admin, loading } = useAuth();
@@ -32,8 +34,10 @@ export default function App() {
           <Route path="products" element={<Products />} />
           <Route path="orders" element={<Orders />} />
           <Route path="mandi" element={<MandiPrices />} />
+          <Route path="analytics" element={<Analytics />} />
           <Route path="schemes" element={<Schemes />} />
           <Route path="notifications" element={<Notifications />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

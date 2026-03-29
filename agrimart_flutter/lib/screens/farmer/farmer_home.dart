@@ -7,6 +7,10 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
+import 'shop_screen.dart';
+import 'mandi_prices_screen.dart';
+import 'profile_screen.dart';
+import 'crop_advisor_screen.dart';
 
 class FarmerHome extends ConsumerStatefulWidget {
   const FarmerHome({super.key});
@@ -18,7 +22,11 @@ class _FarmerHomeState extends ConsumerState<FarmerHome> {
   int _tab = 0;
 
   final _tabs = const [
-    _HomeTab(), _ShopTab(), _AITab(), _MandiTab(), _ProfileTab(),
+    _HomeTab(), 
+    ShopScreen(), 
+    AITabContent(), 
+    MandiPricesScreen(), 
+    ProfileScreen(),
   ];
 
   @override
@@ -124,27 +132,7 @@ class _HomeTab extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             // Weather widget
-            dashboard.whenOrNull(data: (data) {
-              final w = data['weather'];
-              if (w == null) return const SizedBox.shrink();
-              return Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF4FC3F7), Color(0xFF0288D1)]), borderRadius: BorderRadius.circular(16)),
-                child: Row(children: [
-                  const Text('☀️', style: TextStyle(fontSize: 36)),
-                  const SizedBox(width: 12),
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('${w['main']?['temp']?.toStringAsFixed(0) ?? '--'}°C', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white)),
-                    Text('${w['name'] ?? 'Your Location'} · ${w['weather']?[0]?['main'] ?? ''}', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13)),
-                  ]),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () => context.push('/farmer/weather'),
-                    child: const Text('Full Forecast →', style: TextStyle(color: Colors.white)),
-                  ),
-                ]),
-              );
-            }) ?? Container(height: 80, decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(16)), child: const Center(child: CircularProgressIndicator())),
+            _HomeWeatherWidget(dashboard: dashboard),
 
             const SizedBox(height: 20),
 
@@ -234,36 +222,19 @@ class _OrderTile extends StatelessWidget {
   }
 }
 
-// ── Placeholder tabs (navigate to full screens) ──────────
-class _ShopTab extends StatelessWidget { const _ShopTab(); @override Widget build(BuildContext ctx) => const ShopTabContent(); }
-class _AITab extends StatelessWidget { const _AITab(); @override Widget build(BuildContext ctx) => const AITabContent(); }
-class _MandiTab extends StatelessWidget { const _MandiTab(); @override Widget build(BuildContext ctx) => const MandiTabContent(); }
-class _ProfileTab extends StatelessWidget { const _ProfileTab(); @override Widget build(BuildContext ctx) => const ProfileTabContent(); }
-
-// Stub content widgets (full versions in separate files)
-class ShopTabContent extends ConsumerWidget {
-  const ShopTabContent({super.key});
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('🛒 Shop'), backgroundColor: AppColors.primary),
-      body: const Center(child: Text('Shop screen — see shop_screen.dart')),
-    );
-  }
-}
-
+// ── AI Hub Tab ───────────────────────────────────────────
 class AITabContent extends StatelessWidget {
   const AITabContent({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(title: const Text('🤖 AI Tools'), backgroundColor: AppColors.primary),
       body: ListView(padding: const EdgeInsets.all(16), children: [
         _AICard('🧪', 'Soil Analysis', 'Analyze soil type & get fertilizer advice', () => context.push('/farmer/soil')),
         _AICard('🔬', 'Disease Detection', 'Identify crop diseases from photo', () => context.push('/farmer/disease')),
         _AICard('🌱', 'Crop Advisor', 'Get crop recommendations for your farm', () => context.push('/farmer/crop-advisor')),
         _AICard('💬', 'Kisan AI Chat', 'Chat in Marathi, Hindi or English', () => context.push('/farmer/kisan-ai')),
-        _AICard('📅', 'Crop Calendar', 'Monthly farming activities guide', () => context.push('/farmer/crop-advisor')),
       ]),
     );
   }
@@ -277,12 +248,13 @@ class _AICard extends StatelessWidget {
   Widget build(BuildContext context) => GestureDetector(
     onTap: onTap,
     child: Container(margin: const EdgeInsets.only(bottom: 12), padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border)),
+      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))]),
       child: Row(children: [
-        Container(width: 48, height: 48, decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(12)), child: Center(child: Text(emoji, style: const TextStyle(fontSize: 26)))),
+        Container(width: 52, height: 52, decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(14)), child: Center(child: Text(emoji, style: const TextStyle(fontSize: 28)))),
         const SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: AppTextStyles.headingSM),
+          Text(title, style: AppTextStyles.headingMD),
+          const SizedBox(height: 2),
           Text(desc, style: AppTextStyles.bodySM),
         ])),
         const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textTertiary),
@@ -291,90 +263,46 @@ class _AICard extends StatelessWidget {
   );
 }
 
-class MandiTabContent extends ConsumerWidget {
-  const MandiTabContent({super.key});
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final mandi = ref.watch(mandiProvider(null));
-    return Scaffold(
-      appBar: AppBar(title: const Text('📈 Mandi Prices'), backgroundColor: AppColors.primary, actions: [
-        IconButton(icon: const Icon(Icons.refresh), onPressed: () => ref.invalidate(mandiProvider)),
-      ]),
-      body: mandi.when(
-        loading: () => const AppShimmerList(),
-        error: (e, _) => AppErrorState(message: 'Could not load mandi prices', onRetry: () => ref.invalidate(mandiProvider)),
-        data: (data) {
-          final prices = data['prices'] as List? ?? [];
-          if (prices.isEmpty) return const AppEmptyState(icon: '🌾', title: 'No Mandi Data', subtitle: 'Could not find prices for your area');
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: prices.length,
-            itemBuilder: (ctx, i) {
-              final p = prices[i] as Map;
-              final up = (p['change'] as num? ?? 0) >= 0;
-              return Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.border)),
-                child: Row(children: [
-                  Text(p['emoji'] as String? ?? '🌾', style: const TextStyle(fontSize: 28)),
-                  const SizedBox(width: 12),
-                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(p['crop'] as String? ?? '', style: AppTextStyles.headingSM),
-                    Text('₹${p['price']} / quintal', style: AppTextStyles.price.copyWith(fontSize: 16)),
-                  ])),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: (up ? AppColors.success : AppColors.error).withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
-                    child: Text('${up ? '↑' : '↓'} ${(p['change'] as num? ?? 0).abs().toStringAsFixed(1)}%',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: up ? AppColors.success : AppColors.error)),
-                  ),
-                ]),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
+class _HomeWeatherWidget extends StatelessWidget {
+  final AsyncValue dashboard;
+  const _HomeWeatherWidget({required this.dashboard});
 
-class ProfileTabContent extends ConsumerWidget {
-  const ProfileTabContent({super.key});
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authProvider);
-    final user = auth.user;
-    return Scaffold(
-      appBar: AppBar(title: const Text('👤 Profile'), backgroundColor: AppColors.primary, actions: [
-        IconButton(icon: const Icon(Icons.logout), onPressed: () async {
-          await ref.read(authProvider.notifier).logout();
-          context.go('/auth/role');
-        }),
-      ]),
-      body: ListView(padding: const EdgeInsets.all(20), children: [
-        Center(child: Column(children: [
-          Container(width: 80, height: 80, decoration: BoxDecoration(color: AppColors.primarySurface, shape: BoxShape.circle),
-            child: Center(child: Text(user?.initials ?? 'U', style: AppTextStyles.headingXL.copyWith(color: AppColors.primary)))),
-          const SizedBox(height: 12),
-          Text(user?.name ?? '', style: AppTextStyles.headingXL),
-          Text(user?.phone ?? '', style: AppTextStyles.bodySM),
-          const SizedBox(height: 4),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(20)),
-            child: Text(user?.role ?? '', style: AppTextStyles.labelMD.copyWith(color: AppColors.primary))),
-        ])),
-        const SizedBox(height: 28),
-        ...[
-          ['📦', 'My Orders', '/farmer/orders'],
-          ['🏛️', 'Govt Schemes', '/farmer/schemes'],
-          ['🔔', 'Notifications', '/notifications'],
-          ['⚙️', 'Settings', '/farmer/profile'],
-        ].map((item) => ListTile(
-          leading: Text(item[0], style: const TextStyle(fontSize: 22)),
-          title: Text(item[1], style: AppTextStyles.bodyMD),
-          trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textTertiary),
-          onTap: () => context.push(item[2]),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        )),
-      ]),
+  Widget build(BuildContext context) {
+    return dashboard.when(
+      loading: () => const AppShimmerCard(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (data) {
+        final w = data['weather'];
+        if (w == null) return const SizedBox.shrink();
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF4FC3F7), Color(0xFF0288D1)]
+            ), 
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [BoxShadow(color: const Color(0xFF0288D1).withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 6))]
+          ),
+          child: Row(children: [
+            const Text('☀️', style: TextStyle(fontSize: 38)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('${w['main']?['temp']?.toStringAsFixed(0) ?? '--'}°C', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.white)),
+                Text('${w['name'] ?? 'Your Location'} · ${w['weather']?[0]?['main'] ?? ''}', style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600)),
+              ]),
+            ),
+            ElevatedButton(
+              onPressed: () => context.push('/farmer/weather'),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.white.withOpacity(0.2), foregroundColor: Colors.white, elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 12)),
+              child: const Text('Details', style: TextStyle(fontSize: 12)),
+            ),
+          ]),
+        );
+      },
     );
   }
 }
