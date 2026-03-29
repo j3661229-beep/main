@@ -1,0 +1,9 @@
+{
+    "name": "agrimart-root",
+    "private": true,
+    "scripts": {
+        "preinstall": "cd agrimart-backend && npm install",
+        "build": "cd agrimart-backend && npm run build",
+        "start": "cd agrimart-backend && npm start"
+    }
+}
