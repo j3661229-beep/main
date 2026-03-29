@@ -97,3 +97,6 @@ GoogleService-Info.plist
 # Local HTML previews
 agrimart_all_screens.html
 agrimart_complete_ui.html
+
+# Archives (do not commit backups)
+*.zip
