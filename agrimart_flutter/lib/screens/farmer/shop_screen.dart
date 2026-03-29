@@ -37,82 +37,156 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         title: const Text('🛒 Agri Shop'),
         actions: [
           Stack(children: [
-            IconButton(icon: const Icon(Icons.shopping_cart_outlined, color: Colors.white), onPressed: () => context.push('/farmer/cart')),
-            if (cartCount > 0) Positioned(right: 6, top: 6,
-              child: Container(width: 16, height: 16, decoration: const BoxDecoration(color: AppColors.amberLight, shape: BoxShape.circle),
-                child: Center(child: Text('$cartCount', style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: AppColors.primaryDark))))),
+            IconButton(
+                icon: const Icon(Icons.shopping_cart_outlined,
+                    color: Colors.white),
+                onPressed: () => context.push('/farmer/cart')),
+            if (cartCount > 0)
+              Positioned(
+                  right: 6,
+                  top: 6,
+                  child: Container(
+                      width: 16,
+                      height: 16,
+                      decoration: const BoxDecoration(
+                          color: AppColors.amberLight, shape: BoxShape.circle),
+                      child: Center(
+                          child: Text('$cartCount',
+                              style: const TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.primaryDark))))),
           ]),
         ],
       ),
       body: Column(children: [
         // Search + filters
-        Container(color: AppColors.primary, padding: const EdgeInsets.fromLTRB(16, 0, 16, 16), child: Column(children: [
-          TextField(
-            controller: _searchCtrl,
-            decoration: InputDecoration(
-              fillColor: Colors.white,
-              hintText: 'Search seeds, fertilizers…',
-              prefixIcon: const Icon(Icons.search, color: AppColors.textTertiary),
-              suffixIcon: _search.isNotEmpty ? IconButton(icon: const Icon(Icons.clear, color: AppColors.textTertiary), onPressed: () { _searchCtrl.clear(); setState(() => _search = ''); }) : null,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-            ),
-            onChanged: (v) => setState(() => _search = v),
-          ),
-          const SizedBox(height: 16),
-          // Awesome Hero Banner
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFFFFD700), Color(0xFFF59E0B)]),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 10, offset: const Offset(0, 4))],
-            ),
-            child: const Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('KHARIF SPECIAL', style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 1.2)),
-                SizedBox(height: 6),
-                Text('Up to 40% Off\non Fertilizers', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, height: 1.15)),
-              ]),
-              Text('🚜', style: TextStyle(fontSize: 54)),
-            ]),
-          ),
-          const SizedBox(height: 16),
-          // Featured / Top Rated
-          const Align(alignment: Alignment.centerLeft, child: Text('🔥 Hot Deals', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 0.5))),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 100,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                _FeaturedItem('🍅', 'Hybrid Seeds', 'Flat 20% OFF'),
-                _FeaturedItem('🧪', 'Soil Test Kit', '₹299 Only'),
-                _FeaturedItem('⚙️', 'Sprayer', 'Bestseller'),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          // Category chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(children: [
-              _CatChip('All', '', _category == '', () => setState(() => _category = '')),
-              ...AppConstants.categories.map((c) => _CatChip(c['icon']! + ' ' + c['label']!, c['key']!, _category == c['key'], () => setState(() => _category = c['key']!))),
-            ]),
-          ),
-        ])),
+        Container(
+            color: AppColors.primary,
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Column(children: [
+              TextField(
+                controller: _searchCtrl,
+                decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  hintText: 'Search seeds, fertilizers…',
+                  prefixIcon:
+                      const Icon(Icons.search, color: AppColors.textTertiary),
+                  suffixIcon: _search.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear,
+                              color: AppColors.textTertiary),
+                          onPressed: () {
+                            _searchCtrl.clear();
+                            setState(() => _search = '');
+                          })
+                      : null,
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none),
+                ),
+                onChanged: (v) => setState(() => _search = v),
+              ),
+              const SizedBox(height: 16),
+              // Awesome Hero Banner
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                      colors: [Color(0xFFFFD700), Color(0xFFF59E0B)]),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4))
+                  ],
+                ),
+                child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('KHARIF SPECIAL',
+                                style: TextStyle(
+                                    color: AppColors.primaryDark,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 12,
+                                    letterSpacing: 1.2)),
+                            SizedBox(height: 6),
+                            Text('Up to 40% Off\non Fertilizers',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1.15)),
+                          ]),
+                      Text('🚜', style: TextStyle(fontSize: 54)),
+                    ]),
+              ),
+              const SizedBox(height: 16),
+              // Featured / Top Rated
+              const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('🔥 Hot Deals',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5))),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 100,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    _FeaturedItem('🍅', 'Hybrid Seeds', 'Flat 20% OFF'),
+                    _FeaturedItem('🧪', 'Soil Test Kit', '₹299 Only'),
+                    _FeaturedItem('⚙️', 'Sprayer', 'Bestseller'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Category chips
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(children: [
+                  _CatChip('All', '', _category == '',
+                      () => setState(() => _category = '')),
+                  ...AppConstants.categories.map((c) => _CatChip(
+                      c['icon']! + ' ' + c['label']!,
+                      c['key']!,
+                      _category == c['key'],
+                      () => setState(() => _category = c['key']!))),
+                ]),
+              ),
+            ])),
 
         // Products
-        Expanded(child: products.when(
+        Expanded(
+            child: products.when(
           loading: () => const AppShimmerGrid(),
-          error: (e, _) => AppErrorState(message: 'Could not load products from the catalog', onRetry: () => ref.invalidate(productsProvider)),
+          error: (e, _) => AppErrorState(
+              message: 'Could not load products from the catalog',
+              onRetry: () => ref.invalidate(productsProvider)),
           data: (data) {
             final list = data['data'] as List? ?? [];
-            if (list.isEmpty) return const AppEmptyState(icon: '🌿', title: 'No products found', subtitle: 'Try clearing your search or category filters');
+            if (list.isEmpty)
+              return const AppEmptyState(
+                  icon: '🌿',
+                  title: 'No products found',
+                  subtitle: 'Try clearing your search or category filters');
             return GridView.builder(
               padding: const EdgeInsets.all(14),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.72, crossAxisSpacing: 12, mainAxisSpacing: 12),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.72,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12),
               itemCount: list.length,
               itemBuilder: (ctx, i) => _ProductCard(product: list[i] as Map),
             );
@@ -130,18 +204,24 @@ class _CatChip extends StatelessWidget {
   const _CatChip(this.label, this.value, this.active, this.onTap);
   @override
   Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-      decoration: BoxDecoration(
-        color: active ? AppColors.amberLight : Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w700 : FontWeight.w500, color: active ? AppColors.primaryDark : Colors.white)),
-    ),
-  );
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.only(right: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            color: active
+                ? AppColors.amberLight
+                : Colors.white.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(label,
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                  color: active ? AppColors.primaryDark : Colors.white)),
+        ),
+      );
 }
 
 class _ProductCard extends ConsumerWidget {
@@ -154,45 +234,86 @@ class _ProductCard extends ConsumerWidget {
       onTap: () => context.push('/farmer/shop/product/${product['id']}'),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white, 
-          borderRadius: BorderRadius.circular(16), 
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 12, offset: const Offset(0, 4))],
-          border: Border.all(color: AppColors.border.withOpacity(0.3))
-        ),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4))
+            ],
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.3))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           // Image
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
             child: Container(
-              height: 120, width: double.infinity,
+              height: 120,
+              width: double.infinity,
               color: AppColors.primarySurface,
-              child: product['images'] is List && (product['images'] as List).isNotEmpty
-                ? Image.network(product['images'][0], fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Center(child: Text('🌿', style: TextStyle(fontSize: 40))))
-                : const Center(child: Text('🌿', style: TextStyle(fontSize: 40))),
+              child: product['images'] is List &&
+                      (product['images'] as List).isNotEmpty
+                  ? Image.network(product['images'][0],
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Center(
+                          child: Text('🌿', style: TextStyle(fontSize: 40))))
+                  : const Center(
+                      child: Text('🌿', style: TextStyle(fontSize: 40))),
             ),
           ),
-          Padding(padding: const EdgeInsets.all(10), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            if (product['isOrganic'] == true) const Text('🌱 Organic', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.success)),
-            Text(product['name'] ?? '', style: AppTextStyles.headingSM, maxLines: 2, overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 2),
-            Text(product['brand'] ?? '', style: AppTextStyles.caption),
-            const SizedBox(height: 6),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('₹${product['price']}', style: AppTextStyles.priceSmall),
-                Text('/${product['unit']}', style: AppTextStyles.caption),
-              ]),
-              GestureDetector(
-                onTap: () async {
-                  try {
-                    await ref.read(cartProvider.notifier).addItem(product['id'], 1);
-                    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Added to cart ✅'), backgroundColor: AppColors.primary, duration: Duration(seconds: 1)));
-                  } catch (_) {}
-                },
-                child: Container(padding: const EdgeInsets.all(8), decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle), child: const Icon(Icons.shopping_cart_outlined, color: Colors.white, size: 18)),
-              ),
-            ]),
-          ])),
+          Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (product['isOrganic'] == true)
+                      const Text('🌱 Organic',
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.success)),
+                    Text(product['name'] ?? '',
+                        style: AppTextStyles.headingSM,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 2),
+                    Text(product['brand'] ?? '', style: AppTextStyles.caption),
+                    const SizedBox(height: 6),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('₹${product['price']}',
+                                    style: AppTextStyles.priceSmall),
+                                Text('/${product['unit']}',
+                                    style: AppTextStyles.caption),
+                              ]),
+                          GestureDetector(
+                            onTap: () async {
+                              try {
+                                await ref
+                                    .read(cartProvider.notifier)
+                                    .addItem(product['id'], 1);
+                                if (context.mounted)
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text('Added to cart ✅'),
+                                          backgroundColor: AppColors.primary,
+                                          duration: Duration(seconds: 1)));
+                              } catch (_) {}
+                            },
+                            child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: const BoxDecoration(
+                                    color: AppColors.primary,
+                                    shape: BoxShape.circle),
+                                child: const Icon(Icons.shopping_cart_outlined,
+                                    color: Colors.white, size: 18)),
+                          ),
+                        ]),
+                  ])),
         ]),
       ),
     );
@@ -204,13 +325,30 @@ class _FeaturedItem extends StatelessWidget {
   const _FeaturedItem(this.icon, this.title, this.deal);
   @override
   Widget build(BuildContext context) => Container(
-    width: 140, margin: const EdgeInsets.only(right: 10), padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(color: Colors.white.withOpacity(0.12), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white.withOpacity(0.2))),
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [Text(icon, style: const TextStyle(fontSize: 18)), const Spacer(), const Icon(Icons.arrow_forward_ios, size: 10, color: Colors.white)]),
-      const Spacer(),
-      Text(title, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-      Text(deal, style: const TextStyle(color: AppColors.amberLight, fontSize: 10, fontWeight: FontWeight.w900)),
-    ]),
-  );
+        width: 140,
+        margin: const EdgeInsets.only(right: 10),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.2))),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Text(icon, style: const TextStyle(fontSize: 18)),
+            const Spacer(),
+            const Icon(Icons.arrow_forward_ios, size: 10, color: Colors.white)
+          ]),
+          const Spacer(),
+          Text(title,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold)),
+          Text(deal,
+              style: const TextStyle(
+                  color: AppColors.amberLight,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900)),
+        ]),
+      );
 }

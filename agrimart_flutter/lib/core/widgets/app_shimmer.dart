@@ -60,7 +60,8 @@ class AppShimmerList extends StatelessWidget {
                     width: 100,
                     decoration: const BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.horizontal(left: Radius.circular(16)),
+                      borderRadius:
+                          BorderRadius.horizontal(left: Radius.circular(16)),
                     ),
                   ),
                   Expanded(
@@ -69,9 +70,13 @@ class AppShimmerList extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(width: double.infinity, height: 16, color: Colors.white),
+                          Container(
+                              width: double.infinity,
+                              height: 16,
+                              color: Colors.white),
                           const SizedBox(height: 8),
-                          Container(width: 150, height: 12, color: Colors.white),
+                          Container(
+                              width: 150, height: 12, color: Colors.white),
                           const Spacer(),
                           Container(width: 80, height: 16, color: Colors.white),
                         ],
@@ -120,7 +125,8 @@ class AppShimmerGrid extends StatelessWidget {
                   height: 120,
                   decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(16)),
                   ),
                 ),
                 Padding(
@@ -128,7 +134,10 @@ class AppShimmerGrid extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(width: double.infinity, height: 14, color: Colors.white),
+                      Container(
+                          width: double.infinity,
+                          height: 14,
+                          color: Colors.white),
                       const SizedBox(height: 6),
                       Container(width: 100, height: 10, color: Colors.white),
                       const SizedBox(height: 12),
@@ -161,6 +170,75 @@ class AppShimmerCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
         ),
       ),
+    );
+  }
+}
+
+/// Full-page placeholder for weather: hero card + advisory + stats strip.
+class AppShimmerWeatherLayout extends StatelessWidget {
+  const AppShimmerWeatherLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SingleChildScrollView(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AppShimmer(width: double.infinity, height: 240, borderRadius: 20),
+          SizedBox(height: 16),
+          AppShimmer(width: double.infinity, height: 88, borderRadius: 16),
+          SizedBox(height: 16),
+          AppShimmer(width: double.infinity, height: 72, borderRadius: 16),
+        ],
+      ),
+    );
+  }
+}
+
+/// Profile tab: header card + settings rows while auth is loading.
+class AppShimmerProfileLayout extends StatelessWidget {
+  const AppShimmerProfileLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        Shimmer.fromColors(
+          baseColor: AppColors.border,
+          highlightColor: AppColors.surface,
+          child: Container(
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        const AppShimmer(width: 120, height: 12, borderRadius: 6),
+        const SizedBox(height: 12),
+        ...List.generate(
+          5,
+          (i) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Shimmer.fromColors(
+              baseColor: AppColors.border,
+              highlightColor: AppColors.surface,
+              child: Container(
+                height: 64,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const AppShimmer(width: double.infinity, height: 56, borderRadius: 16),
+      ],
     );
   }
 }

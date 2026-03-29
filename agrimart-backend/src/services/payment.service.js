@@ -96,4 +96,25 @@ const requestRefund = async ({ orderId, amount, reason }) => {
     return refund;
 };
 
-module.exports = { createPaymentOrder, verifyPayment, getPayment, handleWebhook, requestRefund };
+const confirmCashOnDelivery = async (orderId, farmerId) => {
+    const order = await prisma.order.findFirst({ where: { id: orderId, farmerId } });
+    if (!order) throw Object.assign(new Error('Order not found'), { statusCode: 404 });
+    if (order.paymentStatus !== 'PENDING') {
+        throw Object.assign(new Error('Payment already processed for this order'), { statusCode: 400 });
+    }
+
+    await prisma.payment.upsert({
+        where: { orderId },
+        create: { orderId, amount: order.totalAmount, status: 'PENDING', method: 'cod' },
+        update: { method: 'cod', status: 'PENDING' },
+    });
+
+    await prisma.order.update({
+        where: { id: orderId },
+        data: { status: 'PROCESSING', paymentStatus: 'PENDING' },
+    });
+
+    return { orderId, status: 'PROCESSING', paymentMethod: 'cod' };
+};
+
+module.exports = { createPaymentOrder, verifyPayment, getPayment, handleWebhook, requestRefund, confirmCashOnDelivery };

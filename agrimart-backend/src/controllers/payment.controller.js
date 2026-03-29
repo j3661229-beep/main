@@ -20,5 +20,14 @@ const handleWebhook = async (req, res, next) => {
 const requestRefund = async (req, res, next) => {
     try { success(res, await paymentService.requestRefund(req.body), 'Refund initiated'); } catch (e) { next(e); }
 };
+const confirmCashOnDelivery = async (req, res, next) => {
+    try {
+        success(
+            res,
+            await paymentService.confirmCashOnDelivery(req.body.orderId, req.user.farmer.id),
+            'Cash on delivery selected'
+        );
+    } catch (e) { next(e); }
+};
 
-module.exports = { createOrder, verifyPayment, getPayment, handleWebhook, requestRefund };
+module.exports = { createOrder, verifyPayment, getPayment, handleWebhook, requestRefund, confirmCashOnDelivery };
