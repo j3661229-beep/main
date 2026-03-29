@@ -5,7 +5,7 @@ class AppConstants {
   // Using 172.20.10.2 to allow your physical Xiaomi device to connect to your PC's locally running backend
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://172.20.10.2:3000/api', 
+    defaultValue: 'https://main-production-8b35.up.railway.app/api', 
   );
 
   // Storage keys

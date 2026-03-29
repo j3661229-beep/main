@@ -43,6 +43,10 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Health check
+app.get('/', (req, res) => {
+  res.json({ success: true, message: '🌾 AgriMart API is LIVE', documentation: '/health' });
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'agrimart-api', version: '1.0.0', timestamp: new Date().toISOString() });
 });

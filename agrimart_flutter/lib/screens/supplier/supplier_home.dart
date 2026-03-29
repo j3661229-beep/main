@@ -323,7 +323,7 @@ class _OrderCard extends ConsumerWidget {
         const Divider(height: 1),
         const SizedBox(height: 12),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          const Text('Update Status:', style: AppTextStyles.labelSM),
+          const Text('Update Status:', style: AppTextStyles.labelMD),
           DropdownButton<String>(
             value: status,
             isDense: true,
