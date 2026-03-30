@@ -97,8 +97,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           const SizedBox(width: 8),
                           _InfoChip('📦 Stock: ${p['stockQuantity']}'),
                           const SizedBox(width: 8),
-                          _InfoChip(
-                              '⭐ ${(p['avgRating'] ?? 0).toStringAsFixed(1)}'),
+                          _InfoChip('🏬 In-Store Pickup'),
                         ]),
                         const SizedBox(height: 20),
                         const Text('Description',
@@ -171,10 +170,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         await ref
                             .read(cartProvider.notifier)
                             .addItem(widget.productId, _quantity);
-                        if (context.mounted) {
+                            if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                  content: Text('Added $_quantity to cart ✅'),
+                                  content: Text('Reserved $_quantity unit(s) ✅'),
                                   backgroundColor: AppColors.primary));
                         }
                       } catch (e) {
@@ -186,7 +185,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         }
                       }
                     },
-                    child: const Text('Add to Cart 🛒', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    child: const Text('Reserve for Pickup 🏬', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   )),
                 ])),
               )),

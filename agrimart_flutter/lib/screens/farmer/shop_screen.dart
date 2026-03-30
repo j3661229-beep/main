@@ -38,7 +38,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         actions: [
           Stack(children: [
             IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined,
+                icon: const Icon(Icons.storefront_outlined,
                     color: Colors.white),
                 onPressed: () => context.push('/farmer/cart')),
             if (cartCount > 0)

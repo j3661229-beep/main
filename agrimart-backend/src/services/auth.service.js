@@ -57,6 +57,9 @@ const verifyOTP = async ({ phone, otp, name, language, role }) => {
 
     // Find or create user
     let user = await prisma.user.findUnique({ where: { phone: formatted } });
+    if (user && user.role !== role) {
+        throw Object.assign(new Error(`This number is registered as a ${user.role}. Cannot login as ${role}.`), { statusCode: 403 });
+    }
     if (!user) {
         user = await prisma.user.create({
             data: { phone: formatted, name: name || 'AgriMart User', role: role || 'FARMER', language: language || 'marathi' },
@@ -101,8 +104,40 @@ const refreshToken = async (token) => {
     return { token: newToken, refreshToken: newRefresh };
 };
 
+const completeOnboarding = async (userId, role, data) => {
+    await prisma.user.update({
+        where: { id: userId },
+        data: { isVerified: true, name: data.name },
+    });
+
+    if (role === 'FARMER') {
+        await prisma.farmer.update({
+            where: { userId },
+            data: {
+                village: data.village || '',
+                district: data.district || '',
+                farmSizeAcres: data.farmSizeAcres != null ? parseFloat(data.farmSizeAcres) : 0,
+            }
+        });
+    } else if (role === 'SUPPLIER') {
+        await prisma.supplier.update({
+            where: { userId },
+            data: {
+                businessName: data.businessName || '',
+                address: data.address || '',
+                district: data.district || '',
+                isVerified: true
+            }
+        });
+    }
+
+    return prisma.user.findUnique({
+        where: { id: userId }, include: { farmer: true, supplier: true },
+    });
+};
+
 const logout = async (token) => {
     await prisma.session.deleteMany({ where: { token } });
 };
 
-module.exports = { sendOTP, verifyOTP, refreshToken, logout };
+module.exports = { sendOTP, verifyOTP, refreshToken, completeOnboarding, logout };

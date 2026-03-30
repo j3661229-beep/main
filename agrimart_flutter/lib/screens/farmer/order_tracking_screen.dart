@@ -27,7 +27,44 @@ class OrderTrackingScreen extends ConsumerWidget {
             onRetry: () => ref.invalidate(orderTrackingProvider)),
         data: (data) {
           final backendSteps = (data['tracking'] as List? ?? []);
+          final order = data['order'] as Map? ?? {};
+          final items = order['items'] as List? ?? [];
+          final supplier = items.isNotEmpty ? items.first['supplier'] : null;
+          final storeName = supplier != null ? supplier['businessName'] : 'Store';
+          final storeAddress = supplier != null ? supplier['address'] : 'Address unavailable';
+          final parsedAddress = storeAddress.split(' | MAP: ');
+          final cleanAddress = parsedAddress[0];
+          final mapLink = parsedAddress.length > 1 ? parsedAddress[1] : null;
+
           return ListView(padding: const EdgeInsets.all(24), children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.primarySurface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.primaryBorder),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   Row(children: [
+                     const Icon(Icons.storefront, color: AppColors.primaryDark),
+                     const SizedBox(width: 8),
+                     const Text('Pickup Location', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
+                   ]),
+                   const SizedBox(height: 12),
+                   Text(storeName, style: AppTextStyles.headingLG),
+                   const SizedBox(height: 4),
+                   SelectableText(cleanAddress, style: AppTextStyles.bodyMD),
+                   if (mapLink != null) ...[
+                     const SizedBox(height: 12),
+                     const Text('📍 Map Link:', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
+                     SelectableText(mapLink, style: const TextStyle(color: Colors.blue, decoration: TextDecoration.underline)),
+                   ]
+                ]
+              )
+            ),
+            const SizedBox(height: 32),
             const Text('Tracking History', style: AppTextStyles.headingLG),
             const SizedBox(height: 24),
             ...backendSteps.asMap().entries.map((e) {
@@ -73,7 +110,6 @@ class OrderTrackingScreen extends ConsumerWidget {
                     ),
                   ]);
             }),
-            const SizedBox(height: 24),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -88,15 +124,15 @@ class OrderTrackingScreen extends ConsumerWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(12)),
-                    child: const Center(child: Text('📈', style: TextStyle(fontSize: 24)))),
+                    child: const Center(child: Text('🏬', style: TextStyle(fontSize: 24)))),
                 const SizedBox(width: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Delivery Progress',
+                    const Text('Pickup Progress',
                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
                     const SizedBox(height: 4),
-                    Text('${data['progressPercent'] ?? 0}% completed',
+                    Text('${data['progressPercent'] ?? 0}% ready',
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.primaryDark)),
                   ],
                 ),

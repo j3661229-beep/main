@@ -41,4 +41,11 @@ const me = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
-module.exports = { sendOTP, verifyOTP, refreshToken, logout, me };
+const completeOnboarding = async (req, res, next) => {
+    try {
+        const data = await authService.completeOnboarding(req.user.id, req.user.role, req.body);
+        success(res, data, 'Profile setup complete');
+    } catch (err) { next(err); }
+};
+
+module.exports = { sendOTP, verifyOTP, refreshToken, logout, me, completeOnboarding };

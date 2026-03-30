@@ -77,6 +77,29 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> completeOnboarding(Map<String, dynamic> data) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final res = await _api.completeOnboarding(data);
+      // The API returns the full user object including the updated profile and isVerified: true
+      // We don't get a new token here (don't strictly need one for `isVerified` change)
+      // but we *do* need to update the cached user.
+      if (res['user'] == null) {
+          // If the backend returns wrapped or unwrapped user
+          final user = UserModel.fromJson(res);
+          await _storage.write(key: AppConstants.userKey, value: jsonEncode(res));
+          state = AuthState(user: user, isAuthenticated: true);
+      } else {
+          final user = UserModel.fromJson(res['user']);
+          await _storage.write(key: AppConstants.userKey, value: jsonEncode(res['user']));
+          state = AuthState(user: user, isAuthenticated: true);
+      }
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: _parseError(e));
+      rethrow;
+    }
+  }
+
   Future<void> logout() async {
     await _api.logout();
     state = const AuthState();

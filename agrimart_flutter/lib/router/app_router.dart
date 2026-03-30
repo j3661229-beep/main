@@ -7,6 +7,7 @@ import '../screens/auth/role_selection_screen.dart';
 import '../screens/auth/phone_screen.dart';
 import '../screens/auth/otp_screen.dart';
 import '../screens/auth/onboarding_screen.dart';
+import '../screens/auth/profile_setup_screen.dart';
 import '../screens/farmer/farmer_home.dart';
 import '../screens/farmer/shop_screen.dart';
 import '../screens/farmer/product_detail_screen.dart';
@@ -40,7 +41,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         return null;
       }
       if (authState.isAuthenticated) {
-        if (state.matchedLocation.startsWith('/auth') || state.matchedLocation == '/splash') {
+        if (!authState.user!.isVerified && state.matchedLocation != '/auth/setup') {
+          return '/auth/setup';
+        }
+        if (authState.user!.isVerified && (state.matchedLocation.startsWith('/auth') || state.matchedLocation == '/splash')) {
           return authState.user!.isFarmer ? '/farmer' : '/supplier';
         }
       }
@@ -59,7 +63,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         final extra = state.extra as Map<String, String>? ?? {};
         return OTPScreen(phone: extra['phone'] ?? '', role: extra['role'] ?? 'FARMER');
       }),
-      GoRoute(path: '/auth/onboarding', builder: (_, __) => const OnboardingScreen()),
+      GoRoute(path: '/auth/onboarding', builder: (_, __) => const OnboardingScreen()), // The animated tour
+      GoRoute(path: '/auth/setup', builder: (_, __) => const ProfileSetupScreen()), // The mandatory info form
 
       // Farmer
       GoRoute(path: '/farmer', builder: (_, __) => const FarmerHome()),

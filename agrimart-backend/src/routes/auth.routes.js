@@ -9,5 +9,6 @@ router.post('/verify-otp', otpLimiter, authController.verifyOTP);
 router.post('/refresh-token', apiLimiter, authController.refreshToken);
 router.post('/logout', authenticate, authController.logout);
 router.get('/me', authenticate, authController.me);
+router.post('/onboarding', authenticate, authController.completeOnboarding);
 
 module.exports = router;

@@ -69,6 +69,11 @@ class _MandiChartScreenState extends ConsumerState<MandiChartScreen> {
 
           minPrice = minPrice * 0.98;
           maxPrice = maxPrice * 1.02;
+          
+          if (maxPrice == minPrice) {
+            minPrice = (minPrice > 0 ? minPrice : 100) * 0.9;
+            maxPrice = (maxPrice > 0 ? maxPrice : 100) * 1.1;
+          }
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,

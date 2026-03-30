@@ -17,7 +17,7 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 }
 
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
-  final _addrCtrl = TextEditingController();
+  String _pickupTime = 'Today, 10:00 AM - 12:00 PM';
   late Razorpay _razorpay;
   bool _placing = false;
   String? _pendingOrderId;
@@ -34,21 +34,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   @override
   void dispose() {
     _razorpay.clear();
-    _addrCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _placeOrder() async {
-    if (_addrCtrl.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enter delivery address')));
-      return;
-    }
     setState(() => _placing = true);
     try {
       // 1. Create order
+      // We send the _pickupTime to the backend in the deliveryAddress field to fulfill BOPIS logic without schema changes
       final order = await ApiService.instance
-          .createOrder(deliveryAddress: _addrCtrl.text.trim());
+          .createOrder(deliveryAddress: 'In-Store Pickup: $_pickupTime');
       _pendingOrderId = order['id'] as String;
       if (_paymentMethod == 'COD') {
         await ApiService.instance.confirmCashOnDelivery(_pendingOrderId!);
@@ -130,7 +125,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           return Column(children: [
             Expanded(
                 child: ListView(padding: const EdgeInsets.all(20), children: [
-              const Text('Delivery Address', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+              const Text('Store Pickup Time', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
               const SizedBox(height: 12),
               Container(
                 decoration: BoxDecoration(
@@ -140,14 +135,23 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))
                   ]
                 ),
-                child: TextFormField(
-                    controller: _addrCtrl,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                        hintText: 'Enter complete village / local address...',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                        contentPadding: const EdgeInsets.all(16),
-                        hintStyle: TextStyle(color: AppColors.textTertiary, fontSize: 13))),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _pickupTime,
+                    isExpanded: true,
+                    icon: const Icon(Icons.storefront_outlined, color: AppColors.primary),
+                    items: [
+                      'Today, 10:00 AM - 12:00 PM',
+                      'Today, 2:00 PM - 5:00 PM',
+                      'Tomorrow, 9:00 AM - 12:00 PM',
+                      'Tomorrow, 1:00 PM - 5:00 PM',
+                    ].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontWeight: FontWeight.w600)))).toList(),
+                    onChanged: (v) {
+                      if (v != null) setState(() => _pickupTime = v);
+                    },
+                  ),
+                ),
               ),
               const SizedBox(height: 32),
               const Text('Payment Method', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),

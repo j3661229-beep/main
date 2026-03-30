@@ -55,6 +55,11 @@ class ApiService {
     return r.data['data'];
   }
 
+  Future<Map> completeOnboarding(Map<String, dynamic> data) async {
+    final r = await _dio.post('/auth/onboarding', data: data);
+    return r.data['data'];
+  }
+
   Future<void> logout() async {
     try {
       await _dio.post('/auth/logout');

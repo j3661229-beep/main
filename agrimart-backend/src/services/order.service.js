@@ -77,17 +77,32 @@ const cancelOrder = async (farmerId, orderId) => {
 
 const getTracking = async (farmerId, orderId) => {
     const order = await getOrder(farmerId, orderId);
-    const steps = ['PENDING', 'PAYMENT_CONFIRMED', 'PROCESSING', 'DISPATCHED', 'OUT_FOR_DELIVERY', 'DELIVERED'];
-    const currentIndex = steps.indexOf(order.status);
+
+    // We map existing enums to the BOPIS model
+    const trackingMap = [
+        { status: 'PENDING', label: 'Order Placed' },
+        { status: 'PROCESSING', label: 'Preparing Order' },
+        { status: 'DISPATCHED', label: 'Ready for Pickup' },
+        { status: 'DELIVERED', label: 'Picked Up' }
+    ];
+
+    // Normalize DB status to one of these 4 if needed (e.g. PAYMENT_CONFIRMED -> PENDING step basically)
+    let currentStatus = order.status;
+    if (currentStatus === 'PAYMENT_CONFIRMED') currentStatus = 'PENDING';
+    if (currentStatus === 'OUT_FOR_DELIVERY') currentStatus = 'DELIVERED';
+
+    let currentIndex = trackingMap.findIndex(s => s.status === currentStatus);
+    if (currentIndex === -1) currentIndex = 0; // fallback if cancelled or weird
+
     return {
         order,
-        tracking: steps.map((step, i) => ({
-            status: step,
-            label: step.replace(/_/g, ' '),
+        tracking: trackingMap.map((step, i) => ({
+            status: step.status,
+            label: step.label,
             completed: i <= currentIndex,
             current: i === currentIndex,
         })),
-        progressPercent: Math.round((currentIndex / (steps.length - 1)) * 100),
+        progressPercent: Math.round((currentIndex / (trackingMap.length - 1)) * 100),
     };
 };
 

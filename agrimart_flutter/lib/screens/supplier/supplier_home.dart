@@ -257,7 +257,15 @@ class _SupplierOrdersTabState extends ConsumerState<_SupplierOrdersTab> with Sin
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white60,
           labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-          tabs: _statuses.map((s) => Tab(text: s)).toList(),
+          tabs: _statuses.map((s) {
+             final label = {
+                'All': 'All',
+                'PROCESSING': 'Preparing',
+                'DISPATCHED': 'Ready for Pickup',
+                'DELIVERED': 'Completed'
+             }[s] ?? s;
+             return Tab(text: label);
+          }).toList(),
         ),
       ),
       body: TabBarView(
@@ -331,8 +339,16 @@ class _OrderCard extends ConsumerWidget {
           DropdownButton<String>(
             value: safeStatus,
             isDense: true,
-            items: _allStatuses.map((s) =>
-              DropdownMenuItem(value: s, child: Text(s.replaceAll('_', ' '), style: TextStyle(fontSize: 12, color: statusColor, fontWeight: FontWeight.w600)))).toList(),
+            items: _allStatuses.map((s) {
+              final label = {
+                'PENDING': 'Awaiting Acceptance',
+                'PROCESSING': 'Preparing Order',
+                'DISPATCHED': 'Ready for Pickup',
+                'OUT_FOR_DELIVERY': 'Out for Delivery',
+                'DELIVERED': 'Picked Up'
+              }[s] ?? s.replaceAll('_', ' ');
+              return DropdownMenuItem(value: s, child: Text(label, style: TextStyle(fontSize: 12, color: statusColor, fontWeight: FontWeight.w600)));
+            }).toList(),
             onChanged: (s) async {
               if (s == null) return;
               await ApiService.instance.updateOrderStatus(order['id'] as String, s);
