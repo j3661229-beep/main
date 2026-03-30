@@ -61,11 +61,16 @@ const verifyOTP = async ({ phone, otp, name, language, role }) => {
         user = await prisma.user.create({
             data: { phone: formatted, name: name || 'AgriMart User', role: role || 'FARMER', language: language || 'marathi' },
         });
-        // Create role-specific profile
         if (user.role === 'FARMER') {
             await prisma.farmer.create({
                 data: {
                     userId: user.id, village: '', taluka: '', district: 'Maharashtra', pincode: '', farmSizeAcres: 0,
+                },
+            });
+        } else if (user.role === 'SUPPLIER') {
+            await prisma.supplier.create({
+                data: {
+                    userId: user.id, businessName: 'My Store', gstNumber: null, address: '', district: 'Maharashtra', pincode: '',
                 },
             });
         }
