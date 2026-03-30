@@ -1,4 +1,5 @@
 const prisma = require('../config/database');
+const { sendNotification } = require('./onesignal.service');
 
 const getSchemes = async ({ isActive }) => {
     return prisma.governmentScheme.findMany({
@@ -20,7 +21,7 @@ const getEligible = async (farmerId) => {
 };
 
 const createScheme = async (data) => {
-    return prisma.governmentScheme.create({
+    const scheme = await prisma.governmentScheme.create({
         data: {
             title: data.title,
             titleMarathi: data.titleMarathi,
@@ -35,6 +36,16 @@ const createScheme = async (data) => {
             isActive: data.isActive !== false,
         },
     });
+
+    // Notify ALL farmers (Don't await)
+    sendNotification({
+        segments: ["Subscribed Users"], // or "Farmers" if mapped
+        title: 'New Government Scheme 🏛️',
+        message: `${scheme.title} is now available. Check eligibility!`,
+        data: { schemeId: scheme.id, type: 'SCHEME' }
+    });
+
+    return scheme;
 };
 
 const updateScheme = async (id, data) => {

@@ -1,6 +1,7 @@
 const prisma = require('../config/database');
 const { uploadToSupabase } = require('../middleware/upload');
 const { haversineDistance } = require('../utils/helpers');
+const { sendNotification } = require('./onesignal.service');
 
 const getProducts = async ({ category, search, sort, district, lat, lng, radius = 50, page, limit, skip }) => {
     const where = { isActive: true, isApproved: true, stockQuantity: { gt: 0 } };
@@ -66,7 +67,7 @@ const getRecommended = async (farmerId) => {
 };
 
 const createProduct = async (supplierId, data) => {
-    return prisma.product.create({
+    const product = await prisma.product.create({
         data: {
             supplierId,
             name: data.name,
@@ -85,6 +86,23 @@ const createProduct = async (supplierId, data) => {
         },
         include: { supplier: true },
     });
+
+    // Notify farmers in the same district (Don't await to keep response fast)
+    prisma.farmer.findMany({
+        where: { district: { contains: product.supplier.district, mode: 'insensitive' } },
+        select: { userId: true }
+    }).then(farmers => {
+        if (farmers.length > 0) {
+            sendNotification({
+                users: farmers.map(f => f.userId),
+                title: 'New Product in Your Region 🌾',
+                message: `${product.name} is now available at ${product.supplier.businessName}!`,
+                data: { productId: product.id, type: 'PRODUCT' }
+            });
+        }
+    });
+
+    return product;
 };
 
 const updateProduct = async (supplierId, productId, data) => {

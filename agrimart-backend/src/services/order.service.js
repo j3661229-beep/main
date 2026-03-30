@@ -1,4 +1,5 @@
 const prisma = require('../config/database');
+const { sendNotification } = require('./onesignal.service');
 
 const createOrder = async (farmerId, { deliveryAddress, deliveryLat, deliveryLng, notes }) => {
     // Get cart
@@ -40,6 +41,16 @@ const createOrder = async (farmerId, { deliveryAddress, deliveryLat, deliveryLng
         // Clear cart
         await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
         return newOrder;
+    });
+
+    // Notify Suppliers (Don't await)
+    order.items.forEach(item => {
+        sendNotification({
+            users: [item.supplier.user.id],
+            title: 'New Order Received! 📦',
+            message: `You have a new order for ${item.product.name} from a farmer.`,
+            data: { orderId: order.id, type: 'ORDER' }
+        });
     });
 
     return order;

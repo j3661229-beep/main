@@ -207,19 +207,21 @@ class ApiService {
   }
 
   // ── AI ────────────────────────────────────────────────────
-  Future<Map> analyzeSoil(String imagePath, {String? location}) async {
+  Future<Map> analyzeSoil(String imagePath, {String? location, String? language}) async {
     final formData = FormData.fromMap({
       'image': await MultipartFile.fromFile(imagePath, filename: 'soil.jpg'),
       if (location != null) 'location': location,
+      if (language != null) 'language': language,
     });
     final r = await _dio.post('/ai/soil-analysis',
         data: formData, options: Options(contentType: 'multipart/form-data'));
     return r.data['data'];
   }
 
-  Future<Map> detectDisease(String imagePath) async {
+  Future<Map> detectDisease(String imagePath, {String? language}) async {
     final formData = FormData.fromMap({
-      'image': await MultipartFile.fromFile(imagePath, filename: 'crop.jpg')
+      'image': await MultipartFile.fromFile(imagePath, filename: 'crop.jpg'),
+      if (language != null) 'language': language,
     });
     final r = await _dio.post('/ai/disease-detection',
         data: formData, options: Options(contentType: 'multipart/form-data'));
@@ -231,9 +233,12 @@ class ApiService {
     return r.data['data'];
   }
 
-  Future<Map> kisanChat({required String message, List? history}) async {
-    final r = await _dio
-        .post('/ai/chat', data: {'message': message, 'history': history ?? []});
+  Future<Map> kisanChat({required String message, List? history, String? language}) async {
+    final r = await _dio.post('/ai/chat', data: {
+      'message': message,
+      'history': history ?? [],
+      if (language != null) 'language': language,
+    });
     return r.data['data'];
   }
 

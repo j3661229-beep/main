@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/api_service.dart';
+import '../utils/cache_manager.dart';
 import 'package:geolocator/geolocator.dart';
 
 // ── Products ──────────────────────────────────────────────
@@ -18,9 +19,31 @@ final productDetailProvider = FutureProvider.family<Map, String>((ref, id) async
 });
 
 final nearbyProductsProvider = FutureProvider.family<List, String>((ref, coordsStr) async {
+  final cacheKey = 'nearby_products_$coordsStr';
+  final cached = CacheManager.get(cacheKey, maxAge: const Duration(hours: 1));
+  
+  if (cached != null) {
+    // Return cached and refresh in background
+    _refreshNearbyProducts(cacheKey, coordsStr);
+    return List.from(cached);
+  }
+
+  final data = await _fetchNearbyProducts(coordsStr);
+  await CacheManager.save(cacheKey, data);
+  return data;
+});
+
+Future<List> _fetchNearbyProducts(String coordsStr) async {
   final parts = coordsStr.split(',');
   return ApiService.instance.getNearbyProducts(lat: double.parse(parts[0]), lng: double.parse(parts[1]));
-});
+}
+
+void _refreshNearbyProducts(String key, String coordsStr) async {
+  try {
+    final data = await _fetchNearbyProducts(coordsStr);
+    await CacheManager.save(key, data);
+  } catch (_) {}
+}
 
 final recommendedProductsProvider = FutureProvider<List>((ref) async {
   return ApiService.instance.getRecommendedProducts();
@@ -90,8 +113,25 @@ final orderTrackingProvider = FutureProvider.family<Map, String>((ref, orderId) 
 
 // ── Farmer Dashboard ──────────────────────────────────────
 final farmerDashboardProvider = FutureProvider<Map>((ref) async {
-  return ApiService.instance.getFarmerDashboard();
+  const cacheKey = 'farmer_dashboard';
+  final cached = CacheManager.get(cacheKey, maxAge: const Duration(minutes: 30));
+  
+  if (cached != null) {
+      _refreshFarmerDashboard();
+      return Map.from(cached);
+  }
+
+  final data = await ApiService.instance.getFarmerDashboard();
+  await CacheManager.save(cacheKey, data);
+  return data;
 });
+
+void _refreshFarmerDashboard() async {
+  try {
+    final data = await ApiService.instance.getFarmerDashboard();
+    await CacheManager.save('farmer_dashboard', data);
+  } catch (_) {}
+}
 
 // ── Weather ───────────────────────────────────────────────
 final weatherProvider = FutureProvider<Map>((ref) async {

@@ -2,7 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:animate_do/animate_do.dart';
 import '../../data/services/api_service.dart';
+import '../../data/providers/auth_provider.dart';
+import '../../services/voice_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -17,6 +20,8 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
   final _scrollCtrl = ScrollController();
   final List<Map<String, String>> _messages = [];
   bool _loading = false;
+  bool _isListening = false;
+  String? _currentlySpeakingId;
 
   @override
   void initState() {
@@ -56,8 +61,10 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
   Future<void> _send(String msg) async {
     if (msg.trim().isEmpty) return;
     _ctrl.clear();
+    final lang = ref.read(languageProvider);
+    
     setState(() {
-      _messages.add({'role': 'user', 'content': msg});
+      _messages.add({'role': 'user', 'content': msg, 'id': DateTime.now().millisecondsSinceEpoch.toString()});
       _loading = true;
     });
     await _saveHistory();
@@ -68,28 +75,62 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
           .toList();
       final res = await ApiService.instance.kisanChat(
           message: msg,
-          history:
-              history.length > 1 ? history.sublist(0, history.length - 1) : []);
-      if (mounted)
+          history: history.length > 1 ? history.sublist(0, history.length - 1) : [],
+          language: lang
+      );
+      
+      if (mounted) {
+        final reply = res['reply'] ?? 'I could not answer that.';
+        final id = DateTime.now().millisecondsSinceEpoch.toString();
         setState(() {
           _messages.add({
             'role': 'assistant',
-            'content': res['reply'] ?? 'I could not answer that.'
+            'content': reply,
+            'id': id
           });
           _loading = false;
         });
+        
+        // Auto-speak new assistant message if it's the most recent
+        _speak(reply, id);
+      }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _messages.add({
             'role': 'assistant',
-            'content': 'Sorry, I had trouble connecting. Please try again.'
+            'content': 'Sorry, I had trouble connecting. Please try again.',
+            'id': DateTime.now().millisecondsSinceEpoch.toString()
           });
           _loading = false;
         });
+      }
     }
     await _saveHistory();
     _scrollToBottom();
+  }
+
+  void _speak(String text, String id) async {
+    final lang = ref.read(languageProvider);
+    setState(() => _currentlySpeakingId = id);
+    await VoiceService.instance.speak(text, languageCode: lang);
+    if (mounted) setState(() => _currentlySpeakingId = null);
+  }
+
+  Future<void> _toggleListen() async {
+    if (_isListening) {
+      await VoiceService.instance.stopListening();
+      setState(() => _isListening = false);
+    } else {
+      final available = await VoiceService.instance.initSpeech();
+      if (available) {
+        setState(() => _isListening = true);
+        await VoiceService.instance.startListening((text) {
+           _ctrl.text = text;
+           if (!_isListening) _send(text); // auto send on stop? maybe not
+        });
+      }
+    }
   }
 
   void _scrollToBottom() {
@@ -165,38 +206,75 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
             itemCount: _messages.length + (_loading ? 1 : 0),
             itemBuilder: (ctx, i) {
               if (i == _messages.length)
-                return const Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Row(children: [
-                      SizedBox(width: 20),
-                      Text('🤖 '),
-                      _TypingDots()
-                    ]));
+                return FadeIn(
+                  child: const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Row(children: [
+                        SizedBox(width: 20),
+                        Text('🤖 '),
+                        _TypingDots()
+                      ])),
+                );
               final m = _messages[i];
               final isUser = m['role'] == 'user';
-              return Align(
-                alignment:
-                    isUser ? Alignment.centerRight : Alignment.centerLeft,
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.78),
-                  decoration: BoxDecoration(
-                    color: isUser ? AppColors.primary : AppColors.surface,
-                    borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(16),
-                      topRight: const Radius.circular(16),
-                      bottomLeft: Radius.circular(isUser ? 16 : 4),
-                      bottomRight: Radius.circular(isUser ? 4 : 16),
-                    ),
-                    border: isUser ? null : Border.all(color: AppColors.border),
+              final isSpeaking = _currentlySpeakingId == m['id'];
+
+              return FadeInUp(
+                duration: const Duration(milliseconds: 300),
+                child: Align(
+                  alignment:
+                      isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (!isUser) ...[
+                        Column(
+                          children: [
+                             const Text('🤖', style: TextStyle(fontSize: 16)),
+                             const SizedBox(height: 4),
+                             IconButton(
+                               icon: Icon(
+                                 isSpeaking ? Icons.volume_up_rounded : Icons.volume_mute_rounded,
+                                 size: 16,
+                                 color: isSpeaking ? AppColors.primary : Colors.grey,
+                               ),
+                               onPressed: () => _speak(m['content']!, m['id']!),
+                             )
+                          ],
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      Flexible(
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: isUser ? AppColors.primary : AppColors.surface,
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(16),
+                              topRight: const Radius.circular(16),
+                              bottomLeft: Radius.circular(isUser ? 16 : 4),
+                              bottomRight: Radius.circular(isUser ? 4 : 16),
+                            ),
+                            border: isUser ? null : Border.all(color: AppColors.border),
+                            boxShadow: [
+                              if (!isUser)
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 2),
+                                )
+                            ],
+                          ),
+                          child: Text(m['content']!,
+                              style: AppTextStyles.bodyMD.copyWith(
+                                  color:
+                                      isUser ? Colors.white : AppColors.textPrimary)),
+                        ),
+                      ),
+                    ],
                   ),
-                  child: Text(m['content']!,
-                      style: AppTextStyles.bodyMD.copyWith(
-                          color:
-                              isUser ? Colors.white : AppColors.textPrimary)),
                 ),
               );
             },
@@ -221,6 +299,21 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
               onSubmitted: _send,
             )),
             const SizedBox(width: 8),
+            GestureDetector(
+              onTap: _toggleListen,
+              child: Container(
+                  width: 44,
+                  height: 44,
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                      color: _isListening ? AppColors.error : AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12)),
+                  child: Icon(
+                    _isListening ? Icons.mic_rounded : Icons.mic_none_rounded,
+                    color: _isListening ? Colors.white : AppColors.primary, 
+                    size: 20
+                  )),
+            ),
             GestureDetector(
               onTap: () => _send(_ctrl.text),
               child: Container(

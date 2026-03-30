@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../data/services/api_service.dart';
+import '../../data/providers/auth_provider.dart';
+import '../../services/voice_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
@@ -32,7 +34,8 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
       _result = null;
     });
     try {
-      final r = await ApiService.instance.detectDisease(_image!.path);
+      final lang = ref.read(languageProvider);
+      final r = await ApiService.instance.detectDisease(_image!.path, language: lang);
       setState(() {
         _result = r;
         _analyzing = false;
@@ -148,31 +151,65 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
             ],
             if (_result != null) ...[
               const SizedBox(height: 20),
-              Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16)),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(children: [
-                          const Text('⚠️', style: TextStyle(fontSize: 24)),
-                          const SizedBox(width: 8),
-                          Text(_result!['disease'] ?? 'Unknown',
-                              style: AppTextStyles.headingMD)
+              FadeInRight(
+                duration: const Duration(milliseconds: 400),
+                child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          )
                         ]),
-                        const SizedBox(height: 8),
-                        Text('Severity: ${_result!['severity'] ?? 'Moderate'}',
-                            style: AppTextStyles.bodyMD),
-                        const SizedBox(height: 8),
-                        const Text('Treatment:',
-                            style: AppTextStyles.headingSM),
-                        Text(
-                            _result!['treatment']?.toString() ??
-                                'No treatment data',
-                            style: AppTextStyles.bodyMD),
-                      ])),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Row(children: [
+                                  const Text('⚠️', style: TextStyle(fontSize: 24)),
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(_result!['analysis']?['diseaseName'] ?? 'Unknown',
+                                        style: AppTextStyles.headingMD),
+                                  )
+                                ]),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.volume_up_rounded, color: AppColors.primary),
+                                onPressed: () {
+                                  final name = _result!['analysis']?['diseaseName'];
+                                  final treat = (_result!['analysis']?['treatments'] as List? ?? []).map((t) => t['name']).join(', ');
+                                  final prev = (_result!['analysis']?['preventionTips'] as List? ?? []).join('. ');
+                                  
+                                  VoiceService.instance.speak("Detected: $name. Treatment includes $treat. Prevention: $prev", 
+                                      languageCode: ref.read(languageProvider));
+                                },
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text('Severity: ${_result!['analysis']?['severity'] ?? 'Moderate'}',
+                              style: AppTextStyles.bodyMD.copyWith(color: AppColors.error, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 12),
+                          const Text('Symptoms:', style: AppTextStyles.headingSM),
+                          Text((_result!['analysis']?['symptoms'] as List? ?? []).join(', '), style: AppTextStyles.bodyMD),
+                          const SizedBox(height: 12),
+                          const Text('Treatment & Application:', style: AppTextStyles.headingSM),
+                          ...(_result!['analysis']?['treatments'] as List? ?? []).map((t) => 
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Text('• ${t['name']}: ${t['dosage']} (${t['application']})', style: AppTextStyles.bodyMD),
+                            )
+                          ),
+                        ])),
+              ),
             ],
           ])),
     );

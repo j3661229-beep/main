@@ -52,7 +52,7 @@ const generateWithFallback = async (prompt, imageBase64 = null) => {
     }
 
     // 2. Fallback to Gemini
-    const modelsToTry = ["gemini-1.5-flash-latest", "gemini-2.5-flash", "gemini-1.5-pro-latest", "gemini-pro"];
+    const modelsToTry = ["gemini-1.5-flash-latest", "gemini-2.0-flash", "gemini-2.0-flash-exp", "gemini-1.5-pro-latest"];
     const contents = imageBase64 ? [prompt, { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }] : prompt;
 
     for (const modelName of modelsToTry) {
@@ -68,10 +68,10 @@ const generateWithFallback = async (prompt, imageBase64 = null) => {
     throw lastError || new Error("All Gemini fallback models failed during generation.");
 };
 
-const soilAnalysis = async (farmerId, imageBuffer, originalName, location = '') => {
+const soilAnalysis = async (farmerId, imageBuffer, originalName, { location = '', language = 'English' } = {}) => {
     const imageUrl = await uploadToSupabase(imageBuffer, originalName || 'soil.jpg', 'soil');
 
-    const prompt = `Analyse this Indian farm soil image. ${location ? `The farm is located in ${location}. ` : ''}Return ONLY valid JSON with these keys exactly: soilType (string), phLevel (number), nitrogenLevel ("low"|"medium"|"high"), phosphorusLevel ("low"|"medium"|"high"), potassiumLevel ("low"|"medium"|"high"), organicMatter ("low"|"medium"|"high"), recommendedCrops (array of 3-5 strings), treatmentAdvice (string in simple English or Indian regional language if appropriate), confidence (number 0-1)`;
+    const prompt = `Analyse this Indian farm soil image. ${location ? `Location: ${location}. ` : ''} Respond in ${language}. Return ONLY valid JSON with these keys: soilType (string), phLevel (number), nitrogenLevel, phosphorusLevel, potassiumLevel, organicMatter, recommendedCrops (array), treatmentAdvice (string - keep sentences short for voice synthesis), confidence (number)`;
 
     const textPayload = await generateWithFallback(prompt, imageBuffer.toString("base64"));
     const analysis = parseJSON(textPayload);
@@ -105,8 +105,8 @@ const soilAnalysis = async (farmerId, imageBuffer, originalName, location = '') 
     return { report, analysis, relatedProducts };
 };
 
-const diseaseDetection = async (imageBuffer, originalName) => {
-    const prompt = `Identify crop disease in this image. Return ONLY valid JSON: diseaseName (string), affectedCrop (string), confidence (number 0-1), severity ("low"|"medium"|"high"), symptoms (array of strings), treatments (array of {name: string, dosage: string, application: string}), preventionTips (array of strings). If no disease visible, diseaseName should be "No disease detected".`;
+const diseaseDetection = async (imageBuffer, originalName, { language = 'English' } = {}) => {
+    const prompt = `Identify crop disease in this image. Respond in ${language}. Return ONLY valid JSON: diseaseName (string), affectedCrop (string), confidence (number), severity, symptoms (array), treatments (array of {name, dosage, application}), preventionTips (array). Keep treatments short for voice.`;
 
     const textPayload = await generateWithFallback(prompt, imageBuffer.toString("base64"));
     const analysis = parseJSON(textPayload);
@@ -121,36 +121,41 @@ const diseaseDetection = async (imageBuffer, originalName) => {
     return { analysis, relatedProducts };
 };
 
-const cropRecommend = async (farmerId, { location, soilType, season, farmSize }) => {
+const cropRecommend = async (farmerId, { location, soilType, season, farmSize, language = 'English' }) => {
     const farmer = await prisma.farmer.findUnique({ where: { id: farmerId } });
     const context = `Location: ${location || farmer?.district}, Soil: ${soilType || farmer?.soilType || 'mixed'}, Season: ${season || 'Kharif'}, Farm size: ${farmSize || farmer?.farmSizeAcres || 2} acres`;
 
-    const prompt = `You are an expert Indian agricultural advisor. Based on this farm data: ${context} — recommend 6 crops ranked by suitability. Return ONLY JSON array of {crop, emoji, matchPercent (number), reason, expectedYield, marketDemand ("low"|"medium"|"high")}`;
+    const cacheKey = `crop_rec:${context.replace(/\s+/g, '_')}_${language}`;
+    const cached = await cache.get(cacheKey);
+    if (cached) return cached;
+
+    const prompt = `You are an expert Indian agricultural advisor. Context: ${context}. Respond in ${language}. Recommend 6 crops. Return ONLY JSON array of {crop, emoji, matchPercent (number), reason (short for voice), expectedYield, marketDemand}`;
 
     const textPayload = await generateWithFallback(prompt);
     const parsed = parseJSON(textPayload);
+    const result = { context, crops: Array.isArray(parsed) ? parsed : parsed.crops || [] };
 
-    return { context, crops: Array.isArray(parsed) ? parsed : parsed.crops || [] };
+    await cache.set(cacheKey, result, 86400); // 24 hour cache
+    return result;
 };
 
-const chat = async (userId, { message, history = [] }) => {
+const chat = async (userId, { message, history = [], language = 'English' }) => {
     let lastError;
+    const personaInstruction = `${SYSTEM_KISAN} Respond in ${language}. Keep sentences short and clear for voice playback.`;
 
     // 1. Try Cerebras first for Chat
     try {
-        const cerebrasHistory = history.map(msg => ({
-            role: msg.role === 'assistant' ? 'assistant' : (msg.role === 'system' ? 'system' : 'user'),
-            content: msg.content
-        }));
-
-        // Ensure SYSTEM_KISAN is present for persona adherence
-        if (!cerebrasHistory.length || cerebrasHistory[0].role !== 'system') {
-            cerebrasHistory.unshift({ role: "system", content: SYSTEM_KISAN });
-        }
-        cerebrasHistory.push({ role: "user", content: message });
+        const cerebrasHistory = [
+            { role: "system", content: personaInstruction },
+            ...history.map(msg => ({
+                role: msg.role === 'assistant' ? 'assistant' : 'user',
+                content: msg.content
+            })),
+            { role: "user", content: message }
+        ];
 
         const cerebrasRes = await axios.post("https://api.cerebras.ai/v1/chat/completions", {
-            model: "llama3.1-70b", // Use 70b for higher Chat intelligence
+            model: "llama3.1-70b",
             messages: cerebrasHistory
         }, {
             headers: {
@@ -182,7 +187,7 @@ const chat = async (userId, { message, history = [] }) => {
         try {
             const model = genAI.getGenerativeModel({
                 model: modelName,
-                systemInstruction: SYSTEM_KISAN
+                systemInstruction: personaInstruction
             });
             const chatSession = model.startChat({ history: geminiHistory });
             const result = await chatSession.sendMessage(message);
@@ -198,9 +203,9 @@ const chat = async (userId, { message, history = [] }) => {
     throw lastError || new Error("AI Chat unavailable. All fallback models failed.");
 };
 
-const cropCalendar = async ({ month, district, crops }) => {
+const cropCalendar = async ({ month, district, crops, language = 'English' }) => {
     const monthName = new Date(2024, (parseInt(month) || new Date().getMonth()), 1).toLocaleString('default', { month: 'long' });
-    const prompt = `Maharashtra farm calendar for ${monthName} in ${district || 'Nashik'} district. For crops: ${crops || 'Onion, Soybean, Cotton, Wheat'}. Return JSON: {month, district, activities: [{crop, emoji, action ("sow"|"fertilize"|"irrigate"|"harvest"|"spray"), description, urgency ("low"|"medium"|"high")}]}`;
+    const prompt = `Maharashtra farm calendar for ${monthName} in ${district || 'Nashik'} district. For crops: ${crops || 'Onion, Soybean, Cotton, Wheat'}. Respond in ${language}. Return JSON: {month, district, activities: [{crop, emoji, action, description (short), urgency}]}`;
 
     const textPayload = await generateWithFallback(prompt);
     return parseJSON(textPayload);

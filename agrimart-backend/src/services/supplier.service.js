@@ -1,4 +1,5 @@
 const prisma = require('../config/database');
+const { sendNotification } = require('./onesignal.service');
 
 const getProfile = async (supplierId) => {
     return prisma.supplier.findUnique({ where: { id: supplierId }, include: { user: true } });
@@ -91,7 +92,25 @@ const updateOrderStatus = async (supplierId, itemId, status) => {
     if (!validTransitions[item.status]?.includes(status)) {
         throw Object.assign(new Error(`Cannot transition from ${item.status} to ${status}`), { statusCode: 400 });
     }
-    return prisma.orderItem.update({ where: { id: itemId }, data: { status } });
+    const updatedItem = await prisma.orderItem.update({ where: { id: itemId }, data: { status }, include: { order: { include: { farmer: true } }, product: true } });
+
+    // Notify farmer (Don't await)
+    const statusLabels = {
+        PROCESSING: 'is being prepared',
+        DISPATCHED: 'is ready for pickup! 🏁',
+        OUT_FOR_DELIVERY: 'is out for delivery',
+        DELIVERED: 'has been picked up'
+    };
+    if (statusLabels[status]) {
+        sendNotification({
+            users: [updatedItem.order.farmer.userId],
+            title: `Order Update: ${updatedItem.product.name}`,
+            message: `Your item ${statusLabels[status]}. Visit the shop soon!`,
+            data: { orderId: updatedItem.orderId, type: 'ORDER' }
+        });
+    }
+
+    return updatedItem;
 };
 
 const getProducts = async (supplierId, { page, limit, skip }) => {

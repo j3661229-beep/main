@@ -88,53 +88,57 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Stack(
-        children: [
-          CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _SwiggyHeaderDelegate(
-                  locationName: locationName,
-                  searchCtrl: _searchCtrl,
-                  searchQuery: _search,
-                  onSearchChanged: (v) => setState(() => _search = v),
-                  onClearSearch: () {
-                    _searchCtrl.clear();
-                    setState(() => _search = '');
-                  },
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(productsProvider);
+          await Future.delayed(const Duration(milliseconds: 500));
+        },
+        child: Stack(
+          children: [
+            CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+              slivers: [
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _SwiggyHeaderDelegate(
+                    locationName: locationName,
+                    searchCtrl: _searchCtrl,
+                    searchQuery: _search,
+                    onSearchChanged: (v) => setState(() => _search = v),
+                    onClearSearch: () {
+                      _searchCtrl.clear();
+                      setState(() => _search = '');
+                    },
+                  ),
                 ),
-              ),
-              
-              SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Carousel / Hot Deals (Swiggy Horizontal Promos)
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      height: 140,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        physics: const BouncingScrollPhysics(),
-                        children: [
-                           _PromoBanner(
-                              title: 'KHARIF SPECIAL',
-                              subtitle: 'Up to 40% Off on Fertilizers',
-                              emoji: '🚜',
-                              colors: const [Color(0xFFFFD700), Color(0xFFF59E0B)]
-                           ),
-                           _PromoBanner(
-                              title: 'NEW ARRIVALS',
-                              subtitle: 'Hybrid Seeds for Better Yield',
-                              emoji: '🌱',
-                              colors: const [AppColors.success, Color(0xFF059669)]
-                           ),
-                        ],
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Carousel / Hot Deals (Swiggy Horizontal Promos)
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: 140,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          physics: const BouncingScrollPhysics(),
+                          children: [
+                             _PromoBanner(
+                                title: 'KHARIF SPECIAL',
+                                subtitle: 'Up to 40% Off on Fertilizers',
+                                emoji: '🚜',
+                                colors: const [Color(0xFFFFD700), Color(0xFFF59E0B)]
+                             ),
+                             _PromoBanner(
+                                title: 'NEW ARRIVALS',
+                                subtitle: 'Hybrid Seeds for Better Yield',
+                                emoji: '🌱',
+                                colors: const [AppColors.success, Color(0xFF059669)]
+                             ),
+                          ],
+                        ),
                       ),
-                    ),
                     const SizedBox(height: 24),
                     
                     // "Explore By Category" Grid

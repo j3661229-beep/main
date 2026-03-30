@@ -1,17 +1,20 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:animate_do/animate_do.dart';
 import '../../data/services/api_service.dart';
+import '../../data/providers/auth_provider.dart';
+import '../../services/voice_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 
-class CropAdvisorScreen extends StatefulWidget {
+class CropAdvisorScreen extends ConsumerStatefulWidget {
   const CropAdvisorScreen({super.key});
 
   @override
-  State<CropAdvisorScreen> createState() => _CropAdvisorState();
+  ConsumerState<CropAdvisorScreen> createState() => _CropAdvisorState();
 }
 
-class _CropAdvisorState extends State<CropAdvisorScreen> {
-  final _locCtrl = TextEditingController(text: 'Nashik');
+class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
+  late final _locCtrl = TextEditingController(text: ref.read(authProvider).user?.farmer?['district'] ?? 'Nashik');
   final _soilCtrl = TextEditingController(text: 'Black Cotton Soil');
   final _seasonCtrl = TextEditingController(text: 'Kharif');
   final _sizeCtrl = TextEditingController(text: '2');
@@ -21,11 +24,13 @@ class _CropAdvisorState extends State<CropAdvisorScreen> {
   Future<void> _analyze() async {
     setState(() => _loading = true);
     try {
+      final lang = ref.read(languageProvider);
       final res = await ApiService.instance.getCropRecommend({
         'location': _locCtrl.text,
         'soilType': _soilCtrl.text,
         'season': _seasonCtrl.text,
         'farmSize': int.tryParse(_sizeCtrl.text) ?? 2,
+        'language': lang,
       });
       setState(() => _recommendations = res['crops'] ?? []);
     } catch (e) {
@@ -209,8 +214,20 @@ class _CropAdvisorState extends State<CropAdvisorScreen> {
                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                              Text(crop['crop'] ?? 'Unknown',
-                                  style: AppTextStyles.headingMD),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(crop['crop'] ?? 'Unknown',
+                                      style: AppTextStyles.headingMD),
+                                  IconButton(
+                                    icon: const Icon(Icons.volume_up_rounded, color: AppColors.primary, size: 20),
+                                    onPressed: () {
+                                       VoiceService.instance.speak("${crop['crop']}. ${crop['reason']}", 
+                                           languageCode: ref.read(languageProvider));
+                                    },
+                                  )
+                                ],
+                              ),
                               const SizedBox(height: 4),
                               Container(
                                   padding: const EdgeInsets.symmetric(

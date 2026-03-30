@@ -103,8 +103,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
-    await _api.logout();
+    // Instant UI feedback: Reset state immediately to trigger GoRouter redirect
     state = const AuthState();
+    
+    // Cleanup in background
+    try {
+      await _api.logout();
+      await _storage.deleteAll();
+    } catch (e) {
+      // Background cleanup error isn't fatal as state is already reset
+    }
   }
 
   String _parseError(dynamic e) {

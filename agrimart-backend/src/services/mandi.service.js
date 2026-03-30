@@ -1,5 +1,5 @@
 const axios = require('axios');
-const redis = require('../config/redis');
+const cache = require('../utils/cache');
 
 // Fallback mock mandi data
 const MOCK_PRICES = [
@@ -15,8 +15,8 @@ const MOCK_PRICES = [
 
 const getPrices = async ({ district, crop, page = 1, limit = 20 }) => {
     const cacheKey = `mandi:${district || 'all'}:${crop || 'all'}`;
-    const cached = await redis.get(cacheKey);
-    if (cached) return JSON.parse(cached);
+    const cached = await cache.get(cacheKey);
+    if (cached) return cached;
 
     let prices = [...MOCK_PRICES];
     if (district) prices = prices.filter(p => p.district.toLowerCase().includes(district.toLowerCase()));

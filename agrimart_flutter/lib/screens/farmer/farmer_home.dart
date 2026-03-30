@@ -226,18 +226,16 @@ class _HomeTab extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-        // Premium Glassmorphic Header
-          SliverAppBar(
-            expandedHeight: 110,
-            backgroundColor: AppColors.background,
-            surfaceTintColor: Colors.transparent,
-            pinned: true,
-            automaticallyImplyLeading: false,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(farmerDashboardProvider);
+          await Future.delayed(const Duration(milliseconds: 500));
+        },
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [AppColors.primary, AppColors.primaryDark],

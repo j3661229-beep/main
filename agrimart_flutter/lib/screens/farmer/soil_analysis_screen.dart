@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../data/services/api_service.dart';
+import '../../data/providers/auth_provider.dart';
+import '../../services/voice_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
@@ -33,8 +35,9 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
     });
     try {
       final user = ref.read(authProvider).user;
-      final location = "${user?.farmer?.village ?? ''}, ${user?.farmer?.district ?? ''}";
-      final res = await ApiService.instance.analyzeSoil(_image!.path, location: location);
+      final language = ref.read(languageProvider);
+      final location = "${user?.farmer?['village'] ?? ''}, ${user?.farmer?['district'] ?? ''}";
+      final res = await ApiService.instance.analyzeSoil(_image!.path, location: location, language: language);
       setState(() {
         _result = res;
         _analyzing = false;
@@ -166,29 +169,60 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
 
             if (_result != null) ...[
               const SizedBox(height: 24),
-              _ResultCard('Soil Type', _result!['soilType'] ?? 'N/A', '🟫'),
-              _ResultCard('pH Level', '${_result!['pH'] ?? 'N/A'}', '⚗️'),
-              _ResultCard('Nitrogen', '${_result!['nitrogen'] ?? 'N/A'}', '🌿'),
-              _ResultCard(
-                  'Phosphorus', '${_result!['phosphorus'] ?? 'N/A'}', '🔵'),
-              _ResultCard(
-                  'Potassium', '${_result!['potassium'] ?? 'N/A'}', '🟡'),
+              FadeInDown(
+                duration: const Duration(milliseconds: 500),
+                child: Column(children: [
+                   _ResultCard('Soil Type', _result!['analysis']?['soilType'] ?? 'N/A', '🟫'),
+                   _ResultCard('pH Level', '${_result!['analysis']?['phLevel'] ?? 'N/A'}', '⚗️'),
+                   _ResultCard('Nitrogen', '${_result!['analysis']?['nitrogenLevel'] ?? 'N/A'}', '🌿'),
+                   _ResultCard('Phosphorus', '${_result!['analysis']?['phosphorusLevel'] ?? 'N/A'}', '🔵'),
+                   _ResultCard('Potassium', '${_result!['analysis']?['potassiumLevel'] ?? 'N/A'}', '🟡'),
+                ]),
+              ),
               const SizedBox(height: 12),
-              if (_result!['recommendations'] != null)
+              if (_result!['analysis']?['treatmentAdvice'] != null)
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                       color: AppColors.primarySurface,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.primaryBorder)),
+                      border: Border.all(color: AppColors.primaryBorder),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        )
+                      ]),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('🌱 AI Recommendations',
-                            style: AppTextStyles.headingMD),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('🌱 AI Advice',
+                                style: AppTextStyles.headingMD),
+                            IconButton(
+                              icon: const Icon(Icons.volume_up_rounded, color: AppColors.primary),
+                              onPressed: () {
+                                final advice = _result!['analysis']?['treatmentAdvice'];
+                                final crops = (_result!['analysis']?['recommendedCrops'] as List? ?? []).join(', ');
+                                VoiceService.instance.speak("$advice. Recommended crops for your area are: $crops", 
+                                    languageCode: ref.read(languageProvider));
+                              },
+                            )
+                          ],
+                        ),
                         const SizedBox(height: 8),
-                        Text(_result!['recommendations'].toString(),
+                        Text(_result!['analysis']?['treatmentAdvice'].toString() ?? '',
                             style: AppTextStyles.bodyMD),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          children: (_result!['analysis']?['recommendedCrops'] as List? ?? []).map((c) => 
+                            Chip(label: Text(c, style: const TextStyle(fontSize: 12)), backgroundColor: Colors.white)
+                          ).toList(),
+                        )
                       ]),
                 ),
             ],

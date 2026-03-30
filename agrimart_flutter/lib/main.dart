@@ -5,8 +5,21 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/app_colors.dart';
 import 'router/app_router.dart';
 
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 1. Initialize Hive for Caching
+  await Hive.initFlutter();
+  await Hive.openBox('app_cache');
+
+  // 2. Initialize OneSignal
+  // Note: Replace with actual App ID from OneSignal Dashboard
+  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+  OneSignal.initialize("YOUR_ONESIGNAL_APP_ID");
+  OneSignal.Notifications.requestPermission(true);
 
   // Lock to portrait
   await SystemChrome.setPreferredOrientations([
