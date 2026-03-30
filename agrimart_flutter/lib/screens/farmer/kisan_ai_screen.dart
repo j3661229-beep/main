@@ -118,6 +118,11 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
     if (mounted) setState(() => _currentlySpeakingId = null);
   }
 
+  void _stopSpeak() async {
+    await VoiceService.instance.stop();
+    if (mounted) setState(() => _currentlySpeakingId = null);
+  }
+
   Future<void> _toggleListen() async {
     if (_isListening) {
       await VoiceService.instance.stopListening();
@@ -233,14 +238,14 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
                           children: [
                              const Text('🤖', style: TextStyle(fontSize: 16)),
                              const SizedBox(height: 4),
-                             IconButton(
-                               icon: Icon(
-                                 isSpeaking ? Icons.volume_up_rounded : Icons.volume_mute_rounded,
-                                 size: 16,
-                                 color: isSpeaking ? AppColors.primary : Colors.grey,
-                               ),
-                               onPressed: () => _speak(m['content']!, m['id']!),
-                             )
+                              IconButton(
+                                icon: Icon(
+                                  isSpeaking ? Icons.stop_circle_outlined : Icons.volume_up_rounded,
+                                  size: 18,
+                                  color: isSpeaking ? AppColors.error : Colors.grey,
+                                ),
+                                onPressed: () => isSpeaking ? _stopSpeak() : _speak(m['content']!, m['id']!),
+                              )
                           ],
                         ),
                         const SizedBox(width: 8),

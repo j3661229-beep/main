@@ -133,6 +133,7 @@ const cropRecommend = async (farmerId, { location, soilType, season, farmSize, l
     const prompt = `You are an expert Indian agricultural advisor. Context: ${context}. Respond in ${language}. Recommend 6 crops. Return ONLY JSON array of {crop, emoji, matchPercent (number), reason (short for voice), expectedYield, marketDemand}`;
 
     const textPayload = await generateWithFallback(prompt);
+    logger.info(`Crop Recommend Raw Payload: ${textPayload}`);
     const parsed = parseJSON(textPayload);
     const result = { context, crops: Array.isArray(parsed) ? parsed : parsed.crops || [] };
 
