@@ -311,8 +311,6 @@ class _HomeTab extends ConsumerWidget {
                 ),
               ),
             ),
-          ),
-
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -447,7 +445,8 @@ class _HomeTab extends ConsumerWidget {
           ),
         ],
       ),
-    );
+    ),
+   );
   }
 }
 

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/api_service.dart';
-import '../utils/cache_manager.dart';
+import '../../core/utils/cache_manager.dart';
 import 'package:geolocator/geolocator.dart';
 
 // ── Products ──────────────────────────────────────────────

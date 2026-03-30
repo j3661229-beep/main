@@ -7,21 +7,28 @@ import 'router/app_router.dart';
 
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Initialize Hive for Caching
+  // 1. Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // 2. Initialize Hive for Caching
   await Hive.initFlutter();
   await Hive.openBox('app_cache');
 
-  // 2. Initialize OneSignal
-  // Note: Replace with actual App ID from OneSignal Dashboard
+  // 3. Initialize OneSignal
+  // Note: Using project-specific App ID
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-  OneSignal.initialize("YOUR_ONESIGNAL_APP_ID");
+  OneSignal.initialize("35bc4b22-b760-4cbd-a426-0de70bf52d11");
   OneSignal.Notifications.requestPermission(true);
 
-  // Lock to portrait
+  // 4. Lock to portrait
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

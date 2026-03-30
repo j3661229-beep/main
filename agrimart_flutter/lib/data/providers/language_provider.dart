@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../core/i18n/app_translations.dart';
 
 const _storage = FlutterSecureStorage();
 const _langKey = 'app_language';
@@ -22,8 +23,9 @@ class LanguageNotifier extends StateNotifier<String> {
   }
 }
 
-import './language_provider.dart';
-import '../core/i18n/app_translations.dart';
+final languageProvider = StateNotifierProvider<LanguageNotifier, String>((ref) {
+  return LanguageNotifier();
+});
 
 extension LanguageHelper on WidgetRef {
   String tr(String key) {
@@ -31,8 +33,4 @@ extension LanguageHelper on WidgetRef {
     return AppTranslations.translate(key, lang);
   }
 }
-
-final languageProvider = StateNotifierProvider<LanguageNotifier, String>((ref) {
-  return LanguageNotifier();
-});
 
