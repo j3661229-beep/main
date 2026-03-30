@@ -59,140 +59,183 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
           ]),
         ],
       ),
-      body: Column(children: [
-        // Search + filters
-        Container(
-            color: AppColors.primary,
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(children: [
-              TextField(
-                controller: _searchCtrl,
-                decoration: InputDecoration(
-                  fillColor: Colors.white,
-                  hintText: 'Search seeds, fertilizers…',
-                  prefixIcon:
-                      const Icon(Icons.search, color: AppColors.textTertiary),
-                  suffixIcon: _search.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear,
-                              color: AppColors.textTertiary),
-                          onPressed: () {
-                            _searchCtrl.clear();
-                            setState(() => _search = '');
-                          })
-                      : null,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none),
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 280,
+            pinned: true,
+            backgroundColor: AppColors.background,
+            surfaceTintColor: Colors.transparent,
+            automaticallyImplyLeading: false, // In tab
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppColors.primary, AppColors.primaryDark],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
+                  ),
                 ),
-                onChanged: (v) => setState(() => _search = v),
-              ),
-              const SizedBox(height: 16),
-              // Awesome Hero Banner
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                      colors: [Color(0xFFFFD700), Color(0xFFF59E0B)]),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.15),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4))
+                padding: const EdgeInsets.fromLTRB(20, 50, 20, 16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: _searchCtrl,
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        filled: true,
+                        hintText: 'Search seeds, fertilizers…',
+                        prefixIcon: const Icon(Icons.search, color: AppColors.textTertiary, size: 20),
+                        suffixIcon: _search.isNotEmpty
+                            ? IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: const Icon(Icons.clear, color: AppColors.textTertiary, size: 20),
+                                onPressed: () {
+                                  _searchCtrl.clear();
+                                  setState(() => _search = '');
+                                })
+                            : null,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none),
+                      ),
+                      onChanged: (v) => setState(() => _search = v),
+                    ),
+                    const SizedBox(height: 16),
+                    // Awesome Hero Banner
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [Color(0xFFFFD700), Color(0xFFF59E0B)]),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4))
+                        ],
+                      ),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('KHARIF SPECIAL',
+                                      style: TextStyle(
+                                          color: AppColors.primaryDark,
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 10,
+                                          letterSpacing: 1.2)),
+                                  const SizedBox(height: 2),
+                                  const Text('Up to 40% Off',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.15)),
+                                  Text('on Fertilizers',
+                                      style: TextStyle(
+                                          color: Colors.white.withValues(alpha: 0.9),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500)),
+                                ]),
+                            const Text('🚜', style: TextStyle(fontSize: 42)),
+                          ]),
+                    ),
                   ],
                 ),
-                child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('KHARIF SPECIAL',
-                                style: TextStyle(
-                                    color: AppColors.primaryDark,
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 12,
-                                    letterSpacing: 1.2)),
-                            SizedBox(height: 6),
-                            Text('Up to 40% Off\non Fertilizers',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    height: 1.15)),
-                          ]),
-                      Text('🚜', style: TextStyle(fontSize: 54)),
-                    ]),
               ),
-              const SizedBox(height: 16),
-              // Featured / Top Rated
-              const Align(
-                  alignment: Alignment.centerLeft,
+            ),
+          ),
+          
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Text('🔥 Hot Deals',
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
+                          color: AppColors.textPrimary,
+                          fontSize: 14,
                           fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5))),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 100,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _FeaturedItem('🍅', 'Hybrid Seeds', 'Flat 20% OFF'),
-                    _FeaturedItem('🧪', 'Soil Test Kit', '₹299 Only'),
-                    _FeaturedItem('⚙️', 'Sprayer', 'Bestseller'),
-                  ],
+                          letterSpacing: -0.2)),
                 ),
-              ),
-              const SizedBox(height: 20),
-              // Category chips
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(children: [
-                  _CatChip('All', '', _category == '',
-                      () => setState(() => _category = '')),
-                  ...AppConstants.categories.map((c) => _CatChip(
-                      c['icon']! + ' ' + c['label']!,
-                      c['key']!,
-                      _category == c['key'],
-                      () => setState(() => _category = c['key']!))),
-                ]),
-              ),
-            ])),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 90,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    physics: const BouncingScrollPhysics(),
+                    children: [
+                      _FeaturedItem('🍅', 'Hybrid Seeds', 'Flat 20% OFF'),
+                      _FeaturedItem('🧪', 'Soil Test Kit', '₹299 Only'),
+                      _FeaturedItem('⚙️', 'Sprayer', 'Bestseller'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // Category chips
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(children: [
+                    _CatChip('All', '', _category == '', () => setState(() => _category = '')),
+                    ...AppConstants.categories.map((c) => _CatChip(
+                        c['icon']! + ' ' + c['label']!,
+                        c['key']!,
+                        _category == c['key'],
+                        () => setState(() => _category = c['key']!))),
+                  ]),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
 
         // Products
-        Expanded(
+          SliverFillRemaining(
             child: products.when(
-          loading: () => const AppShimmerGrid(),
-          error: (e, _) => AppErrorState(
-              message: 'Could not load products from the catalog',
-              onRetry: () => ref.invalidate(productsProvider)),
-          data: (data) {
-            final list = data['data'] as List? ?? [];
-            if (list.isEmpty)
-              return const AppEmptyState(
-                  icon: '🌿',
-                  title: 'No products found',
-                  subtitle: 'Try clearing your search or category filters');
-            return GridView.builder(
-              padding: const EdgeInsets.all(14),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.72,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12),
-              itemCount: list.length,
-              itemBuilder: (ctx, i) => _ProductCard(product: list[i] as Map),
-            );
-          },
-        )),
-      ]),
+              loading: () => const AppShimmerGrid(),
+              error: (e, _) => AppErrorState(
+                  message: 'Could not load products from the catalog',
+                  onRetry: () => ref.invalidate(productsProvider)),
+              data: (data) {
+                final list = data['data'] as List? ?? [];
+                if (list.isEmpty) {
+                  return const AppEmptyState(
+                      icon: '🌿',
+                      title: 'No products found',
+                      subtitle: 'Try clearing your search or category filters');
+                }
+                return GridView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  physics: const NeverScrollableScrollPhysics(), // Handled by CustomScrollView
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.72,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12),
+                  itemCount: list.length,
+                  itemBuilder: (ctx, i) => _ProductCard(product: list[i] as Map),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -211,15 +254,18 @@ class _CatChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           decoration: BoxDecoration(
             color: active
-                ? AppColors.amberLight
-                : Colors.white.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(20),
+                ? AppColors.primary
+                : AppColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: active ? AppColors.primary : AppColors.border,
+            ),
           ),
           child: Text(label,
               style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                  color: active ? AppColors.primaryDark : Colors.white)),
+                  fontSize: 12,
+                  fontWeight: active ? FontWeight.w700 : FontWeight.w600,
+                  color: active ? Colors.white : AppColors.textSecondary)),
         ),
       );
 }
@@ -262,33 +308,43 @@ class _ProductCard extends ConsumerWidget {
             ),
           ),
           Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(12),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (product['isOrganic'] == true)
-                      const Text('🌱 Organic',
-                          style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.success)),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        margin: const EdgeInsets.only(bottom: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.success.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text('🌱 ORGANIC',
+                            style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.success,
+                                letterSpacing: 0.5)),
+                      ),
                     Text(product['name'] ?? '',
-                        style: AppTextStyles.headingSM,
+                        style: AppTextStyles.headingSM.copyWith(fontSize: 13, height: 1.2),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis),
-                    const SizedBox(height: 2),
-                    Text(product['brand'] ?? '', style: AppTextStyles.caption),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
+                    Text(product['brand'] ?? '', style: AppTextStyles.caption.copyWith(fontSize: 11)),
+                    const SizedBox(height: 8),
                     Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('₹${product['price']}',
-                                    style: AppTextStyles.priceSmall),
+                                    style: AppTextStyles.priceSmall.copyWith(fontSize: 15)),
                                 Text('/${product['unit']}',
-                                    style: AppTextStyles.caption),
+                                    style: AppTextStyles.caption.copyWith(fontSize: 10)),
                               ]),
                           GestureDetector(
                             onTap: () async {
@@ -315,11 +371,11 @@ class _ProductCard extends ConsumerWidget {
                             },
                             child: Container(
                                 padding: const EdgeInsets.all(8),
-                                decoration: const BoxDecoration(
-                                    color: AppColors.primary,
-                                    shape: BoxShape.circle),
-                                child: const Icon(Icons.shopping_cart_outlined,
-                                    color: Colors.white, size: 18)),
+                                decoration: BoxDecoration(
+                                    color: AppColors.primarySurface,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: const Icon(Icons.add_shopping_cart,
+                                    color: AppColors.primary, size: 18)),
                           ),
                         ]),
                   ])),
@@ -334,28 +390,29 @@ class _FeaturedItem extends StatelessWidget {
   const _FeaturedItem(this.icon, this.title, this.deal);
   @override
   Widget build(BuildContext context) => Container(
-        width: 140,
-        margin: const EdgeInsets.only(right: 10),
+        width: 130,
+        margin: const EdgeInsets.only(right: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.12),
+            color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.2))),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Text(icon, style: const TextStyle(fontSize: 18)),
+            Text(icon, style: const TextStyle(fontSize: 20)),
             const Spacer(),
-            const Icon(Icons.arrow_forward_ios, size: 10, color: Colors.white)
+            Icon(Icons.arrow_forward, size: 14, color: AppColors.primary.withValues(alpha: 0.5))
           ]),
           const Spacer(),
           Text(title,
               style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.primaryDark,
                   fontSize: 11,
+                  letterSpacing: -0.2,
                   fontWeight: FontWeight.bold)),
           Text(deal,
               style: const TextStyle(
-                  color: AppColors.amberLight,
+                  color: AppColors.primary,
                   fontSize: 10,
                   fontWeight: FontWeight.w900)),
         ]),

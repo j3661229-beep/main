@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/providers/auth_provider.dart';
+import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -22,7 +23,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
     _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     _scale = Tween<double>(begin: 0.7, end: 1.0).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
     _controller.forward();
-    Future.delayed(const Duration(seconds: 2), _navigate);
+    _warmupAndNavigate();
+  }
+
+  Future<void> _warmupAndNavigate() async {
+    // Pre-warm the API cache while the splash is showing
+    final auth = ref.read(authProvider);
+    if (auth.isAuthenticated && auth.user != null) {
+      try {
+        // Kick off parallel prefetch requests to fill the cache
+        await Future.wait([
+          ref.read(farmerDashboardProvider.future).catchError((_) => <String, dynamic>{}),
+          ref.read(weatherProvider.future).catchError((_) => <String, dynamic>{}),
+          ref.read(cartProvider.notifier).load(),
+        ]);
+      } catch (_) {}
+    }
+    // Ensure at least 2 seconds of splash visibility
+    await Future.delayed(const Duration(seconds: 2));
+    _navigate();
   }
 
   void _navigate() {
@@ -36,6 +55,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
 
   @override
   void dispose() { _controller.dispose(); super.dispose(); }
+
 
   @override
   Widget build(BuildContext context) {

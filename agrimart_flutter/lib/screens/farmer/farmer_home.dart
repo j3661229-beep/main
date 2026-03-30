@@ -323,6 +323,52 @@ class _HomeTab extends ConsumerWidget {
                 // Data-dense Weather Widget
                 _HomeWeatherWidget(dashboard: dashboard, ref: ref),
 
+                const SizedBox(height: 16),
+
+                // Data-Dense Financial KPI Strip
+                dashboard.when(
+                  loading: () => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(children: List.generate(3, (_) => Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        height: 72,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const AppShimmer(width: 40, height: 12, borderRadius: 4),
+                            const SizedBox(height: 8),
+                            const AppShimmer(width: 60, height: 20, borderRadius: 4),
+                          ],
+                        ),
+                      )
+                    ))),
+                  ),
+                  error: (_, __) => const SizedBox.shrink(),
+                  data: (data) {
+                    final orders = (data['recentOrders'] as List? ?? []);
+                    final totalSpend = orders.fold<double>(0, (s, o) =>
+                        s + ((o['totalAmount'] as num? ?? 0).toDouble()));
+                    final pending = orders.where((o) => (o['status'] as String? ?? '') == 'PENDING').length;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(children: [
+                        _StatChip('💰', 'Spent', '₹${_fmtNum(totalSpend)}', AppColors.success),
+                        const SizedBox(width: 8),
+                        _StatChip('📦', 'Pending', '$pending', AppColors.amber),
+                        const SizedBox(width: 8),
+                        _StatChip('🌾', 'Farm', '${data['farmSize'] ?? '–'} ha', AppColors.primary),
+                      ]),
+                    );
+                  },
+                ),
+              
                 const SizedBox(height: 24),
 
                 // Premium Quick Actions Scroller
@@ -454,6 +500,44 @@ class _QuickAction extends StatelessWidget {
       ),
     );
   }
+}
+
+String _fmtNum(double n) {
+  if (n >= 100000) return '${(n / 100000).toStringAsFixed(1)}L';
+  if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
+  return n.toStringAsFixed(0);
+}
+
+class _StatChip extends StatelessWidget {
+  final String emoji, label, value;
+  final Color color;
+  const _StatChip(this.emoji, this.label, this.value, this.color);
+  @override
+  Widget build(BuildContext context) => Expanded(
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+        boxShadow: [
+          BoxShadow(color: color.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(0, 4))
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Text(emoji, style: const TextStyle(fontSize: 14)),
+            const SizedBox(width: 4),
+            Text(label, style: TextStyle(fontSize: 10, color: AppColors.textTertiary, fontWeight: FontWeight.w600)),
+          ]),
+          const SizedBox(height: 4),
+          Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color, letterSpacing: -0.5)),
+        ],
+      ),
+    ),
+  );
 }
 
 class _OrderTile extends StatelessWidget {
@@ -653,7 +737,12 @@ class _HomeWeatherWidget extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Text(isSunny ? '☀️' : '☁️', style: const TextStyle(fontSize: 36)),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(isSunny ? '☀️' : '🌥️', style: const TextStyle(fontSize: 42)),
+                ],
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -661,35 +750,42 @@ class _HomeWeatherWidget extends StatelessWidget {
                   children: [
                     Text('${w['main']?['temp']?.toStringAsFixed(0) ?? '--'}°C',
                         style: const TextStyle(
-                            fontSize: 28,
+                            fontSize: 36,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: -1,
-                            color: Colors.white)),
+                            letterSpacing: -2,
+                            color: Colors.white,
+                            height: 1)),
                     const SizedBox(height: 2),
                     Text(
-                        '${w['name'] ?? 'Your Location'} • ${w['weather']?[0]?['main'] ?? ''}',
+                        '${w['name'] ?? 'Your Location'} • ${w['weather']?[0]?['description'] ?? ''}'.capitalize(),
                         style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: Colors.white.withValues(alpha: 0.85),
                             fontSize: 12,
                             fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+                    Row(children: [
+                      _WeatherPill('💧 ${w['main']?['humidity'] ?? '--'}%'),
+                      const SizedBox(width: 8),
+                      _WeatherPill('💨 ${(w['wind']?['speed'] ?? 0).toStringAsFixed(0)} m/s'),
+                      const SizedBox(width: 8),
+                      _WeatherPill('👁️ ${((w['visibility'] as num? ?? 10000) / 1000).toStringAsFixed(0)} km'),
+                    ]),
                   ],
                 ),
               ),
-              Container(
-                height: 32,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
                   borderRadius: BorderRadius.circular(12),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () => context.push('/farmer/weather'),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Center(child: Text('Details', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold))),
+                  onTap: () => context.push('/farmer/weather'),
+                  child: Container(
+                    height: 36,
+                    width: 36,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    child: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
                   ),
                 ),
               ),
@@ -699,4 +795,22 @@ class _HomeWeatherWidget extends StatelessWidget {
       },
     );
   }
+}
+
+extension StringCapitalize on String {
+  String capitalize() => isNotEmpty ? '${this[0].toUpperCase()}${substring(1)}' : '';
+}
+
+class _WeatherPill extends StatelessWidget {
+  final String text;
+  const _WeatherPill(this.text);
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: Colors.white.withValues(alpha: 0.2),
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700)),
+  );
 }

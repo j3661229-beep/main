@@ -3,6 +3,8 @@ const { success, paginated } = require('../utils/apiResponse');
 const { getPagination } = require('../utils/helpers');
 
 const getSupplierId = (req) => req.user?.supplier?.id;
+const getUserId = (req) => req.user?.id;
+
 
 const getProfile = async (req, res, next) => {
     try { success(res, await supplierService.getProfile(getSupplierId(req))); } catch (e) { next(e); }

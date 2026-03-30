@@ -14,8 +14,12 @@ class CartScreen extends ConsumerWidget {
     final cart = ref.watch(cartProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-          title: const Text('🛒 Cart'), backgroundColor: AppColors.primary),
+          title: const Text('🛒 My Cart', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)), 
+          backgroundColor: AppColors.primary,
+          elevation: 0,
+          centerTitle: true),
       body: cart.when(
         loading: () => const AppShimmerList(itemCount: 5),
         error: (e, _) => const Center(child: Text('Could not load cart')),
@@ -46,65 +50,85 @@ class CartScreen extends ConsumerWidget {
           return Column(children: [
             Expanded(
                 child: ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               itemCount: items.length,
               itemBuilder: (ctx, i) {
                 final item = items[i] as Map;
                 final product = item['product'] as Map? ?? {};
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(14),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.border)),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4)
+                        )
+                      ],
+                      border: Border.all(color: AppColors.border.withValues(alpha: 0.5))),
                   child: Row(children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                          width: 64,
-                          height: 64,
+                    Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
                           color: AppColors.primarySurface,
-                          child: const Center(
-                              child:
-                                  Text('🌿', style: TextStyle(fontSize: 30)))),
-                    ),
-                    const SizedBox(width: 12),
+                          borderRadius: BorderRadius.circular(16)
+                        ),
+                        child: const Center(
+                            child:
+                                Text('🌿', style: TextStyle(fontSize: 32)))),
+                    const SizedBox(width: 14),
                     Expanded(
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                           Text(product['name'] ?? '',
-                              style: AppTextStyles.headingSM, maxLines: 2),
+                              style: AppTextStyles.headingSM.copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
+                          const SizedBox(height: 4),
                           Text('₹${product['price']} /${product['unit']}',
                               style: AppTextStyles.priceSmall
-                                  .copyWith(fontSize: 14)),
+                                  .copyWith(fontSize: 13, color: AppColors.textSecondary)),
                         ])),
+                    const SizedBox(width: 8),
                     // Qty control
-                    Row(children: [
-                      _QtyBtn(
-                          icon: Icons.remove,
-                          onTap: () {
-                            if ((item['quantity'] as int) <= 1) {
-                              ref
-                                  .read(cartProvider.notifier)
-                                  .removeItem(item['id']);
-                            } else {
-                              ref.read(cartProvider.notifier).updateItem(
-                                  item['id'], (item['quantity'] as int) - 1);
-                            }
-                          }),
-                      Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                        _QtyBtn(
+                            icon: Icons.remove,
+                            onTap: () {
+                              if ((item['quantity'] as int) <= 1) {
+                                ref
+                                    .read(cartProvider.notifier)
+                                    .removeItem(item['id']);
+                              } else {
+                                ref.read(cartProvider.notifier).updateItem(
+                                    item['id'], (item['quantity'] as int) - 1);
+                              }
+                            }),
+                        Container(
+                          width: 32,
+                          alignment: Alignment.center,
                           child: Text('${item['quantity']}',
-                              style: AppTextStyles.headingMD)),
-                      _QtyBtn(
-                          icon: Icons.add,
-                          onTap: () => ref
-                              .read(cartProvider.notifier)
-                              .updateItem(
-                                  item['id'], (item['quantity'] as int) + 1)),
-                    ]),
+                                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                        ),
+                        _QtyBtn(
+                            icon: Icons.add,
+                            onTap: () => ref
+                                .read(cartProvider.notifier)
+                                .updateItem(
+                                    item['id'], (item['quantity'] as int) + 1)),
+                      ]),
+                    ),
                   ]),
                 );
               },
@@ -112,26 +136,38 @@ class CartScreen extends ConsumerWidget {
 
             // Checkout bar
             Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: AppColors.surface, boxShadow: [
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+              decoration: BoxDecoration(
+                color: Colors.white, 
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 12,
-                    offset: const Offset(0, -4))
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, -10))
               ]),
               child: SafeArea(
                   child: Column(children: [
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Total', style: AppTextStyles.headingLG),
+                      const Text('Total to Pay', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
                       Text('₹${total.toStringAsFixed(0)}',
-                          style: AppTextStyles.price),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5, color: AppColors.primaryDark)),
                     ]),
-                const SizedBox(height: 12),
-                ElevatedButton(
-                  onPressed: () => context.push('/farmer/checkout'),
-                  child: const Text('Proceed to Checkout →'),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 0,
+                    ),
+                    onPressed: () => context.push('/farmer/checkout'),
+                    child: const Text('Proceed to Checkout →', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                  ),
                 ),
               ])),
             ),
@@ -150,12 +186,11 @@ class _QtyBtn extends StatelessWidget {
   Widget build(BuildContext context) => GestureDetector(
         onTap: onTap,
         child: Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-                color: AppColors.primarySurface,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.primaryBorder)),
-            child: Icon(icon, size: 18, color: AppColors.primary)),
+            width: 32,
+            height: 32,
+            decoration: const BoxDecoration(
+                color: Colors.transparent,
+            ),
+            child: Icon(icon, size: 16, color: AppColors.primaryDark)),
       );
 }

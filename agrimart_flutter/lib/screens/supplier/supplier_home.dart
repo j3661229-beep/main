@@ -297,6 +297,10 @@ class _OrderCard extends ConsumerWidget {
       'OUT_FOR_DELIVERY': AppColors.primaryLight, 'DELIVERED': AppColors.success,
     }[status] ?? AppColors.amber;
 
+    final _allStatuses = const ['PENDING', 'PROCESSING', 'DISPATCHED', 'OUT_FOR_DELIVERY', 'DELIVERED'];
+    // Clamp to a known value so the DropdownButton assertion never fires
+    final safeStatus = _allStatuses.contains(status) ? status : 'PENDING';
+
     return Container(margin: const EdgeInsets.only(bottom: 14), decoration: BoxDecoration(
       color: Colors.white, borderRadius: BorderRadius.circular(16),
       boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 3))],
@@ -325,9 +329,9 @@ class _OrderCard extends ConsumerWidget {
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           const Text('Update Status:', style: AppTextStyles.labelMD),
           DropdownButton<String>(
-            value: status,
+            value: safeStatus,
             isDense: true,
-            items: ['PROCESSING', 'DISPATCHED', 'OUT_FOR_DELIVERY', 'DELIVERED'].map((s) =>
+            items: _allStatuses.map((s) =>
               DropdownMenuItem(value: s, child: Text(s.replaceAll('_', ' '), style: TextStyle(fontSize: 12, color: statusColor, fontWeight: FontWeight.w600)))).toList(),
             onChanged: (s) async {
               if (s == null) return;

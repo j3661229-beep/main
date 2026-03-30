@@ -14,9 +14,12 @@ class OrderTrackingScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tracking = ref.watch(orderTrackingProvider(orderId));
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-          title: const Text('📍 Order Tracking'),
-          backgroundColor: AppColors.primary),
+          title: const Text('📍 Order Tracking', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+          backgroundColor: AppColors.primary,
+          elevation: 0,
+          centerTitle: true),
       body: tracking.when(
         loading: () => const AppShimmerList(),
         error: (e, _) => AppErrorState(
@@ -25,7 +28,7 @@ class OrderTrackingScreen extends ConsumerWidget {
         data: (data) {
           final backendSteps = (data['tracking'] as List? ?? []);
           return ListView(padding: const EdgeInsets.all(24), children: [
-            const Text('Order Status', style: AppTextStyles.headingXL),
+            const Text('Tracking History', style: AppTextStyles.headingLG),
             const SizedBox(height: 24),
             ...backendSteps.asMap().entries.map((e) {
               final step = e.value as Map;
@@ -37,17 +40,20 @@ class OrderTrackingScreen extends ConsumerWidget {
                   children: [
                     Column(children: [
                       Container(
-                        width: 28,
-                        height: 28,
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
+                            border: Border.all(
+                                color: completed ? AppColors.primary : AppColors.border, 
+                                width: completed ? 0 : 2),
                             color: completed
                                 ? AppColors.primary
-                                : AppColors.border),
+                                : Colors.transparent),
                         child: Icon(
                             completed && !current ? Icons.check : Icons.circle,
                             size: 16,
-                            color: Colors.white),
+                            color: completed ? Colors.white : AppColors.border),
                       ),
                       if (e.key < backendSteps.length - 1)
                         Container(
@@ -55,35 +61,43 @@ class OrderTrackingScreen extends ConsumerWidget {
                             height: 40,
                             color: completed
                                 ? AppColors.primary
-                                : AppColors.border),
+                                : AppColors.border.withValues(alpha: 0.5)),
                     ]),
                     const SizedBox(width: 16),
                     Padding(
-                      padding: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.only(top: 6),
                       child: Text(label,
                           style: current
-                              ? AppTextStyles.headingSM
-                                  .copyWith(color: AppColors.primary)
-                              : AppTextStyles.bodyMD),
+                              ? const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primaryDark, letterSpacing: 0.5)
+                              : const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary, letterSpacing: 0.5)),
                     ),
                   ]);
             }),
             const SizedBox(height: 24),
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                  color: AppColors.primarySurface,
-                  borderRadius: BorderRadius.circular(14)),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 5))
+                  ],
+                  border: Border.all(color: AppColors.border.withValues(alpha: 0.5))),
               child: Row(children: [
-                const Text('📈', style: TextStyle(fontSize: 24)),
-                const SizedBox(width: 12),
+                Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(12)),
+                    child: const Center(child: Text('📈', style: TextStyle(fontSize: 24)))),
+                const SizedBox(width: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Delivery Progress',
-                        style: AppTextStyles.labelLG),
-                    Text('${data['progressPercent'] ?? 0}% complete',
-                        style: AppTextStyles.headingSM),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
+                    const SizedBox(height: 4),
+                    Text('${data['progressPercent'] ?? 0}% completed',
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.primaryDark)),
                   ],
                 ),
               ]),
