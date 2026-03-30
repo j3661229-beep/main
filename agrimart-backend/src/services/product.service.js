@@ -2,7 +2,7 @@ const prisma = require('../config/database');
 const { uploadToSupabase } = require('../middleware/upload');
 const { haversineDistance } = require('../utils/helpers');
 
-const getProducts = async ({ category, search, sort, district, page, limit, skip }) => {
+const getProducts = async ({ category, search, sort, district, lat, lng, radius = 50, page, limit, skip }) => {
     const where = { isActive: true, isApproved: true, stockQuantity: { gt: 0 } };
     if (category) where.category = category.toUpperCase();
     if (district) where.supplier = { district: { contains: district, mode: 'insensitive' } };
@@ -13,12 +13,23 @@ const getProducts = async ({ category, search, sort, district, page, limit, skip
             { description: { contains: search, mode: 'insensitive' } },
         ];
     }
-    const orderBy = sort === 'price_asc' ? { price: 'asc' } : sort === 'price_desc' ? { price: 'desc' } : { createdAt: 'desc' };
-    const [products, total] = await Promise.all([
-        prisma.product.findMany({ where, skip, take: limit, orderBy, include: { supplier: { include: { user: true } } } }),
-        prisma.product.count({ where }),
-    ]);
-    return { products, total };
+
+    // Sort by location if provided
+    let products = await prisma.product.findMany({
+        where,
+        include: { supplier: { include: { user: true } } },
+        orderBy: sort === 'price_asc' ? { price: 'asc' } : sort === 'price_desc' ? { price: 'desc' } : { createdAt: 'desc' }
+    });
+
+    if (lat && lng) {
+        products = products.filter(p => p.supplier.latitude && p.supplier.longitude &&
+            haversineDistance(parseFloat(lat), parseFloat(lng), p.supplier.latitude, p.supplier.longitude) <= parseFloat(radius));
+    }
+
+    const total = products.length;
+    const paginatedProducts = products.slice(skip, skip + limit);
+
+    return { products: paginatedProducts, total };
 };
 
 const getProduct = async (id) => {
@@ -70,7 +81,7 @@ const createProduct = async (supplierId, data) => {
             brand: data.brand,
             composition: data.composition,
             usageInstructions: data.usageInstructions,
-            images: [],
+            images: data.images || [],
         },
         include: { supplier: true },
     });

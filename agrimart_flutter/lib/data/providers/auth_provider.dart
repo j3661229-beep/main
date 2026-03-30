@@ -86,11 +86,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // but we *do* need to update the cached user.
       if (res['user'] == null) {
           // If the backend returns wrapped or unwrapped user
-          final user = UserModel.fromJson(res);
+          final userData = Map<String, dynamic>.from(res);
+          final user = UserModel.fromJson(userData);
           await _storage.write(key: AppConstants.userKey, value: jsonEncode(res));
           state = AuthState(user: user, isAuthenticated: true);
       } else {
-          final user = UserModel.fromJson(res['user']);
+          final userData = Map<String, dynamic>.from(res['user'] as Map);
+          final user = UserModel.fromJson(userData);
           await _storage.write(key: AppConstants.userKey, value: jsonEncode(res['user']));
           state = AuthState(user: user, isAuthenticated: true);
       }

@@ -87,6 +87,28 @@ const getPendingSuppliers = async () => {
     });
 };
 
+const getAllSuppliers = async ({ page, limit, skip }, { search, isVerified }) => {
+    const where = {};
+    if (isVerified !== undefined) where.isVerified = isVerified === 'true';
+    if (search) {
+        where.OR = [
+            { businessName: { contains: search, mode: 'insensitive' } },
+            { address: { contains: search, mode: 'insensitive' } },
+            { user: { name: { contains: search, mode: 'insensitive' } } },
+            { user: { phone: { contains: search } } }
+        ];
+    }
+    const [suppliers, total] = await Promise.all([
+        prisma.supplier.findMany({
+            where, skip, take: limit,
+            orderBy: { createdAt: 'desc' },
+            include: { user: true, products: { take: 5 } }
+        }),
+        prisma.supplier.count({ where })
+    ]);
+    return { suppliers, total };
+};
+
 const verifySupplier = async (supplierId, { action, reason }) => {
     if (action === 'approve') {
         return prisma.supplier.update({ where: { id: supplierId }, data: { isVerified: true, verifiedAt: new Date() } });
@@ -141,4 +163,4 @@ const { createScheme, updateScheme, deleteScheme } = schemeService;
 const notifService = require('./notification.service');
 const { broadcastNotification } = notifService;
 
-module.exports = { adminLogin, getDashboardStats, getUsers, getUser, toggleUserActive, getPendingSuppliers, verifySupplier, getProducts, approveProduct, rejectProduct, getAllOrders, createScheme, updateScheme, deleteScheme, broadcastNotification };
+module.exports = { adminLogin, getDashboardStats, getUsers, getUser, toggleUserActive, getPendingSuppliers, getAllSuppliers, verifySupplier, getProducts, approveProduct, rejectProduct, getAllOrders, createScheme, updateScheme, deleteScheme, broadcastNotification };

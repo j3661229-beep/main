@@ -32,7 +32,9 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
       _result = null;
     });
     try {
-      final res = await ApiService.instance.analyzeSoil(_image!.path);
+      final user = ref.read(authProvider).user;
+      final location = "${user?.farmer?.village ?? ''}, ${user?.farmer?.district ?? ''}";
+      final res = await ApiService.instance.analyzeSoil(_image!.path, location: location);
       setState(() {
         _result = res;
         _analyzing = false;

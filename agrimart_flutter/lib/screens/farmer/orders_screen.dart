@@ -16,6 +16,10 @@ class OrdersScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/farmer'),
+          ),
           title: const Text('📦 My Orders', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
           backgroundColor: AppColors.primary,
           elevation: 0,

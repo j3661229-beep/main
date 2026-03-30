@@ -106,13 +106,14 @@ class CartScreen extends ConsumerWidget {
                         _QtyBtn(
                             icon: Icons.remove,
                             onTap: () {
-                              if ((item['quantity'] as int) <= 1) {
+                              final currentQty = (item['quantity'] as num).toInt();
+                              if (currentQty <= 1) {
                                 ref
                                     .read(cartProvider.notifier)
                                     .removeItem(item['id']);
                               } else {
                                 ref.read(cartProvider.notifier).updateItem(
-                                    item['id'], (item['quantity'] as int) - 1);
+                                    item['id'], currentQty - 1);
                               }
                             }),
                         Container(
@@ -126,7 +127,7 @@ class CartScreen extends ConsumerWidget {
                             onTap: () => ref
                                 .read(cartProvider.notifier)
                                 .updateItem(
-                                    item['id'], (item['quantity'] as int) + 1)),
+                                    item['id'], (item['quantity'] as num).toInt() + 1)),
                       ]),
                     ),
                   ]),

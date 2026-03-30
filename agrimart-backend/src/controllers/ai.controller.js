@@ -4,7 +4,7 @@ const { success } = require('../utils/apiResponse');
 const soilAnalysis = async (req, res, next) => {
     try {
         if (!req.file) return res.status(400).json({ success: false, message: 'Image file required' });
-        const data = await aiService.soilAnalysis(req.user.farmer?.id, req.file.buffer, req.file.originalname);
+        const data = await aiService.soilAnalysis(req.user.farmer?.id, req.file.buffer, req.file.originalname, req.body.location);
         success(res, data);
     } catch (e) { next(e); }
 };

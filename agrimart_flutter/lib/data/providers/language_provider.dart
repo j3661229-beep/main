@@ -22,6 +22,17 @@ class LanguageNotifier extends StateNotifier<String> {
   }
 }
 
+import './language_provider.dart';
+import '../core/i18n/app_translations.dart';
+
+extension LanguageHelper on WidgetRef {
+  String tr(String key) {
+    final lang = watch(languageProvider);
+    return AppTranslations.translate(key, lang);
+  }
+}
+
 final languageProvider = StateNotifierProvider<LanguageNotifier, String>((ref) {
   return LanguageNotifier();
 });
+

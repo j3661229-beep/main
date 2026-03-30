@@ -96,6 +96,8 @@ class ApiService {
       if (category != null) 'category': category,
       if (search != null) 'search': search,
       if (sort != null) 'sort': sort,
+      if (lat != null) 'lat': lat,
+      if (lng != null) 'lng': lng,
       'page': page,
       'limit': AppConstants.defaultPageSize,
     });
@@ -205,9 +207,10 @@ class ApiService {
   }
 
   // ── AI ────────────────────────────────────────────────────
-  Future<Map> analyzeSoil(String imagePath) async {
+  Future<Map> analyzeSoil(String imagePath, {String? location}) async {
     final formData = FormData.fromMap({
-      'image': await MultipartFile.fromFile(imagePath, filename: 'soil.jpg')
+      'image': await MultipartFile.fromFile(imagePath, filename: 'soil.jpg'),
+      if (location != null) 'location': location,
     });
     final r = await _dio.post('/ai/soil-analysis',
         data: formData, options: Options(contentType: 'multipart/form-data'));

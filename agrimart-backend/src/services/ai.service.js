@@ -13,10 +13,12 @@ const SYSTEM_KISAN = `You are Kisan AI, an expert agricultural assistant for Ind
 
 const parseJSON = (text) => {
     try {
-        const match = text.match(/```json\s*([\s\S]*?)```/) || text.match(/\{[\s\S]*\}/) || text.match(/\[[\s\S]*\]/);
-        return JSON.parse(match ? match[1] || match[0] : text);
-    } catch {
-        return { raw: text };
+        const clean = text.replace(/```json/g, "").replace(/```/g, "").trim();
+        const match = clean.match(/\{[\s\S]*\}/) || clean.match(/\[[\s\S]*\]/);
+        return JSON.parse(match ? match[0] : clean);
+    } catch (e) {
+        logger.error(`JSON Parse Error: ${e.message}. Raw text: ${text.substring(0, 100)}...`);
+        return { error: 'Failed to parse AI response', raw: text };
     }
 };
 
@@ -66,10 +68,10 @@ const generateWithFallback = async (prompt, imageBase64 = null) => {
     throw lastError || new Error("All Gemini fallback models failed during generation.");
 };
 
-const soilAnalysis = async (farmerId, imageBuffer, originalName) => {
+const soilAnalysis = async (farmerId, imageBuffer, originalName, location = '') => {
     const imageUrl = await uploadToSupabase(imageBuffer, originalName || 'soil.jpg', 'soil');
 
-    const prompt = `Analyse this Indian farm soil image. Return ONLY valid JSON with these keys exactly: soilType (string), phLevel (number), nitrogenLevel ("low"|"medium"|"high"), phosphorusLevel ("low"|"medium"|"high"), potassiumLevel ("low"|"medium"|"high"), organicMatter ("low"|"medium"|"high"), recommendedCrops (array of 3-5 strings), treatmentAdvice (string in simple English), confidence (number 0-1)`;
+    const prompt = `Analyse this Indian farm soil image. ${location ? `The farm is located in ${location}. ` : ''}Return ONLY valid JSON with these keys exactly: soilType (string), phLevel (number), nitrogenLevel ("low"|"medium"|"high"), phosphorusLevel ("low"|"medium"|"high"), potassiumLevel ("low"|"medium"|"high"), organicMatter ("low"|"medium"|"high"), recommendedCrops (array of 3-5 strings), treatmentAdvice (string in simple English or Indian regional language if appropriate), confidence (number 0-1)`;
 
     const textPayload = await generateWithFallback(prompt, imageBuffer.toString("base64"));
     const analysis = parseJSON(textPayload);

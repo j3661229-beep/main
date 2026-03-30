@@ -48,28 +48,28 @@ class _FarmerHomeState extends ConsumerState<FarmerHome> {
             child: Row(children: [
               _NavItem(
                   icon: '🏠',
-                  label: 'Home',
+                  label: ref.tr('home'),
                   active: _tab == 0,
                   onTap: () => setState(() => _tab = 0)),
               _NavItem(
                   icon: '🛒',
-                  label: 'Shop',
+                  label: ref.tr('shop'),
                   active: _tab == 1,
                   onTap: () => setState(() => _tab = 1),
                   badge: cartCount > 0 ? cartCount : null),
               _NavItem(
                   icon: '🤖',
-                  label: 'AI',
+                  label: ref.tr('ai'),
                   active: _tab == 2,
                   onTap: () => setState(() => _tab = 2)),
               _NavItem(
                   icon: '📈',
-                  label: 'Mandi',
+                  label: ref.tr('mandi'),
                   active: _tab == 3,
                   onTap: () => setState(() => _tab = 3)),
               _NavItem(
                   icon: '👤',
-                  label: 'Profile',
+                  label: ref.tr('profile'),
                   active: _tab == 4,
                   onTap: () => setState(() => _tab = 4)),
             ]),
@@ -374,24 +374,27 @@ class _HomeTab extends ConsumerWidget {
                 // Premium Quick Actions Scroller
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text('Services & AI', style: AppTextStyles.headingMD.copyWith(letterSpacing: -0.3)),
+                  child: Text(ref.tr('services_ai'), style: AppTextStyles.headingMD.copyWith(letterSpacing: -0.3)),
                 ),
                 const SizedBox(height: 12),
-                SizedBox(
-                  height: 80,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 10,
+                    childAspectRatio: 0.85,
                     children: [
-                      _QuickAction('🌿', 'Shop', const Color(0xFFE8F5E9), const Color(0xFF2E7D32), () => context.push('/farmer/shop')),
-                      _QuickAction('🧪', 'Soil AI', const Color(0xFFFFF3E0), const Color(0xFFE65100), () => context.push('/farmer/soil')),
-                      _QuickAction('🔬', 'Disease', const Color(0xFFFFEBEE), const Color(0xFFC62828), () => context.push('/farmer/disease')),
-                      _QuickAction('📈', 'Mandi', const Color(0xFFE3F2FD), const Color(0xFF1565C0), () => context.push('/farmer/mandi')),
-                      _QuickAction('🌱', 'Crops', const Color(0xFFF1F8E9), const Color(0xFF33691E), () => context.push('/farmer/crop-advisor')),
-                      _QuickAction('☁️', 'Weather', const Color(0xFFE1F5FE), const Color(0xFF0277BD), () => context.push('/farmer/weather')),
-                      _QuickAction('💬', 'Kisan Chat', const Color(0xFFF3E5F5), const Color(0xFF6A1B9A), () => context.push('/farmer/kisan-ai')),
-                      _QuickAction('🏛️', 'Schemes', const Color(0xFFFFFDE7), const Color(0xFFF57F17), () => context.push('/farmer/schemes')),
+                      _QuickAction('🌿', ref.tr('shop'), const Color(0xFFE8F5E9), const Color(0xFF2E7D32), () => context.push('/farmer/shop')),
+                      _QuickAction('🧪', ref.tr('soil_ai'), const Color(0xFFFFF3E0), const Color(0xFFE65100), () => context.push('/farmer/soil')),
+                      _QuickAction('🔬', ref.tr('disease'), const Color(0xFFFFEBEE), const Color(0xFFC62828), () => context.push('/farmer/disease')),
+                      _QuickAction('📤', ref.tr('mandi'), const Color(0xFFE3F2FD), const Color(0xFF1565C0), () => context.push('/farmer/mandi')),
+                      _QuickAction('🌱', ref.tr('crops'), const Color(0xFFF1F8E9), const Color(0xFF33691E), () => context.push('/farmer/crop-advisor')),
+                      _QuickAction('☁️', ref.tr('weather'), const Color(0xFFE1F5FE), const Color(0xFF0277BD), () => context.push('/farmer/weather')),
+                      _QuickAction('💬', ref.tr('kisan_chat'), const Color(0xFFF3E5F5), const Color(0xFF6A1B9A), () => context.push('/farmer/kisan-ai')),
+                      _QuickAction('🏛️', ref.tr('schemes'), const Color(0xFFFFFDE7), const Color(0xFFF57F17), () => context.push('/farmer/schemes')),
                     ],
                   ),
                 ),

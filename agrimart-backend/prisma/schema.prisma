@@ -140,6 +140,10 @@ model Product {
   orderItems        OrderItem[]
   cartItems         CartItem[]
   reviews           Review[]
+
+  @@index([category])
+  @@index([supplierId])
+  @@index([isActive, isApproved])
 }
 
 model Cart {
@@ -180,6 +184,9 @@ model Order {
   farmer          Farmer        @relation(fields: [farmerId], references: [id])
   items           OrderItem[]
   payment         Payment?
+
+  @@index([farmerId])
+  @@index([status])
 }
 
 model OrderItem {

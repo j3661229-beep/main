@@ -20,6 +20,7 @@ router.patch('/users/:id/toggle', adminController.toggleUserActive);
 
 // Suppliers
 router.get('/suppliers/pending', adminController.getPendingSuppliers);
+router.get('/suppliers', adminController.getAllSuppliers);
 router.post('/suppliers/:id/verify', adminController.verifySupplier);
 
 // Products
