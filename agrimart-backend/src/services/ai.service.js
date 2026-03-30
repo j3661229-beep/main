@@ -53,7 +53,7 @@ const generateWithFallback = async (prompt, imageBase64 = null) => {
     }
 
     // 2. Fallback to Gemini
-    const modelsToTry = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-pro"];
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro"];
     const contents = imageBase64 ? [prompt, { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }] : prompt;
 
     for (const modelName of modelsToTry) {
@@ -130,7 +130,10 @@ const cropRecommend = async (farmerId, { location, soilType, season, farmSize, l
     const cached = await cache.get(cacheKey);
     if (cached) return cached;
 
-    const prompt = `You are an expert Indian agricultural advisor. Context: ${context}. Respond in ${language}. Recommend 6 crops. Return ONLY JSON array of {crop, emoji, matchPercent (number), reason (short for voice), expectedYield, marketDemand}`;
+    const prompt = `Recommend 6 suitable crops for an Indian farmer with this context: ${context}. 
+    Respond in ${language}. 
+    IMPORTANT: Return ONLY a valid JSON array of objects. No additional text.
+    Each object must have these keys: crop, emoji, matchPercent (number), reason (short for voice), expectedYield, marketDemand.`;
 
     const textPayload = await generateWithFallback(prompt);
     logger.info(`Crop Recommend Raw Payload: ${textPayload}`);
@@ -183,7 +186,7 @@ const chat = async (userId, { message, history = [], language = 'English' }) => 
             parts: [{ text: msg.content }]
         }));
 
-    const modelsToTry = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-pro"];
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro"];
 
     for (const modelName of modelsToTry) {
         try {
