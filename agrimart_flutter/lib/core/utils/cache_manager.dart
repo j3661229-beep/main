@@ -24,6 +24,10 @@ class CacheManager {
     return entry['data'];
   }
 
+  static Future<void> delete(String key) async {
+    await _box.delete(key);
+  }
+
   static Future<void> clear() async {
     await _box.clear();
   }

@@ -4,6 +4,7 @@ const supabase = require('../config/supabase');
 const prisma = require('../config/database');
 const { uploadToSupabase } = require('../middleware/upload');
 const logger = require('../utils/logger');
+const cache = require('../utils/cache');
 
 // Initialize Gemini & Cerebras
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -52,7 +53,7 @@ const generateWithFallback = async (prompt, imageBase64 = null) => {
     }
 
     // 2. Fallback to Gemini
-    const modelsToTry = ["gemini-1.5-flash-latest", "gemini-2.0-flash", "gemini-2.0-flash-exp", "gemini-1.5-pro-latest"];
+    const modelsToTry = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-pro"];
     const contents = imageBase64 ? [prompt, { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }] : prompt;
 
     for (const modelName of modelsToTry) {
@@ -181,7 +182,7 @@ const chat = async (userId, { message, history = [], language = 'English' }) => 
             parts: [{ text: msg.content }]
         }));
 
-    const modelsToTry = ["gemini-1.5-flash-latest", "gemini-2.5-flash", "gemini-1.5-pro-latest", "gemini-pro"];
+    const modelsToTry = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-pro"];
 
     for (const modelName of modelsToTry) {
         try {

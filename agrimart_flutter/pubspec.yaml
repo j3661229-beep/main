@@ -66,8 +66,8 @@ dependencies:
   onesignal_flutter: ^5.4.6
 
   # Voice-to-Text & Text-to-Speech
-  speech_to_text: ^6.1.1
-  flutter_tts: ^4.2.2
+  speech_to_text: ^7.0.0
+  flutter_tts: ^4.2.5
 
   # Animations
   animate_do: ^3.3.4

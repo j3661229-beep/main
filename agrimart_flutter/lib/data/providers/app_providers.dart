@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/api_service.dart';
 import '../../core/utils/cache_manager.dart';
@@ -54,35 +55,80 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
   CartNotifier() : super(const AsyncValue.loading()) {
     load();
   }
-  final _api = ApiService.instance;
 
   Future<void> load() async {
     state = const AsyncValue.loading();
     try {
-      state = AsyncValue.data(await _api.getCart());
+      final cached = CacheManager.get('local_cart');
+      if (cached != null) {
+        // Safe deep cast
+        final decoded = jsonDecode(jsonEncode(cached));
+        state = AsyncValue.data(decoded is Map ? decoded as Map<String, dynamic> : {'items': []});
+      } else {
+        state = const AsyncValue.data({'items': []});
+      }
     } catch (e, s) {
       state = AsyncValue.error(e, s);
     }
   }
 
-  Future<void> addItem(String productId, int quantity) async {
-    await _api.addToCart(productId: productId, quantity: quantity);
-    await load();
+  Future<void> _saveLocal() async {
+    if (state.hasValue) {
+      await CacheManager.save('local_cart', state.value!);
+    }
+  }
+
+  Future<void> addItem(Map<String, dynamic> product, int quantity) async {
+    final current = state.valueOrNull != null ? Map<String, dynamic>.from(state.value!) : {'items': []};
+    final items = List<Map<String, dynamic>>.from(current['items'] ?? []);
+    
+    final productId = product['id'] ?? product['_id'];
+    
+    final index = items.indexWhere((item) => (item['productId'] == productId) || (item['product']?['id'] == productId) || (item['product']?['_id'] == productId));
+    
+    if (index >= 0) {
+      final existingQty = items[index]['quantity'] as int;
+      items[index] = {...items[index], 'quantity': existingQty + quantity};
+    } else {
+      items.add({
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'productId': productId,
+        'product': product,
+        'quantity': quantity,
+      });
+    }
+    
+    current['items'] = items;
+    state = AsyncValue.data(current);
+    await _saveLocal();
   }
 
   Future<void> updateItem(String itemId, int quantity) async {
-    await _api.updateCartItem(itemId, quantity);
-    await load();
+    final current = state.valueOrNull != null ? Map<String, dynamic>.from(state.value!) : {'items': []};
+    final items = List<Map<String, dynamic>>.from(current['items'] ?? []);
+    
+    final index = items.indexWhere((item) => item['id'] == itemId);
+    if (index >= 0) {
+      items[index] = {...items[index], 'quantity': quantity};
+      current['items'] = items;
+      state = AsyncValue.data(current);
+      await _saveLocal();
+    }
   }
 
   Future<void> removeItem(String itemId) async {
-    await _api.removeCartItem(itemId);
-    await load();
+    final current = state.valueOrNull != null ? Map<String, dynamic>.from(state.value!) : {'items': []};
+    List<Map<String, dynamic>> items = List<Map<String, dynamic>>.from(current['items'] ?? []);
+    
+    items.removeWhere((item) => item['id'] == itemId);
+    current['items'] = items;
+    state = AsyncValue.data(current);
+    await _saveLocal();
   }
 
   Future<void> clear() async {
-    await _api.clearCart();
-    await load();
+    state = const AsyncValue.data({'items': []});
+    await CacheManager.delete('local_cart');
   }
 
   int get itemCount {

@@ -224,7 +224,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                   } else if (cartItemId != null) {
                                      await ref.read(cartProvider.notifier).updateItem(cartItemId, newQty);
                                   } else if (newQty > 0) {
-                                     await ref.read(cartProvider.notifier).addItem(p['id'], newQty);
+                                     await ref.read(cartProvider.notifier).addItem(Map<String, dynamic>.from(p), newQty);
                                   }
                                } catch (e) {
                                   if (context.mounted) {

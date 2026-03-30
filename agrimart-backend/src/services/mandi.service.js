@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cache = require('../utils/cache');
+const redis = require('../config/redis');
 
 // Fallback mock mandi data
 const MOCK_PRICES = [

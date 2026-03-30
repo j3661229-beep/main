@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../data/services/api_service.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
@@ -166,7 +167,34 @@ class CartScreen extends ConsumerWidget {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       elevation: 0,
                     ),
-                    onPressed: () => context.push('/farmer/checkout'),
+                    onPressed: () async {
+                      // Sync local cart to backend before checkout
+                      try {
+                        // show loading dialog
+                        showDialog(
+                          context: context, 
+                          barrierDismissible: false,
+                          builder: (_) => const Center(child: CircularProgressIndicator())
+                        );
+                        final api = ApiService.instance;
+                        await api.clearCart();
+                        for (final item in items) {
+                           await api.addToCart(
+                             productId: item['product']?['id'] ?? item['product']?['_id'] ?? item['productId'], 
+                             quantity: item['quantity']
+                           );
+                        }
+                        if (context.mounted) {
+                          Navigator.pop(context); // hide loading
+                          context.push('/farmer/checkout');
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          Navigator.pop(context); // hide loading
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to sync cart: $e')));
+                        }
+                      }
+                    },
                     child: const Text('Proceed to Checkout →', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
                   ),
                 ),

@@ -169,7 +169,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       try {
                         await ref
                             .read(cartProvider.notifier)
-                            .addItem(widget.productId, _quantity);
+                            .addItem(Map<String, dynamic>.from(p), _quantity);
                             if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
