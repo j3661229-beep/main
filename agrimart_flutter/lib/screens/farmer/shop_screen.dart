@@ -196,7 +196,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                 sliver: products.when(
                   loading: () => const SliverToBoxAdapter(child: AppShimmerGrid()),
                   error: (e, _) => SliverToBoxAdapter(
-                     child: AppErrorState(message: 'Could not load products', onRetry: () => ref.invalidate(productsProvider))
+                     child: AppErrorState(message: e.toString(), onRetry: () => ref.invalidate(productsProvider))
                   ),
                   data: (data) {
                     final list = data['data'] as List? ?? [];

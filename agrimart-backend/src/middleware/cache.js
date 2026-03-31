@@ -37,3 +37,5 @@ const cache = (ttlSeconds) => async (req, res, next) => {
         next() // Proceed without caching on error
     }
 }
+
+module.exports = { cache };

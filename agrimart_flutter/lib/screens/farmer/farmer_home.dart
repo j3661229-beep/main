@@ -424,7 +424,7 @@ class _HomeTab extends ConsumerWidget {
                     children: [_OrderShimmer(), _OrderShimmer(), _OrderShimmer()],
                   ),
                   error: (e, _) => AppErrorState(
-                      message: 'Could not load your activity',
+                      message: e.toString(),
                       onRetry: () => ref.invalidate(farmerDashboardProvider)),
                   data: (data) {
                     final orders = data['recentOrders'] as List? ?? [];
@@ -712,7 +712,7 @@ class _HomeWeatherWidget extends StatelessWidget {
     return dashboard.when(
       loading: () => const _WeatherShimmer(),
       error: (e, _) => AppErrorState(
-        message: 'Weather summary unavailable',
+        message: e.toString(),
         onRetry: () => ref.invalidate(farmerDashboardProvider),
       ),
       data: (data) {

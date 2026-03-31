@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/errors/app_exceptions.dart';
 
 class ApiService {
   static ApiService? _instance;
@@ -22,6 +23,7 @@ class ApiService {
     ),
   )
     ..interceptors.add(_AuthInterceptor(_storage))
+    ..interceptors.add(ErrorInterceptor()) // Unified Error Handling
     ..interceptors.add(PrettyDioLogger(
       requestHeader: false,
       requestBody: true,

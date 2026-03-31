@@ -41,7 +41,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             ],
           ),
         ),
-        error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
+        error: (e, _) => AppErrorState(
+          message: e.toString(), 
+          onRetry: () => ref.invalidate(productDetailProvider(widget.productId))
+        ),
         data: (p) => Stack(children: [
           CustomScrollView(slivers: [
             SliverAppBar(
