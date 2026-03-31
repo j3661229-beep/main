@@ -9,6 +9,8 @@ import '../../core/theme/app_theme.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ShopScreen extends ConsumerStatefulWidget {
   const ShopScreen({super.key});
@@ -325,9 +327,17 @@ class _ProductCardSwiggy extends StatelessWidget {
                     width: double.infinity,
                     color: AppColors.primarySurface.withValues(alpha: 0.5),
                     child: product['images'] is List && (product['images'] as List).isNotEmpty
-                        ? Image.network(product['images'][0],
+                        ? CachedNetworkImage(
+                            imageUrl: product['images'][0],
+                            memCacheWidth: 400, // Optimize memory for thumbnails
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Center(child: Text('🌿', style: TextStyle(fontSize: 40))))
+                            placeholder: (context, url) => Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: Container(color: Colors.white),
+                            ),
+                            errorWidget: (_, __, ___) => const Center(child: Text('🌿', style: TextStyle(fontSize: 40))),
+                          )
                         : const Center(child: Text('🌿', style: TextStyle(fontSize: 40))),
                   ),
                 ),

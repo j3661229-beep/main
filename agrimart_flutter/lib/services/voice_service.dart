@@ -25,8 +25,11 @@ class VoiceService {
     // Map App Language to TTS codes
     String code = "en-IN";
     final lowercaseLang = languageCode?.toLowerCase() ?? '';
-    if (lowercaseLang.contains("marathi")) code = "mr-IN";
-    else if (lowercaseLang.contains("hindi")) code = "hi-IN";
+    if (lowercaseLang.contains("marathi")) {
+      code = "mr-IN";
+    } else if (lowercaseLang.contains("hindi")) {
+      code = "hi-IN";
+    }
     
     await _tts.setLanguage(code);
     await _tts.speak(text);

@@ -6,7 +6,7 @@ class AppConstants {
   // Alternatively, use 10.0.2.2 for Android Emulator or 127.0.0.1 for iOS simulator.
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://main-production-8b35.up.railway.app/api',
+    defaultValue: 'http://172.20.10.2:3000/api', // Pointing to local backend
   );
 
   // Storage keys

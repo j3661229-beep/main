@@ -8,6 +8,8 @@ if (process.env.TWILIO_ACCOUNT_SID) {
     twilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 }
 
+const redis = require('../config/redis');
+
 const createPaymentOrder = async (orderId) => {
     const order = await prisma.order.findUnique({ where: { id: orderId } });
     if (!order) throw Object.assign(new Error('Order not found'), { statusCode: 404 });
@@ -73,6 +75,17 @@ const handleWebhook = async (rawBody, signature) => {
         throw Object.assign(new Error('Invalid webhook signature'), { statusCode: 400 });
     }
     const event = JSON.parse(rawBody);
+
+    // Idempotency Check using Redis
+    const paymentId = event.payload?.payment?.entity?.id || 'unknown';
+    if (redis && paymentId !== 'unknown') {
+        const alreadyDone = await redis.get(`webhook:${paymentId}`);
+        if (alreadyDone) {
+            logger.info(`Duplicate webhook ignored: ${paymentId}`);
+            return { received: true };
+        }
+    }
+
     logger.info('Razorpay webhook:', event.event);
 
     if (event.event === 'payment.failed') {
@@ -83,6 +96,12 @@ const handleWebhook = async (rawBody, signature) => {
             await prisma.payment.update({ where: { orderId: order.id }, data: { status: 'FAILED', failureReason: payment.error_description } });
         }
     }
+
+    // Mark as processed in Redis (24hr TTL)
+    if (redis && paymentId !== 'unknown') {
+        await redis.setex(`webhook:${paymentId}`, 86400, '1');
+    }
+
     return { received: true };
 };
 

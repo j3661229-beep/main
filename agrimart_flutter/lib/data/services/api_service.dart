@@ -346,7 +346,26 @@ class _AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      await _storage.deleteAll();
+      final refreshToken = await _storage.read(key: 'refresh_token');
+      if (refreshToken != null) {
+        try {
+          final dio = Dio(BaseOptions(baseUrl: AppConstants.baseUrl));
+          final res = await dio.post('/auth/refresh-token', data: {'refreshToken': refreshToken});
+          if (res.statusCode == 200 && res.data['data'] != null) {
+            final newToken = res.data['data']['token'];
+            await _storage.write(key: AppConstants.tokenKey, value: newToken);
+            
+            // Retry the original request
+            err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+            final retry = await dio.fetch(err.requestOptions);
+            return handler.resolve(retry);
+          }
+        } catch (_) {
+          await _storage.deleteAll();
+        }
+      } else {
+        await _storage.deleteAll();
+      }
     }
     handler.next(err);
   }

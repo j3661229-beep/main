@@ -8,7 +8,10 @@ import 'router/app_router.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'firebase_options.dart';
+import 'core/storage/offline_cache.dart';
+import 'core/widgets/error_boundary.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,9 +21,16 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // Error handling
+  setUpErrorHandling();
+
+  // Pass all uncaught errors from the framework to Crashlytics.
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
   // 2. Initialize Hive for Caching
   await Hive.initFlutter();
   await Hive.openBox('app_cache');
+  await OfflineCache.init();
 
   // 3. Initialize OneSignal
   // Note: Using project-specific App ID
@@ -40,7 +50,13 @@ void main() async {
     statusBarIconBrightness: Brightness.light,
   ));
 
-  runApp(const ProviderScope(child: AgriMartApp()));
+  runApp(
+    const ProviderScope(
+      child: ErrorBoundary(
+        child: AgriMartApp(),
+      ),
+    ),
+  );
 }
 
 class AgriMartApp extends ConsumerWidget {

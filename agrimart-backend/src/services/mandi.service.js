@@ -16,8 +16,8 @@ const MOCK_PRICES = [
 
 const getPrices = async ({ district, crop, page = 1, limit = 20 }) => {
     const cacheKey = `mandi:${district || 'all'}:${crop || 'all'}`;
-    const cached = await cache.get(cacheKey);
-    if (cached) return cached;
+    const cached = await redis.get(cacheKey);
+    if (cached) return JSON.parse(cached);
 
     let prices = [...MOCK_PRICES];
     if (district) prices = prices.filter(p => p.district.toLowerCase().includes(district.toLowerCase()));
@@ -52,11 +52,17 @@ const getPrices = async ({ district, crop, page = 1, limit = 20 }) => {
                     }).filter(p => p.price > 0);
                 }
             }
-        } catch { }
+        } catch (err) {
+            logger.error(`AGMARKNET API failed: ${err.message}`);
+            // Fallback: Check for stale cache
+            const stale = await redis.get(`${cacheKey}:stale`);
+            if (stale) return { ...JSON.parse(stale), isStale: true, source: 'Stale Cache' };
+        }
     }
 
     const result = { prices, updatedAt: new Date().toISOString(), source: 'AGMARKNET - data.gov.in' };
-    await redis.setex(cacheKey, 3600, JSON.stringify(result)); // Cache 1hr
+    await redis.setex(cacheKey, 1800, JSON.stringify(result)); // Cache 30 mins
+    await redis.setex(`${cacheKey}:stale`, 86400, JSON.stringify(result)); // Stale cache for 24 hours
     return result;
 };
 

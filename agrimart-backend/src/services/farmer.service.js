@@ -37,40 +37,48 @@ const updateFarmDetails = async (farmerId, data) => {
 const getDashboard = async (farmerId) => {
     const farmer = await prisma.farmer.findUnique({ where: { id: farmerId }, include: { user: true } });
 
-    // Get weather (cached 30 min)
-    let weather = null;
-    if (farmer.latitude && farmer.longitude) {
+    // Weather Promise
+    const weatherPromise = (async () => {
+        if (!farmer.latitude || !farmer.longitude) return null;
         const cacheKey = `weather:${farmer.latitude.toFixed(2)},${farmer.longitude.toFixed(2)}`;
         const cached = await redis.get(cacheKey);
-        if (cached) {
-            weather = JSON.parse(cached);
-        } else if (process.env.OPENWEATHER_API_KEY) {
+        if (cached) return JSON.parse(cached);
+        if (process.env.OPENWEATHER_API_KEY) {
             try {
                 const resp = await axios.get(`${process.env.OPENWEATHER_BASE_URL}/weather`, {
                     params: { lat: farmer.latitude, lon: farmer.longitude, appid: process.env.OPENWEATHER_API_KEY, units: 'metric' },
                 });
-                weather = resp.data;
-                await redis.setex(cacheKey, 1800, JSON.stringify(weather));
-            } catch (e) { }
+                await redis.setex(cacheKey, 1800, JSON.stringify(resp.data));
+                return resp.data;
+            } catch (e) { return null; }
         }
-    }
+        return null;
+    })();
 
-    // Nearby products (cached 10 min)
-    const nearbyProducts = await prisma.product.findMany({
+    // Nearby products Promise
+    const nearbyProductsPromise = prisma.product.findMany({
         where: { isActive: true, isApproved: true, stockQuantity: { gt: 0 } },
         take: 6,
         include: { supplier: { include: { user: true } } },
         orderBy: { createdAt: 'desc' },
     });
 
-    const recentOrders = await prisma.order.findMany({
+    const recentOrdersPromise = prisma.order.findMany({
         where: { farmerId },
         take: 5,
         orderBy: { createdAt: 'desc' },
         include: { items: { include: { product: true } } },
     });
 
-    const priceAlerts = await prisma.priceAlert.findMany({ where: { farmerId, isActive: true }, take: 5 });
+    const priceAlertsPromise = prisma.priceAlert.findMany({ where: { farmerId, isActive: true }, take: 5 });
+
+    // Execute in parallel (Fastest Response Time)
+    const [weather, nearbyProducts, recentOrders, priceAlerts] = await Promise.all([
+        weatherPromise,
+        nearbyProductsPromise,
+        recentOrdersPromise,
+        priceAlertsPromise
+    ]);
 
     return { farmer, weather, nearbyProducts, recentOrders, priceAlerts };
 };

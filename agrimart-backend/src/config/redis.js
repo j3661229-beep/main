@@ -1,31 +1,34 @@
-const Redis = require('ioredis');
+const { Redis } = require('@upstash/redis');
 const logger = require('../utils/logger');
 
 let redis;
 
-if (process.env.REDIS_URL) {
-    redis = new Redis(process.env.REDIS_URL, {
-        maxRetriesPerRequest: 3,
-        retryStrategy: (times) => Math.min(times * 50, 2000),
+if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    redis = new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN,
     });
-
-    redis.on('connect', () => logger.info('✅ Redis connected'));
-    redis.on('error', (err) => logger.error('Redis error:', err));
+    logger.info('✅ Upstash Redis (REST) initialized');
 } else {
     // In-memory fallback for development
-    logger.warn('⚠️  No REDIS_URL set — using in-memory cache fallback');
+    logger.warn('⚠️  No UPSTASH_REDIS_REST_URL set — using in-memory cache fallback');
     const store = new Map();
     redis = {
-        get: async (key) => store.get(key) || null,
-        set: async (key, val, ...args) => { store.set(key, val); return 'OK'; },
-        setex: async (key, ttl, val) => { store.set(key, val); setTimeout(() => store.delete(key), ttl * 1000); return 'OK'; },
+        get: async (key) => {
+            const val = store.get(key);
+            if (!val) return null;
+            try { return JSON.parse(val); } catch { return val; }
+        },
+        set: async (key, val) => { store.set(key, typeof val === 'string' ? val : JSON.stringify(val)); return 'OK'; },
+        setex: async (key, ttl, val) => {
+            store.set(key, typeof val === 'string' ? val : JSON.stringify(val));
+            setTimeout(() => store.delete(key), ttl * 1000);
+            return 'OK';
+        },
         del: async (...keys) => { keys.forEach(k => store.delete(k)); return keys.length; },
-        exists: async (key) => store.has(key) ? 1 : 0,
-        incr: async (key) => { const v = (Number(store.get(key)) || 0) + 1; store.set(key, String(v)); return v; },
-        expire: async () => 1,
-        ttl: async () => -1,
-        flushall: async () => { store.clear(); return 'OK'; },
     };
 }
+
+module.exports = redis;
 
 module.exports = redis;

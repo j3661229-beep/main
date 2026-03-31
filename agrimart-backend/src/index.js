@@ -4,6 +4,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
+const cron = require('node-cron');
+const { rateLimit } = require('express-rate-limit');
 
 const { errorHandler, notFound } = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
@@ -37,19 +39,42 @@ app.use(cors({
 }));
 app.use(morgan('combined', { stream: { write: (msg) => logger.info(msg.trim()) } }));
 
+// Global API Rate Limiter (100 reqs per min)
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  message: { error: 'Too many requests, please try again later.' }
+});
+
+// Apply rate limiting to all /api routes
+app.use('/api/', apiLimiter);
+
 // Payment webhook needs raw body before JSON parsing
 app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health check
+// Health check and Keep-alive
 app.get('/', (req, res) => {
   res.json({ success: true, message: '🌾 AgriMart API is LIVE', documentation: '/health' });
 });
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', service: 'agrimart-api', version: '1.0.0', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', service: 'agrimart-api', version: '1.0.0', time: Date.now(), timestamp: new Date().toISOString() });
 });
+
+// Prevent Railway Cold Starts (Ping self every 5 mins)
+if (process.env.RAILWAY_URL || process.env.NODE_ENV === 'production') {
+  cron.schedule('*/5 * * * *', async () => {
+    try {
+      const url = process.env.RAILWAY_URL || `http://localhost:${PORT}`;
+      await fetch(`${url}/health`);
+      logger.info('Keep-alive ping sent to /health');
+    } catch (err) {
+      logger.error('Keep-alive ping failed', err);
+    }
+  });
+}
 
 // API Routes
 app.use('/api/auth', authRoutes);

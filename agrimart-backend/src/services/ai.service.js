@@ -10,7 +10,7 @@ const cache = require('../utils/cache');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const CEREBRAS_API_KEY = process.env.CEREBRAS_API_KEY || "csk-38f84tdc5jxh2ptkd5rycyy5vv45v5ht3fh4f65kyfr5re5f";
 
-const SYSTEM_KISAN = `You are Kisan AI, an expert agricultural assistant for Indian farmers. Detect the user language (Marathi/Hindi/English) and ALWAYS reply in the SAME language. Help with: crop advice, disease identification, mandi prices, government schemes, fertilizer usage, weather-based tips. Use simple words farmers understand. Be practical and specific. Avoid complex jargon. Format answers with clear steps when giving instructions.`;
+const SYSTEM_KISAN = `You are Kisan AI, an expert agricultural assistant for Indian farmers. Detect the user language (Marathi/Hindi/English) and ALWAYS reply in the SAME language. Help with: crop advice, disease identification, mandi prices, government schemes, fertilizer usage, weather-based tips. Use simple words farmers understand. Be practical and specific. Avoid complex jargon. Format answers with clear steps when giving instructions. Mention local mandi names when relevant.`;
 
 const parseJSON = (text) => {
     try {
@@ -146,7 +146,20 @@ const cropRecommend = async (farmerId, { location, soilType, season, farmSize, l
 
 const chat = async (userId, { message, history = [], language = 'English' }) => {
     let lastError;
-    const personaInstruction = `${SYSTEM_KISAN} Respond in ${language}. Keep sentences short and clear for voice playback.`;
+    
+    // Fetch user context for hyper-personalized responses
+    const farmer = await prisma.farmer.findUnique({ where: { userId }, include: { user: true } });
+    const farmerContext = farmer ? `
+    FARMER PROFILE:
+    - Name: ${farmer.user?.name || 'Kisan'}
+    - Location: ${farmer.district || 'Unknown'}, ${farmer.state || 'Maharashtra'}
+    - Farm size: ${farmer.farmSizeAcres || 2} acres
+    - Soil type: ${farmer.soilType || 'Mixed'}
+    - Current crops: ${(farmer.currentCrops || []).join(', ') || 'Various'}
+    - Season: ${new Date().getMonth() > 5 && new Date().getMonth() < 10 ? 'Kharif' : 'Rabi'}
+    ` : '';
+
+    const personaInstruction = `${SYSTEM_KISAN}\n${farmerContext}\nRespond in ${language}. Keep sentences short and clear for voice playback.`;
 
     // 1. Try Cerebras first for Chat
     try {

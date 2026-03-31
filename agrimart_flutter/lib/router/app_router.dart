@@ -35,7 +35,20 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final authState = ref.read(authProvider);
       
+      // Global Redirect Logic
       if (state.matchedLocation == '/splash') return null;
+
+      // Handle deep links from notifications (redirect logic)
+      if (state.uri.path.startsWith('/n/')) {
+        final parts = state.uri.path.split('/');
+        if (parts.length >= 4) {
+          final type = parts[2];
+          final id = parts[3];
+          if (type == 'PRODUCT') return '/farmer/shop/product/$id';
+          if (type == 'ORDER') return '/farmer/orders/$id/tracking';
+        }
+      }
+
       if (!authState.isAuthenticated && authState.user == null) {
         if (!state.matchedLocation.startsWith('/auth')) return '/auth/role';
         return null;

@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/widgets/mandi_chart.dart';
 
 final mandiHistoryProvider = FutureProvider.family<Map, String>((ref, crop) async {
   return ApiService.instance.getCropHistory(crop);
@@ -112,83 +113,12 @@ class _MandiChartScreenState extends ConsumerState<MandiChartScreen> {
                 ),
               ),
               
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
               
-              // ── Chart Area ──
-              SizedBox(
-                height: 280,
-                width: double.infinity,
-                child: LineChart(
-                  LineChartData(
-                    lineTouchData: LineTouchData(
-                      handleBuiltInTouches: true,
-                      touchTooltipData: LineTouchTooltipData(
-                        getTooltipColor: (_) => AppColors.textPrimary,
-                        tooltipRoundedRadius: 8,
-                        tooltipPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        getTooltipItems: (touchedSpots) {
-                          return touchedSpots.map((LineBarSpot touchedSpot) {
-                            return LineTooltipItem(
-                              '₹${touchedSpot.y.toStringAsFixed(0)}',
-                              const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
-                            );
-                          }).toList();
-                        },
-                      ),
-                      getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
-                        return spotIndexes.map((spotIndex) {
-                          return TouchedSpotIndicatorData(
-                            FlLine(color: trendColor.withValues(alpha: 0.3), strokeWidth: 2, dashArray: [4, 4]),
-                            FlDotData(
-                              getDotPainter: (spot, percent, barData, index) {
-                                return FlDotCirclePainter(
-                                  radius: 6,
-                                  color: trendColor,
-                                  strokeWidth: 3,
-                                  strokeColor: Colors.white,
-                                );
-                              },
-                            ),
-                          );
-                        }).toList();
-                      },
-                    ),
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: false,
-                      horizontalInterval: (maxPrice - minPrice) / 3,
-                      getDrawingHorizontalLine: (value) => FlLine(color: AppColors.border.withValues(alpha: 0.5), strokeWidth: 1, dashArray: [8, 8]),
-                    ),
-                    titlesData: FlTitlesData(show: false), // Clean edges
-                    borderData: FlBorderData(show: false),
-                    minX: 0,
-                    maxX: (dataPoints - 1).toDouble(),
-                    minY: minPrice,
-                    maxY: maxPrice,
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: spots,
-                        isCurved: true,
-                        curveSmoothness: 0.35,
-                        color: trendColor,
-                        barWidth: 2.5,
-                        isStrokeCapRound: true,
-                        dotData: const FlDotData(show: false),
-                        belowBarData: BarAreaData(
-                          show: true,
-                          gradient: LinearGradient(
-                            colors: [
-                              trendColor.withValues(alpha: 0.2),
-                              trendColor.withValues(alpha: 0.0),
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              // ── Chart Area (Replaced with Custom Widget for precision) ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: MandiPriceChart(history: history, cropName: cropName),
               ),
 
               const SizedBox(height: 32),

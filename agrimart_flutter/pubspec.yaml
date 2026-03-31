@@ -71,6 +71,8 @@ dependencies:
 
   # Animations
   animate_do: ^3.3.4
+  in_app_review: ^2.0.11
+  firebase_crashlytics: ^4.3.10
 
 dev_dependencies:
   flutter_test:

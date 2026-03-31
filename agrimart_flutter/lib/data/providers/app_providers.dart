@@ -1,18 +1,54 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import '../services/api_service.dart';
 import '../../core/utils/cache_manager.dart';
+import '../../core/storage/offline_cache.dart';
 import 'package:geolocator/geolocator.dart';
+
+// ── Search & Trending ─────────────────────────────────────
+final searchQueryProvider = StateProvider<String>((ref) => '');
+
+final searchResultsProvider = FutureProvider<Map>((ref) async {
+  final query = ref.watch(searchQueryProvider);
+  if (query.isEmpty) return {'data': [], 'pagination': {'total': 0}};
+  
+  // Debounce: Wait for 300ms before calling API
+  await Future.delayed(const Duration(milliseconds: 300));
+  if (ref.read(searchQueryProvider) != query) return {'data': [], 'pagination': {'total': 0}};
+
+  return ApiService.instance.getProducts(search: query);
+});
+
+final trendingSearchesProvider = Provider<List<String>>((ref) {
+  return ['Onion', 'Tomato', 'Fertilizer', 'Organic Seeds', 'Nashik Mandi'];
+});
 
 // ── Products ──────────────────────────────────────────────
 final productsProvider = FutureProvider.family<Map, String>((ref, queryParams) async {
+  ref.keepAlive();
   final uri = Uri(query: queryParams);
-  return ApiService.instance.getProducts(
-    category: uri.queryParameters['category'],
-    search: uri.queryParameters['search'],
-    sort: uri.queryParameters['sort'],
-    page: int.tryParse(uri.queryParameters['page'] ?? '1') ?? 1,
-  );
+  
+  try {
+    final data = await ApiService.instance.getProducts(
+      category: uri.queryParameters['category'],
+      search: uri.queryParameters['search'],
+      sort: uri.queryParameters['sort'],
+      page: int.tryParse(uri.queryParameters['page'] ?? '1') ?? 1,
+    );
+    
+    // Save to offline cache if it's the main list
+    if (queryParams.isEmpty || queryParams == 'page=1') {
+      if (data['data'] != null) await OfflineCache.saveProducts(data['data']);
+    }
+    
+    return data;
+  } catch (e) {
+    // Fallback to offline cache on error
+    final offline = await OfflineCache.getProducts();
+    if (offline != null) return {'data': offline, 'pagination': {'page': 1, 'total': offline.length}};
+    rethrow;
+  }
 });
 
 final productDetailProvider = FutureProvider.family<Map, String>((ref, id) async {
@@ -79,19 +115,19 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
   }
 
   Future<void> addItem(Map<String, dynamic> product, int quantity) async {
+    final previousState = state;
     final current = state.valueOrNull != null ? Map<String, dynamic>.from(state.value!) : {'items': []};
     final items = List<Map<String, dynamic>>.from(current['items'] ?? []);
     
     final productId = product['id'] ?? product['_id'];
+    final index = items.indexWhere((item) => (item['productId'] == productId) || (item['product']?['id'] == productId));
     
-    final index = items.indexWhere((item) => (item['productId'] == productId) || (item['product']?['id'] == productId) || (item['product']?['_id'] == productId));
-    
+    // 1. Optimistic Update
     if (index >= 0) {
-      final existingQty = items[index]['quantity'] as int;
-      items[index] = {...items[index], 'quantity': existingQty + quantity};
+      items[index] = {...items[index], 'quantity': (items[index]['quantity'] as int) + quantity};
     } else {
       items.add({
-        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'id': 'temp_${DateTime.now().millisecondsSinceEpoch}',
         'productId': productId,
         'product': product,
         'quantity': quantity,
@@ -100,30 +136,59 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
     
     current['items'] = items;
     state = AsyncValue.data(current);
-    await _saveLocal();
+    HapticFeedback.lightImpact(); // Premium feel
+
+    // 2. API Call in background
+    try {
+      await ApiService.instance.addToCart(productId: productId, quantity: quantity);
+      await _saveLocal();
+    } catch (e) {
+      // 3. Rollback on failure
+      state = previousState;
+    }
   }
 
   Future<void> updateItem(String itemId, int quantity) async {
+    final previousState = state;
     final current = state.valueOrNull != null ? Map<String, dynamic>.from(state.value!) : {'items': []};
     final items = List<Map<String, dynamic>>.from(current['items'] ?? []);
     
     final index = items.indexWhere((item) => item['id'] == itemId);
     if (index >= 0) {
+      final productId = items[index]['productId'];
+      
+      // 1. Optimistic Update
       items[index] = {...items[index], 'quantity': quantity};
       current['items'] = items;
       state = AsyncValue.data(current);
-      await _saveLocal();
+      HapticFeedback.selectionClick();
+
+      try {
+        await ApiService.instance.updateCartItem(itemId, quantity);
+        await _saveLocal();
+      } catch (e) {
+        state = previousState;
+      }
     }
   }
 
   Future<void> removeItem(String itemId) async {
+    final previousState = state;
     final current = state.valueOrNull != null ? Map<String, dynamic>.from(state.value!) : {'items': []};
     List<Map<String, dynamic>> items = List<Map<String, dynamic>>.from(current['items'] ?? []);
     
+    // 1. Optimistic Update
     items.removeWhere((item) => item['id'] == itemId);
     current['items'] = items;
     state = AsyncValue.data(current);
-    await _saveLocal();
+    HapticFeedback.mediumImpact();
+
+    try {
+      await ApiService.instance.removeCartItem(itemId);
+      await _saveLocal();
+    } catch (e) {
+      state = previousState;
+    }
   }
 
   Future<void> clear() async {
@@ -150,7 +215,15 @@ final cartItemCountProvider = Provider<int>((ref) {
 
 // ── Orders ────────────────────────────────────────────────
 final ordersProvider = FutureProvider<List>((ref) async {
-  return ApiService.instance.getOrders();
+  try {
+    final orders = await ApiService.instance.getOrders();
+    await OfflineCache.saveOrders(orders);
+    return orders;
+  } catch (e) {
+    final offline = await OfflineCache.getOrders();
+    if (offline != null) return offline;
+    rethrow;
+  }
 });
 
 final orderTrackingProvider = FutureProvider.family<Map, String>((ref, orderId) async {
@@ -181,6 +254,7 @@ void _refreshFarmerDashboard() async {
 
 // ── Weather ───────────────────────────────────────────────
 final weatherProvider = FutureProvider<Map>((ref) async {
+  ref.keepAlive();
   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
   if (!serviceEnabled) return ApiService.instance.getWeather(lat: 20.0, lng: 73.78); // Default Nashik
   
@@ -202,6 +276,7 @@ final weatherAdvisoryProvider = FutureProvider.family<Map, String>((ref, distric
 
 // ── Mandi ─────────────────────────────────────────────────
 final mandiProvider = FutureProvider.family<Map, String?>((ref, district) async {
+  ref.keepAlive();
   return ApiService.instance.getMandiPrices(district: district);
 });
 

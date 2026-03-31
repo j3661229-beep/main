@@ -6,6 +6,8 @@ import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final String productId;
@@ -50,7 +52,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 background: Container(
                   color: AppColors.primarySurface,
                   child: p['images'] is List && (p['images'] as List).isNotEmpty
-                      ? Image.network(p['images'][0], fit: BoxFit.contain)
+                      ? CachedNetworkImage(
+                          imageUrl: p['images'][0],
+                          memCacheWidth: 1000,
+                          fit: BoxFit.contain,
+                          placeholder: (context, url) => Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(color: Colors.white),
+                          ),
+                          errorWidget: (_, __, ___) => const Center(child: Text('🌿', style: TextStyle(fontSize: 80))),
+                        )
                       : const Center(
                           child: Text('🌿', style: TextStyle(fontSize: 80))),
                 ),
