@@ -95,8 +95,13 @@ app.use('/api/admin', adminRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  logger.info(`🌾 AgriMart API running on port ${PORT} — ${process.env.NODE_ENV || 'development'}`);
-});
+try {
+  app.listen(PORT, () => {
+    logger.info(`🌾 AgriMart API running on port ${PORT} — ${process.env.NODE_ENV || 'development'}`);
+  });
+} catch (error) {
+  logger.error('CRITICAL: Server failed to start:', error);
+  process.exit(1);
+}
 
 module.exports = app;

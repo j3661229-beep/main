@@ -1,0 +1,306 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/prisma"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  FARMER
+  SUPPLIER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAYMENT_CONFIRMED
+  PROCESSING
+  DISPATCHED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum ProductCategory {
+  SEEDS
+  FERTILIZER
+  PESTICIDE
+  EQUIPMENT
+  ORGANIC
+  OTHER
+}
+
+model User {
+  id            String         @id @default(cuid())
+  phone         String         @unique
+  name          String
+  role          UserRole
+  language      String         @default("marathi")
+  profilePhoto  String?
+  isVerified    Boolean        @default(false)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  farmer        Farmer?
+  supplier      Supplier?
+  notifications Notification[]
+  sessions      Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Farmer {
+  id            String       @id @default(cuid())
+  userId        String       @unique
+  village       String
+  taluka        String
+  district      String
+  state         String       @default("Maharashtra")
+  pincode       String
+  latitude      Float?
+  longitude     Float?
+  farmSizeAcres Float
+  soilType      String?
+  waterSource   String?
+  currentCrops  String[]
+  bankAccountNo String?
+  ifscCode      String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders        Order[]
+  soilReports   SoilReport[]
+  priceAlerts   PriceAlert[]
+  cart          Cart?
+}
+
+model Supplier {
+  id             String      @id @default(cuid())
+  userId         String      @unique
+  businessName   String
+  gstNumber      String?
+  address        String
+  district       String
+  pincode        String
+  latitude       Float?
+  longitude      Float?
+  isVerified     Boolean     @default(false)
+  verifiedAt     DateTime?
+  rejectedAt     DateTime?
+  rejectedReason String?
+  rating         Float       @default(0)
+  totalRatings   Int         @default(0)
+  bankAccountNo  String?
+  ifscCode       String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products       Product[]
+  orderItems     OrderItem[]
+}
+
+model Product {
+  id                String          @id @default(cuid())
+  supplierId        String
+  name              String
+  nameMarathi       String?
+  nameHindi         String?
+  description       String?
+  category          ProductCategory
+  price             Float
+  unit              String
+  stockQuantity     Int
+  images            String[]
+  isActive          Boolean         @default(true)
+  isApproved        Boolean         @default(false)
+  isOrganic         Boolean         @default(false)
+  brand             String?
+  composition       String?
+  usageInstructions String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  supplier          Supplier        @relation(fields: [supplierId], references: [id])
+  orderItems        OrderItem[]
+  cartItems         CartItem[]
+  reviews           Review[]
+
+  @@index([category])
+  @@index([supplierId])
+  @@index([isActive, isApproved])
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  farmerId  String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  farmer    Farmer     @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  productId String
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  farmerId        String
+  totalAmount     Float
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  paymentId       String?
+  razorpayOrderId String?
+  deliveryAddress String
+  deliveryLat     Float?
+  deliveryLng     Float?
+  notes           String?
+  deliveredAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  farmer          Farmer        @relation(fields: [farmerId], references: [id])
+  items           OrderItem[]
+  payment         Payment?
+
+  @@index([farmerId])
+  @@index([status])
+}
+
+model OrderItem {
+  id         String      @id @default(cuid())
+  orderId    String
+  productId  String
+  supplierId String
+  quantity   Int
+  price      Float
+  status     OrderStatus @default(PENDING)
+  createdAt  DateTime    @default(now())
+  order      Order       @relation(fields: [orderId], references: [id])
+  product    Product     @relation(fields: [productId], references: [id])
+  supplier   Supplier    @relation(fields: [supplierId], references: [id])
+  review     Review?
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String        @unique
+  razorpayPaymentId String?
+  razorpayOrderId   String?
+  amount            Float
+  status            PaymentStatus @default(PENDING)
+  method            String?
+  failureReason     String?
+  refundId          String?
+  refundAmount      Float?
+  refundReason      String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  order             Order         @relation(fields: [orderId], references: [id])
+}
+
+model Review {
+  id          String    @id @default(cuid())
+  orderItemId String    @unique
+  productId   String
+  farmerId    String
+  rating      Int
+  comment     String?
+  createdAt   DateTime  @default(now())
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id])
+  product     Product   @relation(fields: [productId], references: [id])
+}
+
+model SoilReport {
+  id               String   @id @default(cuid())
+  farmerId         String
+  imageUrl         String
+  soilType         String
+  phLevel          Float
+  nitrogenLevel    String
+  phosphorusLevel  String
+  potassiumLevel   String
+  organicMatter    String?
+  recommendedCrops String[]
+  treatmentAdvice  String?
+  confidence       Float
+  createdAt        DateTime @default(now())
+  farmer           Farmer   @relation(fields: [farmerId], references: [id])
+}
+
+model PriceAlert {
+  id          String   @id @default(cuid())
+  farmerId    String
+  cropName    String
+  targetPrice Float
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  farmer      Farmer   @relation(fields: [farmerId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  type      String
+  isRead    Boolean  @default(false)
+  data      Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GovernmentScheme {
+  id            String    @id @default(cuid())
+  title         String
+  titleMarathi  String?
+  titleHindi    String?
+  description   String
+  ministry      String
+  benefits      String
+  eligibility   String
+  documents     String[]
+  applyUrl      String?
+  deadline      DateTime?
+  isActive      Boolean   @default(true)
+  eligibleCount Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model FCMToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String
+  device    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, token])
+}
