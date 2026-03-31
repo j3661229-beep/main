@@ -1,4 +1,22 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+
+// Hostinger Crash Logger
+function logCrash(err) {
+  const logPath = path.join(__dirname, '../crash.log');
+  const msg = `[${new Date().toISOString()}] CRASH: ${err.stack || err}\n`;
+  fs.appendFileSync(logPath, msg);
+}
+
+process.on('uncaughtException', (err) => {
+  logCrash(err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  logCrash(reason);
+});
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
