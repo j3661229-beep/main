@@ -1,4 +1,5 @@
 require('dotenv').config();
+console.log('🚀 API STARTING UP...');
 const fs = require('fs');
 const path = require('path');
 
@@ -79,6 +80,11 @@ app.get('/', (req, res) => {
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'agrimart-api', version: '1.0.0', time: Date.now(), timestamp: new Date().toISOString() });
+});
+
+// Alias for Railway/Hostinger health checks
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', alias: true });
 });
 
 // Prevent Railway Cold Starts (Ping self every 5 mins)
