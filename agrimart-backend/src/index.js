@@ -1,4 +1,12 @@
 require('dotenv').config();
+
+// Strip literal quotes from process.env (fixes Railway 'Raw Editor' pasting bug)
+for (const key in process.env) {
+  if (typeof process.env[key] === 'string') {
+    process.env[key] = process.env[key].replace(/^["'](.*)["']$/, '$1');
+  }
+}
+
 console.log('🚀 API STARTING UP...');
 const fs = require('fs');
 const path = require('path');
@@ -120,7 +128,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 try {
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     logger.info(`🌾 AgriMart API running on port ${PORT} — ${process.env.NODE_ENV || 'development'}`);
   });
 } catch (error) {
