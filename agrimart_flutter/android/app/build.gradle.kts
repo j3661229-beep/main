@@ -52,3 +52,11 @@ dependencies {
     // Required for flutter_local_notifications Java 8 features
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin") {
+            useVersion("2.2.20")
+        }
+    }
+}
