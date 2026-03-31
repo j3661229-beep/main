@@ -49,22 +49,25 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               backgroundColor: AppColors.surface,
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(
-                background: Container(
-                  color: AppColors.primarySurface,
-                  child: p['images'] is List && (p['images'] as List).isNotEmpty
-                      ? CachedNetworkImage(
-                          imageUrl: p['images'][0],
-                          memCacheWidth: 1000,
-                          fit: BoxFit.contain,
-                          placeholder: (context, url) => Shimmer.fromColors(
-                            baseColor: Colors.grey[300]!,
-                            highlightColor: Colors.grey[100]!,
-                            child: Container(color: Colors.white),
-                          ),
-                          errorWidget: (_, __, ___) => const Center(child: Text('🌿', style: TextStyle(fontSize: 80))),
-                        )
-                      : const Center(
-                          child: Text('🌿', style: TextStyle(fontSize: 80))),
+                background: Hero(
+                  tag: 'product_${widget.productId}',
+                  child: Container(
+                    color: AppColors.primarySurface,
+                    child: p['images'] is List && (p['images'] as List).isNotEmpty
+                        ? CachedNetworkImage(
+                            imageUrl: p['images'][0],
+                            memCacheWidth: 1000,
+                            fit: BoxFit.contain,
+                            placeholder: (context, url) => Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: Container(color: Colors.white),
+                            ),
+                            errorWidget: (_, __, ___) => const Center(child: Text('🌿', style: TextStyle(fontSize: 80))),
+                          )
+                        : const Center(
+                            child: Text('🌿', style: TextStyle(fontSize: 80))),
+                  ),
                 ),
               ),
             ),

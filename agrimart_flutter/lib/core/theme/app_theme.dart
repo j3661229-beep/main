@@ -93,15 +93,16 @@ class AppTheme {
       centerTitle: false,
       titleTextStyle: TextStyle(
         fontFamily: AppTextStyles.fontFamily,
-        fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.white,
+        fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.white,
+        letterSpacing: -0.5,
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
-        minimumSize: const Size(double.infinity, 52),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        minimumSize: const Size(double.infinity, 54),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         textStyle: AppTextStyles.button,
         elevation: 0,
       ),
@@ -117,33 +118,28 @@ class AppTheme {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.surface,
+      fillColor: AppColors.white,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(color: AppColors.border, width: 1.2),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(color: AppColors.border, width: 1.2),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(18),
         borderSide: const BorderSide(color: AppColors.primary, width: 2),
       ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.error),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       hintStyle: AppTextStyles.bodyMD.copyWith(color: AppColors.textTertiary),
-      labelStyle: AppTextStyles.labelMD,
     ),
     cardTheme: CardThemeData(
       color: AppColors.surface,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: AppColors.border.withValues(alpha: 0.5)),
       ),
       margin: EdgeInsets.zero,
     ),

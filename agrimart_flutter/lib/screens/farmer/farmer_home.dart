@@ -8,6 +8,8 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/widgets/floating_nav.dart';
+import 'package:flutter/services.dart';
 import 'shop_screen.dart';
 import 'mandi_prices_screen.dart';
 import 'profile_screen.dart';
@@ -20,6 +22,30 @@ class FarmerHome extends ConsumerStatefulWidget {
 
 class _FarmerHomeState extends ConsumerState<FarmerHome> {
   int _tab = 0;
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _tab);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onTabChanged(int index) {
+    if (_tab == index) return;
+    HapticFeedback.lightImpact();
+    setState(() => _tab = index);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutQuart,
+    );
+  }
 
   final _tabs = const [
     _HomeTab(),
@@ -34,47 +60,22 @@ class _FarmerHomeState extends ConsumerState<FarmerHome> {
     final cartCount = ref.watch(cartItemCountProvider);
 
     return Scaffold(
-      body: IndexedStack(index: _tab, children: _tabs),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(color: Colors.white, boxShadow: [
-          BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 16,
-              offset: const Offset(0, -4))
-        ]),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Row(children: [
-              _NavItem(
-                  icon: '🏠',
-                  label: ref.tr('home'),
-                  active: _tab == 0,
-                  onTap: () => setState(() => _tab = 0)),
-              _NavItem(
-                  icon: '🛒',
-                  label: ref.tr('shop'),
-                  active: _tab == 1,
-                  onTap: () => setState(() => _tab = 1),
-                  badge: cartCount > 0 ? cartCount : null),
-              _NavItem(
-                  icon: '🤖',
-                  label: ref.tr('ai'),
-                  active: _tab == 2,
-                  onTap: () => setState(() => _tab = 2)),
-              _NavItem(
-                  icon: '📈',
-                  label: ref.tr('mandi'),
-                  active: _tab == 3,
-                  onTap: () => setState(() => _tab = 3)),
-              _NavItem(
-                  icon: '👤',
-                  label: ref.tr('profile'),
-                  active: _tab == 4,
-                  onTap: () => setState(() => _tab = 4)),
-            ]),
-          ),
-        ),
+      extendBody: true, // Crucial for floating nav transparency
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(), // Only via nav
+        children: _tabs,
+      ),
+      bottomNavigationBar: FloatingDockNav(
+        selectedIndex: _tab,
+        onTabSelected: _onTabChanged,
+        items: [
+          FloatingNavItem(icon: '🏠', label: ref.tr('home')),
+          FloatingNavItem(icon: '🛒', label: ref.tr('shop'), badge: cartCount > 0 ? cartCount : null),
+          FloatingNavItem(icon: '🤖', label: ref.tr('ai')),
+          FloatingNavItem(icon: '📈', label: ref.tr('mandi')),
+          FloatingNavItem(icon: '👤', label: ref.tr('profile')),
+        ],
       ),
     );
   }
@@ -236,18 +237,19 @@ class _HomeTab extends ConsumerWidget {
           slivers: [
             SliverToBoxAdapter(
               child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
                     colors: [AppColors.primary, AppColors.primaryDark],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(24),
-                    bottomRight: Radius.circular(24),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(32),
+                    bottomRight: Radius.circular(32),
                   ),
+                  boxShadow: AppColors.primaryShadow,
                 ),
-                padding: const EdgeInsets.fromLTRB(20, 50, 20, 16),
+                padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -450,52 +452,70 @@ class _HomeTab extends ConsumerWidget {
   }
 }
 
-class _QuickAction extends StatelessWidget {
+class _QuickAction extends StatefulWidget {
   final String emoji, label;
   final Color bgColor, textColor;
   final VoidCallback onTap;
   const _QuickAction(this.emoji, this.label, this.bgColor, this.textColor, this.onTap);
 
   @override
+  State<_QuickAction> createState() => _QuickActionState();
+}
+
+class _QuickActionState extends State<_QuickAction> {
+  double _scale = 1.0;
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 72,
-        margin: const EdgeInsets.symmetric(horizontal: 6),
-        child: Column(
-          children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: bgColor.withValues(alpha: 0.4),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
+      onTapDown: (_) => setState(() => _scale = 0.92),
+      onTapUp: (_) => setState(() => _scale = 1.0),
+      onTapCancel: () => setState(() => _scale = 1.0),
+      onTap: () {
+        HapticFeedback.selectionClick();
+        widget.onTap();
+      },
+      child: AnimatedScale(
+        scale: _scale,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOutBack,
+        child: Container(
+          width: 72,
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          child: Column(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: widget.bgColor,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: widget.bgColor.withValues(alpha: 0.5),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(widget.emoji, style: const TextStyle(fontSize: 26)),
+                ),
               ),
-              child: Center(
-                child: Text(emoji, style: const TextStyle(fontSize: 22)),
+              const SizedBox(height: 8),
+              Text(
+                widget.label,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.3,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-                letterSpacing: -0.2,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -558,15 +578,9 @@ class _OrderTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.4)),
+        boxShadow: AppColors.softShadow,
       ),
       child: Row(
         children: [
@@ -578,20 +592,20 @@ class _OrderTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Center(
-              child: Text('📦', style: TextStyle(fontSize: 20)),
+              child: Text('📦', style: TextStyle(fontSize: 22)),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Order #${(order['id'] as String).substring((order['id'] as String).length - 6).toUpperCase()}',
-                  style: AppTextStyles.headingSM.copyWith(letterSpacing: -0.3, fontSize: 13),
+                  style: AppTextStyles.headingMD.copyWith(letterSpacing: -0.5, fontSize: 13, fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 2),
-                Text('₹${order['totalAmount']}', style: AppTextStyles.priceSmall.copyWith(fontSize: 13)),
+                Text('₹${order['totalAmount']}', style: AppTextStyles.priceSmall.copyWith(fontSize: 14, fontWeight: FontWeight.w900)),
               ],
             ),
           ),
@@ -710,89 +724,127 @@ class _HomeWeatherWidget extends StatelessWidget {
         
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
-          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isSunny 
-                  ? [const Color(0xFF4FC3F7), const Color(0xFF0288D1)] 
-                  : [const Color(0xFF78909C), const Color(0xFF455A64)],
-            ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
-                color: isSunny 
-                    ? const Color(0xFF0288D1).withValues(alpha: 0.4) 
-                    : const Color(0xFF455A64).withValues(alpha: 0.4),
-                blurRadius: 16,
+                color: (isSunny ? const Color(0xFF0288D1) : const Color(0xFF455A64)).withValues(alpha: 0.3),
+                blurRadius: 20,
                 offset: const Offset(0, 8),
               )
             ],
-            image: DecorationImage(
-              image: const NetworkImage('https://www.transparenttextures.com/patterns/cubes.png'),
-              opacity: 0.1,
-              repeat: ImageRepeat.repeat,
-            ),
           ),
-          child: Row(
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(isSunny ? '☀️' : '🌥️', style: const TextStyle(fontSize: 42)),
-                ],
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: isSunny 
+                        ? [const Color(0xFF4FC3F7).withValues(alpha: 0.8), const Color(0xFF0288D1).withValues(alpha: 0.85)] 
+                        : [const Color(0xFF78909C).withValues(alpha: 0.8), const Color(0xFF455A64).withValues(alpha: 0.85)],
+                  ),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1.5),
+                ),
+                child: Row(
                   children: [
-                    Text('${w['main']?['temp']?.toStringAsFixed(0) ?? '--'}°C',
-                        style: const TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -2,
-                            color: Colors.white,
-                            height: 1)),
-                    const SizedBox(height: 2),
-                    Text(
-                        '${w['name'] ?? 'Your Location'} • ${w['weather']?[0]?['description'] ?? ''}'.capitalize(),
-                        style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.85),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 8),
-                    Row(children: [
-                      _WeatherPill('💧 ${w['main']?['humidity'] ?? '--'}%'),
-                      const SizedBox(width: 8),
-                      _WeatherPill('💨 ${(w['wind']?['speed'] ?? 0).toStringAsFixed(0)} m/s'),
-                      const SizedBox(width: 8),
-                      _WeatherPill('👁️ ${((w['visibility'] as num? ?? 10000) / 1000).toStringAsFixed(0)} km'),
-                    ]),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(isSunny ? '☀️' : '🌥️', style: const TextStyle(fontSize: 32)),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${w['main']?['temp']?.toStringAsFixed(0) ?? '--'}°',
+                                    style: const TextStyle(
+                                        fontSize: 44,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.white,
+                                        height: 1),
+                                  ),
+                                  Text(
+                                    '${w['weather']?[0]?['main'] ?? ''}'.toUpperCase(),
+                                    style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.9),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 1),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              _DetailedWeatherPill(Icons.water_drop_rounded, '${w['main']?['humidity'] ?? '--'}%'),
+                              const SizedBox(width: 8),
+                              _DetailedWeatherPill(Icons.air_rounded, '${(w['wind']?['speed'] ?? 0).toStringAsFixed(1)}m/s'),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Feels like',
+                            style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 10, fontWeight: FontWeight.w600),
+                          ),
+                          Text(
+                            '${w['main']?['feels_like']?.toStringAsFixed(0) ?? '--'}°',
+                            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () => context.push('/farmer/weather'),
-                  child: Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
+    );
+  }
+}
+
+class _DetailedWeatherPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _DetailedWeatherPill(this.icon, this.label);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 14),
+          const SizedBox(width: 4),
+          Text(label, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+        ],
+      ),
     );
   }
 }

@@ -63,49 +63,51 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
       return null;
     },
-    routes: [
-      GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
-
-      // Auth
-      GoRoute(path: '/auth/role', builder: (_, __) => const RoleSelectionScreen()),
-      GoRoute(path: '/auth/phone', builder: (ctx, state) {
-        final role = state.uri.queryParameters['role'] ?? 'FARMER';
-        return PhoneScreen(role: role);
-      }),
-      GoRoute(path: '/auth/otp', builder: (ctx, state) {
-        final extra = state.extra as Map<String, String>? ?? {};
-        return OTPScreen(phone: extra['phone'] ?? '', role: extra['role'] ?? 'FARMER');
-      }),
-      GoRoute(path: '/auth/onboarding', builder: (_, __) => const OnboardingScreen()), // The animated tour
-      GoRoute(path: '/auth/setup', builder: (_, __) => const ProfileSetupScreen()), // The mandatory info form
-
-      // Farmer
-      GoRoute(path: '/farmer', builder: (_, __) => const FarmerHome()),
-      GoRoute(path: '/farmer/shop', builder: (_, __) => const ShopScreen()),
-      GoRoute(path: '/farmer/shop/product/:id', builder: (ctx, state) => ProductDetailScreen(productId: state.pathParameters['id']!)),
-      GoRoute(path: '/farmer/cart', builder: (_, __) => const CartScreen()),
-      GoRoute(path: '/farmer/checkout', builder: (_, __) => const CheckoutScreen()),
-      GoRoute(path: '/farmer/orders', builder: (_, __) => const OrdersScreen()),
-      GoRoute(path: '/farmer/orders/:id/tracking', builder: (ctx, state) => OrderTrackingScreen(orderId: state.pathParameters['id']!)),
-      GoRoute(path: '/farmer/soil', builder: (_, __) => const SoilAnalysisScreen()),
-      GoRoute(path: '/farmer/disease', builder: (_, __) => const DiseaseDetectionScreen()),
-      GoRoute(path: '/farmer/crop-advisor', builder: (_, __) => const CropAdvisorScreen()),
-      GoRoute(path: '/farmer/weather', builder: (_, __) => const WeatherScreen()),
-      GoRoute(path: '/farmer/mandi', builder: (_, __) => const MandiPricesScreen()),
-      GoRoute(path: '/farmer/kisan-ai', builder: (_, __) => const KisanAiScreen()),
-      GoRoute(path: '/farmer/schemes', builder: (_, __) => const SchemesScreen()),
-      GoRoute(path: '/farmer/profile', builder: (_, __) => const ProfileScreen()),
-      GoRoute(path: '/notifications', builder: (_, __) => const NotificationsScreen()),
-
-      // Supplier
-      GoRoute(path: '/supplier', builder: (_, __) => const SupplierHome()),
-      GoRoute(path: '/supplier/orders', builder: (_, __) => const SupplierOrdersScreen()),
-      GoRoute(path: '/supplier/add-product', builder: (_, __) => const AddProductScreen()),
-      GoRoute(path: '/supplier/analytics', builder: (_, __) => const SupplierAnalyticsScreen()),
-    ],
     errorBuilder: (ctx, state) => Scaffold(
       body: Center(child: Text('Page not found: ${state.uri}', style: const TextStyle(fontSize: 16))),
     ),
+    routes: [
+      _fadedRoute('/splash', const SplashScreen()),
+
+      // Auth
+      _fadedRoute('/auth/role', const RoleSelectionScreen()),
+      GoRoute(path: '/auth/phone', pageBuilder: (ctx, state) {
+        final role = state.uri.queryParameters['role'] ?? 'FARMER';
+        return _fadedPage(PhoneScreen(role: role));
+      }),
+      GoRoute(path: '/auth/otp', pageBuilder: (ctx, state) {
+        final extra = state.extra as Map<String, String>? ?? {};
+        return _fadedPage(OTPScreen(phone: extra['phone'] ?? '', role: extra['role'] ?? 'FARMER'));
+      }),
+      _fadedRoute('/auth/onboarding', const OnboardingScreen()),
+      _fadedRoute('/auth/setup', const ProfileSetupScreen()),
+
+      // Farmer
+      _fadedRoute('/farmer', const FarmerHome()),
+      _fadedRoute('/farmer/shop', const ShopScreen()),
+      GoRoute(path: '/farmer/shop/product/:id', pageBuilder: (ctx, state) => 
+        _fadedPage(ProductDetailScreen(productId: state.pathParameters['id']!))),
+      _fadedRoute('/farmer/cart', const CartScreen()),
+      _fadedRoute('/farmer/checkout', const CheckoutScreen()),
+      _fadedRoute('/farmer/orders', const OrdersScreen()),
+      GoRoute(path: '/farmer/orders/:id/tracking', pageBuilder: (ctx, state) => 
+        _fadedPage(OrderTrackingScreen(orderId: state.pathParameters['id']!))),
+      _fadedRoute('/farmer/soil', const SoilAnalysisScreen()),
+      _fadedRoute('/farmer/disease', const DiseaseDetectionScreen()),
+      _fadedRoute('/farmer/crop-advisor', const CropAdvisorScreen()),
+      _fadedRoute('/farmer/weather', const WeatherScreen()),
+      _fadedRoute('/farmer/mandi', const MandiPricesScreen()),
+      _fadedRoute('/farmer/kisan-ai', const KisanAiScreen()),
+      _fadedRoute('/farmer/schemes', const SchemesScreen()),
+      _fadedRoute('/farmer/profile', const ProfileScreen()),
+      _fadedRoute('/notifications', const NotificationsScreen()),
+
+      // Supplier
+      _fadedRoute('/supplier', const SupplierHome()),
+      _fadedRoute('/supplier/orders', const SupplierOrdersScreen()),
+      _fadedRoute('/supplier/add-product', const AddProductScreen()),
+      _fadedRoute('/supplier/analytics', const SupplierAnalyticsScreen()),
+    ],
   );
 
   ref.listen(authProvider, (previous, next) {
@@ -116,3 +118,30 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   return router;
 });
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
+GoRoute _fadedRoute(String path, Widget child) {
+  return GoRoute(
+    path: path,
+    pageBuilder: (context, state) => _fadedPage(child),
+  );
+}
+
+CustomTransitionPage _fadedPage(Widget child) {
+  return CustomTransitionPage(
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(
+        opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.05),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+          child: child,
+        ),
+      );
+    },
+  );
+}

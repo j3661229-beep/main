@@ -119,26 +119,28 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                     children: [
                       // Carousel / Hot Deals (Swiggy Horizontal Promos)
                       const SizedBox(height: 16),
-                      SizedBox(
-                        height: 140,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          physics: const BouncingScrollPhysics(),
-                          children: [
-                             _PromoBanner(
-                                title: 'KHARIF SPECIAL',
-                                subtitle: 'Up to 40% Off on Fertilizers',
-                                emoji: '🚜',
-                                colors: const [Color(0xFFFFD700), Color(0xFFF59E0B)]
-                             ),
-                             _PromoBanner(
-                                title: 'NEW ARRIVALS',
-                                subtitle: 'Hybrid Seeds for Better Yield',
-                                emoji: '🌱',
-                                colors: const [AppColors.success, Color(0xFF059669)]
-                             ),
-                          ],
+                      RepaintBoundary(
+                        child: SizedBox(
+                          height: 140,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            physics: const BouncingScrollPhysics(),
+                            children: [
+                               _PromoBanner(
+                                  title: 'KHARIF SPECIAL',
+                                  subtitle: 'Up to 40% Off on Fertilizers',
+                                  emoji: '🚜',
+                                  colors: const [Color(0xFFFFD700), Color(0xFFF59E0B)]
+                               ),
+                               _PromoBanner(
+                                  title: 'NEW ARRIVALS',
+                                  subtitle: 'Hybrid Seeds for Better Yield',
+                                  emoji: '🌱',
+                                  colors: const [AppColors.success, Color(0xFF059669)]
+                               ),
+                            ],
+                          ),
                         ),
                       ),
                     const SizedBox(height: 24),
@@ -203,40 +205,43 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                          child: AppEmptyState(icon: '🌿', title: 'No products found', subtitle: 'Try clearing your search or category filters')
                       );
                     }
-                    return SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.65,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (ctx, i) {
-                          final p = list[i] as Map;
-                          final cartItem = _getCartItem(cartAsync, p['id']);
-                          final qty = cartItem?['quantity'] as int? ?? 0;
-                          final cartItemId = cartItem?['id'] as String?;
-                          return _ProductCardSwiggy(
-                            product: p,
-                            cartQty: qty,
-                            onUpdateCart: (int newQty) async {
-                               try {
-                                  if (newQty == 0 && cartItemId != null) {
-                                     await ref.read(cartProvider.notifier).removeItem(cartItemId);
-                                  } else if (cartItemId != null) {
-                                     await ref.read(cartProvider.notifier).updateItem(cartItemId, newQty);
-                                  } else if (newQty > 0) {
-                                     await ref.read(cartProvider.notifier).addItem(Map<String, dynamic>.from(p), newQty);
-                                  }
-                               } catch (e) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e'), backgroundColor: AppColors.error));
-                                  }
-                               }
-                            }
-                          );
-                        },
-                        childCount: list.length,
+                    return RepaintBoundary(
+                      child: SliverGrid(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.65,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (ctx, i) {
+                            final p = list[i] as Map;
+                            final cartItem = _getCartItem(cartAsync, p['id']);
+                            final qty = cartItem?['quantity'] as int? ?? 0;
+                            final cartItemId = cartItem?['id'] as String?;
+                            return _ProductCardSwiggy(
+                              product: p,
+                              cartQty: qty,
+                              onUpdateCart: (int newQty) async {
+                                 try {
+                                    HapticFeedback.mediumImpact();
+                                    if (newQty == 0 && cartItemId != null) {
+                                       await ref.read(cartProvider.notifier).removeItem(cartItemId);
+                                    } else if (cartItemId != null) {
+                                       await ref.read(cartProvider.notifier).updateItem(cartItemId, newQty);
+                                    } else if (newQty > 0) {
+                                       await ref.read(cartProvider.notifier).addItem(Map<String, dynamic>.from(p), newQty);
+                                    }
+                                 } catch (e) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e'), backgroundColor: AppColors.error));
+                                    }
+                                 }
+                              }
+                            );
+                          },
+                          childCount: list.length,
+                        ),
                       ),
                     );
                   },
@@ -249,36 +254,45 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
           if (totalItems > 0)
             Positioned(
               bottom: 24, left: 16, right: 16,
-              child: GestureDetector(
-                onTap: () => context.push('/farmer/cart'),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF10B981), // Swiggy green
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(color: const Color(0xFF10B981).withValues(alpha: 0.3), blurRadius: 15, offset: const Offset(0, 5))
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('$totalItems Item${totalItems > 1 ? 's' : ''}', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                          Text('₹${totalPrice.toStringAsFixed(0)}', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
-                        ],
-                      ),
-                      Row(
-                        children: const [
-                          Text('View Cart', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                          SizedBox(width: 8),
-                          Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
-                        ],
-                      )
-                    ],
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.8, end: 1.0),
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.elasticOut,
+                builder: (context, value, child) => Transform.scale(scale: value, child: child),
+                child: GestureDetector(
+                  onTap: () {
+                    HapticFeedback.heavyImpact();
+                    context.push('/farmer/cart');
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF10B981), // Swiggy green
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(color: const Color(0xFF10B981).withValues(alpha: 0.3), blurRadius: 15, offset: const Offset(0, 5))
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('$totalItems Item${totalItems > 1 ? 's' : ''}', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                            Text('₹${totalPrice.toStringAsFixed(0)}', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+                          ],
+                        ),
+                        Row(
+                          children: const [
+                            Text('View Cart', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                            SizedBox(width: 8),
+                            Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -321,24 +335,27 @@ class _ProductCardSwiggy extends StatelessWidget {
           Expanded(
             child: Stack(
               children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-                  child: Container(
-                    width: double.infinity,
-                    color: AppColors.primarySurface.withValues(alpha: 0.5),
-                    child: product['images'] is List && (product['images'] as List).isNotEmpty
-                        ? CachedNetworkImage(
-                            imageUrl: product['images'][0],
-                            memCacheWidth: 400, // Optimize memory for thumbnails
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Shimmer.fromColors(
-                              baseColor: Colors.grey[300]!,
-                              highlightColor: Colors.grey[100]!,
-                              child: Container(color: Colors.white),
-                            ),
-                            errorWidget: (_, __, ___) => const Center(child: Text('🌿', style: TextStyle(fontSize: 40))),
-                          )
-                        : const Center(child: Text('🌿', style: TextStyle(fontSize: 40))),
+                Hero(
+                  tag: 'product_${product['id']}',
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                    child: Container(
+                      width: double.infinity,
+                      color: AppColors.primarySurface.withValues(alpha: 0.5),
+                      child: product['images'] is List && (product['images'] as List).isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: product['images'][0],
+                              memCacheWidth: 400, // Optimize memory for thumbnails
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: Colors.grey[300]!,
+                                highlightColor: Colors.grey[100]!,
+                                child: Container(color: Colors.white),
+                              ),
+                              errorWidget: (_, __, ___) => const Center(child: Text('🌿', style: TextStyle(fontSize: 40))),
+                            )
+                          : const Center(child: Text('🌿', style: TextStyle(fontSize: 40))),
+                    ),
                   ),
                 ),
                 if (product['isOrganic'] == true)

@@ -6,11 +6,11 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "build": "npx prisma generate",
-    "postinstall": "npx prisma generate",
-    "migrate": "npx prisma generate",
-    "generate": "npx prisma generate",
-    "studio": "npx prisma studio",
+    "build": "node node_modules/prisma/build/index.js generate",
+    "postinstall": "node node_modules/prisma/build/index.js generate",
+    "migrate": "node node_modules/prisma/build/index.js generate",
+    "generate": "node node_modules/prisma/build/index.js generate",
+    "studio": "node node_modules/prisma/build/index.js studio",
     "seed": "node prisma/seed.js"
   },
   "dependencies": {
@@ -41,10 +41,10 @@
     "twilio": "^5.2.3",
     "uuid": "^10.0.0",
     "winston": "^3.13.0",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "prisma": "^5.14.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.4",
-    "prisma": "^5.14.0"
+    "nodemon": "^3.1.4"
   }
 }
