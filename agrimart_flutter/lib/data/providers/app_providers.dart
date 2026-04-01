@@ -11,11 +11,19 @@ final searchQueryProvider = StateProvider<String>((ref) => '');
 
 final searchResultsProvider = FutureProvider<Map>((ref) async {
   final query = ref.watch(searchQueryProvider);
-  if (query.isEmpty) return {'data': [], 'pagination': {'total': 0}};
-  
+  if (query.isEmpty)
+    return {
+      'data': [],
+      'pagination': {'total': 0}
+    };
+
   // Debounce: Wait for 300ms before calling API
   await Future.delayed(const Duration(milliseconds: 300));
-  if (ref.read(searchQueryProvider) != query) return {'data': [], 'pagination': {'total': 0}};
+  if (ref.read(searchQueryProvider) != query)
+    return {
+      'data': [],
+      'pagination': {'total': 0}
+    };
 
   return ApiService.instance.getProducts(search: query);
 });
@@ -25,40 +33,51 @@ final trendingSearchesProvider = Provider<List<String>>((ref) {
 });
 
 // ── Products ──────────────────────────────────────────────
-final productsProvider = FutureProvider.family<Map, String>((ref, queryParams) async {
+final productsProvider =
+    FutureProvider.family<Map, String>((ref, queryParams) async {
   ref.keepAlive();
   final uri = Uri(query: queryParams);
-  
+
   try {
+    final latStr = uri.queryParameters['lat'];
+    final lngStr = uri.queryParameters['lng'];
     final data = await ApiService.instance.getProducts(
       category: uri.queryParameters['category'],
       search: uri.queryParameters['search'],
       sort: uri.queryParameters['sort'],
       page: int.tryParse(uri.queryParameters['page'] ?? '1') ?? 1,
+      lat: latStr != null ? double.tryParse(latStr) : null,
+      lng: lngStr != null ? double.tryParse(lngStr) : null,
     );
-    
+
     // Save to offline cache if it's the main list
     if (queryParams.isEmpty || queryParams == 'page=1') {
       if (data['data'] != null) await OfflineCache.saveProducts(data['data']);
     }
-    
+
     return data;
   } catch (e) {
     // Fallback to offline cache on error
     final offline = await OfflineCache.getProducts();
-    if (offline != null) return {'data': offline, 'pagination': {'page': 1, 'total': offline.length}};
+    if (offline != null)
+      return {
+        'data': offline,
+        'pagination': {'page': 1, 'total': offline.length}
+      };
     rethrow;
   }
 });
 
-final productDetailProvider = FutureProvider.family<Map, String>((ref, id) async {
+final productDetailProvider =
+    FutureProvider.family<Map, String>((ref, id) async {
   return ApiService.instance.getProduct(id);
 });
 
-final nearbyProductsProvider = FutureProvider.family<List, String>((ref, coordsStr) async {
+final nearbyProductsProvider =
+    FutureProvider.family<List, String>((ref, coordsStr) async {
   final cacheKey = 'nearby_products_$coordsStr';
   final cached = CacheManager.get(cacheKey, maxAge: const Duration(hours: 1));
-  
+
   if (cached != null) {
     // Return cached and refresh in background
     _refreshNearbyProducts(cacheKey, coordsStr);
@@ -70,9 +89,19 @@ final nearbyProductsProvider = FutureProvider.family<List, String>((ref, coordsS
   return data;
 });
 
+final nearbySuppliersProvider =
+    FutureProvider.family<List, String>((ref, coordsStr) async {
+  final parts = coordsStr.split(',');
+  return ApiService.instance.getNearbySuppliers(
+    lat: double.parse(parts[0]),
+    lng: double.parse(parts[1]),
+  );
+});
+
 Future<List> _fetchNearbyProducts(String coordsStr) async {
   final parts = coordsStr.split(',');
-  return ApiService.instance.getNearbyProducts(lat: double.parse(parts[0]), lng: double.parse(parts[1]));
+  return ApiService.instance.getNearbyProducts(
+      lat: double.parse(parts[0]), lng: double.parse(parts[1]));
 }
 
 void _refreshNearbyProducts(String key, String coordsStr) async {
@@ -99,7 +128,8 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
       if (cached != null) {
         // Safe deep cast
         final decoded = jsonDecode(jsonEncode(cached));
-        state = AsyncValue.data(decoded is Map ? decoded as Map<String, dynamic> : {'items': []});
+        state = AsyncValue.data(
+            decoded is Map ? decoded as Map<String, dynamic> : {'items': []});
       } else {
         state = const AsyncValue.data({'items': []});
       }
@@ -116,15 +146,22 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
 
   Future<void> addItem(Map<String, dynamic> product, int quantity) async {
     final previousState = state;
-    final current = state.valueOrNull != null ? Map<String, dynamic>.from(state.value!) : {'items': []};
+    final current = state.valueOrNull != null
+        ? Map<String, dynamic>.from(state.value!)
+        : {'items': []};
     final items = List<Map<String, dynamic>>.from(current['items'] ?? []);
-    
+
     final productId = product['id'] ?? product['_id'];
-    final index = items.indexWhere((item) => (item['productId'] == productId) || (item['product']?['id'] == productId));
-    
+    final index = items.indexWhere((item) =>
+        (item['productId'] == productId) ||
+        (item['product']?['id'] == productId));
+
     // 1. Optimistic Update
     if (index >= 0) {
-      items[index] = {...items[index], 'quantity': (items[index]['quantity'] as int) + quantity};
+      items[index] = {
+        ...items[index],
+        'quantity': (items[index]['quantity'] as int) + quantity
+      };
     } else {
       items.add({
         'id': 'temp_${DateTime.now().millisecondsSinceEpoch}',
@@ -133,14 +170,15 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
         'quantity': quantity,
       });
     }
-    
+
     current['items'] = items;
     state = AsyncValue.data(current);
     HapticFeedback.lightImpact(); // Premium feel
 
     // 2. API Call in background
     try {
-      await ApiService.instance.addToCart(productId: productId, quantity: quantity);
+      await ApiService.instance
+          .addToCart(productId: productId, quantity: quantity);
       await _saveLocal();
     } catch (e) {
       // 3. Rollback on failure
@@ -150,13 +188,15 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
 
   Future<void> updateItem(String itemId, int quantity) async {
     final previousState = state;
-    final current = state.valueOrNull != null ? Map<String, dynamic>.from(state.value!) : {'items': []};
+    final current = state.valueOrNull != null
+        ? Map<String, dynamic>.from(state.value!)
+        : {'items': []};
     final items = List<Map<String, dynamic>>.from(current['items'] ?? []);
-    
+
     final index = items.indexWhere((item) => item['id'] == itemId);
     if (index >= 0) {
       final productId = items[index]['productId'];
-      
+
       // 1. Optimistic Update
       items[index] = {...items[index], 'quantity': quantity};
       current['items'] = items;
@@ -174,9 +214,12 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
 
   Future<void> removeItem(String itemId) async {
     final previousState = state;
-    final current = state.valueOrNull != null ? Map<String, dynamic>.from(state.value!) : {'items': []};
-    List<Map<String, dynamic>> items = List<Map<String, dynamic>>.from(current['items'] ?? []);
-    
+    final current = state.valueOrNull != null
+        ? Map<String, dynamic>.from(state.value!)
+        : {'items': []};
+    List<Map<String, dynamic>> items =
+        List<Map<String, dynamic>>.from(current['items'] ?? []);
+
     // 1. Optimistic Update
     items.removeWhere((item) => item['id'] == itemId);
     current['items'] = items;
@@ -199,18 +242,22 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
   int get itemCount {
     final data = state.valueOrNull;
     final items = data?['items'] as List? ?? [];
-    return items.fold<int>(0, (sum, item) => sum + ((item['quantity'] as int?) ?? 0));
+    return items.fold<int>(
+        0, (sum, item) => sum + ((item['quantity'] as int?) ?? 0));
   }
 }
 
-final cartProvider = StateNotifierProvider<CartNotifier, AsyncValue<Map>>((ref) => CartNotifier());
+final cartProvider = StateNotifierProvider<CartNotifier, AsyncValue<Map>>(
+    (ref) => CartNotifier());
 
 final cartItemCountProvider = Provider<int>((ref) {
   final cart = ref.watch(cartProvider);
   return cart.whenOrNull(data: (data) {
-    final items = data['items'] as List? ?? [];
-    return items.fold<int>(0, (sum, item) => sum + ((item['quantity'] as int?) ?? 0));
-  }) ?? 0;
+        final items = data['items'] as List? ?? [];
+        return items.fold<int>(
+            0, (sum, item) => sum + ((item['quantity'] as int?) ?? 0));
+      }) ??
+      0;
 });
 
 // ── Orders ────────────────────────────────────────────────
@@ -226,18 +273,20 @@ final ordersProvider = FutureProvider<List>((ref) async {
   }
 });
 
-final orderTrackingProvider = FutureProvider.family<Map, String>((ref, orderId) async {
+final orderTrackingProvider =
+    FutureProvider.family<Map, String>((ref, orderId) async {
   return ApiService.instance.getOrderTracking(orderId);
 });
 
 // ── Farmer Dashboard ──────────────────────────────────────
 final farmerDashboardProvider = FutureProvider<Map>((ref) async {
   const cacheKey = 'farmer_dashboard';
-  final cached = CacheManager.get(cacheKey, maxAge: const Duration(minutes: 30));
-  
+  final cached =
+      CacheManager.get(cacheKey, maxAge: const Duration(minutes: 30));
+
   if (cached != null) {
-      _refreshFarmerDashboard();
-      return Map.from(cached);
+    _refreshFarmerDashboard();
+    return Map.from(cached);
   }
 
   final data = await ApiService.instance.getFarmerDashboard();
@@ -256,31 +305,38 @@ void _refreshFarmerDashboard() async {
 final weatherProvider = FutureProvider<Map>((ref) async {
   ref.keepAlive();
   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) return ApiService.instance.getWeather(lat: 20.0, lng: 73.78); // Default Nashik
-  
+  if (!serviceEnabled)
+    return ApiService.instance
+        .getWeather(lat: 20.0, lng: 73.78); // Default Nashik
+
   LocationPermission permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied) {
     permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
       return ApiService.instance.getWeather(lat: 20.0, lng: 73.78);
     }
   }
-  
-  Position pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+
+  Position pos = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.medium);
   return ApiService.instance.getWeather(lat: pos.latitude, lng: pos.longitude);
 });
 
-final weatherAdvisoryProvider = FutureProvider.family<Map, String>((ref, district) async {
+final weatherAdvisoryProvider =
+    FutureProvider.family<Map, String>((ref, district) async {
   return ApiService.instance.getWeatherAdvisory(district: district);
 });
 
 // ── Mandi ─────────────────────────────────────────────────
-final mandiProvider = FutureProvider.family<Map, String?>((ref, district) async {
+final mandiProvider =
+    FutureProvider.family<Map, String?>((ref, district) async {
   ref.keepAlive();
   return ApiService.instance.getMandiPrices(district: district);
 });
 
-final cropHistoryProvider = FutureProvider.family<Map, String>((ref, crop) async {
+final cropHistoryProvider =
+    FutureProvider.family<Map, String>((ref, crop) async {
   return ApiService.instance.getCropHistory(crop);
 });
 
@@ -303,7 +359,8 @@ final supplierDashboardProvider = FutureProvider<Map>((ref) async {
   return ApiService.instance.getSupplierDashboard();
 });
 
-final supplierOrdersProvider = FutureProvider.family<List, String?>((ref, status) async {
+final supplierOrdersProvider =
+    FutureProvider.family<List, String?>((ref, status) async {
   return ApiService.instance.getSupplierOrders(status: status);
 });
 

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/app_colors.dart';
 
 class FloatingDockNav extends StatelessWidget {
@@ -73,8 +74,8 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        HapticFeedback.lightImpact();
         onTap();
-        // Feedback
       },
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(

@@ -62,6 +62,11 @@ class ApiService {
     return r.data['data'];
   }
 
+  Future<Map> googleSignIn(Map<String, dynamic> data) async {
+    final r = await _dio.post('/auth/google', data: data);
+    return r.data['data'];
+  }
+
   Future<void> logout() async {
     try {
       await _dio.post('/auth/logout');
@@ -120,6 +125,20 @@ class ApiService {
       {required double lat, required double lng, double radius = 30}) async {
     final r = await _dio.get('/products/nearby',
         queryParameters: {'lat': lat, 'lng': lng, 'radius': radius});
+    return r.data['data'] ?? [];
+  }
+
+  Future<List> getNearbySuppliers(
+      {required double lat,
+      required double lng,
+      double radius = 25,
+      int limit = 20}) async {
+    final r = await _dio.get('/products/nearby-suppliers', queryParameters: {
+      'lat': lat,
+      'lng': lng,
+      'radius': radius,
+      'limit': limit,
+    });
     return r.data['data'] ?? [];
   }
 
@@ -209,7 +228,8 @@ class ApiService {
   }
 
   // ── AI ────────────────────────────────────────────────────
-  Future<Map> analyzeSoil(String imagePath, {String? location, String? language}) async {
+  Future<Map> analyzeSoil(String imagePath,
+      {String? location, String? language}) async {
     final formData = FormData.fromMap({
       'image': await MultipartFile.fromFile(imagePath, filename: 'soil.jpg'),
       if (location != null) 'location': location,
@@ -235,7 +255,8 @@ class ApiService {
     return r.data['data'];
   }
 
-  Future<Map> kisanChat({required String message, List? history, String? language}) async {
+  Future<Map> kisanChat(
+      {required String message, List? history, String? language}) async {
     final r = await _dio.post('/ai/chat', data: {
       'message': message,
       'history': history ?? [],
@@ -280,8 +301,10 @@ class ApiService {
   }
 
   // ── Trade Bookings ─────────────────────────────────────────
-  Future<List> getDealerRates({required String district, required String crop}) async {
-    final r = await _dio.get('/trade/rates', queryParameters: {'district': district, 'crop': crop});
+  Future<List> getDealerRates(
+      {required String district, required String crop}) async {
+    final r = await _dio.get('/trade/rates',
+        queryParameters: {'district': district, 'crop': crop});
     return r.data['data'] ?? [];
   }
 
@@ -363,11 +386,12 @@ class _AuthInterceptor extends Interceptor {
       if (refreshToken != null) {
         try {
           final dio = Dio(BaseOptions(baseUrl: AppConstants.baseUrl));
-          final res = await dio.post('/auth/refresh-token', data: {'refreshToken': refreshToken});
+          final res = await dio.post('/auth/refresh-token',
+              data: {'refreshToken': refreshToken});
           if (res.statusCode == 200 && res.data['data'] != null) {
             final newToken = res.data['data']['token'];
             await _storage.write(key: AppConstants.tokenKey, value: newToken);
-            
+
             // Retry the original request
             err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
             final retry = await dio.fetch(err.requestOptions);

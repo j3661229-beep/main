@@ -136,8 +136,68 @@ const completeOnboarding = async (userId, role, data) => {
     });
 };
 
+const googleSignIn = async ({ email, googleId, name, photoUrl, role }) => {
+    let user = await prisma.user.findFirst({
+        where: {
+            OR: [
+                { googleId },
+                { email }
+            ]
+        }
+    });
+
+    if (user && user.role !== role) {
+        throw Object.assign(new Error(`This account is registered as a ${user.role}. Cannot login as ${role}.`), { statusCode: 403 });
+    }
+
+    if (!user) {
+        user = await prisma.user.create({
+            data: {
+                email,
+                googleId,
+                name: name || 'AgriMart User',
+                profilePhoto: photoUrl,
+                role: role || 'FARMER',
+                language: 'marathi',
+                isVerified: false
+            },
+        });
+        if (user.role === 'FARMER') {
+            await prisma.farmer.create({
+                data: {
+                    userId: user.id, village: '', taluka: '', district: 'Maharashtra', pincode: '', farmSizeAcres: 0,
+                },
+            });
+        } else if (user.role === 'SUPPLIER') {
+            await prisma.supplier.create({
+                data: {
+                    userId: user.id, businessName: 'My Store', gstNumber: null, address: '', district: 'Maharashtra', pincode: '',
+                },
+            });
+        }
+    } else {
+        user = await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                googleId: user.googleId || googleId,
+                profilePhoto: user.profilePhoto || photoUrl,
+                name: user.name === 'AgriMart User' && name ? name : user.name
+            }
+        });
+    }
+
+    const { token, refreshToken } = generateTokens(user.id, user.role);
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await prisma.session.create({ data: { userId: user.id, token, expiresAt } });
+
+    const fullUser = await prisma.user.findUnique({
+        where: { id: user.id }, include: { farmer: true, supplier: true },
+    });
+    return { user: fullUser, token, refreshToken };
+};
+
 const logout = async (token) => {
     await prisma.session.deleteMany({ where: { token } });
 };
 
-module.exports = { sendOTP, verifyOTP, refreshToken, completeOnboarding, logout };
+module.exports = { sendOTP, verifyOTP, googleSignIn, refreshToken, completeOnboarding, logout };

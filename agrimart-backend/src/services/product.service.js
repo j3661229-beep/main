@@ -3,6 +3,28 @@ const { uploadToSupabase } = require('../middleware/upload');
 const { haversineDistance } = require('../utils/helpers');
 const { sendNotification } = require('./onesignal.service');
 
+const toNumberOrNull = (v) => {
+    if (v === undefined || v === null || v === '') return null;
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : null;
+};
+
+const withDistance = (products, lat, lng) => {
+    if (lat === null || lng === null) {
+        return products.map((p) => ({ ...p, supplierDistanceKm: null }));
+    }
+    return products
+        .map((p) => {
+            const sLat = p?.supplier?.latitude;
+            const sLng = p?.supplier?.longitude;
+            if (typeof sLat !== 'number' || typeof sLng !== 'number') {
+                return { ...p, supplierDistanceKm: null };
+            }
+            const distance = haversineDistance(lat, lng, sLat, sLng);
+            return { ...p, supplierDistanceKm: Number(distance.toFixed(2)) };
+        });
+};
+
 const getProducts = async ({ category, search, sort, district, lat, lng, radius = 50, page, limit, skip }) => {
     const where = { isActive: true, isApproved: true, stockQuantity: { gt: 0 } };
     if (category) where.category = category.toUpperCase();
@@ -15,16 +37,28 @@ const getProducts = async ({ category, search, sort, district, lat, lng, radius 
         ];
     }
 
-    // Sort by location if provided
+    const userLat = toNumberOrNull(lat);
+    const userLng = toNumberOrNull(lng);
+    const radiusKm = toNumberOrNull(radius) ?? 50;
+
     let products = await prisma.product.findMany({
         where,
         include: { supplier: { include: { user: true } } },
         orderBy: sort === 'price_asc' ? { price: 'asc' } : sort === 'price_desc' ? { price: 'desc' } : { createdAt: 'desc' }
     });
 
-    if (lat && lng) {
-        products = products.filter(p => p.supplier.latitude && p.supplier.longitude &&
-            haversineDistance(parseFloat(lat), parseFloat(lng), p.supplier.latitude, p.supplier.longitude) <= parseFloat(radius));
+    products = withDistance(products, userLat, userLng);
+
+    if (userLat !== null && userLng !== null) {
+        products = products.filter((p) => p.supplierDistanceKm !== null && p.supplierDistanceKm <= radiusKm);
+    }
+
+    if (sort === 'nearest' && userLat !== null && userLng !== null) {
+        products.sort((a, b) => {
+            const ad = a.supplierDistanceKm ?? Number.POSITIVE_INFINITY;
+            const bd = b.supplierDistanceKm ?? Number.POSITIVE_INFINITY;
+            return ad - bd;
+        });
     }
 
     const total = products.length;
@@ -43,16 +77,57 @@ const getProduct = async (id) => {
 };
 
 const getNearby = async ({ lat, lng, radius = 25 }) => {
-    if (!lat || !lng) throw Object.assign(new Error('lat and lng query params required'), { statusCode: 400 });
+    const userLat = toNumberOrNull(lat);
+    const userLng = toNumberOrNull(lng);
+    const radiusKm = toNumberOrNull(radius) ?? 25;
+    if (userLat === null || userLng === null) {
+        throw Object.assign(new Error('lat and lng query params required'), { statusCode: 400 });
+    }
+
     const products = await prisma.product.findMany({
         where: { isActive: true, isApproved: true, stockQuantity: { gt: 0 } },
         include: { supplier: { include: { user: true } } },
-        take: 50,
     });
-    return products
-        .filter(p => p.supplier.latitude && p.supplier.longitude &&
-            haversineDistance(parseFloat(lat), parseFloat(lng), p.supplier.latitude, p.supplier.longitude) <= parseFloat(radius))
+
+    return withDistance(products, userLat, userLng)
+        .filter((p) => p.supplierDistanceKm !== null && p.supplierDistanceKm <= radiusKm)
+        .sort((a, b) => a.supplierDistanceKm - b.supplierDistanceKm)
         .slice(0, 20);
+};
+
+const getNearbySuppliers = async ({ lat, lng, radius = 25, limit = 20 }) => {
+    const userLat = toNumberOrNull(lat);
+    const userLng = toNumberOrNull(lng);
+    const radiusKm = toNumberOrNull(radius) ?? 25;
+    const maxSuppliers = Math.min(50, Math.max(1, parseInt(limit, 10) || 20));
+    if (userLat === null || userLng === null) {
+        throw Object.assign(new Error('lat and lng query params required'), { statusCode: 400 });
+    }
+
+    const suppliers = await prisma.supplier.findMany({
+        where: {
+            isVerified: true,
+            products: { some: { isActive: true, isApproved: true, stockQuantity: { gt: 0 } } },
+        },
+        include: {
+            user: true,
+            products: {
+                where: { isActive: true, isApproved: true, stockQuantity: { gt: 0 } },
+                take: 8,
+                orderBy: { createdAt: 'desc' },
+            },
+        },
+    });
+
+    return suppliers
+        .map((s) => {
+            if (typeof s.latitude !== 'number' || typeof s.longitude !== 'number') return null;
+            const distanceKm = Number(haversineDistance(userLat, userLng, s.latitude, s.longitude).toFixed(2));
+            return { ...s, distanceKm };
+        })
+        .filter((s) => s !== null && s.distanceKm <= radiusKm)
+        .sort((a, b) => a.distanceKm - b.distanceKm)
+        .slice(0, maxSuppliers);
 };
 
 const getRecommended = async (farmerId) => {
@@ -63,7 +138,22 @@ const getRecommended = async (farmerId) => {
             { description: { contains: farmer.soilType.split(' ')[0], mode: 'insensitive' } },
         ];
     }
-    return prisma.product.findMany({ where, take: 10, include: { supplier: { include: { user: true } } } });
+    const products = await prisma.product.findMany({
+        where,
+        take: 50,
+        include: { supplier: { include: { user: true } } },
+        orderBy: { createdAt: 'desc' },
+    });
+
+    const withDistances = withDistance(products, farmer?.latitude ?? null, farmer?.longitude ?? null);
+    if (farmer?.latitude && farmer?.longitude) {
+        withDistances.sort((a, b) => {
+            const ad = a.supplierDistanceKm ?? Number.POSITIVE_INFINITY;
+            const bd = b.supplierDistanceKm ?? Number.POSITIVE_INFINITY;
+            return ad - bd;
+        });
+    }
+    return withDistances.slice(0, 10);
 };
 
 const createProduct = async (supplierId, data) => {
@@ -156,4 +246,16 @@ const addReview = async (farmerId, productId, { rating, comment, orderItemId }) 
     return review;
 };
 
-module.exports = { getProducts, getProduct, getNearby, getRecommended, createProduct, updateProduct, deleteProduct, uploadImages, getReviews, addReview };
+module.exports = {
+    getProducts,
+    getProduct,
+    getNearby,
+    getNearbySuppliers,
+    getRecommended,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    uploadImages,
+    getReviews,
+    addReview
+};

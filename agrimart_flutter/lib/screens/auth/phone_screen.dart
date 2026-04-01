@@ -35,6 +35,25 @@ class _PhoneScreenState extends ConsumerState<PhoneScreen> {
     }
   }
 
+  Future<void> _googleLogin() async {
+    try {
+      final user = await ref.read(authProvider.notifier).signInWithGoogle(widget.role);
+      // The GoRouter automatically redirects the user if user.isVerified is true.
+      // If it's false, the router redirects them to /auth/setup.
+      if (user != null && mounted) {
+          if (user.isVerified) {
+             context.go(user.isFarmer ? '/farmer' : '/supplier');
+          } else {
+             context.go('/auth/setup');
+          }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Google Sign-In failed: $e'), backgroundColor: AppColors.error),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
@@ -107,11 +126,44 @@ class _PhoneScreenState extends ConsumerState<PhoneScreen> {
                         ]),
                       ),
                       const SizedBox(height: 32),
-                      ElevatedButton(
-                        onPressed: auth.isLoading ? null : _sendOTP,
-                        child: auth.isLoading
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text('Send WhatsApp OTP 📲'),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 54,
+                        child: ElevatedButton(
+                          onPressed: auth.isLoading ? null : _sendOTP,
+                          child: auth.isLoading
+                            ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            : const Text('Send WhatsApp OTP 📲', style: TextStyle(fontSize: 16)),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      const Row(
+                        children: [
+                          Expanded(child: Divider()),
+                          Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text('OR', style: TextStyle(color: AppColors.textTertiary, fontWeight: FontWeight.bold))),
+                          Expanded(child: Divider()),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 54,
+                        child: OutlinedButton(
+                          onPressed: auth.isLoading ? null : _googleLogin,
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: AppColors.border),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.network('https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg', width: 24, height: 24),
+                              const SizedBox(width: 12),
+                              const Text('Continue with Google', style: TextStyle(fontSize: 16, color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+                            ],
+                          ),
+                        ),
                       ),
                     ]),
                   ),

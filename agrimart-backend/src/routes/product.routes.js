@@ -9,6 +9,7 @@ const productController = require('../controllers/product.controller');
 // Public routes
 router.get('/', apiLimiter, cache(300), productController.getProducts);
 router.get('/nearby', apiLimiter, cache(300), productController.getNearby);
+router.get('/nearby-suppliers', apiLimiter, cache(300), productController.getNearbySuppliers);
 router.get('/recommended', authenticate, requireFarmer, apiLimiter, cache(300), productController.getRecommended);
 router.get('/:id', apiLimiter, cache(300), productController.getProduct);
 router.get('/:id/reviews', apiLimiter, cache(300), productController.getReviews);

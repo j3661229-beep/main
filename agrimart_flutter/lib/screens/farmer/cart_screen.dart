@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/services/api_service.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/widgets/app_snackbar.dart';
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
@@ -23,22 +26,35 @@ class CartScreen extends ConsumerWidget {
           centerTitle: true),
       body: cart.when(
         loading: () => const AppShimmerList(itemCount: 5),
-        error: (e, _) => const Center(child: Text('Could not load cart')),
+        error: (e, _) => AppErrorState(
+          message: e.toString(),
+          onRetry: () => ref.read(cartProvider.notifier).load(),
+        ),
         data: (data) {
           final items = data['items'] as List? ?? [];
           if (items.isEmpty) {
-            return Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                  const Text('🛒', style: TextStyle(fontSize: 64)),
-                  const SizedBox(height: 16),
-                  const Text('Cart is empty', style: AppTextStyles.headingLG),
-                  const SizedBox(height: 8),
-                  TextButton(
-                      onPressed: () => context.go('/farmer/shop'),
-                      child: const Text('Start Shopping →')),
-                ]));
+            return RefreshIndicator(
+              color: AppColors.primary,
+              onRefresh: () => ref.read(cartProvider.notifier).load(),
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.65,
+                    child: AppEmptyState(
+                      icon: '🛒',
+                      title: 'Your cart is empty',
+                      subtitle:
+                          'Browse the shop and add seeds, fertilizer, and more.',
+                      actionLabel: 'Browse shop',
+                      onAction: () => context.go('/farmer/shop'),
+                    ),
+                  ),
+                ],
+              ),
+            );
           }
 
           final total = items.fold<double>(
@@ -50,7 +66,13 @@ class CartScreen extends ConsumerWidget {
 
           return Column(children: [
             Expanded(
-                child: ListView.builder(
+                child: RefreshIndicator(
+              color: AppColors.primary,
+              onRefresh: () => ref.read(cartProvider.notifier).load(),
+              child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               itemCount: items.length,
               itemBuilder: (ctx, i) {
@@ -107,6 +129,7 @@ class CartScreen extends ConsumerWidget {
                         _QtyBtn(
                             icon: Icons.remove,
                             onTap: () {
+                              HapticFeedback.selectionClick();
                               final currentQty = (item['quantity'] as num).toInt();
                               if (currentQty <= 1) {
                                 ref
@@ -125,15 +148,18 @@ class CartScreen extends ConsumerWidget {
                         ),
                         _QtyBtn(
                             icon: Icons.add,
-                            onTap: () => ref
-                                .read(cartProvider.notifier)
-                                .updateItem(
-                                    item['id'], (item['quantity'] as num).toInt() + 1)),
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              ref.read(cartProvider.notifier).updateItem(
+                                  item['id'],
+                                  (item['quantity'] as num).toInt() + 1);
+                            }),
                       ]),
                     ),
                   ]),
                 );
               },
+            ),
             )),
 
             // Checkout bar
@@ -191,7 +217,8 @@ class CartScreen extends ConsumerWidget {
                       } catch (e) {
                         if (context.mounted) {
                           Navigator.pop(context); // hide loading
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to sync cart: $e')));
+                          AppSnackbar.error(
+                              context, 'Could not sync cart. Please try again.');
                         }
                       }
                     },
@@ -212,14 +239,16 @@ class _QtyBtn extends StatelessWidget {
   final VoidCallback onTap;
   const _QtyBtn({required this.icon, required this.onTap});
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-            width: 32,
-            height: 32,
-            decoration: const BoxDecoration(
-                color: Colors.transparent,
-            ),
-            child: Icon(icon, size: 16, color: AppColors.primaryDark)),
+  Widget build(BuildContext context) => Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child: Icon(icon, size: 18, color: AppColors.primaryDark),
+          ),
+        ),
       );
 }

@@ -9,6 +9,8 @@ import '../../data/services/api_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/widgets/app_fallback.dart';
+import '../../core/widgets/app_snackbar.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
@@ -50,10 +52,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         ref.read(cartProvider.notifier).clear();
         if (!mounted) return;
         setState(() => _placing = false);
+        AppSnackbar.success(context, 'Order placed with Cash on Delivery');
+        if (!mounted) return;
         context.go('/farmer/orders');
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('✅ Order placed with Cash on Delivery'),
-            backgroundColor: AppColors.success));
         return;
       }
 
@@ -88,17 +89,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     ref.read(cartProvider.notifier).clear();
     if (!mounted) return;
     setState(() => _placing = false);
+    AppSnackbar.success(context, 'Payment successful. Order placed!');
+    if (!mounted) return;
     context.go('/farmer/orders');
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('🎉 Order placed successfully!'),
-        backgroundColor: AppColors.success));
   }
 
   void _onPaymentError(PaymentFailureResponse r) {
     setState(() => _placing = false);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Payment failed: ${r.message}'),
-        backgroundColor: AppColors.error));
+    AppSnackbar.error(
+        context, 'Payment failed: ${r.message ?? "Unknown error"}');
   }
 
   @override
@@ -113,7 +112,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           centerTitle: true),
       body: cart.when(
         loading: () => const AppShimmerList(itemCount: 4),
-        error: (e, _) => const Center(child: Text('Cart error')),
+        error: (e, _) => AppErrorState(
+          message: e.toString(),
+          onRetry: () => ref.read(cartProvider.notifier).load(),
+        ),
         data: (data) {
           final items = data['items'] as List? ?? [];
           final total = items.fold<double>(

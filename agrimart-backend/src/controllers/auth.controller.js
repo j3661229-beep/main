@@ -10,6 +10,15 @@ const sendOTP = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
+const googleSignIn = async (req, res, next) => {
+    try {
+        const { email, googleId, name, photoUrl, role } = req.body;
+        if (!email || !googleId) return error(res, 'Google ID and Email are required');
+        const data = await authService.googleSignIn({ email, googleId, name, photoUrl, role });
+        success(res, data, 'Google Login successful');
+    } catch (err) { next(err); }
+};
+
 const verifyOTP = async (req, res, next) => {
     try {
         const { phone, otp, name, language, role } = req.body;
@@ -48,4 +57,4 @@ const completeOnboarding = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
-module.exports = { sendOTP, verifyOTP, refreshToken, logout, me, completeOnboarding };
+module.exports = { sendOTP, verifyOTP, googleSignIn, refreshToken, logout, me, completeOnboarding };

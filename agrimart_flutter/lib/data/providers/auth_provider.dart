@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../services/api_service.dart';
 import '../models/user_model.dart';
 import '../../core/constants/app_constants.dart';
@@ -64,6 +65,38 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final data = await _api.verifyOTP(phone: phone, otp: otp, name: name, language: language, role: role);
+      final token = data['token'] as String;
+      final user = UserModel.fromJson(data['user']);
+      await _storage.write(key: AppConstants.tokenKey, value: token);
+      await _storage.write(key: AppConstants.refreshTokenKey, value: data['refreshToken'] ?? '');
+      await _storage.write(key: AppConstants.userKey, value: jsonEncode(data['user']));
+      state = AuthState(user: user, isAuthenticated: true);
+      return user;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: _parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<UserModel?> signInWithGoogle(String role) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final googleSignIn = GoogleSignIn();
+      final googleUser = await googleSignIn.signIn();
+      
+      if (googleUser == null) {
+        state = state.copyWith(isLoading: false);
+        return null;
+      }
+
+      final data = await _api.googleSignIn({
+        'email': googleUser.email,
+        'googleId': googleUser.id,
+        'name': googleUser.displayName,
+        'photoUrl': googleUser.photoUrl,
+        'role': role,
+      });
+
       final token = data['token'] as String;
       final user = UserModel.fromJson(data['user']);
       await _storage.write(key: AppConstants.tokenKey, value: token);

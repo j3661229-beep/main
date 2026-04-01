@@ -15,6 +15,9 @@ const getProduct = async (req, res, next) => {
 const getNearby = async (req, res, next) => {
     try { success(res, await productService.getNearby(req.query)); } catch (e) { next(e); }
 };
+const getNearbySuppliers = async (req, res, next) => {
+    try { success(res, await productService.getNearbySuppliers(req.query)); } catch (e) { next(e); }
+};
 const getRecommended = async (req, res, next) => {
     try { success(res, await productService.getRecommended(req.user.farmer.id)); } catch (e) { next(e); }
 };
@@ -37,4 +40,16 @@ const addReview = async (req, res, next) => {
     try { created(res, await productService.addReview(req.user.farmer.id, req.params.id, req.body)); } catch (e) { next(e); }
 };
 
-module.exports = { getProducts, getProduct, getNearby, getRecommended, createProduct, updateProduct, deleteProduct, uploadImages, getReviews, addReview };
+module.exports = {
+    getProducts,
+    getProduct,
+    getNearby,
+    getNearbySuppliers,
+    getRecommended,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    uploadImages,
+    getReviews,
+    addReview
+};
