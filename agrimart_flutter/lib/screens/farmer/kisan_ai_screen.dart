@@ -285,7 +285,7 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
                             ],
                           ),
                           child: Text(m['content']!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 15,
                                   height: 1.4,
                                   fontWeight: FontWeight.w500,
