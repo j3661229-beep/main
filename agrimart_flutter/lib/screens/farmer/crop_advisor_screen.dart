@@ -183,87 +183,116 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
           ])),
       Expanded(
         child: ListView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           itemCount: _recommendations.length,
           itemBuilder: (ctx, i) {
             final crop = _recommendations[i];
-            return Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(20),
+            return FadeInUp(
+              delay: Duration(milliseconds: i * 100),
+              duration: const Duration(milliseconds: 600),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.border),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.04),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4))
-                    ]),
+                  gradient: const LinearGradient(
+                    colors: [Colors.white, Color(0xFFF8FAFC)],
+                    begin: Alignment.topLeft, end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.1), width: 2),
+                  boxShadow: [
+                    BoxShadow(color: AppColors.primary.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 8))
+                  ]
+                ),
                 child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(children: [
-                        Container(
-                            padding: const EdgeInsets.all(12),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Row(
+                        children: [
+                          Container(
+                            height: 70, width: 70,
                             decoration: BoxDecoration(
-                                color: AppColors.primarySurface,
-                                borderRadius: BorderRadius.circular(14)),
-                            child: Text(crop['emoji'] ?? '🌿',
-                                style: const TextStyle(fontSize: 32))),
-                        const SizedBox(width: 16),
-                        Expanded(
+                              gradient: const LinearGradient(colors: [AppColors.primary, AppColors.primaryDark]),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))]
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(crop['emoji'] ?? '🌿', style: const TextStyle(fontSize: 36)),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
                             child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(crop['crop'] ?? 'Unknown',
-                                      style: AppTextStyles.headingMD),
-                                  IconButton(
-                                    icon: const Icon(Icons.volume_up_rounded, color: AppColors.primary, size: 20),
-                                    onPressed: () {
-                                       VoiceService.instance.speak("${crop['crop']}. ${crop['reason']}", 
-                                           languageCode: ref.read(languageProvider));
-                                    },
-                                  )
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                      color: AppColors.primaryLight,
-                                      borderRadius: BorderRadius.circular(20)),
-                                  child: Text('${crop['matchPercent']}% Match',
-                                      style: const TextStyle(
-                                          color: AppColors.primaryDark,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 11))),
-                            ])),
-                      ]),
-                      const SizedBox(height: 16),
-                      const Divider(),
-                      const SizedBox(height: 12),
-                      Text(crop['reason'] ?? '',
-                          style: AppTextStyles.bodyMD
-                              .copyWith(color: AppColors.textSecondary)),
-                      const SizedBox(height: 20),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _statInfo('Exp. Yield',
-                                crop['expectedYield']?.toString() ?? 'N/A',
-                                icon: '🧺'),
-                            _statInfo(
-                                'Market Demand',
-                                (crop['marketDemand']?.toString() ?? 'Medium')
-                                    .toUpperCase(),
-                                icon: '📈'),
-                          ]),
-                    ]));
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(crop['crop'] ?? 'Unknown', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                                    IconButton(
+                                      icon: const Icon(Icons.volume_up_rounded, color: AppColors.primary, size: 24),
+                                      onPressed: () {
+                                        VoiceService.instance.speak("${crop['crop']}. ${crop['reason']}", languageCode: ref.read(languageProvider));
+                                      },
+                                    )
+                                  ]
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(4),
+                                        child: LinearProgressIndicator(
+                                          value: (crop['matchPercent'] ?? 0) / 100.0,
+                                          backgroundColor: AppColors.border,
+                                          valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                                          minHeight: 6,
+                                        ),
+                                      )
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text('${crop['matchPercent']}% Match', style: const TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w900, fontSize: 12)),
+                                  ]
+                                )
+                              ]
+                            )
+                          )
+                        ]
+                      )
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      decoration: BoxDecoration(
+                        color: AppColors.primarySurface.withValues(alpha: 0.5),
+                        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24))
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('💡', style: TextStyle(fontSize: 16)),
+                              const SizedBox(width: 8),
+                              Expanded(child: Text(crop['reason'] ?? '', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4, fontWeight: FontWeight.w500))),
+                            ]
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _statInfo('Exp. Yield', crop['expectedYield']?.toString() ?? 'N/A', icon: '🧺'),
+                              Container(height: 30, width: 1, color: AppColors.border),
+                              _statInfo('Market Demand', (crop['marketDemand']?.toString() ?? 'Medium').toUpperCase(), icon: '📈'),
+                            ]
+                          )
+                        ]
+                      )
+                    )
+                  ]
+                )
+              ),
+            );
           },
         ),
       ),
@@ -275,9 +304,10 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
         Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.circular(8)),
-            child: Text(icon, style: const TextStyle(fontSize: 16))),
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4)]),
+            child: Text(icon, style: const TextStyle(fontSize: 14))),
         const SizedBox(width: 8),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label,
@@ -288,7 +318,7 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
           Text(val,
               style: const TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                   color: AppColors.primaryDark))
         ])
       ]);

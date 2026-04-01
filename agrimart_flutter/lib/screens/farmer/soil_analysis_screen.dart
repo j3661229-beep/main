@@ -172,60 +172,101 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
             if (_result != null) ...[
               const SizedBox(height: 24),
               FadeInDown(
-                duration: const Duration(milliseconds: 500),
-                child: Column(children: [
-                   _ResultCard('Soil Type', _result!['analysis']?['soilType'] ?? 'N/A', '🟫'),
-                   _ResultCard('pH Level', '${_result!['analysis']?['phLevel'] ?? 'N/A'}', '⚗️'),
-                   _ResultCard('Nitrogen', '${_result!['analysis']?['nitrogenLevel'] ?? 'N/A'}', '🌿'),
-                   _ResultCard('Phosphorus', '${_result!['analysis']?['phosphorusLevel'] ?? 'N/A'}', '🔵'),
-                   _ResultCard('Potassium', '${_result!['analysis']?['potassiumLevel'] ?? 'N/A'}', '🟡'),
-                ]),
-              ),
-              const SizedBox(height: 12),
-              if (_result!['analysis']?['treatmentAdvice'] != null)
-                Container(
-                  padding: const EdgeInsets.all(16),
+                duration: const Duration(milliseconds: 600),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                      color: AppColors.primarySurface,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.primaryBorder),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        )
-                      ]),
+                    gradient: LinearGradient(
+                      colors: [Colors.white, AppColors.primarySurface.withValues(alpha: 0.5)],
+                      begin: Alignment.topLeft, end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))],
+                  ),
                   child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('🌱 AI Advice',
-                                style: AppTextStyles.headingMD),
-                            IconButton(
-                              icon: const Icon(Icons.volume_up_rounded, color: AppColors.primary),
-                              onPressed: () {
-                                final advice = _result!['analysis']?['treatmentAdvice'];
-                                final crops = (_result!['analysis']?['recommendedCrops'] as List? ?? []).join(', ');
-                                VoiceService.instance.speak("$advice. Recommended crops for your area are: $crops", 
-                                    languageCode: ref.read(languageProvider));
-                              },
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(_result!['analysis']?['treatmentAdvice'].toString() ?? '',
-                            style: AppTextStyles.bodyMD),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 8,
-                          children: (_result!['analysis']?['recommendedCrops'] as List? ?? []).map((c) => 
-                            Chip(label: Text(c, style: const TextStyle(fontSize: 12)), backgroundColor: Colors.white)
-                          ).toList(),
-                        )
-                      ]),
+                    children: [
+                      Row(
+                        children: [
+                          _PremiumBadge('🟫', 'Soil Type', _result!['analysis']?['soilType'] ?? 'N/A', AppColors.amber),
+                          const SizedBox(width: 16),
+                          _PremiumBadge('⚗️', 'pH Level', '${_result!['analysis']?['phLevel'] ?? 'N/A'}', AppColors.primary),
+                        ],
+                      ),
+                      const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Divider(color: AppColors.primaryBorder)),
+                      _NPKMeter('Nitrogen (N)', '${_result!['analysis']?['nitrogenLevel'] ?? 'N/A'}', '🌿', const Color(0xFF4CAF50)),
+                      _NPKMeter('Phosphorus (P)', '${_result!['analysis']?['phosphorusLevel'] ?? 'N/A'}', '🔵', const Color(0xFF2196F3)),
+                      _NPKMeter('Potassium (K)', '${_result!['analysis']?['potassiumLevel'] ?? 'N/A'}', '🟡', const Color(0xFFFFC107)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              if (_result!['analysis']?['treatmentAdvice'] != null)
+                FadeInUp(
+                  duration: const Duration(milliseconds: 700),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                        color: AppColors.primaryDark,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryDark.withValues(alpha: 0.3),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          )
+                        ]),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
+                                    child: const Text('✨', style: TextStyle(fontSize: 16)),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  const Text('AI Advisory', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+                                ],
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.volume_up_rounded, color: Colors.white),
+                                onPressed: () {
+                                  final advice = _result!['analysis']?['treatmentAdvice'];
+                                  final crops = (_result!['analysis']?['recommendedCrops'] as List? ?? []).join(', ');
+                                  VoiceService.instance.speak("$advice. Recommended crops for your area are: $crops", 
+                                      languageCode: ref.read(languageProvider));
+                                },
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(_result!['analysis']?['treatmentAdvice'].toString() ?? '',
+                              style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.5, fontWeight: FontWeight.w500)),
+                          const SizedBox(height: 20),
+                          const Text('RECOMMENDED CROPS', style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: (_result!['analysis']?['recommendedCrops'] as List? ?? []).map((c) => 
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(c, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryDark)),
+                              )
+                            ).toList(),
+                          )
+                        ]),
+                  ),
                 ),
             ],
           ])),
@@ -233,24 +274,101 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
   }
 }
 
-class _ResultCard extends StatelessWidget {
-  final String key_, value, emoji;
-  const _ResultCard(this.key_, this.value, this.emoji);
+class _PremiumBadge extends StatelessWidget {
+  final String emoji, label, value;
+  final Color color;
+  const _PremiumBadge(this.emoji, this.label, this.value, this.color);
   @override
-  Widget build(BuildContext context) => Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border)),
-        child: Row(children: [
-          Text(emoji, style: const TextStyle(fontSize: 20)),
-          const SizedBox(width: 12),
-          Expanded(child: Text(key_, style: AppTextStyles.bodyMD)),
-          Text(value,
-              style:
-                  AppTextStyles.headingSM.copyWith(color: AppColors.primary)),
-        ]),
-      );
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [BoxShadow(color: color.withValues(alpha: 0.08), blurRadius: 10, offset: const Offset(0, 4))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Text(emoji, style: const TextStyle(fontSize: 20)),
+              const SizedBox(width: 8),
+              Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textTertiary)),
+            ]),
+            const SizedBox(height: 8),
+            Text(value, style: AppTextStyles.headingMD.copyWith(color: AppColors.textPrimary, height: 1.1)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NPKMeter extends StatelessWidget {
+  final String label, value, emoji;
+  final Color color;
+  const _NPKMeter(this.label, this.value, this.emoji, this.color);
+
+  @override
+  Widget build(BuildContext context) {
+    double progress = 0.5;
+    final v = value.toLowerCase();
+    if (v.contains('high')) progress = 0.9;
+    if (v.contains('low')) progress = 0.2;
+    if (v.contains('good') || v.contains('optimal')) progress = 0.8;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                   Text(emoji, style: const TextStyle(fontSize: 16)),
+                   const SizedBox(width: 8),
+                   Text(label, style: AppTextStyles.bodyMD.copyWith(fontWeight: FontWeight.w800, color: AppColors.textSecondary)),
+                ]
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(value.toUpperCase(), style: AppTextStyles.caption.copyWith(color: color, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Stack(
+            children: [
+              Container(
+                height: 8,
+                decoration: BoxDecoration(color: AppColors.border.withValues(alpha: 0.4), borderRadius: BorderRadius.circular(4)),
+              ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 1500),
+                    curve: Curves.fastOutSlowIn,
+                    height: 8,
+                    width: constraints.maxWidth * progress,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [color.withValues(alpha: 0.5), color]),
+                      borderRadius: BorderRadius.circular(4),
+                      boxShadow: [BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 2))],
+                    ),
+                  );
+                }
+              )
+            ],
+          )
+        ],
+      )
+    );
+  }
 }

@@ -9,9 +9,10 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
         token: process.env.UPSTASH_REDIS_REST_TOKEN,
     });
 
-    // Polyfill setex since some managed instances block the SETEX command
+    // Use SET with EX to avoid blocked SETEX command on restricted plans
     const originalSet = redis.set.bind(redis);
-    redis.setex = async (key, ttl, value) => originalSet(key, value, { ex: ttl });
+    redis.setWithExpiry = async (key, ttl, value) => originalSet(key, value, { ex: ttl });
+    redis.setex = async (key, ttl, value) => redis.setWithExpiry(key, ttl, value);
 
     logger.info('✅ Upstash Redis (REST) initialized');
 } else {
@@ -25,15 +26,16 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
             try { return JSON.parse(val); } catch { return val; }
         },
         set: async (key, val) => { store.set(key, typeof val === 'string' ? val : JSON.stringify(val)); return 'OK'; },
-        setex: async (key, ttl, val) => {
+        setWithExpiry: async (key, ttl, val) => {
             store.set(key, typeof val === 'string' ? val : JSON.stringify(val));
             setTimeout(() => store.delete(key), ttl * 1000);
             return 'OK';
         },
+        setex: async (key, ttl, val) => {
+            return redis.setWithExpiry(key, ttl, val);
+        },
         del: async (...keys) => { keys.forEach(k => store.delete(k)); return keys.length; },
     };
 }
-
-module.exports = redis;
 
 module.exports = redis;

@@ -51,6 +51,7 @@ const mandiRoutes = require('./routes/mandi.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const schemeRoutes = require('./routes/scheme.routes');
 const adminRoutes = require('./routes/admin.routes');
+const tradeRoutes = require('./routes/trade.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -122,6 +123,7 @@ app.use('/api/mandi', mandiRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/schemes', schemeRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/trade', tradeRoutes);
 
 // Error handling
 app.use(notFound);

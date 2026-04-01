@@ -99,7 +99,7 @@ const handleWebhook = async (rawBody, signature) => {
 
     // Mark as processed in Redis (24hr TTL)
     if (redis && paymentId !== 'unknown') {
-        await redis.setex(`webhook:${paymentId}`, 86400, '1');
+        await redis.setWithExpiry(`webhook:${paymentId}`, 86400, '1');
     }
 
     return { received: true };

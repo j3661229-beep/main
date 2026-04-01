@@ -24,7 +24,7 @@ const cache = (ttlSeconds) => async (req, res, next) => {
         const originalJson = res.json.bind(res)
         res.json = async (data) => {
             try {
-                await redis.setex(key, ttlSeconds, data)
+                await redis.setWithExpiry(key, ttlSeconds, data)
             } catch (err) {
                 console.error('Redis cache setex error:', err)
             }

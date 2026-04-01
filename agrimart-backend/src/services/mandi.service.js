@@ -61,8 +61,8 @@ const getPrices = async ({ district, crop, page = 1, limit = 20 }) => {
     }
 
     const result = { prices, updatedAt: new Date().toISOString(), source: 'AGMARKNET - data.gov.in' };
-    await redis.setex(cacheKey, 1800, JSON.stringify(result)); // Cache 30 mins
-    await redis.setex(`${cacheKey}:stale`, 86400, JSON.stringify(result)); // Stale cache for 24 hours
+    await redis.setWithExpiry(cacheKey, 1800, JSON.stringify(result)); // Cache 30 mins
+    await redis.setWithExpiry(`${cacheKey}:stale`, 86400, JSON.stringify(result)); // Stale cache for 24 hours
     return result;
 };
 

@@ -20,7 +20,7 @@ const getCurrent = async ({ lat, lng }) => {
         const { data } = await axios.get(`${process.env.OPENWEATHER_BASE_URL}/weather`, {
             params: { lat, lon: lng, appid: process.env.OPENWEATHER_API_KEY, units: 'metric' },
         });
-        await redis.setex(cacheKey, 1800, JSON.stringify(data));
+        await redis.setWithExpiry(cacheKey, 1800, JSON.stringify(data));
         return data;
     } catch {
         return MOCK_WEATHER;

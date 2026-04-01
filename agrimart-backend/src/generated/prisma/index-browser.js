@@ -341,6 +341,31 @@ exports.Prisma.FCMTokenScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.DealerCropRateScalarFieldEnum = {
+  id: 'id',
+  supplierId: 'supplierId',
+  cropName: 'cropName',
+  pricePerQuintal: 'pricePerQuintal',
+  district: 'district',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TradeBookingScalarFieldEnum = {
+  id: 'id',
+  farmerId: 'farmerId',
+  supplierId: 'supplierId',
+  cropName: 'cropName',
+  approxQuintals: 'approxQuintals',
+  pricePerQuintal: 'pricePerQuintal',
+  slotDate: 'slotDate',
+  status: 'status',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -399,6 +424,13 @@ exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   REFUNDED: 'REFUNDED'
 };
 
+exports.TradeStatus = exports.$Enums.TradeStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Session: 'Session',
@@ -415,7 +447,9 @@ exports.Prisma.ModelName = {
   PriceAlert: 'PriceAlert',
   Notification: 'Notification',
   GovernmentScheme: 'GovernmentScheme',
-  FCMToken: 'FCMToken'
+  FCMToken: 'FCMToken',
+  DealerCropRate: 'DealerCropRate',
+  TradeBooking: 'TradeBooking'
 };
 
 /**

@@ -232,51 +232,64 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
                       isUser ? Alignment.centerRight : Alignment.centerLeft,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (!isUser) ...[
                         Column(
                           children: [
-                             const Text('🤖', style: TextStyle(fontSize: 16)),
-                             const SizedBox(height: 4),
-                              IconButton(
+                             Container(
+                               padding: const EdgeInsets.all(8),
+                               decoration: BoxDecoration(
+                                 shape: BoxShape.circle,
+                                 gradient: const LinearGradient(colors: [AppColors.primary, AppColors.primaryDark]),
+                                 boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 6)]
+                               ),
+                               child: const Text('🤖', style: TextStyle(fontSize: 14)),
+                             ),
+                             const SizedBox(height: 6),
+                             IconButton(
+                                constraints: const BoxConstraints(),
+                                padding: EdgeInsets.zero,
                                 icon: Icon(
-                                  isSpeaking ? Icons.stop_circle_outlined : Icons.volume_up_rounded,
-                                  size: 18,
-                                  color: isSpeaking ? AppColors.error : Colors.grey,
+                                  isSpeaking ? Icons.stop_circle_rounded : Icons.volume_up_rounded,
+                                  size: 20,
+                                  color: isSpeaking ? AppColors.error : AppColors.primary,
                                 ),
                                 onPressed: () => isSpeaking ? _stopSpeak() : _speak(m['content']!, m['id']!),
                               )
                           ],
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 12),
                       ],
                       Flexible(
                         child: Container(
-                          margin: const EdgeInsets.only(bottom: 10),
+                          margin: const EdgeInsets.only(bottom: 12),
                           padding:
-                              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                           decoration: BoxDecoration(
-                            color: isUser ? AppColors.primary : AppColors.surface,
+                            gradient: isUser ? const LinearGradient(colors: [AppColors.primary, AppColors.primaryDark]) : null,
+                            color: isUser ? null : Colors.white,
                             borderRadius: BorderRadius.only(
-                              topLeft: const Radius.circular(16),
-                              topRight: const Radius.circular(16),
-                              bottomLeft: Radius.circular(isUser ? 16 : 4),
-                              bottomRight: Radius.circular(isUser ? 4 : 16),
+                              topLeft: const Radius.circular(20),
+                              topRight: const Radius.circular(20),
+                              bottomLeft: Radius.circular(isUser ? 20 : 4),
+                              bottomRight: Radius.circular(isUser ? 4 : 20),
                             ),
-                            border: isUser ? null : Border.all(color: AppColors.border),
+                            border: isUser ? null : Border.all(color: AppColors.primary.withValues(alpha: 0.15), width: 1.5),
                             boxShadow: [
-                              if (!isUser)
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 2),
-                                )
+                              BoxShadow(
+                                color: isUser ? AppColors.primary.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.04),
+                                blurRadius: isUser ? 8 : 12,
+                                offset: const Offset(0, 4),
+                              )
                             ],
                           ),
                           child: Text(m['content']!,
-                              style: AppTextStyles.bodyMD.copyWith(
-                                  color:
-                                      isUser ? Colors.white : AppColors.textPrimary)),
+                              style: const TextStyle(
+                                  fontSize: 15,
+                                  height: 1.4,
+                                  fontWeight: FontWeight.w500,
+                                  color: isUser ? Colors.white : AppColors.textPrimary)),
                         ),
                       ),
                     ],

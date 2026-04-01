@@ -279,6 +279,17 @@ class ApiService {
     return r.data['data'];
   }
 
+  // ── Trade Bookings ─────────────────────────────────────────
+  Future<List> getDealerRates({required String district, required String crop}) async {
+    final r = await _dio.get('/trade/rates', queryParameters: {'district': district, 'crop': crop});
+    return r.data['data'] ?? [];
+  }
+
+  Future<Map> bookTradeSlot(Map<String, dynamic> data) async {
+    final r = await _dio.post('/trade/book', data: data);
+    return r.data;
+  }
+
   // ── Notifications ─────────────────────────────────────────
   Future<Map> getNotifications() async {
     final r = await _dio.get('/notifications');

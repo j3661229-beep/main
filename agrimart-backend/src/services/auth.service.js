@@ -37,8 +37,8 @@ const sendOTP = async (phone, role) => {
     const otpKey = `otp:${formatted}`;
     const roleKey = `otp_role:${formatted}`;
 
-    await redis.setex(otpKey, 600, otp);       // 10 min TTL
-    await redis.setex(roleKey, 600, role);
+    await redis.setWithExpiry(otpKey, 600, otp);       // 10 min TTL
+    await redis.setWithExpiry(roleKey, 600, role);
 
     await sendWhatsAppOTP(formatted, otp);
     return { phone: formatted };

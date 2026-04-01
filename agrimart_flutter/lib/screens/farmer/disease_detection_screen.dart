@@ -152,19 +152,71 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
               ]),
             ],
             if (_result != null) ...[
-              const SizedBox(height: 20),
-              FadeInRight(
-                duration: const Duration(milliseconds: 400),
+              const SizedBox(height: 24),
+              FadeInDown(
+                duration: const Duration(milliseconds: 600),
                 child: Container(
-                    padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.red.shade50, Colors.white],
+                      begin: Alignment.topLeft, end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.red.shade100, width: 2),
+                    boxShadow: [BoxShadow(color: Colors.red.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(color: Colors.red.shade100, shape: BoxShape.circle),
+                            child: const Text('🦠', style: TextStyle(fontSize: 32)),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('DETECTED DISEASE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.red.shade800, letterSpacing: 1.5)),
+                                const SizedBox(height: 4),
+                                Text(_result!['analysis']?['diseaseName'] ?? 'Unknown', style: AppTextStyles.headingMD.copyWith(color: AppColors.textPrimary, height: 1.1)),
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(color: AppColors.error.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                                  child: Text('Severity: ${_result!['analysis']?['severity'] ?? 'Moderate'}', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w800, fontSize: 12)),
+                                )
+                              ]
+                            )
+                          )
+                        ]
+                      ),
+                      const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Divider()),
+                      _DiseaseDetailRow('Symptoms', (_result!['analysis']?['symptoms'] as List? ?? []).join(', '), '🤒'),
+                      const SizedBox(height: 16),
+                      _DiseaseDetailRow('Prevention', (_result!['analysis']?['preventionTips'] as List? ?? []).join('. '), '🛡️'),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              if ((_result!['analysis']?['treatments'] as List? ?? []).isNotEmpty)
+                FadeInUp(
+                  duration: const Duration(milliseconds: 700),
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(16),
+                        color: const Color(0xFF1E293B), // Premium dark theme for actions
+                        borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            color: const Color(0xFF1E293B).withValues(alpha: 0.3),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
                           )
                         ]),
                     child: Column(
@@ -173,18 +225,19 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Expanded(
-                                child: Row(children: [
-                                  const Text('⚠️', style: TextStyle(fontSize: 24)),
-                                  const SizedBox(width: 8),
-                                  Flexible(
-                                    child: Text(_result!['analysis']?['diseaseName'] ?? 'Unknown',
-                                        style: AppTextStyles.headingMD),
-                                  )
-                                ]),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
+                                    child: const Text('💊', style: TextStyle(fontSize: 16)),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  const Text('Treatment Plan', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+                                ],
                               ),
                               IconButton(
-                                icon: const Icon(Icons.volume_up_rounded, color: AppColors.primary),
+                                icon: const Icon(Icons.volume_up_rounded, color: Colors.white),
                                 onPressed: () {
                                   final name = _result!['analysis']?['diseaseName'];
                                   final treat = (_result!['analysis']?['treatments'] as List? ?? []).map((t) => t['name']).join(', ');
@@ -196,24 +249,70 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                               )
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          Text('Severity: ${_result!['analysis']?['severity'] ?? 'Moderate'}',
-                              style: AppTextStyles.bodyMD.copyWith(color: AppColors.error, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 12),
-                          const Text('Symptoms:', style: AppTextStyles.headingSM),
-                          Text((_result!['analysis']?['symptoms'] as List? ?? []).join(', '), style: AppTextStyles.bodyMD),
-                          const SizedBox(height: 12),
-                          const Text('Treatment & Application:', style: AppTextStyles.headingSM),
+                          const SizedBox(height: 20),
                           ...(_result!['analysis']?['treatments'] as List? ?? []).map((t) => 
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text('• ${t['name']}: ${t['dosage']} (${t['application']})', style: AppTextStyles.bodyMD),
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Text('🧪', style: TextStyle(fontSize: 24)),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(t['name'], style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                        const SizedBox(height: 4),
+                                        Text('${t['dosage']} • ${t['application']}', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12)),
+                                      ]
+                                    )
+                                  )
+                                ]
+                              )
                             )
-                          ),
-                        ])),
-              ),
+                          ).toList(),
+                        ]),
+                  ),
+                ),
             ],
           ])),
+    );
+  }
+}
+
+class _DiseaseDetailRow extends StatelessWidget {
+  final String title, content, emoji;
+  const _DiseaseDetailRow(this.title, this.content, this.emoji);
+
+  @override
+  Widget build(BuildContext context) {
+    if (content.isEmpty) return const SizedBox.shrink();
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
+          child: Text(emoji, style: const TextStyle(fontSize: 16)),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+              const SizedBox(height: 4),
+              Text(content, style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.4, fontWeight: FontWeight.w500)),
+            ]
+          )
+        )
+      ]
     );
   }
 }

@@ -70,12 +70,12 @@ model Session {
 }
 
 model Farmer {
-  id            String       @id @default(cuid())
-  userId        String       @unique
+  id            String         @id @default(cuid())
+  userId        String         @unique
   village       String
   taluka        String
   district      String
-  state         String       @default("Maharashtra")
+  state         String         @default("Maharashtra")
   pincode       String
   latitude      Float?
   longitude     Float?
@@ -85,18 +85,19 @@ model Farmer {
   currentCrops  String[]
   bankAccountNo String?
   ifscCode      String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders        Order[]
   soilReports   SoilReport[]
   priceAlerts   PriceAlert[]
   cart          Cart?
+  tradeBookings TradeBooking[]
 }
 
 model Supplier {
-  id             String      @id @default(cuid())
-  userId         String      @unique
+  id             String           @id @default(cuid())
+  userId         String           @unique
   businessName   String
   gstNumber      String?
   address        String
@@ -104,19 +105,21 @@ model Supplier {
   pincode        String
   latitude       Float?
   longitude      Float?
-  isVerified     Boolean     @default(false)
+  isVerified     Boolean          @default(false)
   verifiedAt     DateTime?
   rejectedAt     DateTime?
   rejectedReason String?
-  rating         Float       @default(0)
-  totalRatings   Int         @default(0)
+  rating         Float            @default(0)
+  totalRatings   Int              @default(0)
   bankAccountNo  String?
   ifscCode       String?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   products       Product[]
   orderItems     OrderItem[]
+  cropRates      DealerCropRate[]
+  tradeBookings  TradeBooking[]
 }
 
 model Product {
@@ -303,4 +306,42 @@ model FCMToken {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, token])
+}
+
+enum TradeStatus {
+  PENDING
+  ACCEPTED
+  COMPLETED
+  CANCELLED
+}
+
+model DealerCropRate {
+  id              String   @id @default(cuid())
+  supplierId      String
+  cropName        String
+  pricePerQuintal Float
+  district        String
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  supplier        Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@unique([supplierId, cropName, district])
+  @@index([district, cropName])
+}
+
+model TradeBooking {
+  id              String      @id @default(cuid())
+  farmerId        String
+  supplierId      String
+  cropName        String
+  approxQuintals  Float
+  pricePerQuintal Float
+  slotDate        DateTime
+  status          TradeStatus @default(PENDING)
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  farmer          Farmer      @relation(fields: [farmerId], references: [id])
+  supplier        Supplier    @relation(fields: [supplierId], references: [id])
 }

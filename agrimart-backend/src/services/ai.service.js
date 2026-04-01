@@ -26,33 +26,6 @@ const parseJSON = (text) => {
 const generateWithFallback = async (prompt, imageBase64 = null) => {
     let lastError;
 
-    // 1. Try Cerebras First (Only if no image, since Cerebras Llama is currently text-only)
-    if (!imageBase64) {
-        try {
-            const cerebrasRes = await axios.post("https://api.cerebras.ai/v1/chat/completions", {
-                model: "llama3.1-8b",
-                messages: [
-                    { role: "system", content: "You are an expert agricultural AI assistant. Always return valid JSON when asked." },
-                    { role: "user", content: prompt }
-                ]
-            }, {
-                headers: {
-                    "Authorization": `Bearer ${CEREBRAS_API_KEY}`,
-                    "Content-Type": "application/json"
-                },
-                timeout: 10000 // Ultra-fast inference timeout
-            });
-
-            if (cerebrasRes.data && cerebrasRes.data.choices && cerebrasRes.data.choices[0]) {
-                logger.info('Generation successful using primary Cerebras inference.');
-                return cerebrasRes.data.choices[0].message.content;
-            }
-        } catch (e) {
-            logger.warn(`Cerebras primary generation failed: ${e.message}. Falling back to Gemini...`);
-        }
-    }
-
-    // 2. Fallback to Gemini
     const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
     const contents = imageBase64 ? [prompt, { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }] : prompt;
 
@@ -161,37 +134,6 @@ const chat = async (userId, { message, history = [], language = 'English' }) => 
 
     const personaInstruction = `${SYSTEM_KISAN}\n${farmerContext}\nRespond in ${language}. Keep sentences short and clear for voice playback.`;
 
-    // 1. Try Cerebras first for Chat
-    try {
-        const cerebrasHistory = [
-            { role: "system", content: personaInstruction },
-            ...history.map(msg => ({
-                role: msg.role === 'assistant' ? 'assistant' : 'user',
-                content: msg.content
-            })),
-            { role: "user", content: message }
-        ];
-
-        const cerebrasRes = await axios.post("https://api.cerebras.ai/v1/chat/completions", {
-            model: "llama3.1-70b",
-            messages: cerebrasHistory
-        }, {
-            headers: {
-                "Authorization": `Bearer ${CEREBRAS_API_KEY}`,
-                "Content-Type": "application/json"
-            },
-            timeout: 15000
-        });
-
-        if (cerebrasRes.data && cerebrasRes.data.choices && cerebrasRes.data.choices[0]) {
-            logger.info('Chat handled successfully by primary Cerebras inference.');
-            return { reply: cerebrasRes.data.choices[0].message.content, tokensUsed: null, source: 'cerebras' };
-        }
-    } catch (e) {
-        logger.warn(`Cerebras Chat primary failed: ${e.message}. Falling back to Gemini...`);
-    }
-
-    // 2. Fallback to Gemini
     const geminiHistory = history
         .filter(msg => msg.role !== 'system') // Skip system notes in history
         .map(msg => ({
@@ -210,7 +152,7 @@ const chat = async (userId, { message, history = [], language = 'English' }) => 
             const chatSession = model.startChat({ history: geminiHistory });
             const result = await chatSession.sendMessage(message);
 
-            logger.info(`AI Chat successfully used fallback Gemini model: ${modelName}`);
+            logger.info(`AI Chat successfully used Gemini model: ${modelName}`);
             return { reply: result.response.text(), tokensUsed: null, source: 'gemini' };
         } catch (e) {
             logger.warn(`Model [${modelName}] failed in Kisan Chat: ${e.message}`);
