@@ -116,6 +116,7 @@ const completeOnboarding = async (userId, role, data) => {
             data: {
                 village: data.village || '',
                 district: data.district || '',
+                state: data.state || 'Maharashtra',
                 farmSizeAcres: data.farmSizeAcres != null ? parseFloat(data.farmSizeAcres) : 0,
             }
         });
@@ -126,6 +127,7 @@ const completeOnboarding = async (userId, role, data) => {
                 businessName: data.businessName || '',
                 address: data.address || '',
                 district: data.district || '',
+                state: data.state || 'Maharashtra',
                 isVerified: true
             }
         });

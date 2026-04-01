@@ -5943,6 +5943,7 @@ export namespace Prisma {
     gstNumber: string | null
     address: string | null
     district: string | null
+    state: string | null
     pincode: string | null
     latitude: number | null
     longitude: number | null
@@ -5965,6 +5966,7 @@ export namespace Prisma {
     gstNumber: string | null
     address: string | null
     district: string | null
+    state: string | null
     pincode: string | null
     latitude: number | null
     longitude: number | null
@@ -5987,6 +5989,7 @@ export namespace Prisma {
     gstNumber: number
     address: number
     district: number
+    state: number
     pincode: number
     latitude: number
     longitude: number
@@ -6025,6 +6028,7 @@ export namespace Prisma {
     gstNumber?: true
     address?: true
     district?: true
+    state?: true
     pincode?: true
     latitude?: true
     longitude?: true
@@ -6047,6 +6051,7 @@ export namespace Prisma {
     gstNumber?: true
     address?: true
     district?: true
+    state?: true
     pincode?: true
     latitude?: true
     longitude?: true
@@ -6069,6 +6074,7 @@ export namespace Prisma {
     gstNumber?: true
     address?: true
     district?: true
+    state?: true
     pincode?: true
     latitude?: true
     longitude?: true
@@ -6178,6 +6184,7 @@ export namespace Prisma {
     gstNumber: string | null
     address: string
     district: string
+    state: string
     pincode: string
     latitude: number | null
     longitude: number | null
@@ -6219,6 +6226,7 @@ export namespace Prisma {
     gstNumber?: boolean
     address?: boolean
     district?: boolean
+    state?: boolean
     pincode?: boolean
     latitude?: boolean
     longitude?: boolean
@@ -6247,6 +6255,7 @@ export namespace Prisma {
     gstNumber?: boolean
     address?: boolean
     district?: boolean
+    state?: boolean
     pincode?: boolean
     latitude?: boolean
     longitude?: boolean
@@ -6270,6 +6279,7 @@ export namespace Prisma {
     gstNumber?: boolean
     address?: boolean
     district?: boolean
+    state?: boolean
     pincode?: boolean
     latitude?: boolean
     longitude?: boolean
@@ -6313,6 +6323,7 @@ export namespace Prisma {
       gstNumber: string | null
       address: string
       district: string
+      state: string
       pincode: string
       latitude: number | null
       longitude: number | null
@@ -6730,6 +6741,7 @@ export namespace Prisma {
     readonly gstNumber: FieldRef<"Supplier", 'String'>
     readonly address: FieldRef<"Supplier", 'String'>
     readonly district: FieldRef<"Supplier", 'String'>
+    readonly state: FieldRef<"Supplier", 'String'>
     readonly pincode: FieldRef<"Supplier", 'String'>
     readonly latitude: FieldRef<"Supplier", 'Float'>
     readonly longitude: FieldRef<"Supplier", 'Float'>
@@ -21588,6 +21600,7 @@ export namespace Prisma {
     gstNumber: 'gstNumber',
     address: 'address',
     district: 'district',
+    state: 'state',
     pincode: 'pincode',
     latitude: 'latitude',
     longitude: 'longitude',
@@ -22314,6 +22327,7 @@ export namespace Prisma {
     gstNumber?: StringNullableFilter<"Supplier"> | string | null
     address?: StringFilter<"Supplier"> | string
     district?: StringFilter<"Supplier"> | string
+    state?: StringFilter<"Supplier"> | string
     pincode?: StringFilter<"Supplier"> | string
     latitude?: FloatNullableFilter<"Supplier"> | number | null
     longitude?: FloatNullableFilter<"Supplier"> | number | null
@@ -22341,6 +22355,7 @@ export namespace Prisma {
     gstNumber?: SortOrderInput | SortOrder
     address?: SortOrder
     district?: SortOrder
+    state?: SortOrder
     pincode?: SortOrder
     latitude?: SortOrderInput | SortOrder
     longitude?: SortOrderInput | SortOrder
@@ -22371,6 +22386,7 @@ export namespace Prisma {
     gstNumber?: StringNullableFilter<"Supplier"> | string | null
     address?: StringFilter<"Supplier"> | string
     district?: StringFilter<"Supplier"> | string
+    state?: StringFilter<"Supplier"> | string
     pincode?: StringFilter<"Supplier"> | string
     latitude?: FloatNullableFilter<"Supplier"> | number | null
     longitude?: FloatNullableFilter<"Supplier"> | number | null
@@ -22398,6 +22414,7 @@ export namespace Prisma {
     gstNumber?: SortOrderInput | SortOrder
     address?: SortOrder
     district?: SortOrder
+    state?: SortOrder
     pincode?: SortOrder
     latitude?: SortOrderInput | SortOrder
     longitude?: SortOrderInput | SortOrder
@@ -22428,6 +22445,7 @@ export namespace Prisma {
     gstNumber?: StringNullableWithAggregatesFilter<"Supplier"> | string | null
     address?: StringWithAggregatesFilter<"Supplier"> | string
     district?: StringWithAggregatesFilter<"Supplier"> | string
+    state?: StringWithAggregatesFilter<"Supplier"> | string
     pincode?: StringWithAggregatesFilter<"Supplier"> | string
     latitude?: FloatNullableWithAggregatesFilter<"Supplier"> | number | null
     longitude?: FloatNullableWithAggregatesFilter<"Supplier"> | number | null
@@ -23953,6 +23971,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -23980,6 +23999,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -24005,6 +24025,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -24032,6 +24053,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -24058,6 +24080,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -24079,6 +24102,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -24101,6 +24125,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -25860,6 +25885,7 @@ export namespace Prisma {
     gstNumber?: SortOrder
     address?: SortOrder
     district?: SortOrder
+    state?: SortOrder
     pincode?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
@@ -25889,6 +25915,7 @@ export namespace Prisma {
     gstNumber?: SortOrder
     address?: SortOrder
     district?: SortOrder
+    state?: SortOrder
     pincode?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
@@ -25911,6 +25938,7 @@ export namespace Prisma {
     gstNumber?: SortOrder
     address?: SortOrder
     district?: SortOrder
+    state?: SortOrder
     pincode?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
@@ -28339,6 +28367,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -28364,6 +28393,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -28518,6 +28548,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -28543,6 +28574,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -29489,6 +29521,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -29515,6 +29548,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -29641,6 +29675,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -29667,6 +29702,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -30404,6 +30440,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -30430,6 +30467,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -30599,6 +30637,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -30625,6 +30664,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -31250,6 +31290,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -31276,6 +31317,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -31316,6 +31358,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -31342,6 +31385,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -31419,6 +31463,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -31445,6 +31490,7 @@ export namespace Prisma {
     gstNumber?: string | null
     address: string
     district: string
+    state?: string
     pincode: string
     latitude?: number | null
     longitude?: number | null
@@ -31544,6 +31590,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -31570,6 +31617,7 @@ export namespace Prisma {
     gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     pincode?: StringFieldUpdateOperationsInput | string
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null

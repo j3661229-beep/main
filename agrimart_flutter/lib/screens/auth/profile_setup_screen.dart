@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
@@ -20,6 +22,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   // Farmer specific
   final _villageCtrl = TextEditingController();
   final _districtCtrl = TextEditingController();
+  final _stateCtrl = TextEditingController();
   final _farmSizeCtrl = TextEditingController();
 
   // Supplier specific
@@ -44,12 +47,63 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     _nameCtrl.dispose();
     _villageCtrl.dispose();
     _districtCtrl.dispose();
+    _stateCtrl.dispose();
     _farmSizeCtrl.dispose();
     _businessNameCtrl.dispose();
     _addressCtrl.dispose();
     _mapLinkCtrl.dispose();
     super.dispose();
   }
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Location services are disabled.')));
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Location permissions are denied.')));
+        return;
+      }
+    }
+    
+    if (permission == LocationPermission.deniedForever) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Location permissions are permanently denied.')));
+      return;
+    }
+
+    setState(() => _isLocating = true);
+
+    try {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        setState(() {
+          _villageCtrl.text = place.subLocality ?? place.locality ?? '';
+          _districtCtrl.text = place.subAdministrativeArea ?? '';
+          _stateCtrl.text = place.administrativeArea ?? '';
+          if (_addressCtrl.text.isEmpty) {
+            _addressCtrl.text = '${place.name}, ${place.street}, ${place.locality}';
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error fetching location: $e')));
+    } finally {
+      if (mounted) setState(() => _isLocating = false);
+    }
+  }
+
+  bool _isLocating = false;
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -65,11 +119,13 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       'name': _nameCtrl.text.trim(),
       if (isFarmer) 'village': _villageCtrl.text.trim(),
       if (isFarmer) 'district': _districtCtrl.text.trim(),
+      if (isFarmer) 'state': _stateCtrl.text.trim(),
       if (isFarmer) 'farmSizeAcres': _farmSizeCtrl.text.trim().isNotEmpty ? double.tryParse(_farmSizeCtrl.text.trim()) : 0,
       
       if (!isFarmer) 'businessName': _businessNameCtrl.text.trim(),
       if (!isFarmer) 'address': supplierAddress,
       if (!isFarmer) 'district': _districtCtrl.text.trim(),
+      if (!isFarmer) 'state': _stateCtrl.text.trim(),
     };
 
     try {
@@ -112,6 +168,28 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   : 'Please provide your shop details so farmers can find you.',
                 style: AppTextStyles.bodyMD.copyWith(color: AppColors.textSecondary),
               ),
+              const SizedBox(height: 24),
+              
+              // New Location Fetch Button
+              OutlinedButton(
+                onPressed: _isLocating ? null : _getCurrentLocation,
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_isLocating)
+                      const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    else
+                      const Icon(Icons.my_location, size: 18),
+                    const SizedBox(width: 8),
+                    Text(_isLocating ? 'Locating...' : '📍 Use Current Location'),
+                  ],
+                ),
+              ),
+
               const SizedBox(height: 32),
 
               // Shared Field: Name
@@ -144,6 +222,15 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 ),
                 const SizedBox(height: 24),
 
+                Text('State', style: AppTextStyles.labelLG),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _stateCtrl,
+                  decoration: const InputDecoration(hintText: 'e.g. Maharashtra'),
+                  validator: (v) => v!.isEmpty ? 'State is required' : null,
+                ),
+                const SizedBox(height: 24),
+
                 Text('Farm Size (Acres)', style: AppTextStyles.labelLG),
                 const SizedBox(height: 8),
                 TextFormField(
@@ -171,6 +258,15 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   controller: _districtCtrl,
                   decoration: const InputDecoration(hintText: 'e.g. Dhule'),
                   validator: (v) => v!.isEmpty ? 'District is required' : null,
+                ),
+                const SizedBox(height: 24),
+
+                Text('State', style: AppTextStyles.labelLG),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _stateCtrl,
+                  decoration: const InputDecoration(hintText: 'e.g. Maharashtra'),
+                  validator: (v) => v!.isEmpty ? 'State is required' : null,
                 ),
                 const SizedBox(height: 24),
 

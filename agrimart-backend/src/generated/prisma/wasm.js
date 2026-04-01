@@ -172,6 +172,7 @@ exports.Prisma.SupplierScalarFieldEnum = {
   gstNumber: 'gstNumber',
   address: 'address',
   district: 'district',
+  state: 'state',
   pincode: 'pincode',
   latitude: 'latitude',
   longitude: 'longitude',

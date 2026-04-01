@@ -104,6 +104,7 @@ model Supplier {
   gstNumber      String?
   address        String
   district       String
+  state          String           @default("Maharashtra")
   pincode        String
   latitude       Float?
   longitude      Float?
