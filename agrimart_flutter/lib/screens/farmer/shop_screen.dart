@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:geolocator/geolocator.dart';
@@ -205,43 +206,41 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                          child: AppEmptyState(icon: '🌿', title: 'No products found', subtitle: 'Try clearing your search or category filters')
                       );
                     }
-                    return RepaintBoundary(
-                      child: SliverGrid(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.65,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                        ),
-                        delegate: SliverChildBuilderDelegate(
-                          (ctx, i) {
-                            final p = list[i] as Map;
-                            final cartItem = _getCartItem(cartAsync, p['id']);
-                            final qty = cartItem?['quantity'] as int? ?? 0;
-                            final cartItemId = cartItem?['id'] as String?;
-                            return _ProductCardSwiggy(
-                              product: p,
-                              cartQty: qty,
-                              onUpdateCart: (int newQty) async {
-                                 try {
-                                    HapticFeedback.mediumImpact();
-                                    if (newQty == 0 && cartItemId != null) {
-                                       await ref.read(cartProvider.notifier).removeItem(cartItemId);
-                                    } else if (cartItemId != null) {
-                                       await ref.read(cartProvider.notifier).updateItem(cartItemId, newQty);
-                                    } else if (newQty > 0) {
-                                       await ref.read(cartProvider.notifier).addItem(Map<String, dynamic>.from(p), newQty);
-                                    }
-                                 } catch (e) {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e'), backgroundColor: AppColors.error));
-                                    }
-                                 }
-                              }
-                            );
-                          },
-                          childCount: list.length,
-                        ),
+                    return SliverGrid(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.65,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (ctx, i) {
+                          final p = list[i] as Map;
+                          final cartItem = _getCartItem(cartAsync, p['id']);
+                          final qty = cartItem?['quantity'] as int? ?? 0;
+                          final cartItemId = cartItem?['id'] as String?;
+                          return _ProductCardSwiggy(
+                            product: p,
+                            cartQty: qty,
+                            onUpdateCart: (int newQty) async {
+                               try {
+                                  HapticFeedback.mediumImpact();
+                                  if (newQty == 0 && cartItemId != null) {
+                                     await ref.read(cartProvider.notifier).removeItem(cartItemId);
+                                  } else if (cartItemId != null) {
+                                     await ref.read(cartProvider.notifier).updateItem(cartItemId, newQty);
+                                  } else if (newQty > 0) {
+                                     await ref.read(cartProvider.notifier).addItem(Map<String, dynamic>.from(p), newQty);
+                                  }
+                               } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e'), backgroundColor: AppColors.error));
+                                  }
+                               }
+                            }
+                          );
+                        },
+                        childCount: list.length,
                       ),
                     );
                   },

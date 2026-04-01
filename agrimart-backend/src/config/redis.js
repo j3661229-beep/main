@@ -8,6 +8,11 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
         url: process.env.UPSTASH_REDIS_REST_URL,
         token: process.env.UPSTASH_REDIS_REST_TOKEN,
     });
+
+    // Polyfill setex since some managed instances block the SETEX command
+    const originalSet = redis.set.bind(redis);
+    redis.setex = async (key, ttl, value) => originalSet(key, value, { ex: ttl });
+
     logger.info('✅ Upstash Redis (REST) initialized');
 } else {
     // In-memory fallback for development

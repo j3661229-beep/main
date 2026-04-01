@@ -53,7 +53,7 @@ const generateWithFallback = async (prompt, imageBase64 = null) => {
     }
 
     // 2. Fallback to Gemini
-    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro"];
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
     const contents = imageBase64 ? [prompt, { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }] : prompt;
 
     for (const modelName of modelsToTry) {
@@ -146,7 +146,7 @@ const cropRecommend = async (farmerId, { location, soilType, season, farmSize, l
 
 const chat = async (userId, { message, history = [], language = 'English' }) => {
     let lastError;
-    
+
     // Fetch user context for hyper-personalized responses
     const farmer = await prisma.farmer.findUnique({ where: { userId }, include: { user: true } });
     const farmerContext = farmer ? `
@@ -199,7 +199,7 @@ const chat = async (userId, { message, history = [], language = 'English' }) => 
             parts: [{ text: msg.content }]
         }));
 
-    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro"];
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
 
     for (const modelName of modelsToTry) {
         try {

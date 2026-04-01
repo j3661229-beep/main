@@ -4,10 +4,7 @@ class AppConstants {
   // API
   // Using 172.20.10.2 to allow your physical device to connect to your PC's locally running backend
   // Alternatively, use 10.0.2.2 for Android Emulator or 127.0.0.1 for iOS simulator.
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://172.20.10.2:3000/api', // Pointing to local backend
-  );
+  static const String baseUrl = 'https://main-production-070d.up.railway.app/api';
 
   // Storage keys
   static const String tokenKey = 'auth_token';
