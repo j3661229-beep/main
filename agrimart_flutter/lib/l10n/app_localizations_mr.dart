@@ -309,4 +309,7 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get servicesAi => 'AI सेवा';
+
+  @override
+  String get searchProducts => 'पिके किंवा बाजार शोधा';
 }

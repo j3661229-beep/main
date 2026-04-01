@@ -3,7 +3,7 @@ import 'package:animate_do/animate_do.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/services/api_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:agrimart/l10n/app_localizations.dart';
 
 class BookTradeSlotScreen extends StatefulWidget {
   final String cropName;
@@ -75,6 +75,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
   }
 
   Future<void> _submitBooking() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_selectedDealerId == null) return;
     if (_weightCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.enterWeightError)));

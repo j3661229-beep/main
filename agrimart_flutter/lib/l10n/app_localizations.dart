@@ -693,6 +693,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'AI Services'**
   String get servicesAi;
+
+  /// No description provided for @searchProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Search crops or markets'**
+  String get searchProducts;
 }
 
 class _AppLocalizationsDelegate

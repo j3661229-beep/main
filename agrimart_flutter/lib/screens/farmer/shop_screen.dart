@@ -12,7 +12,7 @@ import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
 import '../../core/widgets/app_snackbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:agrimart/l10n/app_localizations.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShopScreen extends ConsumerStatefulWidget {

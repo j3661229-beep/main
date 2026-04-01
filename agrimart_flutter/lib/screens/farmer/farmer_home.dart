@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/providers/locale_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:agrimart/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_fallback.dart';

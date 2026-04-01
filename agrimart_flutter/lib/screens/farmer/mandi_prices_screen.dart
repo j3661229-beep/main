@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:agrimart/l10n/app_localizations.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
 import 'mandi_chart_screen.dart';
@@ -79,11 +79,11 @@ class _MandiPricesScreenState extends ConsumerState<MandiPricesScreen> {
               },
             ),
           ],
-          bottom: const TabBar(
+          bottom: TabBar(
             labelColor: AppColors.primary,
             unselectedLabelColor: AppColors.textSecondary,
             indicatorColor: AppColors.primary,
-            labelStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+            labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
             tabs: [
               Tab(text: l10n.agmarknetLive),
               Tab(text: l10n.directBuyers),
@@ -143,7 +143,7 @@ class _MandiPricesScreenState extends ConsumerState<MandiPricesScreen> {
                               color: AppColors.success.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
                                  const Icon(Icons.circle, color: AppColors.success, size: 8),
                                  const SizedBox(width: 4),

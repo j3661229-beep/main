@@ -309,4 +309,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get servicesAi => 'AI Services';
+
+  @override
+  String get searchProducts => 'Search crops or markets';
 }

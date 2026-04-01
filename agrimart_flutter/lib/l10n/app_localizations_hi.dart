@@ -310,4 +310,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get servicesAi => 'AI सेवाएं';
+
+  @override
+  String get searchProducts => 'फसलें या बाजार खोजें';
 }

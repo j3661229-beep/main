@@ -97,5 +97,6 @@
   "spent": "Spent",
   "pending": "Pending",
   "farm": "Farm",
-  "servicesAi": "AI Services"
+  "servicesAi": "AI Services",
+  "searchProducts": "Search crops or markets"
 }
