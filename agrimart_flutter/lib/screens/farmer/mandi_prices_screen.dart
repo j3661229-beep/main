@@ -3,16 +3,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
 import 'mandi_chart_screen.dart';
 import 'book_trade_slot_screen.dart';
 
-class MandiPricesScreen extends ConsumerWidget {
+class MandiPricesScreen extends ConsumerStatefulWidget {
   const MandiPricesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MandiPricesScreen> createState() => _MandiPricesScreenState();
+}
+
+class _MandiPricesScreenState extends ConsumerState<MandiPricesScreen> {
+  bool _isSearching = false;
+  final _searchCtrl = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final weather = ref.watch(weatherProvider);
     final district = weather.when(
       data: (d) => d['name'] as String? ?? 'Nashik',
@@ -20,6 +36,7 @@ class MandiPricesScreen extends ConsumerWidget {
       error: (_, __) => 'Nashik',
     );
     final mandi = ref.watch(mandiProvider(district));
+    final l10n = AppLocalizations.of(context)!;
 
     void refreshMandi() {
       ref.invalidate(weatherProvider);
@@ -31,15 +48,35 @@ class MandiPricesScreen extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
-          title: const Text('Live Market',
-              style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5, fontSize: 22)),
+          title: _isSearching
+              ? TextField(
+                  controller: _searchCtrl,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: '${l10n.searchProducts}...',
+                    border: InputBorder.none,
+                    hintStyle: AppTextStyles.bodyMD.copyWith(color: AppColors.textTertiary),
+                  ),
+                  style: AppTextStyles.bodyMD.copyWith(fontWeight: FontWeight.w700),
+                  onChanged: (v) => setState(() => _searchQuery = v.toLowerCase()),
+                )
+              : Text(l10n.liveMarket,
+                  style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5, fontSize: 22)),
           backgroundColor: AppColors.surface,
           foregroundColor: AppColors.textPrimary,
           elevation: 0,
           actions: [
             IconButton(
-              icon: const Icon(Icons.search_rounded),
-              onPressed: () {},
+              icon: Icon(_isSearching ? Icons.close_rounded : Icons.search_rounded),
+              onPressed: () {
+                setState(() {
+                  if (_isSearching) {
+                    _searchCtrl.clear();
+                    _searchQuery = '';
+                  }
+                  _isSearching = !_isSearching;
+                });
+              },
             ),
           ],
           bottom: const TabBar(
@@ -48,8 +85,8 @@ class MandiPricesScreen extends ConsumerWidget {
             indicatorColor: AppColors.primary,
             labelStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
             tabs: [
-              Tab(text: 'AGMARKNET LIVE'),
-              Tab(text: 'DIRECT BUYERS'),
+              Tab(text: l10n.agmarknetLive),
+              Tab(text: l10n.directBuyers),
             ],
           ),
         ),
@@ -58,16 +95,22 @@ class MandiPricesScreen extends ConsumerWidget {
              mandi.when(
               loading: () => const AppShimmerList(itemCount: 12),
               error: (e, _) => AppErrorState(
-                message: 'Market data currently unavailable',
+                message: l10n.marketDataUnavailable,
                 onRetry: refreshMandi,
               ),
               data: (data) {
-                final prices = data['prices'] as List? ?? [];
+                final allPrices = data['prices'] as List? ?? [];
+                final prices = allPrices.where((p) {
+                  final crop = (p['crop'] as String? ?? '').toLowerCase();
+                  final mkt = (p['market'] as String? ?? '').toLowerCase();
+                  return crop.contains(_searchQuery) || mkt.contains(_searchQuery);
+                }).toList();
+
                 if (prices.isEmpty) {
-                  return const AppEmptyState(
+                  return AppEmptyState(
                     icon: '📉',
-                    title: 'Market Closed',
-                    subtitle: 'No live rates available for your current region.',
+                    title: l10n.marketClosed,
+                    subtitle: l10n.noLiveRates,
                   );
                 }
 
@@ -89,8 +132,8 @@ class MandiPricesScreen extends ConsumerWidget {
                             children: [
                               Text(district.toUpperCase(),
                                   style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, letterSpacing: 0.5)),
-                              const Text('Live AGMARKNET Feed',
-                                  style: TextStyle(fontSize: 10, color: AppColors.textTertiary)),
+                              Text(l10n.liveAgmarknetFeed,
+                                  style: const TextStyle(fontSize: 10, color: AppColors.textTertiary)),
                             ],
                           ),
                           const Spacer(),
@@ -102,10 +145,10 @@ class MandiPricesScreen extends ConsumerWidget {
                             ),
                             child: const Row(
                               children: [
-                                Icon(Icons.circle, color: AppColors.success, size: 8),
-                                SizedBox(width: 4),
-                                Text('MARKET OPEN', style: TextStyle(color: AppColors.success, fontSize: 10, fontWeight: FontWeight.w800)),
-                              ],
+                                 const Icon(Icons.circle, color: AppColors.success, size: 8),
+                                 const SizedBox(width: 4),
+                                 Text(l10n.marketOpen, style: const TextStyle(color: AppColors.success, fontSize: 10, fontWeight: FontWeight.w800)),
+                               ],
                             ),
                           ),
                         ],
@@ -212,19 +255,23 @@ class MandiPricesScreen extends ConsumerWidget {
             // DIRECT BUYERS TAB CONTENTS
              mandi.when(
               loading: () => const AppShimmerList(itemCount: 8),
-              error: (e, _) => AppErrorState(message: 'Could not load buyers', onRetry: refreshMandi),
+              error: (e, _) => AppErrorState(message: l10n.marketDataUnavailable, onRetry: refreshMandi),
               data: (data) {
-                final prices = data['prices'] as List? ?? [];
-                if (prices.isEmpty) return const AppEmptyState(icon: '👩‍🌾', title: 'No Buyers', subtitle: 'No direct buyers available right now.');
+                final allPrices = data['prices'] as List? ?? [];
+                final prices = allPrices.where((p) {
+                  final crop = (p['crop'] as String? ?? '').toLowerCase();
+                  return crop.contains(_searchQuery);
+                }).toList();
+                if (prices.isEmpty) return AppEmptyState(icon: '👩‍🌾', title: l10n.marketClosed, subtitle: l10n.noLiveRates);
                 
                 return SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildMarketInsightCard(),
+                      _buildMarketInsightCard(l10n),
                       const SizedBox(height: 24),
-                      Text('Top Verified Dealers', style: AppTextStyles.headingMD),
+                      Text(l10n.topVerifiedDealers, style: AppTextStyles.headingMD),
                       const SizedBox(height: 16),
                       ...prices.map((p) {
                         final cropName = p['crop'] ?? 'Crop';
@@ -258,13 +305,13 @@ class MandiPricesScreen extends ConsumerWidget {
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text('Sell $cropName', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                                          Text('${l10n.sellPrefix} $cropName', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
                                           const SizedBox(height: 2),
                                           Row(
                                             children: [
                                               const Icon(Icons.verified, color: Colors.blue, size: 14),
                                               const SizedBox(width: 4),
-                                              Text('9 Verified Buyers nearby', style: TextStyle(color: AppColors.textTertiary, fontSize: 11, fontWeight: FontWeight.w600)),
+                                              Text('9 ${l10n.verifiedDealersNearby}', style: const TextStyle(color: AppColors.textTertiary, fontSize: 11, fontWeight: FontWeight.w600)),
                                             ],
                                           ),
                                         ],
@@ -274,7 +321,7 @@ class MandiPricesScreen extends ConsumerWidget {
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
                                         Text('₹${p['price']}+', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.primary)),
-                                        const Text('per quintal', style: TextStyle(fontSize: 10, color: AppColors.textTertiary)),
+                                        Text(l10n.perQuintal, style: const TextStyle(fontSize: 10, color: AppColors.textTertiary)),
                                       ],
                                     ),
                                   ],
@@ -294,7 +341,7 @@ class MandiPricesScreen extends ConsumerWidget {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text('VIEW DEALERS & BOOK SLOT', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 12, letterSpacing: 0.5)),
+                                      Text(l10n.viewDealersBookSlot, style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 12, letterSpacing: 0.5)),
                                       const SizedBox(width: 8),
                                       const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.primary),
                                     ],
@@ -316,7 +363,7 @@ class MandiPricesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMarketInsightCard() {
+  Widget _buildMarketInsightCard(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -324,16 +371,16 @@ class MandiPricesScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: AppColors.primaryShadow,
       ),
-      child: const Row(
+      child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Direct Trading', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
-                SizedBox(height: 4),
-                Text('Skip the mandi queues. Sell directly to verified district dealers at competitive rates.', 
-                  style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
+                Text(l10n.directTrading, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 4),
+                Text(l10n.directTradingSubtitle, 
+                  style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
               ],
             ),
           ),

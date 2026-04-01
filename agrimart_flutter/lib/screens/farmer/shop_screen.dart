@@ -12,6 +12,7 @@ import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
 import '../../core/widgets/app_snackbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShopScreen extends ConsumerStatefulWidget {
@@ -96,6 +97,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 
     final user = ref.watch(authProvider).user;
     final locationName = user?.farmer?['village'] as String? ?? 'Your Farm';
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -168,9 +170,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                       const SizedBox(height: 24),
 
                       // "Explore By Category" Grid
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Text('Explore by Category',
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(l10n.exploreByCategory,
                             style: AppTextStyles.headingMD),
                       ),
                       const SizedBox(height: 16),
@@ -189,7 +191,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                         itemBuilder: (ctx, i) {
                           if (i == 0) {
                             return _CategoryGridItem(
-                              label: 'All',
+                              label: l10n.all,
                               icon: '🏪',
                               color: Colors.grey.shade200,
                               iconColor: Colors.black87,
@@ -215,7 +217,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Sort by',
+                              l10n.sortBy,
                               style: AppTextStyles.labelMD.copyWith(
                                 color: AppColors.textSecondary,
                               ),
@@ -226,7 +228,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                               child: Row(
                                 children: [
                                   _SortChip(
-                                    label: 'Nearest',
+                                    label: l10n.nearest,
                                     selected: _sort == 'nearest',
                                     onTap: () {
                                       if (_position == null) {
@@ -240,19 +242,19 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                     },
                                   ),
                                   _SortChip(
-                                    label: 'Newest',
+                                    label: l10n.newest,
                                     selected: _sort == 'createdAt',
                                     onTap: () =>
                                         setState(() => _sort = 'createdAt'),
                                   ),
                                   _SortChip(
-                                    label: 'Price ↑',
+                                    label: l10n.priceAsc,
                                     selected: _sort == 'price_asc',
                                     onTap: () =>
                                         setState(() => _sort = 'price_asc'),
                                   ),
                                   _SortChip(
-                                    label: 'Price ↓',
+                                    label: l10n.priceDesc,
                                     selected: _sort == 'price_desc',
                                     onTap: () =>
                                         setState(() => _sort = 'price_desc'),
@@ -264,9 +266,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Text('Available Near You',
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(l10n.availableNearYou,
                             style: AppTextStyles.headingMD),
                       ),
                       const SizedBox(height: 12),
@@ -346,12 +348,11 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                     data: (data) {
                       final list = data['data'] as List? ?? [];
                       if (list.isEmpty) {
-                        return const SliverToBoxAdapter(
+                        return SliverToBoxAdapter(
                             child: AppEmptyState(
                                 icon: '🌿',
-                                title: 'No products found',
-                                subtitle:
-                                    'Try clearing your search or category filters'));
+                                title: l10n.noProductsFound,
+                                subtitle: l10n.clearFiltersSubtitle));
                       }
                       return SliverGrid(
                         gridDelegate:
@@ -444,8 +445,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                  '$totalItems Item${totalItems > 1 ? 's' : ''}',
+                               Text(
+                                  '$totalItems ${totalItems > 1 ? l10n.itemsCount : l10n.itemCount}',
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 13,
@@ -459,9 +460,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                             ],
                           ),
                           Row(
-                            children: const [
-                              Text('View Cart',
-                                  style: TextStyle(
+                            children: [
+                              Text(l10n.viewCart,
+                                  style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold)),
@@ -552,11 +553,11 @@ class _ProductCardSwiggy extends StatelessWidget {
                               BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)
                             ]),
                         child: Row(
-                          children: const [
-                            Text('🌱', style: TextStyle(fontSize: 10)),
-                            SizedBox(width: 4),
-                            Text('ORGANIC',
-                                style: TextStyle(
+                          children: [
+                            const Text('🌱', style: TextStyle(fontSize: 10)),
+                            const SizedBox(width: 4),
+                            Text(l10n.organic,
+                                style: const TextStyle(
                                     fontSize: 8,
                                     fontWeight: FontWeight.w900,
                                     color: AppColors.success,
@@ -603,8 +604,8 @@ class _ProductCardSwiggy extends StatelessWidget {
                               boxShadow: [
                                 BoxShadow(color: AppColors.primary.withValues(alpha: 0.1), blurRadius: 4, offset: const Offset(0, 2))
                               ]),
-                          child: const Text('ADD',
-                              style: TextStyle(
+                          child: Text(l10n.add,
+                              style: const TextStyle(
                                   color: AppColors.primary,
                                   fontWeight: FontWeight.w900,
                                   fontSize: 12,

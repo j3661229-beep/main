@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:animate_do/animate_do.dart';
 import '../../data/services/api_service.dart';
 import '../../data/providers/auth_provider.dart';
-import '../../data/providers/language_provider.dart';
+import '../../data/providers/auth_provider.dart';
+import '../../core/providers/locale_provider.dart';
 import '../../services/voice_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
@@ -37,7 +39,8 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
     });
     try {
       final user = ref.read(authProvider).user;
-      final language = ref.read(languageProvider);
+      final locale = ref.read(localeProvider);
+      final language = locale.languageCode == 'hi' ? 'Hindi' : locale.languageCode == 'mr' ? 'Marathi' : 'English';
       final location = "${user?.farmer?['village'] ?? ''}, ${user?.farmer?['district'] ?? ''}";
       final res = await ApiService.instance.analyzeSoil(_image!.path, location: location, language: language);
       setState(() {
@@ -55,9 +58,10 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-          title: const Text('🧪 Soil Analysis'),
+          title: Text('🧪 ${l10n.soilAnalysis}'),
           backgroundColor: AppColors.primary),
       body: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -76,9 +80,9 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                        Text('AI Soil Analysis',
+                        Text(l10n.soilAnalysis,
                             style: AppTextStyles.headingSM),
-                        Text(
+                        const Text(
                             'Take a photo of your soil to get instant analysis and crop recommendations powered by AI.',
                             style: AppTextStyles.bodySM),
                       ]))
@@ -150,7 +154,7 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
                 Expanded(
                     child: ElevatedButton.icon(
                         icon: const Icon(Icons.science_outlined),
-                        label: const Text('Analyze Soil'),
+                        label: Text(l10n.soilAnalysis),
                         onPressed: _analyzing ? null : _analyze)),
               ]),
 
@@ -240,7 +244,7 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
                                   final advice = _result!['analysis']?['treatmentAdvice'];
                                   final crops = (_result!['analysis']?['recommendedCrops'] as List? ?? []).join(', ');
                                   VoiceService.instance.speak("$advice. Recommended crops for your area are: $crops", 
-                                      languageCode: ref.read(languageProvider));
+                                      languageCode: ref.read(localeProvider).languageCode);
                                 },
                               )
                             ],

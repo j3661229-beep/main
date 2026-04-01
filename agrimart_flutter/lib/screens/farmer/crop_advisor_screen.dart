@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../data/services/api_service.dart';
 import '../../data/providers/auth_provider.dart';
-import '../../data/providers/language_provider.dart';
+import '../../core/providers/locale_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../services/voice_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
@@ -26,13 +27,14 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
   Future<void> _analyze() async {
     setState(() => _loading = true);
     try {
-      final lang = ref.read(languageProvider);
+      final locale = ref.read(localeProvider);
+      final langName = locale.languageCode == 'hi' ? 'Hindi' : locale.languageCode == 'mr' ? 'Marathi' : 'English';
       final res = await ApiService.instance.getCropRecommend({
         'location': _locCtrl.text,
         'soilType': _soilCtrl.text,
         'season': _seasonCtrl.text,
         'farmSize': int.tryParse(_sizeCtrl.text) ?? 2,
-        'language': lang,
+        'language': langName,
       });
       setState(() => _recommendations = res['crops'] ?? []);
     } catch (e) {
@@ -56,10 +58,11 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-          title: const Text('🌱 AI Crop Advisor'),
+          title: Text('🌱 ${l10n.cropAdvisor}'),
           backgroundColor: AppColors.primary),
       body: _recommendations.isNotEmpty
           ? _buildResults()
@@ -95,17 +98,17 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                               ]))
                         ])),
                     const SizedBox(height: 28),
-                    const Text('Farm Details', style: AppTextStyles.headingMD),
+                    Text(l10n.farmDetails, style: AppTextStyles.headingMD),
                     const SizedBox(height: 16),
                     _buildField(
-                        'Location / District', _locCtrl, 'e.g. Pune, Nashik'),
+                        '${l10n.location} / District', _locCtrl, 'e.g. Pune, Nashik'),
                     const SizedBox(height: 14),
                     _buildField(
-                        'Soil Type', _soilCtrl, 'e.g. Black, Red, Sandy'),
+                        l10n.soilType, _soilCtrl, 'e.g. Black, Red, Sandy'),
                     const SizedBox(height: 14),
-                    _buildField('Season', _seasonCtrl, 'Kharif, Rabi or Zaid'),
+                    _buildField(l10n.season, _seasonCtrl, 'Kharif, Rabi or Zaid'),
                     const SizedBox(height: 14),
-                    _buildField('Farm Size (Acres)', _sizeCtrl,
+                    _buildField('${l10n.farmSize} (Acres)', _sizeCtrl,
                         'Enter farm size in acres',
                         isNum: true),
                     const SizedBox(height: 40),
@@ -125,8 +128,8 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                                   width: 24,
                                   child: CircularProgressIndicator(
                                       color: Colors.white, strokeWidth: 3))
-                              : const Text('✨ Get AI Recommendations',
-                                  style: TextStyle(
+                              : Text(l10n.getAiRecommendations,
+                                  style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold)),
                         )),
@@ -231,7 +234,7 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                                     IconButton(
                                       icon: const Icon(Icons.volume_up_rounded, color: AppColors.primary, size: 24),
                                       onPressed: () {
-                                        VoiceService.instance.speak("${crop['crop']}. ${crop['reason']}", languageCode: ref.read(languageProvider));
+                                        VoiceService.instance.speak("${crop['crop']}. ${crop['reason']}", languageCode: ref.read(localeProvider).languageCode);
                                       },
                                     )
                                   ]

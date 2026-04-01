@@ -27,6 +27,7 @@ export default function Analytics() {
         { name: 'Seeds', value: 400 },
         { name: 'Fertilizers', value: 300 },
         { name: 'Pesticides', value: 200 },
+        { name: 'Dealers', value: 150 }, // Mock data for now
         { name: 'Equipment', value: 100 },
     ];
 
@@ -35,9 +36,9 @@ export default function Analytics() {
             <div className="flex-between mb-24">
                 <h2 className="card-title" style={{ fontSize: 24 }}>📈 Platform Analytics</h2>
                 <div className="flex-center gap-12">
-                    <select 
-                        className="input" 
-                        value={dateRange} 
+                    <select
+                        className="input"
+                        value={dateRange}
                         onChange={(e) => setDateRange(e.target.value)}
                         style={{ width: 140, padding: '8px 12px' }}
                     >
@@ -70,8 +71,8 @@ export default function Analytics() {
                     <div className="stat-card-change up">+4% vs last period</div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-card-label">Active Products</div>
-                    <div className="stat-card-value">{stats.totalProducts || 0}</div>
+                    <div className="stat-card-label">Dealers Active</div>
+                    <div className="stat-card-value">{stats.totalDealers || 0}</div>
                     <div className="stat-card-change up">Healthy growth</div>
                 </div>
             </div>
@@ -87,8 +88,8 @@ export default function Analytics() {
                             <AreaChart data={trend}>
                                 <defs>
                                     <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#2d6a4f" stopOpacity={0.8}/>
-                                        <stop offset="95%" stopColor="#2d6a4f" stopOpacity={0}/>
+                                        <stop offset="5%" stopColor="#2d6a4f" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#2d6a4f" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <XAxis dataKey="date" hide />

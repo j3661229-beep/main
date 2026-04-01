@@ -99,7 +99,7 @@ class LoginScreen extends ConsumerWidget {
                             final user = await ref.read(authProvider.notifier).signInWithGoogle(role);
                             if (user != null && context.mounted) {
                               if (user.isVerified) {
-                                context.go(user.isFarmer ? '/farmer' : user.isDealer ? '/dealer' : '/supplier');
+                                context.go('/auth/language');
                               } else {
                                 context.go('/auth/setup');
                               }

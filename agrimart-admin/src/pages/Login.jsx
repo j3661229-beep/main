@@ -26,20 +26,32 @@ export default function Login() {
     return (
         <div style={{
             minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'linear-gradient(135deg, #1a4231 0%, #2d6a4f 50%, #4dac7a 100%)',
+            background: 'linear-gradient(135deg, #064e3b 0%, #10b981 100%)',
+            position: 'relative', overflow: 'hidden'
         }}>
             <div style={{
-                background: '#fff', borderRadius: 20, padding: '48px 40px',
-                width: '100%', maxWidth: 440, boxShadow: '0 24px 80px rgba(0,0,0,0.25)',
+                position: 'absolute', top: '-10%', left: '-10%', width: '40%', height: '40%',
+                background: 'rgba(255,255,255,0.1)', borderRadius: '50%', filter: 'blur(80px)'
+            }} />
+            <div style={{
+                position: 'absolute', bottom: '-10%', right: '-10%', width: '50%', height: '50%',
+                background: 'rgba(251,191,36,0.1)', borderRadius: '50%', filter: 'blur(100px)'
+            }} />
+            <div style={{
+                background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(20px)',
+                borderRadius: 28, padding: '56px 48px',
+                width: '100%', maxWidth: 460, boxShadow: '0 32px 64px rgba(0,0,0,0.2)',
+                border: '1px solid rgba(255,255,255,0.4)', zIndex: 1
             }}>
                 {/* Logo */}
                 <div style={{ textAlign: 'center', marginBottom: 32 }}>
                     <div style={{
-                        width: 64, height: 64, borderRadius: 16,
-                        background: 'var(--color-primary)', display: 'inline-flex',
-                        alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 16,
+                        width: 72, height: 72, borderRadius: 20,
+                        background: 'var(--grad-primary)', display: 'inline-flex',
+                        alignItems: 'center', justifyContent: 'center', fontSize: 36, marginBottom: 20,
+                        boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
                     }}>🌾</div>
-                    <h1 style={{ fontSize: 26, fontWeight: 800, color: 'var(--text-primary)' }}>AgriMart Admin</h1>
+                    <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>AgriMart Admin</h1>
                     <p style={{ color: 'var(--text-secondary)', marginTop: 4, fontSize: 14 }}>
                         Sign in to manage the AgriMart platform
                     </p>

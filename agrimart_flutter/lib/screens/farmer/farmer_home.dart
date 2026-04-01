@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../data/providers/app_providers.dart';
-import '../../data/providers/language_provider.dart';
+import '../../core/providers/locale_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_fallback.dart';
@@ -59,6 +60,7 @@ class _FarmerHomeState extends ConsumerState<FarmerHome> {
   @override
   Widget build(BuildContext context) {
     final cartCount = ref.watch(cartItemCountProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       extendBody: true, // Crucial for floating nav transparency
@@ -71,11 +73,11 @@ class _FarmerHomeState extends ConsumerState<FarmerHome> {
         selectedIndex: _tab,
         onTabSelected: _onTabChanged,
         items: [
-          FloatingNavItem(icon: '🏠', label: ref.tr('home')),
-          FloatingNavItem(icon: '🛒', label: ref.tr('shop'), badge: cartCount > 0 ? cartCount : null),
-          FloatingNavItem(icon: '🤖', label: ref.tr('ai')),
-          FloatingNavItem(icon: '📈', label: ref.tr('mandi')),
-          FloatingNavItem(icon: '👤', label: ref.tr('profile')),
+          FloatingNavItem(icon: '🏠', label: l10n.home),
+          FloatingNavItem(icon: '🛒', label: l10n.shop, badge: cartCount > 0 ? cartCount : null),
+          FloatingNavItem(icon: '🤖', label: l10n.ai),
+          FloatingNavItem(icon: '📈', label: l10n.mandi),
+          FloatingNavItem(icon: '👤', label: l10n.profile),
         ],
       ),
     );
@@ -218,13 +220,13 @@ class _HomeTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authProvider);
     final dashboard = ref.watch(farmerDashboardProvider);
-    final lang = ref.watch(languageProvider);
+    final locale = ref.watch(localeProvider);
+    final l10n = AppLocalizations.of(context)!;
     
-    final name = auth.user?.name ?? (lang == 'English' ? 'Farmer' : 'शेतकरी');
+    final name = auth.user?.name ?? (locale.languageCode == 'en' ? 'Farmer' : 'शेतकरी');
     
-    String greeting = 'Hello, $name 👋';
-    if (lang == 'मराठी (Marathi)') greeting = 'नमस्कार, $name 🙏';
-    if (lang == 'हिंदी (Hindi)') greeting = 'नमस्ते, $name 🙏';
+    String greeting = '${l10n.hello}, $name 👋';
+    if (locale.languageCode != 'en') greeting = '${l10n.hello}, $name 🙏';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -363,11 +365,11 @@ class _HomeTab extends ConsumerWidget {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(children: [
-                        _StatChip('💰', 'Spent', '₹${_fmtNum(totalSpend)}', AppColors.success),
+                        _StatChip('💰', l10n.spent, '₹${_fmtNum(totalSpend)}', AppColors.success),
                         const SizedBox(width: 8),
-                        _StatChip('📦', 'Pending', '$pending', AppColors.amber),
+                        _StatChip('📦', l10n.pending, '$pending', AppColors.amber),
                         const SizedBox(width: 8),
-                        _StatChip('🌾', 'Farm', '${data['farmSize'] ?? '–'} ha', AppColors.primary),
+                        _StatChip('🌾', l10n.farm, '${data['farmSize'] ?? '–'} ha', AppColors.primary),
                       ]),
                     );
                   },
@@ -378,7 +380,7 @@ class _HomeTab extends ConsumerWidget {
                 // Premium Quick Actions Scroller
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(ref.tr('services_ai'), style: AppTextStyles.headingMD.copyWith(letterSpacing: -0.3)),
+                  child: Text(l10n.servicesAi, style: AppTextStyles.headingMD.copyWith(letterSpacing: -0.3)),
                 ),
                 const SizedBox(height: 12),
                 Padding(
@@ -391,14 +393,14 @@ class _HomeTab extends ConsumerWidget {
                     crossAxisSpacing: 10,
                     childAspectRatio: 0.85,
                     children: [
-                      _QuickAction('🌿', ref.tr('shop'), const Color(0xFFE8F5E9), const Color(0xFF2E7D32), () => context.push('/farmer/shop')),
-                      _QuickAction('🧪', ref.tr('soil_ai'), const Color(0xFFFFF3E0), const Color(0xFFE65100), () => context.push('/farmer/soil')),
-                      _QuickAction('🔬', ref.tr('disease'), const Color(0xFFFFEBEE), const Color(0xFFC62828), () => context.push('/farmer/disease')),
-                      _QuickAction('📤', ref.tr('mandi'), const Color(0xFFE3F2FD), const Color(0xFF1565C0), () => context.push('/farmer/mandi')),
-                      _QuickAction('🌱', ref.tr('crops'), const Color(0xFFF1F8E9), const Color(0xFF33691E), () => context.push('/farmer/crop-advisor')),
-                      _QuickAction('☁️', ref.tr('weather'), const Color(0xFFE1F5FE), const Color(0xFF0277BD), () => context.push('/farmer/weather')),
-                      _QuickAction('💬', ref.tr('kisan_chat'), const Color(0xFFF3E5F5), const Color(0xFF6A1B9A), () => context.push('/farmer/kisan-ai')),
-                      _QuickAction('🏛️', ref.tr('schemes'), const Color(0xFFFFFDE7), const Color(0xFFF57F17), () => context.push('/farmer/schemes')),
+                      _QuickAction('🌿', l10n.shop, const Color(0xFFE8F5E9), const Color(0xFF2E7D32), () => context.push('/farmer/shop')),
+                      _QuickAction('🧪', l10n.soilAnalysis, const Color(0xFFFFF3E0), const Color(0xFFE65100), () => context.push('/farmer/soil')),
+                      _QuickAction('🔬', l10n.diseaseDetection, const Color(0xFFFFEBEE), const Color(0xFFC62828), () => context.push('/farmer/disease')),
+                      _QuickAction('📤', l10n.mandi, const Color(0xFFE3F2FD), const Color(0xFF1565C0), () => context.push('/farmer/mandi')),
+                      _QuickAction('🌱', l10n.cropAdvisor, const Color(0xFFF1F8E9), const Color(0xFF33691E), () => context.push('/farmer/crop-advisor')),
+                      _QuickAction('☁️', l10n.weather, const Color(0xFFE1F5FE), const Color(0xFF0277BD), () => context.push('/farmer/weather')),
+                      _QuickAction('💬', l10n.kisanAi, const Color(0xFFF3E5F5), const Color(0xFF6A1B9A), () => context.push('/farmer/kisan-ai')),
+                      _QuickAction('🏛️', l10n.schemes, const Color(0xFFFFFDE7), const Color(0xFFF57F17), () => context.push('/farmer/schemes')),
                     ],
                   ),
                 ),

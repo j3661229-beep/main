@@ -46,10 +46,10 @@ export default function Dashboard() {
                 {[
                     { icon: '👥', label: 'Total Users', value: fmtNum(s.totalUsers), change: `+${s.newUsersThisMonth || 0} this month`, color: '#dbeafe', up: true },
                     { icon: '🌾', label: 'Farmers', value: fmtNum(s.totalFarmers), change: 'Active farmers', color: '#dcfce7', up: true },
+                    { icon: '🤝', label: 'Dealers', value: fmtNum(s.totalDealers), change: 'Trading partners', color: '#e0f2fe', up: true },
                     { icon: '🏪', label: 'Suppliers', value: fmtNum(s.totalSuppliers), change: `${s.pendingSuppliers || 0} pending verify`, color: '#fef9c3', up: false },
                     { icon: '📦', label: 'Total Orders', value: fmtNum(s.totalOrders), change: `${s.pendingOrders || 0} pending`, color: '#f3e8ff', up: true },
                     { icon: '💰', label: 'Revenue', value: fmt(s.totalRevenue), change: 'All-time GMV', color: '#dcfce7', up: true },
-                    { icon: '🌿', label: 'Products', value: fmtNum(s.totalProducts), change: 'Active listings', color: '#fde8d8', up: true },
                 ].map(card => (
                     <div className="stat-card" key={card.label}>
                         <div className="stat-card-header">

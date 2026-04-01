@@ -7,6 +7,7 @@ import '../screens/auth/role_selection_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/onboarding_screen.dart';
 import '../screens/auth/profile_setup_screen.dart';
+import '../screens/auth/language_selection_screen.dart';
 import '../screens/farmer/farmer_home.dart';
 import '../screens/farmer/shop_screen.dart';
 import '../screens/farmer/product_detail_screen.dart';
@@ -81,6 +82,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       }),
       _fadedRoute('/auth/onboarding', const OnboardingScreen()),
       _fadedRoute('/auth/setup', const ProfileSetupScreen()),
+      _fadedRoute('/auth/language', const LanguageSelectionScreen()),
 
       // Farmer
       _fadedRoute('/farmer', const FarmerHome()),

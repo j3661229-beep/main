@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/auth_provider.dart';
-import '../../data/providers/language_provider.dart';
+import '../../core/providers/locale_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
@@ -13,13 +14,16 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authProvider);
     final user = auth.user;
-    final lang = ref.watch(languageProvider);
+    final locale = ref.watch(localeProvider);
+    final l10n = AppLocalizations.of(context)!;
+
+    final langName = locale.languageCode == 'hi' ? 'हिंदी (Hindi)' : locale.languageCode == 'mr' ? 'मराठी (Marathi)' : 'English';
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('⚙️ Profile & Settings',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('⚙️ ${l10n.profile}',
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: AppColors.primary,
         elevation: 0,
       ),
@@ -78,9 +82,9 @@ class ProfileScreen extends ConsumerWidget {
                   ]),
                 ),
                 const SizedBox(height: 32),
-                _sectionHeader('ACCOUNT MANAGEMENT'),
-                _buildItem(Icons.language, 'App Language', lang, () {
-                  _showLanguagePicker(context, ref, lang);
+                _sectionHeader(l10n.accountManagement.toUpperCase()),
+                _buildItem(Icons.language, l10n.appLanguage, langName, () {
+                  _showLanguagePicker(context, ref, locale);
                 }),
                 _buildItem(Icons.location_on_outlined, 'My Farm Address',
                     'Manage saved locations', () {
@@ -101,20 +105,20 @@ class ProfileScreen extends ConsumerWidget {
                       'Manage data sharing settings, device permissions, and activity history.');
                 }),
                 const SizedBox(height: 24),
-                _sectionHeader('SUPPORT & LEGAL'),
-                _buildItem(Icons.help_outline, 'Help Center',
+                _sectionHeader(l10n.supportLegal.toUpperCase()),
+                _buildItem(Icons.help_outline, l10n.helpCenter,
                     'FAQs & Customer Support', () {
                    _showStubSheet(context, '💬 Need Help?', 
                       'Contact our 24/7 Kisan Helpline at 1800-120-120\nor email support@agrimart.in');
                 }),
-                _buildItem(Icons.article_outlined, 'Terms of Service',
+                _buildItem(Icons.article_outlined, l10n.termsOfService,
                     'Platform agreements & legal', () {
-                  _showStubSheet(context, '📄 Terms of Service', 
+                  _showStubSheet(context, '📄 ${l10n.termsOfService}', 
                       'By using AgriMart, you agree to our fair usage policy and zero-commission structure (for first year).');
                 }),
-                _buildItem(Icons.info_outline, 'About AgriMart',
+                _buildItem(Icons.info_outline, l10n.aboutUs,
                     'Version 1.0.0 (Production)', () {
-                  _showStubSheet(context, '🌾 About Us', 
+                  _showStubSheet(context, '🌾 ${l10n.aboutUs}', 
                       'AgriMart v1.0.0\nBuilt for the farmers of India to provide direct market access, AI crop tools, and transparent pricing.');
                 }),
                 const SizedBox(height: 40),
@@ -133,8 +137,8 @@ class ProfileScreen extends ConsumerWidget {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16)),
                     ),
-                    label: const Text('Log Out From Device',
-                        style: TextStyle(
+                    label: Text(l10n.logout,
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
                 ),
@@ -144,7 +148,7 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  void _showLanguagePicker(BuildContext context, WidgetRef ref, String currentLang) {
+  void _showLanguagePicker(BuildContext context, WidgetRef ref, Locale currentLocale) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
@@ -156,15 +160,19 @@ class ProfileScreen extends ConsumerWidget {
             children: [
               const Text('Select Language / भाषा निवडा', style: AppTextStyles.headingLG),
               const SizedBox(height: 16),
-              ...['English', 'मराठी (Marathi)', 'हिंदी (Hindi)'].map((l) {
-                final isSelected = currentLang == l;
+              ...[
+                {'name': 'English', 'code': 'en'},
+                {'name': 'मराठी (Marathi)', 'code': 'mr'},
+                {'name': 'हिंदी (Hindi)', 'code': 'hi'}
+              ].map((l) {
+                final isSelected = currentLocale.languageCode == l['code'];
                 return ListTile(
-                  title: Text(l, style: isSelected ? AppTextStyles.headingMD.copyWith(color: AppColors.primary) : AppTextStyles.bodyLG),
+                  title: Text(l['name']!, style: isSelected ? AppTextStyles.headingMD.copyWith(color: AppColors.primary) : AppTextStyles.bodyLG),
                   trailing: isSelected ? const Icon(Icons.check_circle, color: AppColors.primary) : null,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   tileColor: isSelected ? AppColors.primarySurface : null,
                   onTap: () {
-                    ref.read(languageProvider.notifier).setLanguage(l);
+                    ref.read(localeProvider.notifier).setLocale(Locale(l['code']!));
                     Navigator.pop(ctx);
                   },
                 );

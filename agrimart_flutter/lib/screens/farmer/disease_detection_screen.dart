@@ -5,8 +5,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../data/services/api_service.dart';
 import '../../data/providers/auth_provider.dart';
-import '../../data/providers/language_provider.dart';
+import '../../core/providers/locale_provider.dart';
 import '../../services/voice_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
@@ -36,8 +37,9 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
       _result = null;
     });
     try {
-      final lang = ref.read(languageProvider);
-      final r = await ApiService.instance.detectDisease(_image!.path, language: lang);
+      final locale = ref.read(localeProvider);
+      final langName = locale.languageCode == 'hi' ? 'Hindi' : locale.languageCode == 'mr' ? 'Marathi' : 'English';
+      final r = await ApiService.instance.detectDisease(_image!.path, language: langName);
       setState(() {
         _result = r;
         _analyzing = false;
@@ -53,9 +55,10 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-          title: const Text('🔬 Disease Detection'),
+          title: Text('🔬 ${l10n.diseaseDetection}'),
           backgroundColor: AppColors.primary),
       body: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -74,9 +77,9 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                        Text('AI Disease Detection',
+                        Text(l10n.diseaseDetection,
                             style: AppTextStyles.headingSM),
-                        Text(
+                        const Text(
                             'Photo of affected crop leaf/plant for AI disease identification and treatment recommendations.',
                             style: AppTextStyles.bodySM),
                       ]))
@@ -133,7 +136,7 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
             if (_image != null)
               ElevatedButton.icon(
                   icon: const Icon(Icons.biotech),
-                  label: const Text('Detect Disease'),
+                  label: Text(l10n.diseaseDetection),
                   onPressed: _analyzing ? null : _analyze),
             if (_analyzing) ...[
               const SizedBox(height: 32),
@@ -244,7 +247,7 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                                   final prev = (_result!['analysis']?['preventionTips'] as List? ?? []).join('. ');
                                   
                                   VoiceService.instance.speak("Detected: $name. Treatment includes $treat. Prevention: $prev", 
-                                      languageCode: ref.read(languageProvider));
+                                      languageCode: ref.read(localeProvider).languageCode);
                                 },
                               )
                             ],

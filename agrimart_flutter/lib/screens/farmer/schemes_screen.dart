@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
 
@@ -12,6 +13,7 @@ class SchemesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final schemes = ref.watch(schemesProvider);
 
     return Scaffold(
@@ -37,10 +39,10 @@ class SchemesScreen extends ConsumerWidget {
                       ])),
                     ])),
                   Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    if (s['benefits'] != null) ...[const Text('Benefits', style: AppTextStyles.labelLG), const SizedBox(height: 4), Text(s['benefits'] ?? '', style: AppTextStyles.bodyMD), const SizedBox(height: 10)],
-                    if (s['eligibility'] != null) ...[const Text('Eligibility', style: AppTextStyles.labelLG), const SizedBox(height: 4), Text(s['eligibility'] ?? '', style: AppTextStyles.bodyMD.copyWith(color: AppColors.textSecondary)), const SizedBox(height: 10)],
+                    if (s['benefits'] != null) ...[Text(l10n.benefits, style: AppTextStyles.labelLG), const SizedBox(height: 4), Text(s['benefits'] ?? '', style: AppTextStyles.bodyMD), const SizedBox(height: 10)],
+                    if (s['eligibility'] != null) ...[Text(l10n.eligibility, style: AppTextStyles.labelLG), const SizedBox(height: 4), Text(s['eligibility'] ?? '', style: AppTextStyles.bodyMD.copyWith(color: AppColors.textSecondary)), const SizedBox(height: 10)],
                     if (s['documents'] is List) ...[
-                      const Text('Documents Needed', style: AppTextStyles.labelLG),
+                      Text(l10n.documentsNeeded, style: AppTextStyles.labelLG),
                       const SizedBox(height: 6),
                       Wrap(spacing: 6, runSpacing: 4, children: (s['documents'] as List).map((d) => Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -52,7 +54,7 @@ class SchemesScreen extends ConsumerWidget {
                     if (s['applyUrl'] != null) SizedBox(width: double.infinity,
                       child: OutlinedButton.icon(
                         icon: const Icon(Icons.open_in_new, size: 16),
-                        label: const Text('Apply Online →'),
+                        label: Text('${l10n.applyOnline} →'),
                         onPressed: () async {
                           final url = Uri.parse(s['applyUrl']);
                           if (await canLaunchUrl(url)) launchUrl(url, mode: LaunchMode.externalApplication);

@@ -43,6 +43,7 @@ export default function Users() {
                     <select className="input" style={{ width: 130 }} value={role} onChange={e => { setRole(e.target.value); setPage(1); }}>
                         <option value="">All Roles</option>
                         <option value="FARMER">Farmers</option>
+                        <option value="DEALER">Dealers</option>
                         <option value="SUPPLIER">Suppliers</option>
                         <option value="ADMIN">Admins</option>
                     </select>
@@ -69,9 +70,9 @@ export default function Users() {
                                         </td>
                                         <td style={{ fontFamily: 'monospace', fontSize: 13 }}>{u.phone}</td>
                                         <td>
-                                            <span className={`badge ${u.role === 'FARMER' ? 'badge-success' : u.role === 'SUPPLIER' ? 'badge-info' : 'badge-purple'}`}>{u.role}</span>
+                                            <span className={`badge ${u.role === 'FARMER' ? 'badge-success' : u.role === 'DEALER' ? 'badge-warning' : u.role === 'SUPPLIER' ? 'badge-info' : 'badge-purple'}`}>{u.role}</span>
                                         </td>
-                                        <td className="text-secondary text-sm">{u.farmer?.district || u.supplier?.district || '—'}</td>
+                                        <td className="text-secondary text-sm">{u.farmer?.district || u.dealer?.district || u.supplier?.district || '—'}</td>
                                         <td className="text-secondary text-sm">{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
                                         <td>
                                             <div className="flex-center gap-4">

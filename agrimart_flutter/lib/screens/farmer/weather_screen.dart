@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
 
@@ -18,10 +19,11 @@ class WeatherScreen extends ConsumerWidget {
       error: (_, __) => 'Maharashtra',
     );
     final advisory = ref.watch(weatherAdvisoryProvider(district));
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-          title: const Text('☀️ Weather'), backgroundColor: AppColors.primary),
+          title: Text('☀️ ${l10n.weather}'), backgroundColor: AppColors.primary),
       body: weather.when(
         loading: () => const AppShimmerWeatherLayout(),
         error: (e, _) => AppErrorState(
@@ -57,11 +59,11 @@ class WeatherScreen extends ConsumerWidget {
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _WeatherStat('💧', 'Humidity',
+                        _WeatherStat('💧', l10n.humidity,
                             '${data['main']?['humidity'] ?? '--'}%'),
-                        _WeatherStat('💨', 'Wind',
+                        _WeatherStat('💨', l10n.wind,
                             '${data['wind']?['speed'] ?? '--'} m/s'),
-                        _WeatherStat('🌡️', 'Feels Like',
+                        _WeatherStat('🌡️', l10n.feelsLike,
                             '${data['main']?['feels_like']?.toStringAsFixed(0) ?? '--'}°C'),
                       ]),
                 ]),
@@ -88,7 +90,7 @@ class WeatherScreen extends ConsumerWidget {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('🌾 Farm Advisory',
+                          Text('🌾 ${l10n.farmAdvisory}',
                               style: AppTextStyles.headingMD),
                           const SizedBox(height: 12),
                           if (list is List && list.isNotEmpty)
@@ -134,13 +136,13 @@ class WeatherScreen extends ConsumerWidget {
                     children: [
                       _TempCard(
                           '🔆',
-                          'Max Temp',
+                          l10n.maxTemp,
                           '${data['main']?['temp_max']?.toStringAsFixed(0) ?? '--'}°C',
                           AppColors.error),
                       Container(width: 1, height: 40, color: AppColors.border),
                       _TempCard(
                           '❄️',
-                          'Min Temp',
+                          l10n.minTemp,
                           '${data['main']?['temp_min']?.toStringAsFixed(0) ?? '--'}°C',
                           AppColors.info),
                     ]),

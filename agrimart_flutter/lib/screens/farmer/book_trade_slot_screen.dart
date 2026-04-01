@@ -3,6 +3,7 @@ import 'package:animate_do/animate_do.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/services/api_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BookTradeSlotScreen extends StatefulWidget {
   final String cropName;
@@ -76,7 +77,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
   Future<void> _submitBooking() async {
     if (_selectedDealerId == null) return;
     if (_weightCtrl.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter approximate weight (Quintals)')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.enterWeightError)));
       return;
     }
 
@@ -109,9 +110,9 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                   child: const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 48),
                 ),
                 const SizedBox(height: 24),
-                const Text('Booking Confirmed!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                Text(l10n.bookingConfirmed, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 12),
-                Text('Your physical delivery slot is confirmed for ${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}.', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary, height: 1.4)),
+                Text('${l10n.deliverySlotConfirmed} ${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}.', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary, height: 1.4)),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
@@ -121,7 +122,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                    child: const Text('Back to Dashboard', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: Text(l10n.backToDashboard, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                 )
               ]
@@ -132,17 +133,18 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isSubmitting = false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error booking slot: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${l10n.errorBookingSlot}: $e')));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Sell ${widget.cropName}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: Text('${l10n.sellPrefix} ${widget.cropName}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
@@ -156,7 +158,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                     children: [
                       const Icon(Icons.storefront_outlined, size: 64, color: AppColors.textTertiary),
                       const SizedBox(height: 16),
-                      Text('No dealers found for ${widget.cropName} in ${widget.district}.', style: const TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+                      Text(l10n.noDealersFound(widget.cropName, widget.district), style: const TextStyle(color: AppColors.textSecondary, fontSize: 16), textAlign: TextAlign.center),
                     ],
                   ),
                 )
@@ -167,7 +169,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Select Local Dealer', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textSecondary, letterSpacing: 0.5)),
+                        Text(l10n.selectLocalDealer, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textSecondary, letterSpacing: 0.5)),
                         const SizedBox(height: 12),
                         ..._dealers.map((dealer) {
                           final isSelected = dealer['supplierId'] == _selectedDealerId;
@@ -207,7 +209,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                                           children: [
                                             const Icon(Icons.verified_rounded, color: AppColors.success, size: 14),
                                             const SizedBox(width: 4),
-                                            Text('${widget.district} Verified', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+                                            Text('${widget.district} ${l10n.verifiedDistrict}', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
                                           ],
                                         )
                                       ],
@@ -217,7 +219,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text('₹$rate', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.primaryDark)),
-                                      const Text('/ quintal', style: TextStyle(fontSize: 10, color: AppColors.textTertiary, fontWeight: FontWeight.bold)),
+                                      Text(l10n.perQuintalShort, style: const TextStyle(fontSize: 10, color: AppColors.textTertiary, fontWeight: FontWeight.bold)),
                                     ],
                                   )
                                 ],
@@ -226,7 +228,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                           );
                         }).toList(),
                         const SizedBox(height: 32),
-                        const Text('Booking Details', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textSecondary, letterSpacing: 0.5)),
+                        Text(l10n.bookingDetails, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textSecondary, letterSpacing: 0.5)),
                         const SizedBox(height: 12),
                         Container(
                           padding: const EdgeInsets.all(20),
@@ -238,7 +240,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Approximate Weight (Quintals)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+                              Text(l10n.approxWeightQuintals, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
                               const SizedBox(height: 8),
                               TextField(
                                 controller: _weightCtrl,
@@ -252,7 +254,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              const Text('Drop-off Date', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+                              Text(l10n.dropOffDate, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
                               const SizedBox(height: 8),
                               GestureDetector(
                                 onTap: () => _selectDate(context),
@@ -269,7 +271,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              const Text('Additional Notes (Optional)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+                              Text(l10n.additionalNotesOptional, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
                               const SizedBox(height: 8),
                               TextField(
                                 controller: _notesCtrl,
@@ -306,7 +308,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
               ),
               child: _isSubmitting 
                 ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
-                : const Text('Confirm Booking Slot', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                : Text(l10n.confirmBookingSlot, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
             )
           )
         )

@@ -5,8 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../data/services/api_service.dart';
 import '../../data/providers/auth_provider.dart';
-import '../../data/providers/language_provider.dart';
+import '../../core/providers/locale_provider.dart';
 import '../../services/voice_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -62,7 +63,8 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
   Future<void> _send(String msg) async {
     if (msg.trim().isEmpty) return;
     _ctrl.clear();
-    final lang = ref.read(languageProvider);
+    final locale = ref.read(localeProvider);
+    final langName = locale.languageCode == 'hi' ? 'Hindi' : locale.languageCode == 'mr' ? 'Marathi' : 'English';
     
     setState(() {
       _messages.add({'role': 'user', 'content': msg, 'id': DateTime.now().millisecondsSinceEpoch.toString()});
@@ -77,7 +79,7 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
       final res = await ApiService.instance.kisanChat(
           message: msg,
           history: history.length > 1 ? history.sublist(0, history.length - 1) : [],
-          language: lang
+          language: langName
       );
       
       if (mounted) {
@@ -112,9 +114,9 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
   }
 
   void _speak(String text, String id) async {
-    final lang = ref.read(languageProvider);
+    final locale = ref.read(localeProvider);
     setState(() => _currentlySpeakingId = id);
-    await VoiceService.instance.speak(text, languageCode: lang);
+    await VoiceService.instance.speak(text, languageCode: locale.languageCode);
     if (mounted) setState(() => _currentlySpeakingId = null);
   }
 
@@ -146,22 +148,22 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
             duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
     });
   }
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Row(children: [
-          Text('🤖', style: TextStyle(fontSize: 22)),
-          SizedBox(width: 8),
+        title: Row(children: [
+          const Text('🤖', style: TextStyle(fontSize: 22)),
+          const SizedBox(width: 8),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Kisan AI',
-                style: TextStyle(
+            Text(l10n.kisanAi,
+                style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Colors.white)),
-            Text('मराठी | हिंदी | English',
+            const Text('मराठी | हिंदी | English',
                 style: TextStyle(fontSize: 11, color: Colors.white70)),
           ]),
         ]),
@@ -311,7 +313,7 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
                 child: TextField(
               controller: _ctrl,
               decoration: const InputDecoration(
-                  hintText: 'Ask anything in Marathi, Hindi or English…',
+                  hintText: 'Ask in Marathi, Hindi or English…',
                   border: InputBorder.none,
                   filled: false),
               maxLines: null,

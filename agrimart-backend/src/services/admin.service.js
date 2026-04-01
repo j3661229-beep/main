@@ -15,13 +15,14 @@ const adminLogin = async ({ phone, password }) => {
 // Dashboard stats
 const getDashboardStats = async () => {
     const [
-        totalUsers, totalFarmers, totalSuppliers,
+        totalUsers, totalFarmers, totalSuppliers, totalDealers,
         totalOrders, totalRevenue, pendingOrders,
         pendingSuppliers, totalProducts, newUsersThisMonth,
     ] = await Promise.all([
         prisma.user.count({ where: { isActive: true } }),
         prisma.user.count({ where: { role: 'FARMER', isActive: true } }),
         prisma.user.count({ where: { role: 'SUPPLIER', isActive: true } }),
+        prisma.user.count({ where: { role: 'DEALER', isActive: true } }),
         prisma.order.count(),
         prisma.payment.aggregate({ where: { status: 'SUCCESS' }, _sum: { amount: true } }),
         prisma.order.count({ where: { status: { in: ['PENDING', 'PAYMENT_CONFIRMED'] } } }),
@@ -47,7 +48,7 @@ const getDashboardStats = async () => {
     );
 
     return {
-        stats: { totalUsers, totalFarmers, totalSuppliers, totalOrders, totalRevenue: totalRevenue._sum.amount || 0, pendingOrders, pendingSuppliers, totalProducts, newUsersThisMonth },
+        stats: { totalUsers, totalFarmers, totalSuppliers, totalDealers, totalOrders, totalRevenue: totalRevenue._sum.amount || 0, pendingOrders, pendingSuppliers, totalProducts, newUsersThisMonth },
         recentOrders,
         revenueTrend: trend.reverse(),
     };
