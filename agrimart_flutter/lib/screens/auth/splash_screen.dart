@@ -47,7 +47,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
   void _navigate() {
     final auth = ref.read(authProvider);
     if (auth.isAuthenticated && auth.user != null) {
-      context.go(auth.user!.isFarmer ? '/farmer' : '/supplier');
+      if (auth.user!.isFarmer) {
+        context.go('/farmer');
+      } else if (auth.user!.isDealer) {
+        context.go('/dealer');
+      } else {
+        context.go('/supplier');
+      }
     } else {
       context.go('/auth/role');
     }

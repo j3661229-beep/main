@@ -34,6 +34,11 @@ export type Farmer = $Result.DefaultSelection<Prisma.$FarmerPayload>
  */
 export type Supplier = $Result.DefaultSelection<Prisma.$SupplierPayload>
 /**
+ * Model Dealer
+ * 
+ */
+export type Dealer = $Result.DefaultSelection<Prisma.$DealerPayload>
+/**
  * Model Product
  * 
  */
@@ -111,6 +116,7 @@ export namespace $Enums {
   export const UserRole: {
   FARMER: 'FARMER',
   SUPPLIER: 'SUPPLIER',
+  DEALER: 'DEALER',
   ADMIN: 'ADMIN'
 };
 
@@ -346,6 +352,16 @@ export class PrismaClient<
     * ```
     */
   get supplier(): Prisma.SupplierDelegate<ExtArgs>;
+
+  /**
+   * `prisma.dealer`: Exposes CRUD operations for the **Dealer** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Dealers
+    * const dealers = await prisma.dealer.findMany()
+    * ```
+    */
+  get dealer(): Prisma.DealerDelegate<ExtArgs>;
 
   /**
    * `prisma.product`: Exposes CRUD operations for the **Product** model.
@@ -931,6 +947,7 @@ export namespace Prisma {
     Session: 'Session',
     Farmer: 'Farmer',
     Supplier: 'Supplier',
+    Dealer: 'Dealer',
     Product: 'Product',
     Cart: 'Cart',
     CartItem: 'CartItem',
@@ -960,7 +977,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "session" | "farmer" | "supplier" | "product" | "cart" | "cartItem" | "order" | "orderItem" | "payment" | "review" | "soilReport" | "priceAlert" | "notification" | "governmentScheme" | "fCMToken" | "dealerCropRate" | "tradeBooking"
+      modelProps: "user" | "session" | "farmer" | "supplier" | "dealer" | "product" | "cart" | "cartItem" | "order" | "orderItem" | "payment" | "review" | "soilReport" | "priceAlert" | "notification" | "governmentScheme" | "fCMToken" | "dealerCropRate" | "tradeBooking"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1241,6 +1258,76 @@ export namespace Prisma {
           count: {
             args: Prisma.SupplierCountArgs<ExtArgs>
             result: $Utils.Optional<SupplierCountAggregateOutputType> | number
+          }
+        }
+      }
+      Dealer: {
+        payload: Prisma.$DealerPayload<ExtArgs>
+        fields: Prisma.DealerFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DealerFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealerPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DealerFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealerPayload>
+          }
+          findFirst: {
+            args: Prisma.DealerFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealerPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DealerFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealerPayload>
+          }
+          findMany: {
+            args: Prisma.DealerFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealerPayload>[]
+          }
+          create: {
+            args: Prisma.DealerCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealerPayload>
+          }
+          createMany: {
+            args: Prisma.DealerCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DealerCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealerPayload>[]
+          }
+          delete: {
+            args: Prisma.DealerDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealerPayload>
+          }
+          update: {
+            args: Prisma.DealerUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealerPayload>
+          }
+          deleteMany: {
+            args: Prisma.DealerDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DealerUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.DealerUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealerPayload>
+          }
+          aggregate: {
+            args: Prisma.DealerAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDealer>
+          }
+          groupBy: {
+            args: Prisma.DealerGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DealerGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DealerCountArgs<ExtArgs>
+            result: $Utils.Optional<DealerCountAggregateOutputType> | number
           }
         }
       }
@@ -2485,15 +2572,11 @@ export namespace Prisma {
   export type SupplierCountOutputType = {
     products: number
     orderItems: number
-    cropRates: number
-    tradeBookings: number
   }
 
   export type SupplierCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     products?: boolean | SupplierCountOutputTypeCountProductsArgs
     orderItems?: boolean | SupplierCountOutputTypeCountOrderItemsArgs
-    cropRates?: boolean | SupplierCountOutputTypeCountCropRatesArgs
-    tradeBookings?: boolean | SupplierCountOutputTypeCountTradeBookingsArgs
   }
 
   // Custom InputTypes
@@ -2521,17 +2604,43 @@ export namespace Prisma {
     where?: OrderItemWhereInput
   }
 
+
   /**
-   * SupplierCountOutputType without action
+   * Count Type DealerCountOutputType
    */
-  export type SupplierCountOutputTypeCountCropRatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+
+  export type DealerCountOutputType = {
+    cropRates: number
+    tradeBookings: number
+  }
+
+  export type DealerCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    cropRates?: boolean | DealerCountOutputTypeCountCropRatesArgs
+    tradeBookings?: boolean | DealerCountOutputTypeCountTradeBookingsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * DealerCountOutputType without action
+   */
+  export type DealerCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DealerCountOutputType
+     */
+    select?: DealerCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * DealerCountOutputType without action
+   */
+  export type DealerCountOutputTypeCountCropRatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DealerCropRateWhereInput
   }
 
   /**
-   * SupplierCountOutputType without action
+   * DealerCountOutputType without action
    */
-  export type SupplierCountOutputTypeCountTradeBookingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DealerCountOutputTypeCountTradeBookingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TradeBookingWhereInput
   }
 
@@ -2873,6 +2982,7 @@ export namespace Prisma {
     updatedAt?: boolean
     farmer?: boolean | User$farmerArgs<ExtArgs>
     supplier?: boolean | User$supplierArgs<ExtArgs>
+    dealer?: boolean | User$dealerArgs<ExtArgs>
     notifications?: boolean | User$notificationsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -2911,6 +3021,7 @@ export namespace Prisma {
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     farmer?: boolean | User$farmerArgs<ExtArgs>
     supplier?: boolean | User$supplierArgs<ExtArgs>
+    dealer?: boolean | User$dealerArgs<ExtArgs>
     notifications?: boolean | User$notificationsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -2922,6 +3033,7 @@ export namespace Prisma {
     objects: {
       farmer: Prisma.$FarmerPayload<ExtArgs> | null
       supplier: Prisma.$SupplierPayload<ExtArgs> | null
+      dealer: Prisma.$DealerPayload<ExtArgs> | null
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
       sessions: Prisma.$SessionPayload<ExtArgs>[]
     }
@@ -3304,6 +3416,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     farmer<T extends User$farmerArgs<ExtArgs> = {}>(args?: Subset<T, User$farmerArgs<ExtArgs>>): Prisma__FarmerClient<$Result.GetResult<Prisma.$FarmerPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     supplier<T extends User$supplierArgs<ExtArgs> = {}>(args?: Subset<T, User$supplierArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    dealer<T extends User$dealerArgs<ExtArgs> = {}>(args?: Subset<T, User$dealerArgs<ExtArgs>>): Prisma__DealerClient<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     notifications<T extends User$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany"> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany"> | Null>
     /**
@@ -3688,6 +3801,21 @@ export namespace Prisma {
      */
     include?: SupplierInclude<ExtArgs> | null
     where?: SupplierWhereInput
+  }
+
+  /**
+   * User.dealer
+   */
+  export type User$dealerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Dealer
+     */
+    select?: DealerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealerInclude<ExtArgs> | null
+    where?: DealerWhereInput
   }
 
   /**
@@ -6243,8 +6371,6 @@ export namespace Prisma {
     user?: boolean | UserDefaultArgs<ExtArgs>
     products?: boolean | Supplier$productsArgs<ExtArgs>
     orderItems?: boolean | Supplier$orderItemsArgs<ExtArgs>
-    cropRates?: boolean | Supplier$cropRatesArgs<ExtArgs>
-    tradeBookings?: boolean | Supplier$tradeBookingsArgs<ExtArgs>
     _count?: boolean | SupplierCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["supplier"]>
 
@@ -6299,8 +6425,6 @@ export namespace Prisma {
     user?: boolean | UserDefaultArgs<ExtArgs>
     products?: boolean | Supplier$productsArgs<ExtArgs>
     orderItems?: boolean | Supplier$orderItemsArgs<ExtArgs>
-    cropRates?: boolean | Supplier$cropRatesArgs<ExtArgs>
-    tradeBookings?: boolean | Supplier$tradeBookingsArgs<ExtArgs>
     _count?: boolean | SupplierCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SupplierIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6313,8 +6437,6 @@ export namespace Prisma {
       user: Prisma.$UserPayload<ExtArgs>
       products: Prisma.$ProductPayload<ExtArgs>[]
       orderItems: Prisma.$OrderItemPayload<ExtArgs>[]
-      cropRates: Prisma.$DealerCropRatePayload<ExtArgs>[]
-      tradeBookings: Prisma.$TradeBookingPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6704,8 +6826,6 @@ export namespace Prisma {
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     products<T extends Supplier$productsArgs<ExtArgs> = {}>(args?: Subset<T, Supplier$productsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findMany"> | Null>
     orderItems<T extends Supplier$orderItemsArgs<ExtArgs> = {}>(args?: Subset<T, Supplier$orderItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany"> | Null>
-    cropRates<T extends Supplier$cropRatesArgs<ExtArgs> = {}>(args?: Subset<T, Supplier$cropRatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DealerCropRatePayload<ExtArgs>, T, "findMany"> | Null>
-    tradeBookings<T extends Supplier$tradeBookingsArgs<ExtArgs> = {}>(args?: Subset<T, Supplier$tradeBookingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TradeBookingPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7113,9 +7233,1118 @@ export namespace Prisma {
   }
 
   /**
-   * Supplier.cropRates
+   * Supplier without action
    */
-  export type Supplier$cropRatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SupplierDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Dealer
+   */
+
+  export type AggregateDealer = {
+    _count: DealerCountAggregateOutputType | null
+    _avg: DealerAvgAggregateOutputType | null
+    _sum: DealerSumAggregateOutputType | null
+    _min: DealerMinAggregateOutputType | null
+    _max: DealerMaxAggregateOutputType | null
+  }
+
+  export type DealerAvgAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+    rating: number | null
+    totalRatings: number | null
+  }
+
+  export type DealerSumAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+    rating: number | null
+    totalRatings: number | null
+  }
+
+  export type DealerMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    businessName: string | null
+    address: string | null
+    district: string | null
+    state: string | null
+    pincode: string | null
+    latitude: number | null
+    longitude: number | null
+    isVerified: boolean | null
+    verifiedAt: Date | null
+    rating: number | null
+    totalRatings: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DealerMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    businessName: string | null
+    address: string | null
+    district: string | null
+    state: string | null
+    pincode: string | null
+    latitude: number | null
+    longitude: number | null
+    isVerified: boolean | null
+    verifiedAt: Date | null
+    rating: number | null
+    totalRatings: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DealerCountAggregateOutputType = {
+    id: number
+    userId: number
+    businessName: number
+    address: number
+    district: number
+    state: number
+    pincode: number
+    latitude: number
+    longitude: number
+    isVerified: number
+    verifiedAt: number
+    rating: number
+    totalRatings: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DealerAvgAggregateInputType = {
+    latitude?: true
+    longitude?: true
+    rating?: true
+    totalRatings?: true
+  }
+
+  export type DealerSumAggregateInputType = {
+    latitude?: true
+    longitude?: true
+    rating?: true
+    totalRatings?: true
+  }
+
+  export type DealerMinAggregateInputType = {
+    id?: true
+    userId?: true
+    businessName?: true
+    address?: true
+    district?: true
+    state?: true
+    pincode?: true
+    latitude?: true
+    longitude?: true
+    isVerified?: true
+    verifiedAt?: true
+    rating?: true
+    totalRatings?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DealerMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    businessName?: true
+    address?: true
+    district?: true
+    state?: true
+    pincode?: true
+    latitude?: true
+    longitude?: true
+    isVerified?: true
+    verifiedAt?: true
+    rating?: true
+    totalRatings?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DealerCountAggregateInputType = {
+    id?: true
+    userId?: true
+    businessName?: true
+    address?: true
+    district?: true
+    state?: true
+    pincode?: true
+    latitude?: true
+    longitude?: true
+    isVerified?: true
+    verifiedAt?: true
+    rating?: true
+    totalRatings?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DealerAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Dealer to aggregate.
+     */
+    where?: DealerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Dealers to fetch.
+     */
+    orderBy?: DealerOrderByWithRelationInput | DealerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DealerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Dealers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Dealers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Dealers
+    **/
+    _count?: true | DealerCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DealerAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DealerSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DealerMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DealerMaxAggregateInputType
+  }
+
+  export type GetDealerAggregateType<T extends DealerAggregateArgs> = {
+        [P in keyof T & keyof AggregateDealer]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDealer[P]>
+      : GetScalarType<T[P], AggregateDealer[P]>
+  }
+
+
+
+
+  export type DealerGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DealerWhereInput
+    orderBy?: DealerOrderByWithAggregationInput | DealerOrderByWithAggregationInput[]
+    by: DealerScalarFieldEnum[] | DealerScalarFieldEnum
+    having?: DealerScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DealerCountAggregateInputType | true
+    _avg?: DealerAvgAggregateInputType
+    _sum?: DealerSumAggregateInputType
+    _min?: DealerMinAggregateInputType
+    _max?: DealerMaxAggregateInputType
+  }
+
+  export type DealerGroupByOutputType = {
+    id: string
+    userId: string
+    businessName: string
+    address: string
+    district: string
+    state: string
+    pincode: string
+    latitude: number | null
+    longitude: number | null
+    isVerified: boolean
+    verifiedAt: Date | null
+    rating: number
+    totalRatings: number
+    createdAt: Date
+    updatedAt: Date
+    _count: DealerCountAggregateOutputType | null
+    _avg: DealerAvgAggregateOutputType | null
+    _sum: DealerSumAggregateOutputType | null
+    _min: DealerMinAggregateOutputType | null
+    _max: DealerMaxAggregateOutputType | null
+  }
+
+  type GetDealerGroupByPayload<T extends DealerGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DealerGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DealerGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DealerGroupByOutputType[P]>
+            : GetScalarType<T[P], DealerGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DealerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    businessName?: boolean
+    address?: boolean
+    district?: boolean
+    state?: boolean
+    pincode?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    isVerified?: boolean
+    verifiedAt?: boolean
+    rating?: boolean
+    totalRatings?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    cropRates?: boolean | Dealer$cropRatesArgs<ExtArgs>
+    tradeBookings?: boolean | Dealer$tradeBookingsArgs<ExtArgs>
+    _count?: boolean | DealerCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["dealer"]>
+
+  export type DealerSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    businessName?: boolean
+    address?: boolean
+    district?: boolean
+    state?: boolean
+    pincode?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    isVerified?: boolean
+    verifiedAt?: boolean
+    rating?: boolean
+    totalRatings?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["dealer"]>
+
+  export type DealerSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    businessName?: boolean
+    address?: boolean
+    district?: boolean
+    state?: boolean
+    pincode?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    isVerified?: boolean
+    verifiedAt?: boolean
+    rating?: boolean
+    totalRatings?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DealerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    cropRates?: boolean | Dealer$cropRatesArgs<ExtArgs>
+    tradeBookings?: boolean | Dealer$tradeBookingsArgs<ExtArgs>
+    _count?: boolean | DealerCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type DealerIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $DealerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Dealer"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      cropRates: Prisma.$DealerCropRatePayload<ExtArgs>[]
+      tradeBookings: Prisma.$TradeBookingPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      businessName: string
+      address: string
+      district: string
+      state: string
+      pincode: string
+      latitude: number | null
+      longitude: number | null
+      isVerified: boolean
+      verifiedAt: Date | null
+      rating: number
+      totalRatings: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["dealer"]>
+    composites: {}
+  }
+
+  type DealerGetPayload<S extends boolean | null | undefined | DealerDefaultArgs> = $Result.GetResult<Prisma.$DealerPayload, S>
+
+  type DealerCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<DealerFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: DealerCountAggregateInputType | true
+    }
+
+  export interface DealerDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Dealer'], meta: { name: 'Dealer' } }
+    /**
+     * Find zero or one Dealer that matches the filter.
+     * @param {DealerFindUniqueArgs} args - Arguments to find a Dealer
+     * @example
+     * // Get one Dealer
+     * const dealer = await prisma.dealer.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DealerFindUniqueArgs>(args: SelectSubset<T, DealerFindUniqueArgs<ExtArgs>>): Prisma__DealerClient<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one Dealer that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {DealerFindUniqueOrThrowArgs} args - Arguments to find a Dealer
+     * @example
+     * // Get one Dealer
+     * const dealer = await prisma.dealer.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DealerFindUniqueOrThrowArgs>(args: SelectSubset<T, DealerFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DealerClient<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first Dealer that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealerFindFirstArgs} args - Arguments to find a Dealer
+     * @example
+     * // Get one Dealer
+     * const dealer = await prisma.dealer.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DealerFindFirstArgs>(args?: SelectSubset<T, DealerFindFirstArgs<ExtArgs>>): Prisma__DealerClient<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first Dealer that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealerFindFirstOrThrowArgs} args - Arguments to find a Dealer
+     * @example
+     * // Get one Dealer
+     * const dealer = await prisma.dealer.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DealerFindFirstOrThrowArgs>(args?: SelectSubset<T, DealerFindFirstOrThrowArgs<ExtArgs>>): Prisma__DealerClient<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more Dealers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealerFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Dealers
+     * const dealers = await prisma.dealer.findMany()
+     * 
+     * // Get first 10 Dealers
+     * const dealers = await prisma.dealer.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const dealerWithIdOnly = await prisma.dealer.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DealerFindManyArgs>(args?: SelectSubset<T, DealerFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a Dealer.
+     * @param {DealerCreateArgs} args - Arguments to create a Dealer.
+     * @example
+     * // Create one Dealer
+     * const Dealer = await prisma.dealer.create({
+     *   data: {
+     *     // ... data to create a Dealer
+     *   }
+     * })
+     * 
+     */
+    create<T extends DealerCreateArgs>(args: SelectSubset<T, DealerCreateArgs<ExtArgs>>): Prisma__DealerClient<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many Dealers.
+     * @param {DealerCreateManyArgs} args - Arguments to create many Dealers.
+     * @example
+     * // Create many Dealers
+     * const dealer = await prisma.dealer.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DealerCreateManyArgs>(args?: SelectSubset<T, DealerCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Dealers and returns the data saved in the database.
+     * @param {DealerCreateManyAndReturnArgs} args - Arguments to create many Dealers.
+     * @example
+     * // Create many Dealers
+     * const dealer = await prisma.dealer.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Dealers and only return the `id`
+     * const dealerWithIdOnly = await prisma.dealer.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DealerCreateManyAndReturnArgs>(args?: SelectSubset<T, DealerCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a Dealer.
+     * @param {DealerDeleteArgs} args - Arguments to delete one Dealer.
+     * @example
+     * // Delete one Dealer
+     * const Dealer = await prisma.dealer.delete({
+     *   where: {
+     *     // ... filter to delete one Dealer
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DealerDeleteArgs>(args: SelectSubset<T, DealerDeleteArgs<ExtArgs>>): Prisma__DealerClient<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one Dealer.
+     * @param {DealerUpdateArgs} args - Arguments to update one Dealer.
+     * @example
+     * // Update one Dealer
+     * const dealer = await prisma.dealer.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DealerUpdateArgs>(args: SelectSubset<T, DealerUpdateArgs<ExtArgs>>): Prisma__DealerClient<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more Dealers.
+     * @param {DealerDeleteManyArgs} args - Arguments to filter Dealers to delete.
+     * @example
+     * // Delete a few Dealers
+     * const { count } = await prisma.dealer.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DealerDeleteManyArgs>(args?: SelectSubset<T, DealerDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Dealers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealerUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Dealers
+     * const dealer = await prisma.dealer.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DealerUpdateManyArgs>(args: SelectSubset<T, DealerUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Dealer.
+     * @param {DealerUpsertArgs} args - Arguments to update or create a Dealer.
+     * @example
+     * // Update or create a Dealer
+     * const dealer = await prisma.dealer.upsert({
+     *   create: {
+     *     // ... data to create a Dealer
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Dealer we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DealerUpsertArgs>(args: SelectSubset<T, DealerUpsertArgs<ExtArgs>>): Prisma__DealerClient<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of Dealers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealerCountArgs} args - Arguments to filter Dealers to count.
+     * @example
+     * // Count the number of Dealers
+     * const count = await prisma.dealer.count({
+     *   where: {
+     *     // ... the filter for the Dealers we want to count
+     *   }
+     * })
+    **/
+    count<T extends DealerCountArgs>(
+      args?: Subset<T, DealerCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DealerCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Dealer.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealerAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DealerAggregateArgs>(args: Subset<T, DealerAggregateArgs>): Prisma.PrismaPromise<GetDealerAggregateType<T>>
+
+    /**
+     * Group by Dealer.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealerGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DealerGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DealerGroupByArgs['orderBy'] }
+        : { orderBy?: DealerGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DealerGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDealerGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Dealer model
+   */
+  readonly fields: DealerFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Dealer.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DealerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    cropRates<T extends Dealer$cropRatesArgs<ExtArgs> = {}>(args?: Subset<T, Dealer$cropRatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DealerCropRatePayload<ExtArgs>, T, "findMany"> | Null>
+    tradeBookings<T extends Dealer$tradeBookingsArgs<ExtArgs> = {}>(args?: Subset<T, Dealer$tradeBookingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TradeBookingPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Dealer model
+   */ 
+  interface DealerFieldRefs {
+    readonly id: FieldRef<"Dealer", 'String'>
+    readonly userId: FieldRef<"Dealer", 'String'>
+    readonly businessName: FieldRef<"Dealer", 'String'>
+    readonly address: FieldRef<"Dealer", 'String'>
+    readonly district: FieldRef<"Dealer", 'String'>
+    readonly state: FieldRef<"Dealer", 'String'>
+    readonly pincode: FieldRef<"Dealer", 'String'>
+    readonly latitude: FieldRef<"Dealer", 'Float'>
+    readonly longitude: FieldRef<"Dealer", 'Float'>
+    readonly isVerified: FieldRef<"Dealer", 'Boolean'>
+    readonly verifiedAt: FieldRef<"Dealer", 'DateTime'>
+    readonly rating: FieldRef<"Dealer", 'Float'>
+    readonly totalRatings: FieldRef<"Dealer", 'Int'>
+    readonly createdAt: FieldRef<"Dealer", 'DateTime'>
+    readonly updatedAt: FieldRef<"Dealer", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Dealer findUnique
+   */
+  export type DealerFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Dealer
+     */
+    select?: DealerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealerInclude<ExtArgs> | null
+    /**
+     * Filter, which Dealer to fetch.
+     */
+    where: DealerWhereUniqueInput
+  }
+
+  /**
+   * Dealer findUniqueOrThrow
+   */
+  export type DealerFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Dealer
+     */
+    select?: DealerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealerInclude<ExtArgs> | null
+    /**
+     * Filter, which Dealer to fetch.
+     */
+    where: DealerWhereUniqueInput
+  }
+
+  /**
+   * Dealer findFirst
+   */
+  export type DealerFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Dealer
+     */
+    select?: DealerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealerInclude<ExtArgs> | null
+    /**
+     * Filter, which Dealer to fetch.
+     */
+    where?: DealerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Dealers to fetch.
+     */
+    orderBy?: DealerOrderByWithRelationInput | DealerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Dealers.
+     */
+    cursor?: DealerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Dealers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Dealers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Dealers.
+     */
+    distinct?: DealerScalarFieldEnum | DealerScalarFieldEnum[]
+  }
+
+  /**
+   * Dealer findFirstOrThrow
+   */
+  export type DealerFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Dealer
+     */
+    select?: DealerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealerInclude<ExtArgs> | null
+    /**
+     * Filter, which Dealer to fetch.
+     */
+    where?: DealerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Dealers to fetch.
+     */
+    orderBy?: DealerOrderByWithRelationInput | DealerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Dealers.
+     */
+    cursor?: DealerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Dealers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Dealers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Dealers.
+     */
+    distinct?: DealerScalarFieldEnum | DealerScalarFieldEnum[]
+  }
+
+  /**
+   * Dealer findMany
+   */
+  export type DealerFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Dealer
+     */
+    select?: DealerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealerInclude<ExtArgs> | null
+    /**
+     * Filter, which Dealers to fetch.
+     */
+    where?: DealerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Dealers to fetch.
+     */
+    orderBy?: DealerOrderByWithRelationInput | DealerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Dealers.
+     */
+    cursor?: DealerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Dealers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Dealers.
+     */
+    skip?: number
+    distinct?: DealerScalarFieldEnum | DealerScalarFieldEnum[]
+  }
+
+  /**
+   * Dealer create
+   */
+  export type DealerCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Dealer
+     */
+    select?: DealerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealerInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Dealer.
+     */
+    data: XOR<DealerCreateInput, DealerUncheckedCreateInput>
+  }
+
+  /**
+   * Dealer createMany
+   */
+  export type DealerCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Dealers.
+     */
+    data: DealerCreateManyInput | DealerCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Dealer createManyAndReturn
+   */
+  export type DealerCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Dealer
+     */
+    select?: DealerSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many Dealers.
+     */
+    data: DealerCreateManyInput | DealerCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealerIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Dealer update
+   */
+  export type DealerUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Dealer
+     */
+    select?: DealerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealerInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Dealer.
+     */
+    data: XOR<DealerUpdateInput, DealerUncheckedUpdateInput>
+    /**
+     * Choose, which Dealer to update.
+     */
+    where: DealerWhereUniqueInput
+  }
+
+  /**
+   * Dealer updateMany
+   */
+  export type DealerUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Dealers.
+     */
+    data: XOR<DealerUpdateManyMutationInput, DealerUncheckedUpdateManyInput>
+    /**
+     * Filter which Dealers to update
+     */
+    where?: DealerWhereInput
+  }
+
+  /**
+   * Dealer upsert
+   */
+  export type DealerUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Dealer
+     */
+    select?: DealerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealerInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Dealer to update in case it exists.
+     */
+    where: DealerWhereUniqueInput
+    /**
+     * In case the Dealer found by the `where` argument doesn't exist, create a new Dealer with this data.
+     */
+    create: XOR<DealerCreateInput, DealerUncheckedCreateInput>
+    /**
+     * In case the Dealer was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DealerUpdateInput, DealerUncheckedUpdateInput>
+  }
+
+  /**
+   * Dealer delete
+   */
+  export type DealerDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Dealer
+     */
+    select?: DealerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealerInclude<ExtArgs> | null
+    /**
+     * Filter which Dealer to delete.
+     */
+    where: DealerWhereUniqueInput
+  }
+
+  /**
+   * Dealer deleteMany
+   */
+  export type DealerDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Dealers to delete
+     */
+    where?: DealerWhereInput
+  }
+
+  /**
+   * Dealer.cropRates
+   */
+  export type Dealer$cropRatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the DealerCropRate
      */
@@ -7133,9 +8362,9 @@ export namespace Prisma {
   }
 
   /**
-   * Supplier.tradeBookings
+   * Dealer.tradeBookings
    */
-  export type Supplier$tradeBookingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Dealer$tradeBookingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the TradeBooking
      */
@@ -7153,17 +8382,17 @@ export namespace Prisma {
   }
 
   /**
-   * Supplier without action
+   * Dealer without action
    */
-  export type SupplierDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DealerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Supplier
+     * Select specific fields to fetch from the Dealer
      */
-    select?: SupplierSelect<ExtArgs> | null
+    select?: DealerSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: SupplierInclude<ExtArgs> | null
+    include?: DealerInclude<ExtArgs> | null
   }
 
 
@@ -19497,10 +20726,11 @@ export namespace Prisma {
 
   export type DealerCropRateMinAggregateOutputType = {
     id: string | null
-    supplierId: string | null
+    dealerId: string | null
     cropName: string | null
     pricePerQuintal: number | null
     district: string | null
+    state: string | null
     isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -19508,10 +20738,11 @@ export namespace Prisma {
 
   export type DealerCropRateMaxAggregateOutputType = {
     id: string | null
-    supplierId: string | null
+    dealerId: string | null
     cropName: string | null
     pricePerQuintal: number | null
     district: string | null
+    state: string | null
     isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -19519,10 +20750,11 @@ export namespace Prisma {
 
   export type DealerCropRateCountAggregateOutputType = {
     id: number
-    supplierId: number
+    dealerId: number
     cropName: number
     pricePerQuintal: number
     district: number
+    state: number
     isActive: number
     createdAt: number
     updatedAt: number
@@ -19540,10 +20772,11 @@ export namespace Prisma {
 
   export type DealerCropRateMinAggregateInputType = {
     id?: true
-    supplierId?: true
+    dealerId?: true
     cropName?: true
     pricePerQuintal?: true
     district?: true
+    state?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -19551,10 +20784,11 @@ export namespace Prisma {
 
   export type DealerCropRateMaxAggregateInputType = {
     id?: true
-    supplierId?: true
+    dealerId?: true
     cropName?: true
     pricePerQuintal?: true
     district?: true
+    state?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -19562,10 +20796,11 @@ export namespace Prisma {
 
   export type DealerCropRateCountAggregateInputType = {
     id?: true
-    supplierId?: true
+    dealerId?: true
     cropName?: true
     pricePerQuintal?: true
     district?: true
+    state?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -19660,10 +20895,11 @@ export namespace Prisma {
 
   export type DealerCropRateGroupByOutputType = {
     id: string
-    supplierId: string
+    dealerId: string
     cropName: string
     pricePerQuintal: number
     district: string
+    state: string
     isActive: boolean
     createdAt: Date
     updatedAt: Date
@@ -19690,57 +20926,61 @@ export namespace Prisma {
 
   export type DealerCropRateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    supplierId?: boolean
+    dealerId?: boolean
     cropName?: boolean
     pricePerQuintal?: boolean
     district?: boolean
+    state?: boolean
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    supplier?: boolean | SupplierDefaultArgs<ExtArgs>
+    dealer?: boolean | DealerDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["dealerCropRate"]>
 
   export type DealerCropRateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    supplierId?: boolean
+    dealerId?: boolean
     cropName?: boolean
     pricePerQuintal?: boolean
     district?: boolean
+    state?: boolean
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    supplier?: boolean | SupplierDefaultArgs<ExtArgs>
+    dealer?: boolean | DealerDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["dealerCropRate"]>
 
   export type DealerCropRateSelectScalar = {
     id?: boolean
-    supplierId?: boolean
+    dealerId?: boolean
     cropName?: boolean
     pricePerQuintal?: boolean
     district?: boolean
+    state?: boolean
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
   export type DealerCropRateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    supplier?: boolean | SupplierDefaultArgs<ExtArgs>
+    dealer?: boolean | DealerDefaultArgs<ExtArgs>
   }
   export type DealerCropRateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    supplier?: boolean | SupplierDefaultArgs<ExtArgs>
+    dealer?: boolean | DealerDefaultArgs<ExtArgs>
   }
 
   export type $DealerCropRatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "DealerCropRate"
     objects: {
-      supplier: Prisma.$SupplierPayload<ExtArgs>
+      dealer: Prisma.$DealerPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      supplierId: string
+      dealerId: string
       cropName: string
       pricePerQuintal: number
       district: string
+      state: string
       isActive: boolean
       createdAt: Date
       updatedAt: Date
@@ -20108,7 +21348,7 @@ export namespace Prisma {
    */
   export interface Prisma__DealerCropRateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    supplier<T extends SupplierDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SupplierDefaultArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    dealer<T extends DealerDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DealerDefaultArgs<ExtArgs>>): Prisma__DealerClient<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -20139,10 +21379,11 @@ export namespace Prisma {
    */ 
   interface DealerCropRateFieldRefs {
     readonly id: FieldRef<"DealerCropRate", 'String'>
-    readonly supplierId: FieldRef<"DealerCropRate", 'String'>
+    readonly dealerId: FieldRef<"DealerCropRate", 'String'>
     readonly cropName: FieldRef<"DealerCropRate", 'String'>
     readonly pricePerQuintal: FieldRef<"DealerCropRate", 'Float'>
     readonly district: FieldRef<"DealerCropRate", 'String'>
+    readonly state: FieldRef<"DealerCropRate", 'String'>
     readonly isActive: FieldRef<"DealerCropRate", 'Boolean'>
     readonly createdAt: FieldRef<"DealerCropRate", 'DateTime'>
     readonly updatedAt: FieldRef<"DealerCropRate", 'DateTime'>
@@ -20503,7 +21744,7 @@ export namespace Prisma {
   export type TradeBookingMinAggregateOutputType = {
     id: string | null
     farmerId: string | null
-    supplierId: string | null
+    dealerId: string | null
     cropName: string | null
     approxQuintals: number | null
     pricePerQuintal: number | null
@@ -20517,7 +21758,7 @@ export namespace Prisma {
   export type TradeBookingMaxAggregateOutputType = {
     id: string | null
     farmerId: string | null
-    supplierId: string | null
+    dealerId: string | null
     cropName: string | null
     approxQuintals: number | null
     pricePerQuintal: number | null
@@ -20531,7 +21772,7 @@ export namespace Prisma {
   export type TradeBookingCountAggregateOutputType = {
     id: number
     farmerId: number
-    supplierId: number
+    dealerId: number
     cropName: number
     approxQuintals: number
     pricePerQuintal: number
@@ -20557,7 +21798,7 @@ export namespace Prisma {
   export type TradeBookingMinAggregateInputType = {
     id?: true
     farmerId?: true
-    supplierId?: true
+    dealerId?: true
     cropName?: true
     approxQuintals?: true
     pricePerQuintal?: true
@@ -20571,7 +21812,7 @@ export namespace Prisma {
   export type TradeBookingMaxAggregateInputType = {
     id?: true
     farmerId?: true
-    supplierId?: true
+    dealerId?: true
     cropName?: true
     approxQuintals?: true
     pricePerQuintal?: true
@@ -20585,7 +21826,7 @@ export namespace Prisma {
   export type TradeBookingCountAggregateInputType = {
     id?: true
     farmerId?: true
-    supplierId?: true
+    dealerId?: true
     cropName?: true
     approxQuintals?: true
     pricePerQuintal?: true
@@ -20686,7 +21927,7 @@ export namespace Prisma {
   export type TradeBookingGroupByOutputType = {
     id: string
     farmerId: string
-    supplierId: string
+    dealerId: string
     cropName: string
     approxQuintals: number
     pricePerQuintal: number
@@ -20719,7 +21960,7 @@ export namespace Prisma {
   export type TradeBookingSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     farmerId?: boolean
-    supplierId?: boolean
+    dealerId?: boolean
     cropName?: boolean
     approxQuintals?: boolean
     pricePerQuintal?: boolean
@@ -20729,13 +21970,13 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
-    supplier?: boolean | SupplierDefaultArgs<ExtArgs>
+    dealer?: boolean | DealerDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["tradeBooking"]>
 
   export type TradeBookingSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     farmerId?: boolean
-    supplierId?: boolean
+    dealerId?: boolean
     cropName?: boolean
     approxQuintals?: boolean
     pricePerQuintal?: boolean
@@ -20745,13 +21986,13 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
-    supplier?: boolean | SupplierDefaultArgs<ExtArgs>
+    dealer?: boolean | DealerDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["tradeBooking"]>
 
   export type TradeBookingSelectScalar = {
     id?: boolean
     farmerId?: boolean
-    supplierId?: boolean
+    dealerId?: boolean
     cropName?: boolean
     approxQuintals?: boolean
     pricePerQuintal?: boolean
@@ -20764,23 +22005,23 @@ export namespace Prisma {
 
   export type TradeBookingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
-    supplier?: boolean | SupplierDefaultArgs<ExtArgs>
+    dealer?: boolean | DealerDefaultArgs<ExtArgs>
   }
   export type TradeBookingIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
-    supplier?: boolean | SupplierDefaultArgs<ExtArgs>
+    dealer?: boolean | DealerDefaultArgs<ExtArgs>
   }
 
   export type $TradeBookingPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "TradeBooking"
     objects: {
       farmer: Prisma.$FarmerPayload<ExtArgs>
-      supplier: Prisma.$SupplierPayload<ExtArgs>
+      dealer: Prisma.$DealerPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       farmerId: string
-      supplierId: string
+      dealerId: string
       cropName: string
       approxQuintals: number
       pricePerQuintal: number
@@ -21154,7 +22395,7 @@ export namespace Prisma {
   export interface Prisma__TradeBookingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     farmer<T extends FarmerDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FarmerDefaultArgs<ExtArgs>>): Prisma__FarmerClient<$Result.GetResult<Prisma.$FarmerPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    supplier<T extends SupplierDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SupplierDefaultArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    dealer<T extends DealerDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DealerDefaultArgs<ExtArgs>>): Prisma__DealerClient<$Result.GetResult<Prisma.$DealerPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -21186,7 +22427,7 @@ export namespace Prisma {
   interface TradeBookingFieldRefs {
     readonly id: FieldRef<"TradeBooking", 'String'>
     readonly farmerId: FieldRef<"TradeBooking", 'String'>
-    readonly supplierId: FieldRef<"TradeBooking", 'String'>
+    readonly dealerId: FieldRef<"TradeBooking", 'String'>
     readonly cropName: FieldRef<"TradeBooking", 'String'>
     readonly approxQuintals: FieldRef<"TradeBooking", 'Float'>
     readonly pricePerQuintal: FieldRef<"TradeBooking", 'Float'>
@@ -21619,6 +22860,27 @@ export namespace Prisma {
   export type SupplierScalarFieldEnum = (typeof SupplierScalarFieldEnum)[keyof typeof SupplierScalarFieldEnum]
 
 
+  export const DealerScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    businessName: 'businessName',
+    address: 'address',
+    district: 'district',
+    state: 'state',
+    pincode: 'pincode',
+    latitude: 'latitude',
+    longitude: 'longitude',
+    isVerified: 'isVerified',
+    verifiedAt: 'verifiedAt',
+    rating: 'rating',
+    totalRatings: 'totalRatings',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DealerScalarFieldEnum = (typeof DealerScalarFieldEnum)[keyof typeof DealerScalarFieldEnum]
+
+
   export const ProductScalarFieldEnum: {
     id: 'id',
     supplierId: 'supplierId',
@@ -21813,10 +23075,11 @@ export namespace Prisma {
 
   export const DealerCropRateScalarFieldEnum: {
     id: 'id',
-    supplierId: 'supplierId',
+    dealerId: 'dealerId',
     cropName: 'cropName',
     pricePerQuintal: 'pricePerQuintal',
     district: 'district',
+    state: 'state',
     isActive: 'isActive',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -21828,7 +23091,7 @@ export namespace Prisma {
   export const TradeBookingScalarFieldEnum: {
     id: 'id',
     farmerId: 'farmerId',
-    supplierId: 'supplierId',
+    dealerId: 'dealerId',
     cropName: 'cropName',
     approxQuintals: 'approxQuintals',
     pricePerQuintal: 'pricePerQuintal',
@@ -22049,6 +23312,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     farmer?: XOR<FarmerNullableRelationFilter, FarmerWhereInput> | null
     supplier?: XOR<SupplierNullableRelationFilter, SupplierWhereInput> | null
+    dealer?: XOR<DealerNullableRelationFilter, DealerWhereInput> | null
     notifications?: NotificationListRelationFilter
     sessions?: SessionListRelationFilter
   }
@@ -22068,6 +23332,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     farmer?: FarmerOrderByWithRelationInput
     supplier?: SupplierOrderByWithRelationInput
+    dealer?: DealerOrderByWithRelationInput
     notifications?: NotificationOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
   }
@@ -22090,6 +23355,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     farmer?: XOR<FarmerNullableRelationFilter, FarmerWhereInput> | null
     supplier?: XOR<SupplierNullableRelationFilter, SupplierWhereInput> | null
+    dealer?: XOR<DealerNullableRelationFilter, DealerWhereInput> | null
     notifications?: NotificationListRelationFilter
     sessions?: SessionListRelationFilter
   }, "id" | "phone" | "email" | "googleId">
@@ -22344,8 +23610,6 @@ export namespace Prisma {
     user?: XOR<UserRelationFilter, UserWhereInput>
     products?: ProductListRelationFilter
     orderItems?: OrderItemListRelationFilter
-    cropRates?: DealerCropRateListRelationFilter
-    tradeBookings?: TradeBookingListRelationFilter
   }
 
   export type SupplierOrderByWithRelationInput = {
@@ -22372,8 +23636,6 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     products?: ProductOrderByRelationAggregateInput
     orderItems?: OrderItemOrderByRelationAggregateInput
-    cropRates?: DealerCropRateOrderByRelationAggregateInput
-    tradeBookings?: TradeBookingOrderByRelationAggregateInput
   }
 
   export type SupplierWhereUniqueInput = Prisma.AtLeast<{
@@ -22403,8 +23665,6 @@ export namespace Prisma {
     user?: XOR<UserRelationFilter, UserWhereInput>
     products?: ProductListRelationFilter
     orderItems?: OrderItemListRelationFilter
-    cropRates?: DealerCropRateListRelationFilter
-    tradeBookings?: TradeBookingListRelationFilter
   }, "id" | "userId">
 
   export type SupplierOrderByWithAggregationInput = {
@@ -22459,6 +23719,119 @@ export namespace Prisma {
     ifscCode?: StringNullableWithAggregatesFilter<"Supplier"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Supplier"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Supplier"> | Date | string
+  }
+
+  export type DealerWhereInput = {
+    AND?: DealerWhereInput | DealerWhereInput[]
+    OR?: DealerWhereInput[]
+    NOT?: DealerWhereInput | DealerWhereInput[]
+    id?: StringFilter<"Dealer"> | string
+    userId?: StringFilter<"Dealer"> | string
+    businessName?: StringFilter<"Dealer"> | string
+    address?: StringFilter<"Dealer"> | string
+    district?: StringFilter<"Dealer"> | string
+    state?: StringFilter<"Dealer"> | string
+    pincode?: StringFilter<"Dealer"> | string
+    latitude?: FloatNullableFilter<"Dealer"> | number | null
+    longitude?: FloatNullableFilter<"Dealer"> | number | null
+    isVerified?: BoolFilter<"Dealer"> | boolean
+    verifiedAt?: DateTimeNullableFilter<"Dealer"> | Date | string | null
+    rating?: FloatFilter<"Dealer"> | number
+    totalRatings?: IntFilter<"Dealer"> | number
+    createdAt?: DateTimeFilter<"Dealer"> | Date | string
+    updatedAt?: DateTimeFilter<"Dealer"> | Date | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+    cropRates?: DealerCropRateListRelationFilter
+    tradeBookings?: TradeBookingListRelationFilter
+  }
+
+  export type DealerOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    businessName?: SortOrder
+    address?: SortOrder
+    district?: SortOrder
+    state?: SortOrder
+    pincode?: SortOrder
+    latitude?: SortOrderInput | SortOrder
+    longitude?: SortOrderInput | SortOrder
+    isVerified?: SortOrder
+    verifiedAt?: SortOrderInput | SortOrder
+    rating?: SortOrder
+    totalRatings?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    cropRates?: DealerCropRateOrderByRelationAggregateInput
+    tradeBookings?: TradeBookingOrderByRelationAggregateInput
+  }
+
+  export type DealerWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId?: string
+    AND?: DealerWhereInput | DealerWhereInput[]
+    OR?: DealerWhereInput[]
+    NOT?: DealerWhereInput | DealerWhereInput[]
+    businessName?: StringFilter<"Dealer"> | string
+    address?: StringFilter<"Dealer"> | string
+    district?: StringFilter<"Dealer"> | string
+    state?: StringFilter<"Dealer"> | string
+    pincode?: StringFilter<"Dealer"> | string
+    latitude?: FloatNullableFilter<"Dealer"> | number | null
+    longitude?: FloatNullableFilter<"Dealer"> | number | null
+    isVerified?: BoolFilter<"Dealer"> | boolean
+    verifiedAt?: DateTimeNullableFilter<"Dealer"> | Date | string | null
+    rating?: FloatFilter<"Dealer"> | number
+    totalRatings?: IntFilter<"Dealer"> | number
+    createdAt?: DateTimeFilter<"Dealer"> | Date | string
+    updatedAt?: DateTimeFilter<"Dealer"> | Date | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+    cropRates?: DealerCropRateListRelationFilter
+    tradeBookings?: TradeBookingListRelationFilter
+  }, "id" | "userId">
+
+  export type DealerOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    businessName?: SortOrder
+    address?: SortOrder
+    district?: SortOrder
+    state?: SortOrder
+    pincode?: SortOrder
+    latitude?: SortOrderInput | SortOrder
+    longitude?: SortOrderInput | SortOrder
+    isVerified?: SortOrder
+    verifiedAt?: SortOrderInput | SortOrder
+    rating?: SortOrder
+    totalRatings?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DealerCountOrderByAggregateInput
+    _avg?: DealerAvgOrderByAggregateInput
+    _max?: DealerMaxOrderByAggregateInput
+    _min?: DealerMinOrderByAggregateInput
+    _sum?: DealerSumOrderByAggregateInput
+  }
+
+  export type DealerScalarWhereWithAggregatesInput = {
+    AND?: DealerScalarWhereWithAggregatesInput | DealerScalarWhereWithAggregatesInput[]
+    OR?: DealerScalarWhereWithAggregatesInput[]
+    NOT?: DealerScalarWhereWithAggregatesInput | DealerScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Dealer"> | string
+    userId?: StringWithAggregatesFilter<"Dealer"> | string
+    businessName?: StringWithAggregatesFilter<"Dealer"> | string
+    address?: StringWithAggregatesFilter<"Dealer"> | string
+    district?: StringWithAggregatesFilter<"Dealer"> | string
+    state?: StringWithAggregatesFilter<"Dealer"> | string
+    pincode?: StringWithAggregatesFilter<"Dealer"> | string
+    latitude?: FloatNullableWithAggregatesFilter<"Dealer"> | number | null
+    longitude?: FloatNullableWithAggregatesFilter<"Dealer"> | number | null
+    isVerified?: BoolWithAggregatesFilter<"Dealer"> | boolean
+    verifiedAt?: DateTimeNullableWithAggregatesFilter<"Dealer"> | Date | string | null
+    rating?: FloatWithAggregatesFilter<"Dealer"> | number
+    totalRatings?: IntWithAggregatesFilter<"Dealer"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"Dealer"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Dealer"> | Date | string
   }
 
   export type ProductWhereInput = {
@@ -23472,50 +24845,54 @@ export namespace Prisma {
     OR?: DealerCropRateWhereInput[]
     NOT?: DealerCropRateWhereInput | DealerCropRateWhereInput[]
     id?: StringFilter<"DealerCropRate"> | string
-    supplierId?: StringFilter<"DealerCropRate"> | string
+    dealerId?: StringFilter<"DealerCropRate"> | string
     cropName?: StringFilter<"DealerCropRate"> | string
     pricePerQuintal?: FloatFilter<"DealerCropRate"> | number
     district?: StringFilter<"DealerCropRate"> | string
+    state?: StringFilter<"DealerCropRate"> | string
     isActive?: BoolFilter<"DealerCropRate"> | boolean
     createdAt?: DateTimeFilter<"DealerCropRate"> | Date | string
     updatedAt?: DateTimeFilter<"DealerCropRate"> | Date | string
-    supplier?: XOR<SupplierRelationFilter, SupplierWhereInput>
+    dealer?: XOR<DealerRelationFilter, DealerWhereInput>
   }
 
   export type DealerCropRateOrderByWithRelationInput = {
     id?: SortOrder
-    supplierId?: SortOrder
+    dealerId?: SortOrder
     cropName?: SortOrder
     pricePerQuintal?: SortOrder
     district?: SortOrder
+    state?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    supplier?: SupplierOrderByWithRelationInput
+    dealer?: DealerOrderByWithRelationInput
   }
 
   export type DealerCropRateWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    supplierId_cropName_district?: DealerCropRateSupplierIdCropNameDistrictCompoundUniqueInput
+    dealerId_cropName_district?: DealerCropRateDealerIdCropNameDistrictCompoundUniqueInput
     AND?: DealerCropRateWhereInput | DealerCropRateWhereInput[]
     OR?: DealerCropRateWhereInput[]
     NOT?: DealerCropRateWhereInput | DealerCropRateWhereInput[]
-    supplierId?: StringFilter<"DealerCropRate"> | string
+    dealerId?: StringFilter<"DealerCropRate"> | string
     cropName?: StringFilter<"DealerCropRate"> | string
     pricePerQuintal?: FloatFilter<"DealerCropRate"> | number
     district?: StringFilter<"DealerCropRate"> | string
+    state?: StringFilter<"DealerCropRate"> | string
     isActive?: BoolFilter<"DealerCropRate"> | boolean
     createdAt?: DateTimeFilter<"DealerCropRate"> | Date | string
     updatedAt?: DateTimeFilter<"DealerCropRate"> | Date | string
-    supplier?: XOR<SupplierRelationFilter, SupplierWhereInput>
-  }, "id" | "supplierId_cropName_district">
+    dealer?: XOR<DealerRelationFilter, DealerWhereInput>
+  }, "id" | "dealerId_cropName_district">
 
   export type DealerCropRateOrderByWithAggregationInput = {
     id?: SortOrder
-    supplierId?: SortOrder
+    dealerId?: SortOrder
     cropName?: SortOrder
     pricePerQuintal?: SortOrder
     district?: SortOrder
+    state?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -23531,10 +24908,11 @@ export namespace Prisma {
     OR?: DealerCropRateScalarWhereWithAggregatesInput[]
     NOT?: DealerCropRateScalarWhereWithAggregatesInput | DealerCropRateScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"DealerCropRate"> | string
-    supplierId?: StringWithAggregatesFilter<"DealerCropRate"> | string
+    dealerId?: StringWithAggregatesFilter<"DealerCropRate"> | string
     cropName?: StringWithAggregatesFilter<"DealerCropRate"> | string
     pricePerQuintal?: FloatWithAggregatesFilter<"DealerCropRate"> | number
     district?: StringWithAggregatesFilter<"DealerCropRate"> | string
+    state?: StringWithAggregatesFilter<"DealerCropRate"> | string
     isActive?: BoolWithAggregatesFilter<"DealerCropRate"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"DealerCropRate"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"DealerCropRate"> | Date | string
@@ -23546,7 +24924,7 @@ export namespace Prisma {
     NOT?: TradeBookingWhereInput | TradeBookingWhereInput[]
     id?: StringFilter<"TradeBooking"> | string
     farmerId?: StringFilter<"TradeBooking"> | string
-    supplierId?: StringFilter<"TradeBooking"> | string
+    dealerId?: StringFilter<"TradeBooking"> | string
     cropName?: StringFilter<"TradeBooking"> | string
     approxQuintals?: FloatFilter<"TradeBooking"> | number
     pricePerQuintal?: FloatFilter<"TradeBooking"> | number
@@ -23556,13 +24934,13 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"TradeBooking"> | Date | string
     updatedAt?: DateTimeFilter<"TradeBooking"> | Date | string
     farmer?: XOR<FarmerRelationFilter, FarmerWhereInput>
-    supplier?: XOR<SupplierRelationFilter, SupplierWhereInput>
+    dealer?: XOR<DealerRelationFilter, DealerWhereInput>
   }
 
   export type TradeBookingOrderByWithRelationInput = {
     id?: SortOrder
     farmerId?: SortOrder
-    supplierId?: SortOrder
+    dealerId?: SortOrder
     cropName?: SortOrder
     approxQuintals?: SortOrder
     pricePerQuintal?: SortOrder
@@ -23572,7 +24950,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     farmer?: FarmerOrderByWithRelationInput
-    supplier?: SupplierOrderByWithRelationInput
+    dealer?: DealerOrderByWithRelationInput
   }
 
   export type TradeBookingWhereUniqueInput = Prisma.AtLeast<{
@@ -23581,7 +24959,7 @@ export namespace Prisma {
     OR?: TradeBookingWhereInput[]
     NOT?: TradeBookingWhereInput | TradeBookingWhereInput[]
     farmerId?: StringFilter<"TradeBooking"> | string
-    supplierId?: StringFilter<"TradeBooking"> | string
+    dealerId?: StringFilter<"TradeBooking"> | string
     cropName?: StringFilter<"TradeBooking"> | string
     approxQuintals?: FloatFilter<"TradeBooking"> | number
     pricePerQuintal?: FloatFilter<"TradeBooking"> | number
@@ -23591,13 +24969,13 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"TradeBooking"> | Date | string
     updatedAt?: DateTimeFilter<"TradeBooking"> | Date | string
     farmer?: XOR<FarmerRelationFilter, FarmerWhereInput>
-    supplier?: XOR<SupplierRelationFilter, SupplierWhereInput>
+    dealer?: XOR<DealerRelationFilter, DealerWhereInput>
   }, "id">
 
   export type TradeBookingOrderByWithAggregationInput = {
     id?: SortOrder
     farmerId?: SortOrder
-    supplierId?: SortOrder
+    dealerId?: SortOrder
     cropName?: SortOrder
     approxQuintals?: SortOrder
     pricePerQuintal?: SortOrder
@@ -23619,7 +24997,7 @@ export namespace Prisma {
     NOT?: TradeBookingScalarWhereWithAggregatesInput | TradeBookingScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"TradeBooking"> | string
     farmerId?: StringWithAggregatesFilter<"TradeBooking"> | string
-    supplierId?: StringWithAggregatesFilter<"TradeBooking"> | string
+    dealerId?: StringWithAggregatesFilter<"TradeBooking"> | string
     cropName?: StringWithAggregatesFilter<"TradeBooking"> | string
     approxQuintals?: FloatWithAggregatesFilter<"TradeBooking"> | number
     pricePerQuintal?: FloatWithAggregatesFilter<"TradeBooking"> | number
@@ -23645,6 +25023,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     farmer?: FarmerCreateNestedOneWithoutUserInput
     supplier?: SupplierCreateNestedOneWithoutUserInput
+    dealer?: DealerCreateNestedOneWithoutUserInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
@@ -23664,6 +25043,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     farmer?: FarmerUncheckedCreateNestedOneWithoutUserInput
     supplier?: SupplierUncheckedCreateNestedOneWithoutUserInput
+    dealer?: DealerUncheckedCreateNestedOneWithoutUserInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
@@ -23683,6 +25063,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmer?: FarmerUpdateOneWithoutUserNestedInput
     supplier?: SupplierUpdateOneWithoutUserNestedInput
+    dealer?: DealerUpdateOneWithoutUserNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
@@ -23702,6 +25083,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmer?: FarmerUncheckedUpdateOneWithoutUserNestedInput
     supplier?: SupplierUncheckedUpdateOneWithoutUserNestedInput
+    dealer?: DealerUncheckedUpdateOneWithoutUserNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -23988,8 +25370,6 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutSupplierInput
     products?: ProductCreateNestedManyWithoutSupplierInput
     orderItems?: OrderItemCreateNestedManyWithoutSupplierInput
-    cropRates?: DealerCropRateCreateNestedManyWithoutSupplierInput
-    tradeBookings?: TradeBookingCreateNestedManyWithoutSupplierInput
   }
 
   export type SupplierUncheckedCreateInput = {
@@ -24015,8 +25395,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     products?: ProductUncheckedCreateNestedManyWithoutSupplierInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutSupplierInput
-    cropRates?: DealerCropRateUncheckedCreateNestedManyWithoutSupplierInput
-    tradeBookings?: TradeBookingUncheckedCreateNestedManyWithoutSupplierInput
   }
 
   export type SupplierUpdateInput = {
@@ -24042,8 +25420,6 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutSupplierNestedInput
     products?: ProductUpdateManyWithoutSupplierNestedInput
     orderItems?: OrderItemUpdateManyWithoutSupplierNestedInput
-    cropRates?: DealerCropRateUpdateManyWithoutSupplierNestedInput
-    tradeBookings?: TradeBookingUpdateManyWithoutSupplierNestedInput
   }
 
   export type SupplierUncheckedUpdateInput = {
@@ -24069,8 +25445,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUncheckedUpdateManyWithoutSupplierNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutSupplierNestedInput
-    cropRates?: DealerCropRateUncheckedUpdateManyWithoutSupplierNestedInput
-    tradeBookings?: TradeBookingUncheckedUpdateManyWithoutSupplierNestedInput
   }
 
   export type SupplierCreateManyInput = {
@@ -24137,6 +25511,139 @@ export namespace Prisma {
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
     ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DealerCreateInput = {
+    id?: string
+    businessName: string
+    address: string
+    district: string
+    state?: string
+    pincode: string
+    latitude?: number | null
+    longitude?: number | null
+    isVerified?: boolean
+    verifiedAt?: Date | string | null
+    rating?: number
+    totalRatings?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutDealerInput
+    cropRates?: DealerCropRateCreateNestedManyWithoutDealerInput
+    tradeBookings?: TradeBookingCreateNestedManyWithoutDealerInput
+  }
+
+  export type DealerUncheckedCreateInput = {
+    id?: string
+    userId: string
+    businessName: string
+    address: string
+    district: string
+    state?: string
+    pincode: string
+    latitude?: number | null
+    longitude?: number | null
+    isVerified?: boolean
+    verifiedAt?: Date | string | null
+    rating?: number
+    totalRatings?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cropRates?: DealerCropRateUncheckedCreateNestedManyWithoutDealerInput
+    tradeBookings?: TradeBookingUncheckedCreateNestedManyWithoutDealerInput
+  }
+
+  export type DealerUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    businessName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
+    pincode?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rating?: FloatFieldUpdateOperationsInput | number
+    totalRatings?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutDealerNestedInput
+    cropRates?: DealerCropRateUpdateManyWithoutDealerNestedInput
+    tradeBookings?: TradeBookingUpdateManyWithoutDealerNestedInput
+  }
+
+  export type DealerUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    businessName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
+    pincode?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rating?: FloatFieldUpdateOperationsInput | number
+    totalRatings?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cropRates?: DealerCropRateUncheckedUpdateManyWithoutDealerNestedInput
+    tradeBookings?: TradeBookingUncheckedUpdateManyWithoutDealerNestedInput
+  }
+
+  export type DealerCreateManyInput = {
+    id?: string
+    userId: string
+    businessName: string
+    address: string
+    district: string
+    state?: string
+    pincode: string
+    latitude?: number | null
+    longitude?: number | null
+    isVerified?: boolean
+    verifiedAt?: Date | string | null
+    rating?: number
+    totalRatings?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DealerUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    businessName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
+    pincode?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rating?: FloatFieldUpdateOperationsInput | number
+    totalRatings?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DealerUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    businessName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
+    pincode?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rating?: FloatFieldUpdateOperationsInput | number
+    totalRatings?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25252,18 +26759,20 @@ export namespace Prisma {
     cropName: string
     pricePerQuintal: number
     district: string
+    state?: string
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    supplier: SupplierCreateNestedOneWithoutCropRatesInput
+    dealer: DealerCreateNestedOneWithoutCropRatesInput
   }
 
   export type DealerCropRateUncheckedCreateInput = {
     id?: string
-    supplierId: string
+    dealerId: string
     cropName: string
     pricePerQuintal: number
     district: string
+    state?: string
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25274,18 +26783,20 @@ export namespace Prisma {
     cropName?: StringFieldUpdateOperationsInput | string
     pricePerQuintal?: FloatFieldUpdateOperationsInput | number
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    supplier?: SupplierUpdateOneRequiredWithoutCropRatesNestedInput
+    dealer?: DealerUpdateOneRequiredWithoutCropRatesNestedInput
   }
 
   export type DealerCropRateUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    supplierId?: StringFieldUpdateOperationsInput | string
+    dealerId?: StringFieldUpdateOperationsInput | string
     cropName?: StringFieldUpdateOperationsInput | string
     pricePerQuintal?: FloatFieldUpdateOperationsInput | number
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25293,10 +26804,11 @@ export namespace Prisma {
 
   export type DealerCropRateCreateManyInput = {
     id?: string
-    supplierId: string
+    dealerId: string
     cropName: string
     pricePerQuintal: number
     district: string
+    state?: string
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25307,6 +26819,7 @@ export namespace Prisma {
     cropName?: StringFieldUpdateOperationsInput | string
     pricePerQuintal?: FloatFieldUpdateOperationsInput | number
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25314,10 +26827,11 @@ export namespace Prisma {
 
   export type DealerCropRateUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    supplierId?: StringFieldUpdateOperationsInput | string
+    dealerId?: StringFieldUpdateOperationsInput | string
     cropName?: StringFieldUpdateOperationsInput | string
     pricePerQuintal?: FloatFieldUpdateOperationsInput | number
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25334,13 +26848,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     farmer: FarmerCreateNestedOneWithoutTradeBookingsInput
-    supplier: SupplierCreateNestedOneWithoutTradeBookingsInput
+    dealer: DealerCreateNestedOneWithoutTradeBookingsInput
   }
 
   export type TradeBookingUncheckedCreateInput = {
     id?: string
     farmerId: string
-    supplierId: string
+    dealerId: string
     cropName: string
     approxQuintals: number
     pricePerQuintal: number
@@ -25362,13 +26876,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmer?: FarmerUpdateOneRequiredWithoutTradeBookingsNestedInput
-    supplier?: SupplierUpdateOneRequiredWithoutTradeBookingsNestedInput
+    dealer?: DealerUpdateOneRequiredWithoutTradeBookingsNestedInput
   }
 
   export type TradeBookingUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     farmerId?: StringFieldUpdateOperationsInput | string
-    supplierId?: StringFieldUpdateOperationsInput | string
+    dealerId?: StringFieldUpdateOperationsInput | string
     cropName?: StringFieldUpdateOperationsInput | string
     approxQuintals?: FloatFieldUpdateOperationsInput | number
     pricePerQuintal?: FloatFieldUpdateOperationsInput | number
@@ -25382,7 +26896,7 @@ export namespace Prisma {
   export type TradeBookingCreateManyInput = {
     id?: string
     farmerId: string
-    supplierId: string
+    dealerId: string
     cropName: string
     approxQuintals: number
     pricePerQuintal: number
@@ -25408,7 +26922,7 @@ export namespace Prisma {
   export type TradeBookingUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     farmerId?: StringFieldUpdateOperationsInput | string
-    supplierId?: StringFieldUpdateOperationsInput | string
+    dealerId?: StringFieldUpdateOperationsInput | string
     cropName?: StringFieldUpdateOperationsInput | string
     approxQuintals?: FloatFieldUpdateOperationsInput | number
     pricePerQuintal?: FloatFieldUpdateOperationsInput | number
@@ -25480,6 +26994,11 @@ export namespace Prisma {
   export type SupplierNullableRelationFilter = {
     is?: SupplierWhereInput | null
     isNot?: SupplierWhereInput | null
+  }
+
+  export type DealerNullableRelationFilter = {
+    is?: DealerWhereInput | null
+    isNot?: DealerWhereInput | null
   }
 
   export type NotificationListRelationFilter = {
@@ -25860,21 +27379,11 @@ export namespace Prisma {
     none?: OrderItemWhereInput
   }
 
-  export type DealerCropRateListRelationFilter = {
-    every?: DealerCropRateWhereInput
-    some?: DealerCropRateWhereInput
-    none?: DealerCropRateWhereInput
-  }
-
   export type ProductOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type OrderItemOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type DealerCropRateOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -25989,6 +27498,84 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type DealerCropRateListRelationFilter = {
+    every?: DealerCropRateWhereInput
+    some?: DealerCropRateWhereInput
+    none?: DealerCropRateWhereInput
+  }
+
+  export type DealerCropRateOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DealerCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    businessName?: SortOrder
+    address?: SortOrder
+    district?: SortOrder
+    state?: SortOrder
+    pincode?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    isVerified?: SortOrder
+    verifiedAt?: SortOrder
+    rating?: SortOrder
+    totalRatings?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DealerAvgOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+    rating?: SortOrder
+    totalRatings?: SortOrder
+  }
+
+  export type DealerMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    businessName?: SortOrder
+    address?: SortOrder
+    district?: SortOrder
+    state?: SortOrder
+    pincode?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    isVerified?: SortOrder
+    verifiedAt?: SortOrder
+    rating?: SortOrder
+    totalRatings?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DealerMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    businessName?: SortOrder
+    address?: SortOrder
+    district?: SortOrder
+    state?: SortOrder
+    pincode?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    isVerified?: SortOrder
+    verifiedAt?: SortOrder
+    rating?: SortOrder
+    totalRatings?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DealerSumOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+    rating?: SortOrder
+    totalRatings?: SortOrder
   }
 
   export type EnumProductCategoryFilter<$PrismaModel = never> = {
@@ -26698,18 +28285,24 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-  export type DealerCropRateSupplierIdCropNameDistrictCompoundUniqueInput = {
-    supplierId: string
+  export type DealerRelationFilter = {
+    is?: DealerWhereInput
+    isNot?: DealerWhereInput
+  }
+
+  export type DealerCropRateDealerIdCropNameDistrictCompoundUniqueInput = {
+    dealerId: string
     cropName: string
     district: string
   }
 
   export type DealerCropRateCountOrderByAggregateInput = {
     id?: SortOrder
-    supplierId?: SortOrder
+    dealerId?: SortOrder
     cropName?: SortOrder
     pricePerQuintal?: SortOrder
     district?: SortOrder
+    state?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -26721,10 +28314,11 @@ export namespace Prisma {
 
   export type DealerCropRateMaxOrderByAggregateInput = {
     id?: SortOrder
-    supplierId?: SortOrder
+    dealerId?: SortOrder
     cropName?: SortOrder
     pricePerQuintal?: SortOrder
     district?: SortOrder
+    state?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -26732,10 +28326,11 @@ export namespace Prisma {
 
   export type DealerCropRateMinOrderByAggregateInput = {
     id?: SortOrder
-    supplierId?: SortOrder
+    dealerId?: SortOrder
     cropName?: SortOrder
     pricePerQuintal?: SortOrder
     district?: SortOrder
+    state?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -26755,7 +28350,7 @@ export namespace Prisma {
   export type TradeBookingCountOrderByAggregateInput = {
     id?: SortOrder
     farmerId?: SortOrder
-    supplierId?: SortOrder
+    dealerId?: SortOrder
     cropName?: SortOrder
     approxQuintals?: SortOrder
     pricePerQuintal?: SortOrder
@@ -26774,7 +28369,7 @@ export namespace Prisma {
   export type TradeBookingMaxOrderByAggregateInput = {
     id?: SortOrder
     farmerId?: SortOrder
-    supplierId?: SortOrder
+    dealerId?: SortOrder
     cropName?: SortOrder
     approxQuintals?: SortOrder
     pricePerQuintal?: SortOrder
@@ -26788,7 +28383,7 @@ export namespace Prisma {
   export type TradeBookingMinOrderByAggregateInput = {
     id?: SortOrder
     farmerId?: SortOrder
-    supplierId?: SortOrder
+    dealerId?: SortOrder
     cropName?: SortOrder
     approxQuintals?: SortOrder
     pricePerQuintal?: SortOrder
@@ -26826,6 +28421,12 @@ export namespace Prisma {
     connect?: SupplierWhereUniqueInput
   }
 
+  export type DealerCreateNestedOneWithoutUserInput = {
+    create?: XOR<DealerCreateWithoutUserInput, DealerUncheckedCreateWithoutUserInput>
+    connectOrCreate?: DealerCreateOrConnectWithoutUserInput
+    connect?: DealerWhereUniqueInput
+  }
+
   export type NotificationCreateNestedManyWithoutUserInput = {
     create?: XOR<NotificationCreateWithoutUserInput, NotificationUncheckedCreateWithoutUserInput> | NotificationCreateWithoutUserInput[] | NotificationUncheckedCreateWithoutUserInput[]
     connectOrCreate?: NotificationCreateOrConnectWithoutUserInput | NotificationCreateOrConnectWithoutUserInput[]
@@ -26850,6 +28451,12 @@ export namespace Prisma {
     create?: XOR<SupplierCreateWithoutUserInput, SupplierUncheckedCreateWithoutUserInput>
     connectOrCreate?: SupplierCreateOrConnectWithoutUserInput
     connect?: SupplierWhereUniqueInput
+  }
+
+  export type DealerUncheckedCreateNestedOneWithoutUserInput = {
+    create?: XOR<DealerCreateWithoutUserInput, DealerUncheckedCreateWithoutUserInput>
+    connectOrCreate?: DealerCreateOrConnectWithoutUserInput
+    connect?: DealerWhereUniqueInput
   }
 
   export type NotificationUncheckedCreateNestedManyWithoutUserInput = {
@@ -26906,6 +28513,16 @@ export namespace Prisma {
     update?: XOR<XOR<SupplierUpdateToOneWithWhereWithoutUserInput, SupplierUpdateWithoutUserInput>, SupplierUncheckedUpdateWithoutUserInput>
   }
 
+  export type DealerUpdateOneWithoutUserNestedInput = {
+    create?: XOR<DealerCreateWithoutUserInput, DealerUncheckedCreateWithoutUserInput>
+    connectOrCreate?: DealerCreateOrConnectWithoutUserInput
+    upsert?: DealerUpsertWithoutUserInput
+    disconnect?: DealerWhereInput | boolean
+    delete?: DealerWhereInput | boolean
+    connect?: DealerWhereUniqueInput
+    update?: XOR<XOR<DealerUpdateToOneWithWhereWithoutUserInput, DealerUpdateWithoutUserInput>, DealerUncheckedUpdateWithoutUserInput>
+  }
+
   export type NotificationUpdateManyWithoutUserNestedInput = {
     create?: XOR<NotificationCreateWithoutUserInput, NotificationUncheckedCreateWithoutUserInput> | NotificationCreateWithoutUserInput[] | NotificationUncheckedCreateWithoutUserInput[]
     connectOrCreate?: NotificationCreateOrConnectWithoutUserInput | NotificationCreateOrConnectWithoutUserInput[]
@@ -26952,6 +28569,16 @@ export namespace Prisma {
     delete?: SupplierWhereInput | boolean
     connect?: SupplierWhereUniqueInput
     update?: XOR<XOR<SupplierUpdateToOneWithWhereWithoutUserInput, SupplierUpdateWithoutUserInput>, SupplierUncheckedUpdateWithoutUserInput>
+  }
+
+  export type DealerUncheckedUpdateOneWithoutUserNestedInput = {
+    create?: XOR<DealerCreateWithoutUserInput, DealerUncheckedCreateWithoutUserInput>
+    connectOrCreate?: DealerCreateOrConnectWithoutUserInput
+    upsert?: DealerUpsertWithoutUserInput
+    disconnect?: DealerWhereInput | boolean
+    delete?: DealerWhereInput | boolean
+    connect?: DealerWhereUniqueInput
+    update?: XOR<XOR<DealerUpdateToOneWithWhereWithoutUserInput, DealerUpdateWithoutUserInput>, DealerUncheckedUpdateWithoutUserInput>
   }
 
   export type NotificationUncheckedUpdateManyWithoutUserNestedInput = {
@@ -27255,20 +28882,6 @@ export namespace Prisma {
     connect?: OrderItemWhereUniqueInput | OrderItemWhereUniqueInput[]
   }
 
-  export type DealerCropRateCreateNestedManyWithoutSupplierInput = {
-    create?: XOR<DealerCropRateCreateWithoutSupplierInput, DealerCropRateUncheckedCreateWithoutSupplierInput> | DealerCropRateCreateWithoutSupplierInput[] | DealerCropRateUncheckedCreateWithoutSupplierInput[]
-    connectOrCreate?: DealerCropRateCreateOrConnectWithoutSupplierInput | DealerCropRateCreateOrConnectWithoutSupplierInput[]
-    createMany?: DealerCropRateCreateManySupplierInputEnvelope
-    connect?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
-  }
-
-  export type TradeBookingCreateNestedManyWithoutSupplierInput = {
-    create?: XOR<TradeBookingCreateWithoutSupplierInput, TradeBookingUncheckedCreateWithoutSupplierInput> | TradeBookingCreateWithoutSupplierInput[] | TradeBookingUncheckedCreateWithoutSupplierInput[]
-    connectOrCreate?: TradeBookingCreateOrConnectWithoutSupplierInput | TradeBookingCreateOrConnectWithoutSupplierInput[]
-    createMany?: TradeBookingCreateManySupplierInputEnvelope
-    connect?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
-  }
-
   export type ProductUncheckedCreateNestedManyWithoutSupplierInput = {
     create?: XOR<ProductCreateWithoutSupplierInput, ProductUncheckedCreateWithoutSupplierInput> | ProductCreateWithoutSupplierInput[] | ProductUncheckedCreateWithoutSupplierInput[]
     connectOrCreate?: ProductCreateOrConnectWithoutSupplierInput | ProductCreateOrConnectWithoutSupplierInput[]
@@ -27281,20 +28894,6 @@ export namespace Prisma {
     connectOrCreate?: OrderItemCreateOrConnectWithoutSupplierInput | OrderItemCreateOrConnectWithoutSupplierInput[]
     createMany?: OrderItemCreateManySupplierInputEnvelope
     connect?: OrderItemWhereUniqueInput | OrderItemWhereUniqueInput[]
-  }
-
-  export type DealerCropRateUncheckedCreateNestedManyWithoutSupplierInput = {
-    create?: XOR<DealerCropRateCreateWithoutSupplierInput, DealerCropRateUncheckedCreateWithoutSupplierInput> | DealerCropRateCreateWithoutSupplierInput[] | DealerCropRateUncheckedCreateWithoutSupplierInput[]
-    connectOrCreate?: DealerCropRateCreateOrConnectWithoutSupplierInput | DealerCropRateCreateOrConnectWithoutSupplierInput[]
-    createMany?: DealerCropRateCreateManySupplierInputEnvelope
-    connect?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
-  }
-
-  export type TradeBookingUncheckedCreateNestedManyWithoutSupplierInput = {
-    create?: XOR<TradeBookingCreateWithoutSupplierInput, TradeBookingUncheckedCreateWithoutSupplierInput> | TradeBookingCreateWithoutSupplierInput[] | TradeBookingUncheckedCreateWithoutSupplierInput[]
-    connectOrCreate?: TradeBookingCreateOrConnectWithoutSupplierInput | TradeBookingCreateOrConnectWithoutSupplierInput[]
-    createMany?: TradeBookingCreateManySupplierInputEnvelope
-    connect?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -27345,34 +28944,6 @@ export namespace Prisma {
     deleteMany?: OrderItemScalarWhereInput | OrderItemScalarWhereInput[]
   }
 
-  export type DealerCropRateUpdateManyWithoutSupplierNestedInput = {
-    create?: XOR<DealerCropRateCreateWithoutSupplierInput, DealerCropRateUncheckedCreateWithoutSupplierInput> | DealerCropRateCreateWithoutSupplierInput[] | DealerCropRateUncheckedCreateWithoutSupplierInput[]
-    connectOrCreate?: DealerCropRateCreateOrConnectWithoutSupplierInput | DealerCropRateCreateOrConnectWithoutSupplierInput[]
-    upsert?: DealerCropRateUpsertWithWhereUniqueWithoutSupplierInput | DealerCropRateUpsertWithWhereUniqueWithoutSupplierInput[]
-    createMany?: DealerCropRateCreateManySupplierInputEnvelope
-    set?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
-    disconnect?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
-    delete?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
-    connect?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
-    update?: DealerCropRateUpdateWithWhereUniqueWithoutSupplierInput | DealerCropRateUpdateWithWhereUniqueWithoutSupplierInput[]
-    updateMany?: DealerCropRateUpdateManyWithWhereWithoutSupplierInput | DealerCropRateUpdateManyWithWhereWithoutSupplierInput[]
-    deleteMany?: DealerCropRateScalarWhereInput | DealerCropRateScalarWhereInput[]
-  }
-
-  export type TradeBookingUpdateManyWithoutSupplierNestedInput = {
-    create?: XOR<TradeBookingCreateWithoutSupplierInput, TradeBookingUncheckedCreateWithoutSupplierInput> | TradeBookingCreateWithoutSupplierInput[] | TradeBookingUncheckedCreateWithoutSupplierInput[]
-    connectOrCreate?: TradeBookingCreateOrConnectWithoutSupplierInput | TradeBookingCreateOrConnectWithoutSupplierInput[]
-    upsert?: TradeBookingUpsertWithWhereUniqueWithoutSupplierInput | TradeBookingUpsertWithWhereUniqueWithoutSupplierInput[]
-    createMany?: TradeBookingCreateManySupplierInputEnvelope
-    set?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
-    disconnect?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
-    delete?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
-    connect?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
-    update?: TradeBookingUpdateWithWhereUniqueWithoutSupplierInput | TradeBookingUpdateWithWhereUniqueWithoutSupplierInput[]
-    updateMany?: TradeBookingUpdateManyWithWhereWithoutSupplierInput | TradeBookingUpdateManyWithWhereWithoutSupplierInput[]
-    deleteMany?: TradeBookingScalarWhereInput | TradeBookingScalarWhereInput[]
-  }
-
   export type ProductUncheckedUpdateManyWithoutSupplierNestedInput = {
     create?: XOR<ProductCreateWithoutSupplierInput, ProductUncheckedCreateWithoutSupplierInput> | ProductCreateWithoutSupplierInput[] | ProductUncheckedCreateWithoutSupplierInput[]
     connectOrCreate?: ProductCreateOrConnectWithoutSupplierInput | ProductCreateOrConnectWithoutSupplierInput[]
@@ -27401,31 +28972,101 @@ export namespace Prisma {
     deleteMany?: OrderItemScalarWhereInput | OrderItemScalarWhereInput[]
   }
 
-  export type DealerCropRateUncheckedUpdateManyWithoutSupplierNestedInput = {
-    create?: XOR<DealerCropRateCreateWithoutSupplierInput, DealerCropRateUncheckedCreateWithoutSupplierInput> | DealerCropRateCreateWithoutSupplierInput[] | DealerCropRateUncheckedCreateWithoutSupplierInput[]
-    connectOrCreate?: DealerCropRateCreateOrConnectWithoutSupplierInput | DealerCropRateCreateOrConnectWithoutSupplierInput[]
-    upsert?: DealerCropRateUpsertWithWhereUniqueWithoutSupplierInput | DealerCropRateUpsertWithWhereUniqueWithoutSupplierInput[]
-    createMany?: DealerCropRateCreateManySupplierInputEnvelope
+  export type UserCreateNestedOneWithoutDealerInput = {
+    create?: XOR<UserCreateWithoutDealerInput, UserUncheckedCreateWithoutDealerInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDealerInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type DealerCropRateCreateNestedManyWithoutDealerInput = {
+    create?: XOR<DealerCropRateCreateWithoutDealerInput, DealerCropRateUncheckedCreateWithoutDealerInput> | DealerCropRateCreateWithoutDealerInput[] | DealerCropRateUncheckedCreateWithoutDealerInput[]
+    connectOrCreate?: DealerCropRateCreateOrConnectWithoutDealerInput | DealerCropRateCreateOrConnectWithoutDealerInput[]
+    createMany?: DealerCropRateCreateManyDealerInputEnvelope
+    connect?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
+  }
+
+  export type TradeBookingCreateNestedManyWithoutDealerInput = {
+    create?: XOR<TradeBookingCreateWithoutDealerInput, TradeBookingUncheckedCreateWithoutDealerInput> | TradeBookingCreateWithoutDealerInput[] | TradeBookingUncheckedCreateWithoutDealerInput[]
+    connectOrCreate?: TradeBookingCreateOrConnectWithoutDealerInput | TradeBookingCreateOrConnectWithoutDealerInput[]
+    createMany?: TradeBookingCreateManyDealerInputEnvelope
+    connect?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
+  }
+
+  export type DealerCropRateUncheckedCreateNestedManyWithoutDealerInput = {
+    create?: XOR<DealerCropRateCreateWithoutDealerInput, DealerCropRateUncheckedCreateWithoutDealerInput> | DealerCropRateCreateWithoutDealerInput[] | DealerCropRateUncheckedCreateWithoutDealerInput[]
+    connectOrCreate?: DealerCropRateCreateOrConnectWithoutDealerInput | DealerCropRateCreateOrConnectWithoutDealerInput[]
+    createMany?: DealerCropRateCreateManyDealerInputEnvelope
+    connect?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
+  }
+
+  export type TradeBookingUncheckedCreateNestedManyWithoutDealerInput = {
+    create?: XOR<TradeBookingCreateWithoutDealerInput, TradeBookingUncheckedCreateWithoutDealerInput> | TradeBookingCreateWithoutDealerInput[] | TradeBookingUncheckedCreateWithoutDealerInput[]
+    connectOrCreate?: TradeBookingCreateOrConnectWithoutDealerInput | TradeBookingCreateOrConnectWithoutDealerInput[]
+    createMany?: TradeBookingCreateManyDealerInputEnvelope
+    connect?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
+  }
+
+  export type UserUpdateOneRequiredWithoutDealerNestedInput = {
+    create?: XOR<UserCreateWithoutDealerInput, UserUncheckedCreateWithoutDealerInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDealerInput
+    upsert?: UserUpsertWithoutDealerInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDealerInput, UserUpdateWithoutDealerInput>, UserUncheckedUpdateWithoutDealerInput>
+  }
+
+  export type DealerCropRateUpdateManyWithoutDealerNestedInput = {
+    create?: XOR<DealerCropRateCreateWithoutDealerInput, DealerCropRateUncheckedCreateWithoutDealerInput> | DealerCropRateCreateWithoutDealerInput[] | DealerCropRateUncheckedCreateWithoutDealerInput[]
+    connectOrCreate?: DealerCropRateCreateOrConnectWithoutDealerInput | DealerCropRateCreateOrConnectWithoutDealerInput[]
+    upsert?: DealerCropRateUpsertWithWhereUniqueWithoutDealerInput | DealerCropRateUpsertWithWhereUniqueWithoutDealerInput[]
+    createMany?: DealerCropRateCreateManyDealerInputEnvelope
     set?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
     disconnect?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
     delete?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
     connect?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
-    update?: DealerCropRateUpdateWithWhereUniqueWithoutSupplierInput | DealerCropRateUpdateWithWhereUniqueWithoutSupplierInput[]
-    updateMany?: DealerCropRateUpdateManyWithWhereWithoutSupplierInput | DealerCropRateUpdateManyWithWhereWithoutSupplierInput[]
+    update?: DealerCropRateUpdateWithWhereUniqueWithoutDealerInput | DealerCropRateUpdateWithWhereUniqueWithoutDealerInput[]
+    updateMany?: DealerCropRateUpdateManyWithWhereWithoutDealerInput | DealerCropRateUpdateManyWithWhereWithoutDealerInput[]
     deleteMany?: DealerCropRateScalarWhereInput | DealerCropRateScalarWhereInput[]
   }
 
-  export type TradeBookingUncheckedUpdateManyWithoutSupplierNestedInput = {
-    create?: XOR<TradeBookingCreateWithoutSupplierInput, TradeBookingUncheckedCreateWithoutSupplierInput> | TradeBookingCreateWithoutSupplierInput[] | TradeBookingUncheckedCreateWithoutSupplierInput[]
-    connectOrCreate?: TradeBookingCreateOrConnectWithoutSupplierInput | TradeBookingCreateOrConnectWithoutSupplierInput[]
-    upsert?: TradeBookingUpsertWithWhereUniqueWithoutSupplierInput | TradeBookingUpsertWithWhereUniqueWithoutSupplierInput[]
-    createMany?: TradeBookingCreateManySupplierInputEnvelope
+  export type TradeBookingUpdateManyWithoutDealerNestedInput = {
+    create?: XOR<TradeBookingCreateWithoutDealerInput, TradeBookingUncheckedCreateWithoutDealerInput> | TradeBookingCreateWithoutDealerInput[] | TradeBookingUncheckedCreateWithoutDealerInput[]
+    connectOrCreate?: TradeBookingCreateOrConnectWithoutDealerInput | TradeBookingCreateOrConnectWithoutDealerInput[]
+    upsert?: TradeBookingUpsertWithWhereUniqueWithoutDealerInput | TradeBookingUpsertWithWhereUniqueWithoutDealerInput[]
+    createMany?: TradeBookingCreateManyDealerInputEnvelope
     set?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
     disconnect?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
     delete?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
     connect?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
-    update?: TradeBookingUpdateWithWhereUniqueWithoutSupplierInput | TradeBookingUpdateWithWhereUniqueWithoutSupplierInput[]
-    updateMany?: TradeBookingUpdateManyWithWhereWithoutSupplierInput | TradeBookingUpdateManyWithWhereWithoutSupplierInput[]
+    update?: TradeBookingUpdateWithWhereUniqueWithoutDealerInput | TradeBookingUpdateWithWhereUniqueWithoutDealerInput[]
+    updateMany?: TradeBookingUpdateManyWithWhereWithoutDealerInput | TradeBookingUpdateManyWithWhereWithoutDealerInput[]
+    deleteMany?: TradeBookingScalarWhereInput | TradeBookingScalarWhereInput[]
+  }
+
+  export type DealerCropRateUncheckedUpdateManyWithoutDealerNestedInput = {
+    create?: XOR<DealerCropRateCreateWithoutDealerInput, DealerCropRateUncheckedCreateWithoutDealerInput> | DealerCropRateCreateWithoutDealerInput[] | DealerCropRateUncheckedCreateWithoutDealerInput[]
+    connectOrCreate?: DealerCropRateCreateOrConnectWithoutDealerInput | DealerCropRateCreateOrConnectWithoutDealerInput[]
+    upsert?: DealerCropRateUpsertWithWhereUniqueWithoutDealerInput | DealerCropRateUpsertWithWhereUniqueWithoutDealerInput[]
+    createMany?: DealerCropRateCreateManyDealerInputEnvelope
+    set?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
+    disconnect?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
+    delete?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
+    connect?: DealerCropRateWhereUniqueInput | DealerCropRateWhereUniqueInput[]
+    update?: DealerCropRateUpdateWithWhereUniqueWithoutDealerInput | DealerCropRateUpdateWithWhereUniqueWithoutDealerInput[]
+    updateMany?: DealerCropRateUpdateManyWithWhereWithoutDealerInput | DealerCropRateUpdateManyWithWhereWithoutDealerInput[]
+    deleteMany?: DealerCropRateScalarWhereInput | DealerCropRateScalarWhereInput[]
+  }
+
+  export type TradeBookingUncheckedUpdateManyWithoutDealerNestedInput = {
+    create?: XOR<TradeBookingCreateWithoutDealerInput, TradeBookingUncheckedCreateWithoutDealerInput> | TradeBookingCreateWithoutDealerInput[] | TradeBookingUncheckedCreateWithoutDealerInput[]
+    connectOrCreate?: TradeBookingCreateOrConnectWithoutDealerInput | TradeBookingCreateOrConnectWithoutDealerInput[]
+    upsert?: TradeBookingUpsertWithWhereUniqueWithoutDealerInput | TradeBookingUpsertWithWhereUniqueWithoutDealerInput[]
+    createMany?: TradeBookingCreateManyDealerInputEnvelope
+    set?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
+    disconnect?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
+    delete?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
+    connect?: TradeBookingWhereUniqueInput | TradeBookingWhereUniqueInput[]
+    update?: TradeBookingUpdateWithWhereUniqueWithoutDealerInput | TradeBookingUpdateWithWhereUniqueWithoutDealerInput[]
+    updateMany?: TradeBookingUpdateManyWithWhereWithoutDealerInput | TradeBookingUpdateManyWithWhereWithoutDealerInput[]
     deleteMany?: TradeBookingScalarWhereInput | TradeBookingScalarWhereInput[]
   }
 
@@ -27938,18 +29579,18 @@ export namespace Prisma {
     push?: string | string[]
   }
 
-  export type SupplierCreateNestedOneWithoutCropRatesInput = {
-    create?: XOR<SupplierCreateWithoutCropRatesInput, SupplierUncheckedCreateWithoutCropRatesInput>
-    connectOrCreate?: SupplierCreateOrConnectWithoutCropRatesInput
-    connect?: SupplierWhereUniqueInput
+  export type DealerCreateNestedOneWithoutCropRatesInput = {
+    create?: XOR<DealerCreateWithoutCropRatesInput, DealerUncheckedCreateWithoutCropRatesInput>
+    connectOrCreate?: DealerCreateOrConnectWithoutCropRatesInput
+    connect?: DealerWhereUniqueInput
   }
 
-  export type SupplierUpdateOneRequiredWithoutCropRatesNestedInput = {
-    create?: XOR<SupplierCreateWithoutCropRatesInput, SupplierUncheckedCreateWithoutCropRatesInput>
-    connectOrCreate?: SupplierCreateOrConnectWithoutCropRatesInput
-    upsert?: SupplierUpsertWithoutCropRatesInput
-    connect?: SupplierWhereUniqueInput
-    update?: XOR<XOR<SupplierUpdateToOneWithWhereWithoutCropRatesInput, SupplierUpdateWithoutCropRatesInput>, SupplierUncheckedUpdateWithoutCropRatesInput>
+  export type DealerUpdateOneRequiredWithoutCropRatesNestedInput = {
+    create?: XOR<DealerCreateWithoutCropRatesInput, DealerUncheckedCreateWithoutCropRatesInput>
+    connectOrCreate?: DealerCreateOrConnectWithoutCropRatesInput
+    upsert?: DealerUpsertWithoutCropRatesInput
+    connect?: DealerWhereUniqueInput
+    update?: XOR<XOR<DealerUpdateToOneWithWhereWithoutCropRatesInput, DealerUpdateWithoutCropRatesInput>, DealerUncheckedUpdateWithoutCropRatesInput>
   }
 
   export type FarmerCreateNestedOneWithoutTradeBookingsInput = {
@@ -27958,10 +29599,10 @@ export namespace Prisma {
     connect?: FarmerWhereUniqueInput
   }
 
-  export type SupplierCreateNestedOneWithoutTradeBookingsInput = {
-    create?: XOR<SupplierCreateWithoutTradeBookingsInput, SupplierUncheckedCreateWithoutTradeBookingsInput>
-    connectOrCreate?: SupplierCreateOrConnectWithoutTradeBookingsInput
-    connect?: SupplierWhereUniqueInput
+  export type DealerCreateNestedOneWithoutTradeBookingsInput = {
+    create?: XOR<DealerCreateWithoutTradeBookingsInput, DealerUncheckedCreateWithoutTradeBookingsInput>
+    connectOrCreate?: DealerCreateOrConnectWithoutTradeBookingsInput
+    connect?: DealerWhereUniqueInput
   }
 
   export type EnumTradeStatusFieldUpdateOperationsInput = {
@@ -27976,12 +29617,12 @@ export namespace Prisma {
     update?: XOR<XOR<FarmerUpdateToOneWithWhereWithoutTradeBookingsInput, FarmerUpdateWithoutTradeBookingsInput>, FarmerUncheckedUpdateWithoutTradeBookingsInput>
   }
 
-  export type SupplierUpdateOneRequiredWithoutTradeBookingsNestedInput = {
-    create?: XOR<SupplierCreateWithoutTradeBookingsInput, SupplierUncheckedCreateWithoutTradeBookingsInput>
-    connectOrCreate?: SupplierCreateOrConnectWithoutTradeBookingsInput
-    upsert?: SupplierUpsertWithoutTradeBookingsInput
-    connect?: SupplierWhereUniqueInput
-    update?: XOR<XOR<SupplierUpdateToOneWithWhereWithoutTradeBookingsInput, SupplierUpdateWithoutTradeBookingsInput>, SupplierUncheckedUpdateWithoutTradeBookingsInput>
+  export type DealerUpdateOneRequiredWithoutTradeBookingsNestedInput = {
+    create?: XOR<DealerCreateWithoutTradeBookingsInput, DealerUncheckedCreateWithoutTradeBookingsInput>
+    connectOrCreate?: DealerCreateOrConnectWithoutTradeBookingsInput
+    upsert?: DealerUpsertWithoutTradeBookingsInput
+    connect?: DealerWhereUniqueInput
+    update?: XOR<XOR<DealerUpdateToOneWithWhereWithoutTradeBookingsInput, DealerUpdateWithoutTradeBookingsInput>, DealerUncheckedUpdateWithoutTradeBookingsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -28383,8 +30024,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     products?: ProductCreateNestedManyWithoutSupplierInput
     orderItems?: OrderItemCreateNestedManyWithoutSupplierInput
-    cropRates?: DealerCropRateCreateNestedManyWithoutSupplierInput
-    tradeBookings?: TradeBookingCreateNestedManyWithoutSupplierInput
   }
 
   export type SupplierUncheckedCreateWithoutUserInput = {
@@ -28409,13 +30048,54 @@ export namespace Prisma {
     updatedAt?: Date | string
     products?: ProductUncheckedCreateNestedManyWithoutSupplierInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutSupplierInput
-    cropRates?: DealerCropRateUncheckedCreateNestedManyWithoutSupplierInput
-    tradeBookings?: TradeBookingUncheckedCreateNestedManyWithoutSupplierInput
   }
 
   export type SupplierCreateOrConnectWithoutUserInput = {
     where: SupplierWhereUniqueInput
     create: XOR<SupplierCreateWithoutUserInput, SupplierUncheckedCreateWithoutUserInput>
+  }
+
+  export type DealerCreateWithoutUserInput = {
+    id?: string
+    businessName: string
+    address: string
+    district: string
+    state?: string
+    pincode: string
+    latitude?: number | null
+    longitude?: number | null
+    isVerified?: boolean
+    verifiedAt?: Date | string | null
+    rating?: number
+    totalRatings?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cropRates?: DealerCropRateCreateNestedManyWithoutDealerInput
+    tradeBookings?: TradeBookingCreateNestedManyWithoutDealerInput
+  }
+
+  export type DealerUncheckedCreateWithoutUserInput = {
+    id?: string
+    businessName: string
+    address: string
+    district: string
+    state?: string
+    pincode: string
+    latitude?: number | null
+    longitude?: number | null
+    isVerified?: boolean
+    verifiedAt?: Date | string | null
+    rating?: number
+    totalRatings?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cropRates?: DealerCropRateUncheckedCreateNestedManyWithoutDealerInput
+    tradeBookings?: TradeBookingUncheckedCreateNestedManyWithoutDealerInput
+  }
+
+  export type DealerCreateOrConnectWithoutUserInput = {
+    where: DealerWhereUniqueInput
+    create: XOR<DealerCreateWithoutUserInput, DealerUncheckedCreateWithoutUserInput>
   }
 
   export type NotificationCreateWithoutUserInput = {
@@ -28564,8 +30244,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUpdateManyWithoutSupplierNestedInput
     orderItems?: OrderItemUpdateManyWithoutSupplierNestedInput
-    cropRates?: DealerCropRateUpdateManyWithoutSupplierNestedInput
-    tradeBookings?: TradeBookingUpdateManyWithoutSupplierNestedInput
   }
 
   export type SupplierUncheckedUpdateWithoutUserInput = {
@@ -28590,8 +30268,55 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUncheckedUpdateManyWithoutSupplierNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutSupplierNestedInput
-    cropRates?: DealerCropRateUncheckedUpdateManyWithoutSupplierNestedInput
-    tradeBookings?: TradeBookingUncheckedUpdateManyWithoutSupplierNestedInput
+  }
+
+  export type DealerUpsertWithoutUserInput = {
+    update: XOR<DealerUpdateWithoutUserInput, DealerUncheckedUpdateWithoutUserInput>
+    create: XOR<DealerCreateWithoutUserInput, DealerUncheckedCreateWithoutUserInput>
+    where?: DealerWhereInput
+  }
+
+  export type DealerUpdateToOneWithWhereWithoutUserInput = {
+    where?: DealerWhereInput
+    data: XOR<DealerUpdateWithoutUserInput, DealerUncheckedUpdateWithoutUserInput>
+  }
+
+  export type DealerUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    businessName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
+    pincode?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rating?: FloatFieldUpdateOperationsInput | number
+    totalRatings?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cropRates?: DealerCropRateUpdateManyWithoutDealerNestedInput
+    tradeBookings?: TradeBookingUpdateManyWithoutDealerNestedInput
+  }
+
+  export type DealerUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    businessName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
+    pincode?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rating?: FloatFieldUpdateOperationsInput | number
+    totalRatings?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cropRates?: DealerCropRateUncheckedUpdateManyWithoutDealerNestedInput
+    tradeBookings?: TradeBookingUncheckedUpdateManyWithoutDealerNestedInput
   }
 
   export type NotificationUpsertWithWhereUniqueWithoutUserInput = {
@@ -28666,6 +30391,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     farmer?: FarmerCreateNestedOneWithoutUserInput
     supplier?: SupplierCreateNestedOneWithoutUserInput
+    dealer?: DealerCreateNestedOneWithoutUserInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
@@ -28684,6 +30410,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     farmer?: FarmerUncheckedCreateNestedOneWithoutUserInput
     supplier?: SupplierUncheckedCreateNestedOneWithoutUserInput
+    dealer?: DealerUncheckedCreateNestedOneWithoutUserInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -28718,6 +30445,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmer?: FarmerUpdateOneWithoutUserNestedInput
     supplier?: SupplierUpdateOneWithoutUserNestedInput
+    dealer?: DealerUpdateOneWithoutUserNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
@@ -28736,6 +30464,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmer?: FarmerUncheckedUpdateOneWithoutUserNestedInput
     supplier?: SupplierUncheckedUpdateOneWithoutUserNestedInput
+    dealer?: DealerUncheckedUpdateOneWithoutUserNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -28753,6 +30482,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     supplier?: SupplierCreateNestedOneWithoutUserInput
+    dealer?: DealerCreateNestedOneWithoutUserInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
@@ -28771,6 +30501,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     supplier?: SupplierUncheckedCreateNestedOneWithoutUserInput
+    dealer?: DealerUncheckedCreateNestedOneWithoutUserInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
@@ -28923,12 +30654,12 @@ export namespace Prisma {
     notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    supplier: SupplierCreateNestedOneWithoutTradeBookingsInput
+    dealer: DealerCreateNestedOneWithoutTradeBookingsInput
   }
 
   export type TradeBookingUncheckedCreateWithoutFarmerInput = {
     id?: string
-    supplierId: string
+    dealerId: string
     cropName: string
     approxQuintals: number
     pricePerQuintal: number
@@ -28974,6 +30705,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supplier?: SupplierUpdateOneWithoutUserNestedInput
+    dealer?: DealerUpdateOneWithoutUserNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
@@ -28992,6 +30724,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supplier?: SupplierUncheckedUpdateOneWithoutUserNestedInput
+    dealer?: DealerUncheckedUpdateOneWithoutUserNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -29143,7 +30876,7 @@ export namespace Prisma {
     NOT?: TradeBookingScalarWhereInput | TradeBookingScalarWhereInput[]
     id?: StringFilter<"TradeBooking"> | string
     farmerId?: StringFilter<"TradeBooking"> | string
-    supplierId?: StringFilter<"TradeBooking"> | string
+    dealerId?: StringFilter<"TradeBooking"> | string
     cropName?: StringFilter<"TradeBooking"> | string
     approxQuintals?: FloatFilter<"TradeBooking"> | number
     pricePerQuintal?: FloatFilter<"TradeBooking"> | number
@@ -29168,6 +30901,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     farmer?: FarmerCreateNestedOneWithoutUserInput
+    dealer?: DealerCreateNestedOneWithoutUserInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
@@ -29186,6 +30920,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     farmer?: FarmerUncheckedCreateNestedOneWithoutUserInput
+    dealer?: DealerUncheckedCreateNestedOneWithoutUserInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
@@ -29285,72 +31020,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type DealerCropRateCreateWithoutSupplierInput = {
-    id?: string
-    cropName: string
-    pricePerQuintal: number
-    district: string
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type DealerCropRateUncheckedCreateWithoutSupplierInput = {
-    id?: string
-    cropName: string
-    pricePerQuintal: number
-    district: string
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type DealerCropRateCreateOrConnectWithoutSupplierInput = {
-    where: DealerCropRateWhereUniqueInput
-    create: XOR<DealerCropRateCreateWithoutSupplierInput, DealerCropRateUncheckedCreateWithoutSupplierInput>
-  }
-
-  export type DealerCropRateCreateManySupplierInputEnvelope = {
-    data: DealerCropRateCreateManySupplierInput | DealerCropRateCreateManySupplierInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type TradeBookingCreateWithoutSupplierInput = {
-    id?: string
-    cropName: string
-    approxQuintals: number
-    pricePerQuintal: number
-    slotDate: Date | string
-    status?: $Enums.TradeStatus
-    notes?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    farmer: FarmerCreateNestedOneWithoutTradeBookingsInput
-  }
-
-  export type TradeBookingUncheckedCreateWithoutSupplierInput = {
-    id?: string
-    farmerId: string
-    cropName: string
-    approxQuintals: number
-    pricePerQuintal: number
-    slotDate: Date | string
-    status?: $Enums.TradeStatus
-    notes?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type TradeBookingCreateOrConnectWithoutSupplierInput = {
-    where: TradeBookingWhereUniqueInput
-    create: XOR<TradeBookingCreateWithoutSupplierInput, TradeBookingUncheckedCreateWithoutSupplierInput>
-  }
-
-  export type TradeBookingCreateManySupplierInputEnvelope = {
-    data: TradeBookingCreateManySupplierInput | TradeBookingCreateManySupplierInput[]
-    skipDuplicates?: boolean
-  }
-
   export type UserUpsertWithoutSupplierInput = {
     update: XOR<UserUpdateWithoutSupplierInput, UserUncheckedUpdateWithoutSupplierInput>
     create: XOR<UserCreateWithoutSupplierInput, UserUncheckedCreateWithoutSupplierInput>
@@ -29376,6 +31045,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmer?: FarmerUpdateOneWithoutUserNestedInput
+    dealer?: DealerUpdateOneWithoutUserNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
@@ -29394,6 +31064,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmer?: FarmerUncheckedUpdateOneWithoutUserNestedInput
+    dealer?: DealerUncheckedUpdateOneWithoutUserNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -29469,20 +31140,180 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"OrderItem"> | Date | string
   }
 
-  export type DealerCropRateUpsertWithWhereUniqueWithoutSupplierInput = {
-    where: DealerCropRateWhereUniqueInput
-    update: XOR<DealerCropRateUpdateWithoutSupplierInput, DealerCropRateUncheckedUpdateWithoutSupplierInput>
-    create: XOR<DealerCropRateCreateWithoutSupplierInput, DealerCropRateUncheckedCreateWithoutSupplierInput>
+  export type UserCreateWithoutDealerInput = {
+    id?: string
+    phone?: string | null
+    email?: string | null
+    googleId?: string | null
+    name: string
+    role: $Enums.UserRole
+    language?: string
+    profilePhoto?: string | null
+    isVerified?: boolean
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    farmer?: FarmerCreateNestedOneWithoutUserInput
+    supplier?: SupplierCreateNestedOneWithoutUserInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
-  export type DealerCropRateUpdateWithWhereUniqueWithoutSupplierInput = {
-    where: DealerCropRateWhereUniqueInput
-    data: XOR<DealerCropRateUpdateWithoutSupplierInput, DealerCropRateUncheckedUpdateWithoutSupplierInput>
+  export type UserUncheckedCreateWithoutDealerInput = {
+    id?: string
+    phone?: string | null
+    email?: string | null
+    googleId?: string | null
+    name: string
+    role: $Enums.UserRole
+    language?: string
+    profilePhoto?: string | null
+    isVerified?: boolean
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    farmer?: FarmerUncheckedCreateNestedOneWithoutUserInput
+    supplier?: SupplierUncheckedCreateNestedOneWithoutUserInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type DealerCropRateUpdateManyWithWhereWithoutSupplierInput = {
+  export type UserCreateOrConnectWithoutDealerInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutDealerInput, UserUncheckedCreateWithoutDealerInput>
+  }
+
+  export type DealerCropRateCreateWithoutDealerInput = {
+    id?: string
+    cropName: string
+    pricePerQuintal: number
+    district: string
+    state?: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DealerCropRateUncheckedCreateWithoutDealerInput = {
+    id?: string
+    cropName: string
+    pricePerQuintal: number
+    district: string
+    state?: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DealerCropRateCreateOrConnectWithoutDealerInput = {
+    where: DealerCropRateWhereUniqueInput
+    create: XOR<DealerCropRateCreateWithoutDealerInput, DealerCropRateUncheckedCreateWithoutDealerInput>
+  }
+
+  export type DealerCropRateCreateManyDealerInputEnvelope = {
+    data: DealerCropRateCreateManyDealerInput | DealerCropRateCreateManyDealerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TradeBookingCreateWithoutDealerInput = {
+    id?: string
+    cropName: string
+    approxQuintals: number
+    pricePerQuintal: number
+    slotDate: Date | string
+    status?: $Enums.TradeStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    farmer: FarmerCreateNestedOneWithoutTradeBookingsInput
+  }
+
+  export type TradeBookingUncheckedCreateWithoutDealerInput = {
+    id?: string
+    farmerId: string
+    cropName: string
+    approxQuintals: number
+    pricePerQuintal: number
+    slotDate: Date | string
+    status?: $Enums.TradeStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TradeBookingCreateOrConnectWithoutDealerInput = {
+    where: TradeBookingWhereUniqueInput
+    create: XOR<TradeBookingCreateWithoutDealerInput, TradeBookingUncheckedCreateWithoutDealerInput>
+  }
+
+  export type TradeBookingCreateManyDealerInputEnvelope = {
+    data: TradeBookingCreateManyDealerInput | TradeBookingCreateManyDealerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserUpsertWithoutDealerInput = {
+    update: XOR<UserUpdateWithoutDealerInput, UserUncheckedUpdateWithoutDealerInput>
+    create: XOR<UserCreateWithoutDealerInput, UserUncheckedCreateWithoutDealerInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutDealerInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutDealerInput, UserUncheckedUpdateWithoutDealerInput>
+  }
+
+  export type UserUpdateWithoutDealerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    googleId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    language?: StringFieldUpdateOperationsInput | string
+    profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    farmer?: FarmerUpdateOneWithoutUserNestedInput
+    supplier?: SupplierUpdateOneWithoutUserNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutDealerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    googleId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    language?: StringFieldUpdateOperationsInput | string
+    profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    farmer?: FarmerUncheckedUpdateOneWithoutUserNestedInput
+    supplier?: SupplierUncheckedUpdateOneWithoutUserNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type DealerCropRateUpsertWithWhereUniqueWithoutDealerInput = {
+    where: DealerCropRateWhereUniqueInput
+    update: XOR<DealerCropRateUpdateWithoutDealerInput, DealerCropRateUncheckedUpdateWithoutDealerInput>
+    create: XOR<DealerCropRateCreateWithoutDealerInput, DealerCropRateUncheckedCreateWithoutDealerInput>
+  }
+
+  export type DealerCropRateUpdateWithWhereUniqueWithoutDealerInput = {
+    where: DealerCropRateWhereUniqueInput
+    data: XOR<DealerCropRateUpdateWithoutDealerInput, DealerCropRateUncheckedUpdateWithoutDealerInput>
+  }
+
+  export type DealerCropRateUpdateManyWithWhereWithoutDealerInput = {
     where: DealerCropRateScalarWhereInput
-    data: XOR<DealerCropRateUpdateManyMutationInput, DealerCropRateUncheckedUpdateManyWithoutSupplierInput>
+    data: XOR<DealerCropRateUpdateManyMutationInput, DealerCropRateUncheckedUpdateManyWithoutDealerInput>
   }
 
   export type DealerCropRateScalarWhereInput = {
@@ -29490,29 +31321,30 @@ export namespace Prisma {
     OR?: DealerCropRateScalarWhereInput[]
     NOT?: DealerCropRateScalarWhereInput | DealerCropRateScalarWhereInput[]
     id?: StringFilter<"DealerCropRate"> | string
-    supplierId?: StringFilter<"DealerCropRate"> | string
+    dealerId?: StringFilter<"DealerCropRate"> | string
     cropName?: StringFilter<"DealerCropRate"> | string
     pricePerQuintal?: FloatFilter<"DealerCropRate"> | number
     district?: StringFilter<"DealerCropRate"> | string
+    state?: StringFilter<"DealerCropRate"> | string
     isActive?: BoolFilter<"DealerCropRate"> | boolean
     createdAt?: DateTimeFilter<"DealerCropRate"> | Date | string
     updatedAt?: DateTimeFilter<"DealerCropRate"> | Date | string
   }
 
-  export type TradeBookingUpsertWithWhereUniqueWithoutSupplierInput = {
+  export type TradeBookingUpsertWithWhereUniqueWithoutDealerInput = {
     where: TradeBookingWhereUniqueInput
-    update: XOR<TradeBookingUpdateWithoutSupplierInput, TradeBookingUncheckedUpdateWithoutSupplierInput>
-    create: XOR<TradeBookingCreateWithoutSupplierInput, TradeBookingUncheckedCreateWithoutSupplierInput>
+    update: XOR<TradeBookingUpdateWithoutDealerInput, TradeBookingUncheckedUpdateWithoutDealerInput>
+    create: XOR<TradeBookingCreateWithoutDealerInput, TradeBookingUncheckedCreateWithoutDealerInput>
   }
 
-  export type TradeBookingUpdateWithWhereUniqueWithoutSupplierInput = {
+  export type TradeBookingUpdateWithWhereUniqueWithoutDealerInput = {
     where: TradeBookingWhereUniqueInput
-    data: XOR<TradeBookingUpdateWithoutSupplierInput, TradeBookingUncheckedUpdateWithoutSupplierInput>
+    data: XOR<TradeBookingUpdateWithoutDealerInput, TradeBookingUncheckedUpdateWithoutDealerInput>
   }
 
-  export type TradeBookingUpdateManyWithWhereWithoutSupplierInput = {
+  export type TradeBookingUpdateManyWithWhereWithoutDealerInput = {
     where: TradeBookingScalarWhereInput
-    data: XOR<TradeBookingUpdateManyMutationInput, TradeBookingUncheckedUpdateManyWithoutSupplierInput>
+    data: XOR<TradeBookingUpdateManyMutationInput, TradeBookingUncheckedUpdateManyWithoutDealerInput>
   }
 
   export type SupplierCreateWithoutProductsInput = {
@@ -29537,8 +31369,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSupplierInput
     orderItems?: OrderItemCreateNestedManyWithoutSupplierInput
-    cropRates?: DealerCropRateCreateNestedManyWithoutSupplierInput
-    tradeBookings?: TradeBookingCreateNestedManyWithoutSupplierInput
   }
 
   export type SupplierUncheckedCreateWithoutProductsInput = {
@@ -29563,8 +31393,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutSupplierInput
-    cropRates?: DealerCropRateUncheckedCreateNestedManyWithoutSupplierInput
-    tradeBookings?: TradeBookingUncheckedCreateNestedManyWithoutSupplierInput
   }
 
   export type SupplierCreateOrConnectWithoutProductsInput = {
@@ -29691,8 +31519,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSupplierNestedInput
     orderItems?: OrderItemUpdateManyWithoutSupplierNestedInput
-    cropRates?: DealerCropRateUpdateManyWithoutSupplierNestedInput
-    tradeBookings?: TradeBookingUpdateManyWithoutSupplierNestedInput
   }
 
   export type SupplierUncheckedUpdateWithoutProductsInput = {
@@ -29717,8 +31543,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orderItems?: OrderItemUncheckedUpdateManyWithoutSupplierNestedInput
-    cropRates?: DealerCropRateUncheckedUpdateManyWithoutSupplierNestedInput
-    tradeBookings?: TradeBookingUncheckedUpdateManyWithoutSupplierNestedInput
   }
 
   export type OrderItemUpsertWithWhereUniqueWithoutProductInput = {
@@ -30456,8 +32280,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSupplierInput
     products?: ProductCreateNestedManyWithoutSupplierInput
-    cropRates?: DealerCropRateCreateNestedManyWithoutSupplierInput
-    tradeBookings?: TradeBookingCreateNestedManyWithoutSupplierInput
   }
 
   export type SupplierUncheckedCreateWithoutOrderItemsInput = {
@@ -30482,8 +32304,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     products?: ProductUncheckedCreateNestedManyWithoutSupplierInput
-    cropRates?: DealerCropRateUncheckedCreateNestedManyWithoutSupplierInput
-    tradeBookings?: TradeBookingUncheckedCreateNestedManyWithoutSupplierInput
   }
 
   export type SupplierCreateOrConnectWithoutOrderItemsInput = {
@@ -30653,8 +32473,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSupplierNestedInput
     products?: ProductUpdateManyWithoutSupplierNestedInput
-    cropRates?: DealerCropRateUpdateManyWithoutSupplierNestedInput
-    tradeBookings?: TradeBookingUpdateManyWithoutSupplierNestedInput
   }
 
   export type SupplierUncheckedUpdateWithoutOrderItemsInput = {
@@ -30679,8 +32497,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUncheckedUpdateManyWithoutSupplierNestedInput
-    cropRates?: DealerCropRateUncheckedUpdateManyWithoutSupplierNestedInput
-    tradeBookings?: TradeBookingUncheckedUpdateManyWithoutSupplierNestedInput
   }
 
   export type ReviewUpsertWithoutOrderItemInput = {
@@ -31211,6 +33027,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     farmer?: FarmerCreateNestedOneWithoutUserInput
     supplier?: SupplierCreateNestedOneWithoutUserInput
+    dealer?: DealerCreateNestedOneWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -31229,6 +33046,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     farmer?: FarmerUncheckedCreateNestedOneWithoutUserInput
     supplier?: SupplierUncheckedCreateNestedOneWithoutUserInput
+    dealer?: DealerUncheckedCreateNestedOneWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -31263,6 +33081,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmer?: FarmerUpdateOneWithoutUserNestedInput
     supplier?: SupplierUpdateOneWithoutUserNestedInput
+    dealer?: DealerUpdateOneWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -31281,13 +33100,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmer?: FarmerUncheckedUpdateOneWithoutUserNestedInput
     supplier?: SupplierUncheckedUpdateOneWithoutUserNestedInput
+    dealer?: DealerUncheckedUpdateOneWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
-  export type SupplierCreateWithoutCropRatesInput = {
+  export type DealerCreateWithoutCropRatesInput = {
     id?: string
     businessName: string
-    gstNumber?: string | null
     address: string
     district: string
     state?: string
@@ -31296,25 +33115,18 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
-    rejectedAt?: Date | string | null
-    rejectedReason?: string | null
     rating?: number
     totalRatings?: number
-    bankAccountNo?: string | null
-    ifscCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutSupplierInput
-    products?: ProductCreateNestedManyWithoutSupplierInput
-    orderItems?: OrderItemCreateNestedManyWithoutSupplierInput
-    tradeBookings?: TradeBookingCreateNestedManyWithoutSupplierInput
+    user: UserCreateNestedOneWithoutDealerInput
+    tradeBookings?: TradeBookingCreateNestedManyWithoutDealerInput
   }
 
-  export type SupplierUncheckedCreateWithoutCropRatesInput = {
+  export type DealerUncheckedCreateWithoutCropRatesInput = {
     id?: string
     userId: string
     businessName: string
-    gstNumber?: string | null
     address: string
     district: string
     state?: string
@@ -31323,39 +33135,32 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
-    rejectedAt?: Date | string | null
-    rejectedReason?: string | null
     rating?: number
     totalRatings?: number
-    bankAccountNo?: string | null
-    ifscCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    products?: ProductUncheckedCreateNestedManyWithoutSupplierInput
-    orderItems?: OrderItemUncheckedCreateNestedManyWithoutSupplierInput
-    tradeBookings?: TradeBookingUncheckedCreateNestedManyWithoutSupplierInput
+    tradeBookings?: TradeBookingUncheckedCreateNestedManyWithoutDealerInput
   }
 
-  export type SupplierCreateOrConnectWithoutCropRatesInput = {
-    where: SupplierWhereUniqueInput
-    create: XOR<SupplierCreateWithoutCropRatesInput, SupplierUncheckedCreateWithoutCropRatesInput>
+  export type DealerCreateOrConnectWithoutCropRatesInput = {
+    where: DealerWhereUniqueInput
+    create: XOR<DealerCreateWithoutCropRatesInput, DealerUncheckedCreateWithoutCropRatesInput>
   }
 
-  export type SupplierUpsertWithoutCropRatesInput = {
-    update: XOR<SupplierUpdateWithoutCropRatesInput, SupplierUncheckedUpdateWithoutCropRatesInput>
-    create: XOR<SupplierCreateWithoutCropRatesInput, SupplierUncheckedCreateWithoutCropRatesInput>
-    where?: SupplierWhereInput
+  export type DealerUpsertWithoutCropRatesInput = {
+    update: XOR<DealerUpdateWithoutCropRatesInput, DealerUncheckedUpdateWithoutCropRatesInput>
+    create: XOR<DealerCreateWithoutCropRatesInput, DealerUncheckedCreateWithoutCropRatesInput>
+    where?: DealerWhereInput
   }
 
-  export type SupplierUpdateToOneWithWhereWithoutCropRatesInput = {
-    where?: SupplierWhereInput
-    data: XOR<SupplierUpdateWithoutCropRatesInput, SupplierUncheckedUpdateWithoutCropRatesInput>
+  export type DealerUpdateToOneWithWhereWithoutCropRatesInput = {
+    where?: DealerWhereInput
+    data: XOR<DealerUpdateWithoutCropRatesInput, DealerUncheckedUpdateWithoutCropRatesInput>
   }
 
-  export type SupplierUpdateWithoutCropRatesInput = {
+  export type DealerUpdateWithoutCropRatesInput = {
     id?: StringFieldUpdateOperationsInput | string
     businessName?: StringFieldUpdateOperationsInput | string
-    gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
     state?: StringFieldUpdateOperationsInput | string
@@ -31364,25 +33169,18 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
-    bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
-    ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutSupplierNestedInput
-    products?: ProductUpdateManyWithoutSupplierNestedInput
-    orderItems?: OrderItemUpdateManyWithoutSupplierNestedInput
-    tradeBookings?: TradeBookingUpdateManyWithoutSupplierNestedInput
+    user?: UserUpdateOneRequiredWithoutDealerNestedInput
+    tradeBookings?: TradeBookingUpdateManyWithoutDealerNestedInput
   }
 
-  export type SupplierUncheckedUpdateWithoutCropRatesInput = {
+  export type DealerUncheckedUpdateWithoutCropRatesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     businessName?: StringFieldUpdateOperationsInput | string
-    gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
     state?: StringFieldUpdateOperationsInput | string
@@ -31391,17 +33189,11 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
-    bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
-    ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    products?: ProductUncheckedUpdateManyWithoutSupplierNestedInput
-    orderItems?: OrderItemUncheckedUpdateManyWithoutSupplierNestedInput
-    tradeBookings?: TradeBookingUncheckedUpdateManyWithoutSupplierNestedInput
+    tradeBookings?: TradeBookingUncheckedUpdateManyWithoutDealerNestedInput
   }
 
   export type FarmerCreateWithoutTradeBookingsInput = {
@@ -31457,10 +33249,9 @@ export namespace Prisma {
     create: XOR<FarmerCreateWithoutTradeBookingsInput, FarmerUncheckedCreateWithoutTradeBookingsInput>
   }
 
-  export type SupplierCreateWithoutTradeBookingsInput = {
+  export type DealerCreateWithoutTradeBookingsInput = {
     id?: string
     businessName: string
-    gstNumber?: string | null
     address: string
     district: string
     state?: string
@@ -31469,25 +33260,18 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
-    rejectedAt?: Date | string | null
-    rejectedReason?: string | null
     rating?: number
     totalRatings?: number
-    bankAccountNo?: string | null
-    ifscCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutSupplierInput
-    products?: ProductCreateNestedManyWithoutSupplierInput
-    orderItems?: OrderItemCreateNestedManyWithoutSupplierInput
-    cropRates?: DealerCropRateCreateNestedManyWithoutSupplierInput
+    user: UserCreateNestedOneWithoutDealerInput
+    cropRates?: DealerCropRateCreateNestedManyWithoutDealerInput
   }
 
-  export type SupplierUncheckedCreateWithoutTradeBookingsInput = {
+  export type DealerUncheckedCreateWithoutTradeBookingsInput = {
     id?: string
     userId: string
     businessName: string
-    gstNumber?: string | null
     address: string
     district: string
     state?: string
@@ -31496,22 +33280,16 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
-    rejectedAt?: Date | string | null
-    rejectedReason?: string | null
     rating?: number
     totalRatings?: number
-    bankAccountNo?: string | null
-    ifscCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    products?: ProductUncheckedCreateNestedManyWithoutSupplierInput
-    orderItems?: OrderItemUncheckedCreateNestedManyWithoutSupplierInput
-    cropRates?: DealerCropRateUncheckedCreateNestedManyWithoutSupplierInput
+    cropRates?: DealerCropRateUncheckedCreateNestedManyWithoutDealerInput
   }
 
-  export type SupplierCreateOrConnectWithoutTradeBookingsInput = {
-    where: SupplierWhereUniqueInput
-    create: XOR<SupplierCreateWithoutTradeBookingsInput, SupplierUncheckedCreateWithoutTradeBookingsInput>
+  export type DealerCreateOrConnectWithoutTradeBookingsInput = {
+    where: DealerWhereUniqueInput
+    create: XOR<DealerCreateWithoutTradeBookingsInput, DealerUncheckedCreateWithoutTradeBookingsInput>
   }
 
   export type FarmerUpsertWithoutTradeBookingsInput = {
@@ -31573,21 +33351,20 @@ export namespace Prisma {
     cart?: CartUncheckedUpdateOneWithoutFarmerNestedInput
   }
 
-  export type SupplierUpsertWithoutTradeBookingsInput = {
-    update: XOR<SupplierUpdateWithoutTradeBookingsInput, SupplierUncheckedUpdateWithoutTradeBookingsInput>
-    create: XOR<SupplierCreateWithoutTradeBookingsInput, SupplierUncheckedCreateWithoutTradeBookingsInput>
-    where?: SupplierWhereInput
+  export type DealerUpsertWithoutTradeBookingsInput = {
+    update: XOR<DealerUpdateWithoutTradeBookingsInput, DealerUncheckedUpdateWithoutTradeBookingsInput>
+    create: XOR<DealerCreateWithoutTradeBookingsInput, DealerUncheckedCreateWithoutTradeBookingsInput>
+    where?: DealerWhereInput
   }
 
-  export type SupplierUpdateToOneWithWhereWithoutTradeBookingsInput = {
-    where?: SupplierWhereInput
-    data: XOR<SupplierUpdateWithoutTradeBookingsInput, SupplierUncheckedUpdateWithoutTradeBookingsInput>
+  export type DealerUpdateToOneWithWhereWithoutTradeBookingsInput = {
+    where?: DealerWhereInput
+    data: XOR<DealerUpdateWithoutTradeBookingsInput, DealerUncheckedUpdateWithoutTradeBookingsInput>
   }
 
-  export type SupplierUpdateWithoutTradeBookingsInput = {
+  export type DealerUpdateWithoutTradeBookingsInput = {
     id?: StringFieldUpdateOperationsInput | string
     businessName?: StringFieldUpdateOperationsInput | string
-    gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
     state?: StringFieldUpdateOperationsInput | string
@@ -31596,25 +33373,18 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
-    bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
-    ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutSupplierNestedInput
-    products?: ProductUpdateManyWithoutSupplierNestedInput
-    orderItems?: OrderItemUpdateManyWithoutSupplierNestedInput
-    cropRates?: DealerCropRateUpdateManyWithoutSupplierNestedInput
+    user?: UserUpdateOneRequiredWithoutDealerNestedInput
+    cropRates?: DealerCropRateUpdateManyWithoutDealerNestedInput
   }
 
-  export type SupplierUncheckedUpdateWithoutTradeBookingsInput = {
+  export type DealerUncheckedUpdateWithoutTradeBookingsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     businessName?: StringFieldUpdateOperationsInput | string
-    gstNumber?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
     district?: StringFieldUpdateOperationsInput | string
     state?: StringFieldUpdateOperationsInput | string
@@ -31623,17 +33393,11 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
-    bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
-    ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    products?: ProductUncheckedUpdateManyWithoutSupplierNestedInput
-    orderItems?: OrderItemUncheckedUpdateManyWithoutSupplierNestedInput
-    cropRates?: DealerCropRateUncheckedUpdateManyWithoutSupplierNestedInput
+    cropRates?: DealerCropRateUncheckedUpdateManyWithoutDealerNestedInput
   }
 
   export type NotificationCreateManyUserInput = {
@@ -31746,7 +33510,7 @@ export namespace Prisma {
 
   export type TradeBookingCreateManyFarmerInput = {
     id?: string
-    supplierId: string
+    dealerId: string
     cropName: string
     approxQuintals: number
     pricePerQuintal: number
@@ -31891,12 +33655,12 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    supplier?: SupplierUpdateOneRequiredWithoutTradeBookingsNestedInput
+    dealer?: DealerUpdateOneRequiredWithoutTradeBookingsNestedInput
   }
 
   export type TradeBookingUncheckedUpdateWithoutFarmerInput = {
     id?: StringFieldUpdateOperationsInput | string
-    supplierId?: StringFieldUpdateOperationsInput | string
+    dealerId?: StringFieldUpdateOperationsInput | string
     cropName?: StringFieldUpdateOperationsInput | string
     approxQuintals?: FloatFieldUpdateOperationsInput | number
     pricePerQuintal?: FloatFieldUpdateOperationsInput | number
@@ -31909,7 +33673,7 @@ export namespace Prisma {
 
   export type TradeBookingUncheckedUpdateManyWithoutFarmerInput = {
     id?: StringFieldUpdateOperationsInput | string
-    supplierId?: StringFieldUpdateOperationsInput | string
+    dealerId?: StringFieldUpdateOperationsInput | string
     cropName?: StringFieldUpdateOperationsInput | string
     approxQuintals?: FloatFieldUpdateOperationsInput | number
     pricePerQuintal?: FloatFieldUpdateOperationsInput | number
@@ -31949,29 +33713,6 @@ export namespace Prisma {
     price: number
     status?: $Enums.OrderStatus
     createdAt?: Date | string
-  }
-
-  export type DealerCropRateCreateManySupplierInput = {
-    id?: string
-    cropName: string
-    pricePerQuintal: number
-    district: string
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type TradeBookingCreateManySupplierInput = {
-    id?: string
-    farmerId: string
-    cropName: string
-    approxQuintals: number
-    pricePerQuintal: number
-    slotDate: Date | string
-    status?: $Enums.TradeStatus
-    notes?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
   }
 
   export type ProductUpdateWithoutSupplierInput = {
@@ -32075,37 +33816,64 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type DealerCropRateUpdateWithoutSupplierInput = {
+  export type DealerCropRateCreateManyDealerInput = {
+    id?: string
+    cropName: string
+    pricePerQuintal: number
+    district: string
+    state?: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TradeBookingCreateManyDealerInput = {
+    id?: string
+    farmerId: string
+    cropName: string
+    approxQuintals: number
+    pricePerQuintal: number
+    slotDate: Date | string
+    status?: $Enums.TradeStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DealerCropRateUpdateWithoutDealerInput = {
     id?: StringFieldUpdateOperationsInput | string
     cropName?: StringFieldUpdateOperationsInput | string
     pricePerQuintal?: FloatFieldUpdateOperationsInput | number
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type DealerCropRateUncheckedUpdateWithoutSupplierInput = {
+  export type DealerCropRateUncheckedUpdateWithoutDealerInput = {
     id?: StringFieldUpdateOperationsInput | string
     cropName?: StringFieldUpdateOperationsInput | string
     pricePerQuintal?: FloatFieldUpdateOperationsInput | number
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type DealerCropRateUncheckedUpdateManyWithoutSupplierInput = {
+  export type DealerCropRateUncheckedUpdateManyWithoutDealerInput = {
     id?: StringFieldUpdateOperationsInput | string
     cropName?: StringFieldUpdateOperationsInput | string
     pricePerQuintal?: FloatFieldUpdateOperationsInput | number
     district?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type TradeBookingUpdateWithoutSupplierInput = {
+  export type TradeBookingUpdateWithoutDealerInput = {
     id?: StringFieldUpdateOperationsInput | string
     cropName?: StringFieldUpdateOperationsInput | string
     approxQuintals?: FloatFieldUpdateOperationsInput | number
@@ -32118,7 +33886,7 @@ export namespace Prisma {
     farmer?: FarmerUpdateOneRequiredWithoutTradeBookingsNestedInput
   }
 
-  export type TradeBookingUncheckedUpdateWithoutSupplierInput = {
+  export type TradeBookingUncheckedUpdateWithoutDealerInput = {
     id?: StringFieldUpdateOperationsInput | string
     farmerId?: StringFieldUpdateOperationsInput | string
     cropName?: StringFieldUpdateOperationsInput | string
@@ -32131,7 +33899,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type TradeBookingUncheckedUpdateManyWithoutSupplierInput = {
+  export type TradeBookingUncheckedUpdateManyWithoutDealerInput = {
     id?: StringFieldUpdateOperationsInput | string
     farmerId?: StringFieldUpdateOperationsInput | string
     cropName?: StringFieldUpdateOperationsInput | string
@@ -32346,6 +34114,10 @@ export namespace Prisma {
      */
     export type SupplierCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = SupplierCountOutputTypeDefaultArgs<ExtArgs>
     /**
+     * @deprecated Use DealerCountOutputTypeDefaultArgs instead
+     */
+    export type DealerCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DealerCountOutputTypeDefaultArgs<ExtArgs>
+    /**
      * @deprecated Use ProductCountOutputTypeDefaultArgs instead
      */
     export type ProductCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ProductCountOutputTypeDefaultArgs<ExtArgs>
@@ -32373,6 +34145,10 @@ export namespace Prisma {
      * @deprecated Use SupplierDefaultArgs instead
      */
     export type SupplierArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = SupplierDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use DealerDefaultArgs instead
+     */
+    export type DealerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DealerDefaultArgs<ExtArgs>
     /**
      * @deprecated Use ProductDefaultArgs instead
      */

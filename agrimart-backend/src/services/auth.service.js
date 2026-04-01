@@ -76,6 +76,12 @@ const verifyOTP = async ({ phone, otp, name, language, role }) => {
                     userId: user.id, businessName: 'My Store', gstNumber: null, address: '', district: 'Maharashtra', pincode: '',
                 },
             });
+        } else if (user.role === 'DEALER') {
+            await prisma.dealer.create({
+                data: {
+                    userId: user.id, businessName: 'My Agency', address: '', district: 'Maharashtra', pincode: '',
+                },
+            });
         }
     } else if (name) {
         user = await prisma.user.update({ where: { id: user.id }, data: { name, language: language || user.language } });
@@ -86,7 +92,7 @@ const verifyOTP = async ({ phone, otp, name, language, role }) => {
     await prisma.session.create({ data: { userId: user.id, token, expiresAt } });
 
     const fullUser = await prisma.user.findUnique({
-        where: { id: user.id }, include: { farmer: true, supplier: true },
+        where: { id: user.id }, include: { farmer: true, supplier: true, dealer: true },
     });
     return { user: fullUser, token, refreshToken };
 };
@@ -124,6 +130,14 @@ const completeOnboarding = async (userId, role, data) => {
         await prisma.supplier.update({
             where: { userId },
             data: {
+                status: 'isVerified',
+                isVerified: true
+            }
+        });
+    } else if (role === 'DEALER') {
+        await prisma.dealer.update({
+            where: { userId },
+            data: {
                 businessName: data.businessName || '',
                 address: data.address || '',
                 district: data.district || '',
@@ -134,7 +148,7 @@ const completeOnboarding = async (userId, role, data) => {
     }
 
     return prisma.user.findUnique({
-        where: { id: userId }, include: { farmer: true, supplier: true },
+        where: { id: userId }, include: { farmer: true, supplier: true, dealer: true },
     });
 };
 
@@ -176,6 +190,12 @@ const googleSignIn = async ({ email, googleId, name, photoUrl, role }) => {
                     userId: user.id, businessName: 'My Store', gstNumber: null, address: '', district: 'Maharashtra', pincode: '',
                 },
             });
+        } else if (user.role === 'DEALER') {
+            await prisma.dealer.create({
+                data: {
+                    userId: user.id, businessName: name, address: '', district: 'Maharashtra', pincode: '',
+                },
+            });
         }
     } else {
         user = await prisma.user.update({
@@ -193,7 +213,7 @@ const googleSignIn = async ({ email, googleId, name, photoUrl, role }) => {
     await prisma.session.create({ data: { userId: user.id, token, expiresAt } });
 
     const fullUser = await prisma.user.findUnique({
-        where: { id: user.id }, include: { farmer: true, supplier: true },
+        where: { id: user.id }, include: { farmer: true, supplier: true, dealer: true },
     });
     return { user: fullUser, token, refreshToken };
 };

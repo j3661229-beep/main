@@ -322,7 +322,12 @@ class _HomeTab extends ConsumerWidget {
                 // Data-dense Weather Widget
                 _HomeWeatherWidget(dashboard: dashboard, ref: ref),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
+
+                // Featured "Sell" Card
+                _SellCropsCard(onTap: () => context.push('/farmer/mandi')),
+
+                const SizedBox(height: 20),
 
                 // Data-Dense Financial KPI Strip
                 dashboard.when(
@@ -561,6 +566,90 @@ class _StatChip extends StatelessWidget {
   );
 }
 
+class _SellCropsCard extends StatelessWidget {
+  final VoidCallback onTap;
+  const _SellCropsCard({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          colors: [Colors.orange.shade700, Colors.orange.shade900],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.orange.withValues(alpha: 0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          )
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Text(
+                          'HOT FEATURE 🔥',
+                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'आपला माल विका',
+                        style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5),
+                      ),
+                      const Text(
+                        'Sell Your Crops',
+                        style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: onTap,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.orange.shade900,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text('Book Slot Now ➔', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                ),
+                Transform.scale(
+                  scale: 1.2,
+                  child: const Text('🌾', style: TextStyle(fontSize: 80)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _OrderTile extends StatelessWidget {
   final Map order;
   const _OrderTile({required this.order});
@@ -639,65 +728,110 @@ class AITabContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-          title: const Text('🤖 AI Tools'), backgroundColor: AppColors.primary),
-      body: ListView(padding: const EdgeInsets.all(16), children: [
-        _AICard(
-            '🧪',
-            'Soil Analysis',
-            'Analyze soil type & get fertilizer advice',
-            () => context.push('/farmer/soil')),
-        _AICard('🔬', 'Disease Detection', 'Identify crop diseases from photo',
-            () => context.push('/farmer/disease')),
-        _AICard('🌱', 'Crop Advisor', 'Get crop recommendations for your farm',
-            () => context.push('/farmer/crop-advisor')),
-        _AICard('💬', 'Kisan AI Chat', 'Chat in Marathi, Hindi or English',
-            () => context.push('/farmer/kisan-ai')),
-      ]),
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(24, 60, 24, 32),
+              decoration: const BoxDecoration(
+                gradient: AppColors.heroGradient,
+                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(32), bottomRight: Radius.circular(32)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('🤖 AgriAI Hub', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.white)),
+                  const SizedBox(height: 8),
+                  Text('Your smart farming assistant powered by Gemini', style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w500)),
+                ],
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.all(20),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                _AICard(
+                    '🧪',
+                    'Soil Analysis',
+                    'Analyze soil type & get fertilizer advice',
+                    'INSTANT RESULT',
+                    const Color(0xFFFFF3E0),
+                    () => context.push('/farmer/soil')),
+                _AICard(
+                    '🔬',
+                    'Disease Detection',
+                    'Identify crop diseases from a photo',
+                    'VISUAL AI',
+                    const Color(0xFFFFEBEE),
+                    () => context.push('/farmer/disease')),
+                _AICard(
+                    '🌱',
+                    'Crop Advisor',
+                    'Get crop recommendations for your farm',
+                    'PLANNING',
+                    const Color(0xFFF1F8E9),
+                    () => context.push('/farmer/crop-advisor')),
+                _AICard(
+                    '💬',
+                    'Kisan AI Chat',
+                    'Ask anything in Marathi, Hindi or English',
+                    'VOICE SUPPORT',
+                    const Color(0xFFF3E5F5),
+                    () => context.push('/farmer/kisan-ai')),
+              ]),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
 class _AICard extends StatelessWidget {
-  final String emoji, title, desc;
+  final String emoji, title, desc, tag;
+  final Color color;
   final VoidCallback onTap;
-  const _AICard(this.emoji, this.title, this.desc, this.onTap);
+  const _AICard(this.emoji, this.title, this.desc, this.tag, this.color, this.onTap);
+
   @override
   Widget build(BuildContext context) => GestureDetector(
         onTap: onTap,
         child: Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4))
-              ]),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: AppColors.softShadow,
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+          ),
           child: Row(children: [
             Container(
-                width: 52,
-                height: 52,
+                width: 60,
+                height: 60,
                 decoration: BoxDecoration(
-                    color: AppColors.primarySurface,
-                    borderRadius: BorderRadius.circular(14)),
+                    color: color,
+                    borderRadius: BorderRadius.circular(18)),
                 child: Center(
-                    child: Text(emoji, style: const TextStyle(fontSize: 28)))),
-            const SizedBox(width: 14),
+                    child: Text(emoji, style: const TextStyle(fontSize: 32)))),
+            const SizedBox(width: 16),
             Expanded(
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  Text(title, style: AppTextStyles.headingMD),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(6)),
+                    child: Text(tag, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: Colors.black.withValues(alpha: 0.5), letterSpacing: 0.5)),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(title, style: AppTextStyles.headingMD.copyWith(letterSpacing: -0.3)),
                   const SizedBox(height: 2),
-                  Text(desc, style: AppTextStyles.bodySM),
+                  Text(desc, style: AppTextStyles.bodySM.copyWith(color: AppColors.textTertiary)),
                 ])),
             const Icon(Icons.arrow_forward_ios_rounded,
-                size: 14, color: AppColors.textTertiary),
+                size: 16, color: AppColors.border),
           ]),
         ),
       );

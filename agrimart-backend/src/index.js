@@ -52,6 +52,7 @@ const notificationRoutes = require('./routes/notification.routes');
 const schemeRoutes = require('./routes/scheme.routes');
 const adminRoutes = require('./routes/admin.routes');
 const tradeRoutes = require('./routes/trade.routes');
+const dealerRoutes = require('./routes/dealer.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -124,6 +125,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/schemes', schemeRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/trade', tradeRoutes);
+app.use('/api/dealer', dealerRoutes);
 
 // Error handling
 app.use(notFound);

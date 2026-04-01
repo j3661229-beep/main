@@ -13,6 +13,7 @@ datasource db {
 enum UserRole {
   FARMER
   SUPPLIER
+  DEALER
   ADMIN
 }
 
@@ -58,6 +59,7 @@ model User {
   updatedAt     DateTime       @updatedAt
   farmer        Farmer?
   supplier      Supplier?
+  dealer        Dealer?
   notifications Notification[]
   sessions      Session[]
 }
@@ -98,31 +100,50 @@ model Farmer {
 }
 
 model Supplier {
-  id             String           @id @default(cuid())
-  userId         String           @unique
+  id             String      @id @default(cuid())
+  userId         String      @unique
   businessName   String
   gstNumber      String?
   address        String
   district       String
-  state          String           @default("Maharashtra")
+  state          String      @default("Maharashtra")
   pincode        String
   latitude       Float?
   longitude      Float?
-  isVerified     Boolean          @default(false)
+  isVerified     Boolean     @default(false)
   verifiedAt     DateTime?
   rejectedAt     DateTime?
   rejectedReason String?
-  rating         Float            @default(0)
-  totalRatings   Int              @default(0)
+  rating         Float       @default(0)
+  totalRatings   Int         @default(0)
   bankAccountNo  String?
   ifscCode       String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   products       Product[]
   orderItems     OrderItem[]
-  cropRates      DealerCropRate[]
-  tradeBookings  TradeBooking[]
+}
+
+model Dealer {
+  id            String           @id @default(cuid())
+  userId        String           @unique
+  businessName  String
+  address       String
+  district      String
+  state         String           @default("Maharashtra")
+  pincode       String
+  latitude      Float?
+  longitude     Float?
+  isVerified    Boolean          @default(false)
+  verifiedAt    DateTime?
+  rating        Float            @default(0)
+  totalRatings  Int              @default(0)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cropRates     DealerCropRate[]
+  tradeBookings TradeBooking[]
 }
 
 model Product {
@@ -320,23 +341,24 @@ enum TradeStatus {
 
 model DealerCropRate {
   id              String   @id @default(cuid())
-  supplierId      String
+  dealerId        String
   cropName        String
   pricePerQuintal Float
   district        String
+  state           String   @default("Maharashtra")
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  supplier        Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  dealer          Dealer   @relation(fields: [dealerId], references: [id], onDelete: Cascade)
 
-  @@unique([supplierId, cropName, district])
+  @@unique([dealerId, cropName, district])
   @@index([district, cropName])
 }
 
 model TradeBooking {
   id              String      @id @default(cuid())
   farmerId        String
-  supplierId      String
+  dealerId        String
   cropName        String
   approxQuintals  Float
   pricePerQuintal Float
@@ -346,5 +368,5 @@ model TradeBooking {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   farmer          Farmer      @relation(fields: [farmerId], references: [id])
-  supplier        Supplier    @relation(fields: [supplierId], references: [id])
+  dealer          Dealer      @relation(fields: [dealerId], references: [id])
 }

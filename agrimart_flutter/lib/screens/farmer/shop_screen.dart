@@ -504,14 +504,9 @@ class _ProductCardSwiggy extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4))
-            ],
-            border: Border.all(color: AppColors.border.withValues(alpha: 0.5))),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: AppColors.softShadow,
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.4))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           // Image Area
           Expanded(
@@ -521,22 +516,18 @@ class _ProductCardSwiggy extends StatelessWidget {
                   tag: 'product_${product['id']}',
                   child: ClipRRect(
                     borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(15)),
+                        const BorderRadius.vertical(top: Radius.circular(19)),
                     child: Container(
                       width: double.infinity,
-                      color: AppColors.primarySurface.withValues(alpha: 0.5),
+                      decoration: BoxDecoration(
+                        color: AppColors.primarySurface.withValues(alpha: 0.3),
+                      ),
                       child: product['images'] is List &&
                               (product['images'] as List).isNotEmpty
                           ? CachedNetworkImage(
                               imageUrl: product['images'][0],
-                              memCacheWidth:
-                                  400, // Optimize memory for thumbnails
+                              memCacheWidth: 400,
                               fit: BoxFit.cover,
-                              placeholder: (context, url) => Shimmer.fromColors(
-                                baseColor: Colors.grey[300]!,
-                                highlightColor: Colors.grey[100]!,
-                                child: Container(color: Colors.white),
-                              ),
                               errorWidget: (_, __, ___) => const Center(
                                   child: Text('🌿',
                                       style: TextStyle(fontSize: 40))),
@@ -549,23 +540,27 @@ class _ProductCardSwiggy extends StatelessWidget {
                 ),
                 if (product['isOrganic'] == true)
                   Positioned(
-                    top: 8,
-                    left: 8,
+                    top: 10,
+                    left: 10,
                     child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 4),
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(6)),
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)
+                            ]),
                         child: Row(
                           children: const [
                             Text('🌱', style: TextStyle(fontSize: 10)),
                             SizedBox(width: 4),
-                            Text('Organic',
+                            Text('ORGANIC',
                                 style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.success)),
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.success,
+                                    letterSpacing: 0.5)),
                           ],
                         )),
                   ),
@@ -581,18 +576,18 @@ class _ProductCardSwiggy extends StatelessWidget {
               children: [
                 Text(product['name'] ?? '',
                     style: AppTextStyles.headingSM
-                        .copyWith(fontSize: 13, height: 1.2),
+                        .copyWith(fontSize: 13, height: 1.2, fontWeight: FontWeight.w800),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 Text('${product['brand'] ?? 'Local'} • ${product['unit']}',
-                    style: AppTextStyles.caption.copyWith(fontSize: 11)),
+                    style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('₹${product['price']}',
-                        style: AppTextStyles.priceSmall.copyWith(fontSize: 15)),
+                        style: AppTextStyles.priceSmall.copyWith(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
 
                     // ADD BUTTON / QTY SELECTOR
                     if (cartQty == 0)
@@ -600,16 +595,20 @@ class _ProductCardSwiggy extends StatelessWidget {
                         onTap: () => onUpdateCart(1),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 6),
+                              horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.primary),
-                              borderRadius: BorderRadius.circular(8),
-                              color: AppColors.primary.withValues(alpha: 0.05)),
+                              border: Border.all(color: AppColors.primary.withValues(alpha: 0.5)),
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(color: AppColors.primary.withValues(alpha: 0.1), blurRadius: 4, offset: const Offset(0, 2))
+                              ]),
                           child: const Text('ADD',
                               style: TextStyle(
                                   color: AppColors.primary,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 13)),
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 12,
+                                  letterSpacing: 0.5)),
                         ),
                       )
                     else
@@ -617,27 +616,30 @@ class _ProductCardSwiggy extends StatelessWidget {
                           height: 32,
                           decoration: BoxDecoration(
                             color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 3))
+                            ]
                           ),
                           child: Row(children: [
                             GestureDetector(
                               onTap: () => onUpdateCart(cartQty - 1),
                               child: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
                                   child: Icon(Icons.remove,
-                                      color: Colors.white, size: 16)),
+                                      color: Colors.white, size: 14)),
                             ),
                             Text('$cartQty',
                                 style: const TextStyle(
                                     color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w900,
                                     fontSize: 13)),
                             GestureDetector(
                               onTap: () => onUpdateCart(cartQty + 1),
                               child: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
                                   child: Icon(Icons.add,
-                                      color: Colors.white, size: 16)),
+                                      color: Colors.white, size: 14)),
                             ),
                           ]))
                   ],

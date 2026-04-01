@@ -217,74 +217,129 @@ class MandiPricesScreen extends ConsumerWidget {
                 final prices = data['prices'] as List? ?? [];
                 if (prices.isEmpty) return const AppEmptyState(icon: '👩‍🌾', title: 'No Buyers', subtitle: 'No direct buyers available right now.');
                 
-                return ListView.builder(
+                return SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
-                  itemCount: prices.length,
-                  itemBuilder: (ctx, i) {
-                     final p = prices[i] as Map;
-                     final cropName = p['crop'] ?? 'Crop';
-                     return Container(
-                       margin: const EdgeInsets.only(bottom: 16),
-                       decoration: BoxDecoration(
-                         gradient: const LinearGradient(colors: [Colors.white, Color(0xFFF8FAFC)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                         borderRadius: BorderRadius.circular(24),
-                         border: Border.all(color: AppColors.primary.withValues(alpha: 0.1), width: 2),
-                         boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 8))]
-                       ),
-                       child: Padding(
-                         padding: const EdgeInsets.all(20),
-                         child: Column(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           children: [
-                             Row(
-                               children: [
-                                  Text(p['emoji'] as String? ?? '🌾', style: const TextStyle(fontSize: 28)),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildMarketInsightCard(),
+                      const SizedBox(height: 24),
+                      Text('Top Verified Dealers', style: AppTextStyles.headingMD),
+                      const SizedBox(height: 16),
+                      ...prices.map((p) {
+                        final cropName = p['crop'] ?? 'Crop';
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.08),
+                                blurRadius: 24,
+                                offset: const Offset(0, 8),
+                              )
+                            ],
+                            border: Border.all(color: AppColors.primary.withValues(alpha: 0.05)),
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 56, height: 56,
+                                      decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(16)),
+                                      child: Center(child: Text(p['emoji'] as String? ?? '🌾', style: const TextStyle(fontSize: 32))),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Sell $cropName', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                                          const SizedBox(height: 2),
+                                          Row(
+                                            children: [
+                                              const Icon(Icons.verified, color: Colors.blue, size: 14),
+                                              const SizedBox(width: 4),
+                                              Text('9 Verified Buyers nearby', style: TextStyle(color: AppColors.textTertiary, fontSize: 11, fontWeight: FontWeight.w600)),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
-                                        Text('Sell $cropName Direct', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.textPrimary)),
-                                        Text('Top buyers in $district', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+                                        Text('₹${p['price']}+', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.primary)),
+                                        const Text('per quintal', style: TextStyle(fontSize: 10, color: AppColors.textTertiary)),
                                       ],
-                                    )
-                                  ),
-                               ]
-                             ),
-                             const SizedBox(height: 20),
-                             SizedBox(
-                               width: double.infinity,
-                               child: ElevatedButton(
-                                 onPressed: () {
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(alpha: 0.03),
+                                  borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
+                                ),
+                                child: InkWell(
+                                  onTap: () {
                                     Navigator.push(context, MaterialPageRoute(builder: (_) => BookTradeSlotScreen(cropName: cropName, district: district)));
-                                 },
-                                 style: ElevatedButton.styleFrom(
-                                   backgroundColor: AppColors.primaryDark,
-                                   foregroundColor: Colors.white,
-                                   padding: const EdgeInsets.symmetric(vertical: 16),
-                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                   elevation: 0,
-                                 ),
-                                 child: const Row(
-                                   mainAxisAlignment: MainAxisAlignment.center,
-                                   children: [
-                                     Text('View Dealers & Book Slot', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
-                                     SizedBox(width: 8),
-                                     Icon(Icons.arrow_forward_rounded, size: 18)
-                                   ]
-                                 )
-                               )
-                             )
-                           ]
-                         )
-                       )
-                     );
-                  }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('VIEW DEALERS & BOOK SLOT', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 12, letterSpacing: 0.5)),
+                                      const SizedBox(width: 8),
+                                      const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.primary),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
                 );
               }
              )
           ]
         ),
+      ),
+    );
+  }
+
+  Widget _buildMarketInsightCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [AppColors.primary, AppColors.primaryDark], begin: Alignment.topLeft, end: Alignment.bottomRight),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: AppColors.primaryShadow,
+      ),
+      child: const Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Direct Trading', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
+                SizedBox(height: 4),
+                Text('Skip the mandi queues. Sell directly to verified district dealers at competitive rates.', 
+                  style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
+              ],
+            ),
+          ),
+          SizedBox(width: 16),
+          CircleAvatar(backgroundColor: Colors.white24, radius: 24, child: Text('🤝', style: TextStyle(fontSize: 24))),
+        ],
       ),
     );
   }

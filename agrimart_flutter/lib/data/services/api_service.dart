@@ -35,27 +35,6 @@ class ApiService {
   Dio get dio => _dio;
 
   // ── Auth ──────────────────────────────────────────────────
-  Future<Map> sendOTP(String phone, String role) async {
-    final r =
-        await _dio.post('/auth/send-otp', data: {'phone': phone, 'role': role});
-    return r.data['data'];
-  }
-
-  Future<Map> verifyOTP(
-      {required String phone,
-      required String otp,
-      String? name,
-      String? language,
-      String? role}) async {
-    final r = await _dio.post('/auth/verify-otp', data: {
-      'phone': phone,
-      'otp': otp,
-      'name': name,
-      'language': language,
-      'role': role
-    });
-    return r.data['data'];
-  }
 
   Future<Map> completeOnboarding(Map<String, dynamic> data) async {
     final r = await _dio.post('/auth/onboarding', data: data);

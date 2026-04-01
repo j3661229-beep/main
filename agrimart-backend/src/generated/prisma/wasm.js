@@ -188,6 +188,24 @@ exports.Prisma.SupplierScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.DealerScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  businessName: 'businessName',
+  address: 'address',
+  district: 'district',
+  state: 'state',
+  pincode: 'pincode',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  isVerified: 'isVerified',
+  verifiedAt: 'verifiedAt',
+  rating: 'rating',
+  totalRatings: 'totalRatings',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ProductScalarFieldEnum = {
   id: 'id',
   supplierId: 'supplierId',
@@ -346,10 +364,11 @@ exports.Prisma.FCMTokenScalarFieldEnum = {
 
 exports.Prisma.DealerCropRateScalarFieldEnum = {
   id: 'id',
-  supplierId: 'supplierId',
+  dealerId: 'dealerId',
   cropName: 'cropName',
   pricePerQuintal: 'pricePerQuintal',
   district: 'district',
+  state: 'state',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -358,7 +377,7 @@ exports.Prisma.DealerCropRateScalarFieldEnum = {
 exports.Prisma.TradeBookingScalarFieldEnum = {
   id: 'id',
   farmerId: 'farmerId',
-  supplierId: 'supplierId',
+  dealerId: 'dealerId',
   cropName: 'cropName',
   approxQuintals: 'approxQuintals',
   pricePerQuintal: 'pricePerQuintal',
@@ -397,6 +416,7 @@ exports.Prisma.JsonNullValueFilter = {
 exports.UserRole = exports.$Enums.UserRole = {
   FARMER: 'FARMER',
   SUPPLIER: 'SUPPLIER',
+  DEALER: 'DEALER',
   ADMIN: 'ADMIN'
 };
 
@@ -439,6 +459,7 @@ exports.Prisma.ModelName = {
   Session: 'Session',
   Farmer: 'Farmer',
   Supplier: 'Supplier',
+  Dealer: 'Dealer',
   Product: 'Product',
   Cart: 'Cart',
   CartItem: 'CartItem',

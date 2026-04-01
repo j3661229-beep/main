@@ -111,6 +111,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     if (user == null) return;
 
     final isFarmer = user.isFarmer;
+    final isDealer = user.isDealer;
     
     // We append the map link directly to the address text to avoid Prisma migration for now
     final supplierAddress = '${_addressCtrl.text.trim()}${_mapLinkCtrl.text.isNotEmpty ? ' | MAP: ${_mapLinkCtrl.text.trim()}' : ''}';
@@ -126,6 +127,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       if (!isFarmer) 'address': supplierAddress,
       if (!isFarmer) 'district': _districtCtrl.text.trim(),
       if (!isFarmer) 'state': _stateCtrl.text.trim(),
+      
+      'role': user.role,
     };
 
     try {
@@ -165,141 +168,198 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               Text(
                 isFarmer 
                   ? 'Please fill in a few details about your farm to proceed.'
-                  : 'Please provide your shop details so farmers can find you.',
+                  : (user.isDealer ? 'Please provide your agency details to start buying crops.' : 'Please provide your shop details so farmers can find you.'),
                 style: AppTextStyles.bodyMD.copyWith(color: AppColors.textSecondary),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               
               // New Location Fetch Button
-              OutlinedButton(
-                onPressed: _isLocating ? null : _getCurrentLocation,
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.primarySurface,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.primaryBorder.withValues(alpha: 0.5)),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Column(
                   children: [
-                    if (_isLocating)
-                      const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                    else
-                      const Icon(Icons.my_location, size: 18),
-                    const SizedBox(width: 8),
-                    Text(_isLocating ? 'Locating...' : '📍 Use Current Location'),
+                    const Text('📍 High-Accuracy Location', style: AppTextStyles.headingSM),
+                    const SizedBox(height: 4),
+                    const Text('Auto-fill your address using GPS', style: AppTextStyles.bodyXS),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _isLocating ? null : _getCurrentLocation,
+                        icon: _isLocating 
+                          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          : const Icon(Icons.my_location, size: 18),
+                        label: Text(_isLocating ? 'Locating...' : 'Use Current Location'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 32),
-
-              // Shared Field: Name
-              Text('Your Full Name', style: AppTextStyles.labelLG),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _nameCtrl,
-                decoration: const InputDecoration(hintText: 'e.g. Ramesh Patel'),
-                validator: (v) => v!.isEmpty ? 'Name is required' : null,
-              ),
               const SizedBox(height: 24),
 
-              // Farmer Fields
-              if (isFarmer) ...[
-                Text('Village / Town', style: AppTextStyles.labelLG),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _villageCtrl,
-                  decoration: const InputDecoration(hintText: 'e.g. Shirpur'),
-                  validator: (v) => v!.isEmpty ? 'Village is required' : null,
-                ),
-                const SizedBox(height: 24),
+              // Card 1: Personal Details
+              _SetupCard(
+                title: '👤 Personal Identity',
+                children: [
+                  const Text('Your Full Name', style: AppTextStyles.labelLG),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _nameCtrl,
+                    decoration: const InputDecoration(hintText: 'e.g. Ramesh Patel'),
+                    validator: (v) => v!.isEmpty ? 'Name is required' : null,
+                  ),
+                ],
+              ),
 
-                Text('District', style: AppTextStyles.labelLG),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _districtCtrl,
-                  decoration: const InputDecoration(hintText: 'e.g. Dhule'),
-                  validator: (v) => v!.isEmpty ? 'District is required' : null,
-                ),
-                const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
-                Text('State', style: AppTextStyles.labelLG),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _stateCtrl,
-                  decoration: const InputDecoration(hintText: 'e.g. Maharashtra'),
-                  validator: (v) => v!.isEmpty ? 'State is required' : null,
-                ),
-                const SizedBox(height: 24),
+              // Card 2: Farm/Business Details
+              _SetupCard(
+                title: isFarmer ? '🌾 Farm Details' : (user.isDealer ? '🤝 Agency Details' : '🏪 Shop Details'),
+                children: [
+                  if (isFarmer) ...[
+                    const Text('Village / Town', style: AppTextStyles.labelLG),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _villageCtrl,
+                      decoration: const InputDecoration(hintText: 'e.g. Shirpur'),
+                      validator: (v) => v!.isEmpty ? 'Village is required' : null,
+                    ),
+                    const SizedBox(height: 24),
 
-                Text('Farm Size (Acres)', style: AppTextStyles.labelLG),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _farmSizeCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(hintText: 'e.g. 5.0'),
-                  validator: (v) => v!.isEmpty ? 'Farm size is required' : null,
-                ),
-              ],
+                    const Text('District', style: AppTextStyles.labelLG),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _districtCtrl,
+                      decoration: const InputDecoration(hintText: 'e.g. Dhule'),
+                      validator: (v) => v!.isEmpty ? 'District is required' : null,
+                    ),
+                    const SizedBox(height: 24),
 
-              // Supplier Fields
-              if (!isFarmer) ...[
-                Text('Store / Business Name', style: AppTextStyles.labelLG),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _businessNameCtrl,
-                  decoration: const InputDecoration(hintText: 'e.g. Patel Krushi Kendra'),
-                  validator: (v) => v!.isEmpty ? 'Business name is required' : null,
-                ),
-                const SizedBox(height: 24),
+                    const Text('State', style: AppTextStyles.labelLG),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _stateCtrl,
+                      decoration: const InputDecoration(hintText: 'e.g. Maharashtra'),
+                      validator: (v) => v!.isEmpty ? 'State is required' : null,
+                    ),
+                    const SizedBox(height: 24),
 
-                Text('District', style: AppTextStyles.labelLG),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _districtCtrl,
-                  decoration: const InputDecoration(hintText: 'e.g. Dhule'),
-                  validator: (v) => v!.isEmpty ? 'District is required' : null,
-                ),
-                const SizedBox(height: 24),
+                    const Text('Farm Size (Acres)', style: AppTextStyles.labelLG),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _farmSizeCtrl,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(hintText: 'e.g. 5.0'),
+                      validator: (v) => v!.isEmpty ? 'Farm size is required' : null,
+                    ),
+                  ],
 
-                Text('State', style: AppTextStyles.labelLG),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _stateCtrl,
-                  decoration: const InputDecoration(hintText: 'e.g. Maharashtra'),
-                  validator: (v) => v!.isEmpty ? 'State is required' : null,
-                ),
-                const SizedBox(height: 24),
+                  if (!isFarmer) ...[
+                    Text(user.isDealer ? 'Agency / Business Name' : 'Store / Business Name', style: AppTextStyles.labelLG),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _businessNameCtrl,
+                      decoration: InputDecoration(hintText: user.isDealer ? 'e.g. Gaikwad Trading Co.' : 'e.g. Patel Krushi Kendra'),
+                      validator: (v) => v!.isEmpty ? 'Business name is required' : null,
+                    ),
+                    const SizedBox(height: 24),
 
-                Text('Complete Shop Address', style: AppTextStyles.labelLG),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _addressCtrl,
-                  maxLines: 3,
-                  decoration: const InputDecoration(hintText: 'e.g. Shop No 4, Main Market, Shirpur'),
-                  validator: (v) => v!.isEmpty ? 'Address is required' : null,
-                ),
-                const SizedBox(height: 24),
+                    const Text('District', style: AppTextStyles.labelLG),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _districtCtrl,
+                      decoration: const InputDecoration(hintText: 'e.g. Dhule'),
+                      validator: (v) => v!.isEmpty ? 'District is required' : null,
+                    ),
+                    const SizedBox(height: 24),
 
-                Text('Google Maps Link (Recommended)', style: AppTextStyles.labelLG),
-                const SizedBox(height: 4),
-                Text('Help farmers navigate directly to your shop.', style: TextStyle(fontSize: 12, color: AppColors.textTertiary)),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _mapLinkCtrl,
-                  decoration: const InputDecoration(hintText: 'e.g. https://maps.app.goo.gl/...'),
-                ),
-              ],
+                    const Text('State', style: AppTextStyles.labelLG),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _stateCtrl,
+                      decoration: const InputDecoration(hintText: 'e.g. Maharashtra'),
+                      validator: (v) => v!.isEmpty ? 'State is required' : null,
+                    ),
+                    const SizedBox(height: 24),
+
+                    Text(user.isDealer ? 'Agency Address' : 'Complete Shop Address', style: AppTextStyles.labelLG),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _addressCtrl,
+                      maxLines: 3,
+                      decoration: InputDecoration(hintText: user.isDealer ? 'e.g. Plot No 12, APMC Yard, Jalgaon' : 'e.g. Shop No 4, Main Market, Shirpur'),
+                      validator: (v) => v!.isEmpty ? 'Address is required' : null,
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text('Google Maps Link (Recommended)', style: AppTextStyles.labelLG),
+                    const SizedBox(height: 4),
+                    const Text('Help farmers navigate directly to your shop.', style: TextStyle(fontSize: 12, color: AppColors.textTertiary)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _mapLinkCtrl,
+                      decoration: const InputDecoration(hintText: 'e.g. https://maps.app.goo.gl/...'),
+                    ),
+                  ],
+                ],
+              ),
 
               const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: auth.isLoading ? null : _submit,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  elevation: 8,
+                  shadowColor: AppColors.primary.withValues(alpha: 0.3),
+                ),
                 child: auth.isLoading
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : const Text('Complete Setup ✨'),
+                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
+                  : const Text('Complete Setup ✨', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
+              const SizedBox(height: 32),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SetupCard extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+  const _SetupCard({required this.title, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: AppColors.softShadow,
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: AppTextStyles.headingLG.copyWith(color: AppColors.primary)),
+          const Divider(height: 32),
+          ...children,
+        ],
       ),
     );
   }

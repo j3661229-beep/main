@@ -4,8 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../data/providers/auth_provider.dart';
 import '../screens/auth/splash_screen.dart';
 import '../screens/auth/role_selection_screen.dart';
-import '../screens/auth/phone_screen.dart';
-import '../screens/auth/otp_screen.dart';
+import '../screens/auth/login_screen.dart';
 import '../screens/auth/onboarding_screen.dart';
 import '../screens/auth/profile_setup_screen.dart';
 import '../screens/farmer/farmer_home.dart';
@@ -28,6 +27,9 @@ import '../screens/supplier/supplier_orders_screen.dart';
 import '../screens/supplier/add_product_screen.dart';
 import '../screens/supplier/supplier_analytics_screen.dart';
 import '../screens/shared/notifications_screen.dart';
+import '../screens/dealer/dealer_home.dart';
+import '../screens/dealer/manage_rates_screen.dart';
+import '../screens/dealer/view_bookings_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
@@ -58,7 +60,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           return '/auth/setup';
         }
         if (authState.user!.isVerified && (state.matchedLocation.startsWith('/auth') || state.matchedLocation == '/splash')) {
-          return authState.user!.isFarmer ? '/farmer' : '/supplier';
+          if (authState.user!.isFarmer) return '/farmer';
+          if (authState.user!.isDealer) return '/dealer';
+          return '/supplier';
         }
       }
       return null;
@@ -71,13 +75,9 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Auth
       _fadedRoute('/auth/role', const RoleSelectionScreen()),
-      GoRoute(path: '/auth/phone', pageBuilder: (ctx, state) {
+      GoRoute(path: '/auth/login', pageBuilder: (ctx, state) {
         final role = state.uri.queryParameters['role'] ?? 'FARMER';
-        return _fadedPage(PhoneScreen(role: role));
-      }),
-      GoRoute(path: '/auth/otp', pageBuilder: (ctx, state) {
-        final extra = state.extra as Map<String, String>? ?? {};
-        return _fadedPage(OTPScreen(phone: extra['phone'] ?? '', role: extra['role'] ?? 'FARMER'));
+        return _fadedPage(LoginScreen(role: role));
       }),
       _fadedRoute('/auth/onboarding', const OnboardingScreen()),
       _fadedRoute('/auth/setup', const ProfileSetupScreen()),
@@ -107,6 +107,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       _fadedRoute('/supplier/orders', const SupplierOrdersScreen()),
       _fadedRoute('/supplier/add-product', const AddProductScreen()),
       _fadedRoute('/supplier/analytics', const SupplierAnalyticsScreen()),
+
+      // Dealer
+      _fadedRoute('/dealer', const DealerHome()),
+      _fadedRoute('/dealer/rates', const ManageRatesScreen()),
+      _fadedRoute('/dealer/bookings', const DealerBookingsScreen()),
     ],
   );
 

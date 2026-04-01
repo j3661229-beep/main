@@ -2,6 +2,7 @@
 //  AgriMart — Complete Supplier App
 // ─────────────────────────────────────────────────
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -161,14 +162,20 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: bg, borderRadius: BorderRadius.circular(16),
-      boxShadow: [BoxShadow(color: accent.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 3))],
+      color: Colors.white, 
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: AppColors.softShadow,
+      border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
     ),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(emoji, style: const TextStyle(fontSize: 22)),
+      Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(color: accent.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+        child: Text(emoji, style: const TextStyle(fontSize: 18)),
+      ),
       const Spacer(),
-      Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: accent)),
-      Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+      Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: accent, letterSpacing: -0.5)),
+      Text(label, style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
     ]),
   );
 }
@@ -181,17 +188,26 @@ class _QuickAction extends StatelessWidget {
   const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap});
   @override
   Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
+    onTap: () {
+      HapticFeedback.lightImpact();
+      onTap();
+    },
     child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8)]),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.white, 
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: AppColors.softShadow,
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+      ),
       child: Column(children: [
-        Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
-          child: Icon(icon, color: color, size: 22)),
-        const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600), textAlign: TextAlign.center),
+        Container(
+          padding: const EdgeInsets.all(12), 
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+          child: Icon(icon, color: color, size: 24)
+        ),
+        const SizedBox(height: 10),
+        Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: -0.2), textAlign: TextAlign.center),
       ]),
     ),
   );
@@ -204,19 +220,29 @@ class _RecentOrderTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final status = order['status'] as String? ?? 'PENDING';
     final statusColor = status == 'DELIVERED' ? AppColors.success : status == 'DISPATCHED' ? AppColors.info : AppColors.amber;
-    return Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.border)),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12), 
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white, 
+        borderRadius: BorderRadius.circular(20), 
+        boxShadow: AppColors.softShadow,
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.4))
+      ),
       child: Row(children: [
-        Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(10)),
-          child: const Text('📦', style: TextStyle(fontSize: 20))),
-        const SizedBox(width: 12),
+        Container(
+          padding: const EdgeInsets.all(12), 
+          decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(12)),
+          child: const Text('📦', style: TextStyle(fontSize: 22))
+        ),
+        const SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Order #${(order['id'] as String? ?? '').substring(0,8).toUpperCase()}', style: AppTextStyles.headingSM),
-          Text('${order['items']?.length ?? 1} item(s)', style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+          Text('Order #${(order['id'] as String? ?? '').substring(0,8).toUpperCase()}', style: AppTextStyles.headingSM.copyWith(fontWeight: FontWeight.w800)),
+          Text('${order['items']?.length ?? 1} item(s)', style: TextStyle(color: AppColors.textTertiary, fontSize: 12, fontWeight: FontWeight.w500)),
         ])),
-        Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
-          child: Text(status, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: statusColor))),
+        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
+          child: Text(status, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: statusColor, letterSpacing: 0.5))),
       ]));
   }
 }

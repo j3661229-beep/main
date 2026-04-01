@@ -6,9 +6,8 @@ const { uploadToSupabase } = require('../middleware/upload');
 const logger = require('../utils/logger');
 const cache = require('../utils/cache');
 
-// Initialize Gemini & Cerebras
+// Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const CEREBRAS_API_KEY = process.env.CEREBRAS_API_KEY || "csk-38f84tdc5jxh2ptkd5rycyy5vv45v5ht3fh4f65kyfr5re5f";
 
 const SYSTEM_KISAN = `You are Kisan AI, an expert agricultural assistant for Indian farmers. Detect the user language (Marathi/Hindi/English) and ALWAYS reply in the SAME language. Help with: crop advice, disease identification, mandi prices, government schemes, fertilizer usage, weather-based tips. Use simple words farmers understand. Be practical and specific. Avoid complex jargon. Format answers with clear steps when giving instructions. Mention local mandi names when relevant.`;
 
@@ -26,7 +25,7 @@ const parseJSON = (text) => {
 const generateWithFallback = async (prompt, imageBase64 = null) => {
     let lastError;
 
-    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro"];
     const contents = imageBase64 ? [prompt, { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }] : prompt;
 
     for (const modelName of modelsToTry) {
@@ -141,7 +140,7 @@ const chat = async (userId, { message, history = [], language = 'English' }) => 
             parts: [{ text: msg.content }]
         }));
 
-    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro"];
 
     for (const modelName of modelsToTry) {
         try {
