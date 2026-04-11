@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { adminLogin as apiLogin } from '../lib/api';
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
     const [admin, setAdmin] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -11,16 +11,18 @@ export const AuthProvider = ({ children }) => {
         const token = localStorage.getItem('admin_token');
         const stored = localStorage.getItem('admin_user');
         if (token && stored) {
-            setAdmin(JSON.parse(stored));
+            try { setAdmin(JSON.parse(stored)); } catch { /* ignore bad data */ }
         }
         setLoading(false);
     }, []);
 
     const login = async (phone, password) => {
         const res = await apiLogin({ phone, password });
-        localStorage.setItem('admin_token', res.data.token);
-        localStorage.setItem('admin_user', JSON.stringify(res.data.user));
-        setAdmin(res.data.user);
+        // Interceptor unwraps axios res.data → { success, message, data: { token, user } }
+        const { token, user } = res.data;
+        localStorage.setItem('admin_token', token);
+        localStorage.setItem('admin_user', JSON.stringify(user));
+        setAdmin(user);
         return res;
     };
 
@@ -35,6 +37,4 @@ export const AuthProvider = ({ children }) => {
             {children}
         </AuthContext.Provider>
     );
-};
-
-export const useAuth = () => useContext(AuthContext);
+}

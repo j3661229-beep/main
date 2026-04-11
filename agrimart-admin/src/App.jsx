@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
+import { useAuth } from './context/useAuth';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -16,9 +16,11 @@ import Settings from './pages/Settings';
 
 const PrivateRoute = ({ children }) => {
   const { admin, loading } = useAuth();
+  const hasToken = !!localStorage.getItem('admin_token');
   if (loading) return <div className="page-loader"><div className="loading-spinner" /></div>;
-  return admin ? children : <Navigate to="/login" replace />;
+  return (admin || hasToken) ? children : <Navigate to="/login" replace />;
 };
+
 
 export default function App() {
   return (

@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
+
 import toast from 'react-hot-toast';
+
 
 export default function Login() {
     const { login } = useAuth();
-    const navigate = useNavigate();
     const [form, setForm] = useState({ phone: '+919999999999', password: 'AgriMart@Admin2024' });
     const [loading, setLoading] = useState(false);
 
@@ -15,13 +15,15 @@ export default function Login() {
         try {
             await login(form.phone, form.password);
             toast.success('Welcome back, Admin!');
-            navigate('/dashboard');
+            // Hard redirect — bypasses React state race condition entirely
+            window.location.href = '/dashboard';
         } catch (err) {
-            toast.error(err?.message || 'Login failed');
-        } finally {
+            toast.error(err?.message || err?.error || 'Login failed');
             setLoading(false);
         }
     };
+
+
 
     return (
         <div style={{
