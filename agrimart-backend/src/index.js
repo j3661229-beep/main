@@ -59,6 +59,9 @@ const uploadRoutes = require('./routes/upload.routes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust reverse proxy (Railway/Hostinger) so rate limiter doesn't block everyone
+app.set('trust proxy', 1);
+
 // Security + utility middleware
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(compression());
