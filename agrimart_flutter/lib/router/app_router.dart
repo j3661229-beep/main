@@ -70,17 +70,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         final hasUploadedDoc = (supplier?['govtDocUrl'] != null) || (dealer?['govtDocUrl'] != null);
         final isPending = (supplierDocStatus == 'PENDING' && hasUploadedDoc) ||
                          (dealerDocStatus == 'PENDING' && hasUploadedDoc);
-        final needsDocUpload = !user.isFarmer && !hasUploadedDoc && user.isAuthenticated;
+        final needsDocUpload = !user.isFarmer && !hasUploadedDoc;
 
-        if (!user.isVerified && state.matchedLocation == '/auth/setup') return null;
+
+        final hasProfileBasics = (supplier?['businessName'] != null && supplier?['businessName'] != 'My Agency') ||
+                                (dealer?['businessName'] != null && dealer?['businessName'] != 'My Agency');
+
+        if (!user.isVerified && state.matchedLocation == '/auth/setup' && !hasProfileBasics) return null;
         if (!user.isVerified && state.matchedLocation == '/auth/doc-upload') return null;
         if (!user.isVerified && state.matchedLocation == '/auth/pending') return null;
         
-        if (!user.isVerified && needsDocUpload && state.matchedLocation != '/auth/setup') {
+        if (!user.isVerified && needsDocUpload) {
           return '/auth/doc-upload';
         }
         if (!user.isVerified && isPending) return '/auth/pending';
-        if (!user.isVerified && state.matchedLocation != '/auth/setup') return '/auth/setup';
+        if (!user.isVerified && !hasProfileBasics) return '/auth/setup';
+
 
         if (user.isVerified && (state.matchedLocation.startsWith('/auth') || state.matchedLocation == '/splash')) {
           if (user.isFarmer) return '/farmer';

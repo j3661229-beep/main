@@ -133,7 +133,14 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
     try {
       await ref.read(authProvider.notifier).completeOnboarding(data);
-      // Once isVerified is true, router automatically bumps us to /farmer or /supplier
+      if (mounted) {
+        if (user.isFarmer) {
+          context.go('/farmer');
+        } else {
+          context.go('/auth/doc-upload');
+        }
+      }
+
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
 import Suppliers from './pages/Suppliers';
+import Dealers from './pages/Dealers';
 import Products from './pages/Products';
 import Orders from './pages/Orders';
 import MandiPrices from './pages/MandiPrices';
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="users" element={<Users />} />
           <Route path="suppliers" element={<Suppliers />} />
+          <Route path="dealers" element={<Dealers />} />
           <Route path="products" element={<Products />} />
           <Route path="orders" element={<Orders />} />
           <Route path="mandi" element={<MandiPrices />} />

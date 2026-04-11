@@ -41,6 +41,12 @@ export const getPendingSuppliers = () => api.get('/admin/suppliers/pending');
 export const getAllSuppliers = (params) => api.get('/admin/suppliers', { params });
 export const verifySupplier = (id, data) => api.post(`/admin/suppliers/${id}/verify`, data);
 
+/* Dealers */
+export const getPendingDealers = () => api.get('/admin/dealers/pending');
+export const getAllDealers = (params) => api.get('/admin/dealers', { params });
+export const verifyDealer = (id, data) => api.post(`/admin/dealers/${id}/verify`, data);
+
+
 /* Products */
 export const getProducts = (params) => api.get('/admin/products', { params });
 export const approveProduct = (id) => api.patch(`/admin/products/${id}/approve`);

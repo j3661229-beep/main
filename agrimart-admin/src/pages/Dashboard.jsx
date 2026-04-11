@@ -36,8 +36,10 @@ export default function Dashboard() {
 
     const pieData = [
         { name: 'Farmers', value: s.totalFarmers },
+        { name: 'Dealers', value: s.totalDealers },
         { name: 'Suppliers', value: s.totalSuppliers },
     ];
+
 
     return (
         <div className="animate-fade">

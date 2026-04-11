@@ -27,7 +27,9 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
   static const _districts = [
     'Dhule', 'Nashik', 'Pune', 'Jalgaon', 'Aurangabad',
     'Ahmednagar', 'Kolhapur', 'Solapur', 'Nagpur', 'Amravati',
+    'Konkan Division', 'Mumbai', 'Mumbai Suburban', 'Other',
   ];
+
 
   @override
   Widget build(BuildContext context) {
