@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { requireAuth } = require('../middleware/auth');
+const { authenticate } = require('../middleware/auth');
 const { upload, uploadToSupabase } = require('../middleware/upload');
 const prisma = require('../config/database');
 const { success, error } = require('../utils/apiResponse');
@@ -8,7 +8,8 @@ const logger = require('../utils/logger');
 
 // POST /api/upload/govt-doc
 // Upload a government document for supplier/dealer verification
-router.post('/govt-doc', requireAuth, upload.single('document'), async (req, res, next) => {
+router.post('/govt-doc', authenticate, upload.single('document'), async (req, res, next) => {
+
     try {
         const user = req.user;
         if (!req.file) return error(res, 'Document file is required', 400);
