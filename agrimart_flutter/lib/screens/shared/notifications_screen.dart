@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/app_fallback.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
@@ -17,16 +18,19 @@ class NotificationsScreen extends ConsumerWidget {
       ]),
       body: notifications.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => const Center(child: Text('Could not load notifications')),
+        error: (e, _) => AppErrorState(
+          message: e.toString(),
+          onRetry: () => ref.read(notificationsProvider.notifier).load(),
+        ),
         data: (data) {
           final list = data['data'] as List? ?? [];
-          if (list.isEmpty) return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Text('🔔', style: TextStyle(fontSize: 64)),
-            const SizedBox(height: 16),
-            const Text('No notifications yet', style: AppTextStyles.headingLG),
-            const SizedBox(height: 8),
-            Text('You\'ll be notified about orders, prices & weather', style: AppTextStyles.bodySM, textAlign: TextAlign.center),
-          ]));
+          if (list.isEmpty) {
+            return const AppEmptyState(
+              icon: '🔔',
+              title: 'No notifications yet',
+              subtitle: 'You\'ll be notified about orders, prices & weather',
+            );
+          }
 
           final typeEmoji = {'ORDER': '📦', 'WEATHER': '☀️', 'PRICE_ALERT': '📈', 'SCHEME': '🏛️', 'ADVISORY': '🌾', 'GENERAL': '📢'};
 

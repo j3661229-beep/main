@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
 
 class OrdersScreen extends ConsumerWidget {
@@ -28,18 +29,13 @@ class OrdersScreen extends ConsumerWidget {
         loading: () => const AppShimmerList(itemCount: 6),
         error: (e, _) => const Center(child: Text('Could not load orders')),
         data: (list) => list.isEmpty
-            ? Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                    const Text('📦', style: TextStyle(fontSize: 64)),
-                    const SizedBox(height: 16),
-                    const Text('No orders yet', style: AppTextStyles.headingLG),
-                    const SizedBox(height: 8),
-                    TextButton(
-                        onPressed: () => context.push('/farmer/shop'),
-                        child: const Text('Start Shopping →')),
-                  ]))
+            ? AppEmptyState(
+                icon: '📦',
+                title: 'No orders yet',
+                subtitle: 'Browse the shop to buy seeds, fertilizers, and more.',
+                actionLabel: 'Start Shopping →',
+                onAction: () => context.push('/farmer/shop'),
+              )
             : ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: list.length,

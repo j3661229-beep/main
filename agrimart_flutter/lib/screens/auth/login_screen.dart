@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/app_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   final String role;
@@ -214,16 +215,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                                       ]),
                                     ),
                                     const SizedBox(height: 28),
-                                    SizedBox(
-                                      width: double.infinity,
-                                      height: 56,
-                                      child: ElevatedButton(
-                                        onPressed: auth.isLoading ? null : _sendOTP,
-                                        style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))),
-                                        child: auth.isLoading
-                                            ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
-                                            : const Text('Send WhatsApp OTP 📲', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                      ),
+                                    AppButton(
+                                      label: 'Send WhatsApp OTP 📲',
+                                      isLoading: auth.isLoading,
+                                      onPressed: _sendOTP,
                                     ),
                                   ],
                                 ),
@@ -259,34 +254,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                                     ),
                                   ),
                                   const SizedBox(height: 28),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: 58,
-                                    child: ElevatedButton(
-                                      onPressed: auth.isLoading ? null : _googleSignIn,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.white,
-                                        foregroundColor: AppColors.textPrimary,
-                                        elevation: 0,
-                                        side: const BorderSide(color: AppColors.border),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                      ),
-                                      child: auth.isLoading
-                                          ? const CircularProgressIndicator()
-                                          : Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Image.network(
-                                                  'https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png',
-                                                  width: 24, height: 24,
-                                                  errorBuilder: (_, __, ___) => const Icon(Icons.account_circle, color: Colors.grey),
-                                                ),
-                                                const SizedBox(width: 12),
-                                                const Text('Sign in with Google',
-                                                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-                                              ],
-                                            ),
-                                    ),
+                                  AppButton(
+                                    label: 'Sign in with Google',
+                                    isPrimary: false,
+                                    isLoading: auth.isLoading,
+                                    onPressed: _googleSignIn,
                                   ),
                                 ],
                               ),

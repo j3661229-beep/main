@@ -9,12 +9,20 @@ import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
 import '../../core/widgets/app_snackbar.dart';
+import '../../core/widgets/app_button.dart';
 
-class CartScreen extends ConsumerWidget {
+class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends ConsumerState<CartScreen> {
+  bool _isCheckingOut = false;
+
+  @override
+  Widget build(BuildContext context) {
     final cart = ref.watch(cartProvider);
 
     return Scaffold(
@@ -184,46 +192,31 @@ class CartScreen extends ConsumerWidget {
                           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5, color: AppColors.primaryDark)),
                     ]),
                 const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      elevation: 0,
-                    ),
-                    onPressed: () async {
-                      // Sync local cart to backend before checkout
-                      try {
-                        // show loading dialog
-                        showDialog(
-                          context: context, 
-                          barrierDismissible: false,
-                          builder: (_) => const Center(child: CircularProgressIndicator())
-                        );
-                        final api = ApiService.instance;
-                        await api.clearCart();
-                        for (final item in items) {
-                           await api.addToCart(
-                             productId: item['product']?['id'] ?? item['product']?['_id'] ?? item['productId'], 
-                             quantity: item['quantity']
-                           );
-                        }
-                        if (context.mounted) {
-                          Navigator.pop(context); // hide loading
-                          context.push('/farmer/checkout');
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          Navigator.pop(context); // hide loading
-                          AppSnackbar.error(
-                              context, 'Could not sync cart. Please try again.');
-                        }
+                AppButton(
+                  label: 'Proceed to Checkout →',
+                  isLoading: _isCheckingOut,
+                  onPressed: () async {
+                    setState(() => _isCheckingOut = true);
+                    try {
+                      final api = ApiService.instance;
+                      await api.clearCart();
+                      for (final item in items) {
+                         await api.addToCart(
+                           productId: item['product']?['id'] ?? item['product']?['_id'] ?? item['productId'], 
+                           quantity: item['quantity']
+                         );
                       }
-                    },
-                    child: const Text('Proceed to Checkout →', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
-                  ),
+                      if (context.mounted) {
+                        context.push('/farmer/checkout');
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        AppSnackbar.error(context, 'Could not sync cart. Please try again.');
+                      }
+                    } finally {
+                      if (mounted) setState(() => _isCheckingOut = false);
+                    }
+                  },
                 ),
               ])),
             ),

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/app_button.dart';
 
 class OTPScreen extends ConsumerStatefulWidget {
   final String phone;
@@ -134,11 +135,10 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
                       ),
                   ]),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: auth.isLoading ? null : _verifyOTP,
-                    child: auth.isLoading
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : const Text('Verify & Login ✅'),
+                  AppButton(
+                    onPressed: _verifyOTP,
+                    isLoading: auth.isLoading,
+                    label: 'Verify & Login ✅',
                   ),
                 ]),
               ),
