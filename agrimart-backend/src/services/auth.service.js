@@ -130,7 +130,6 @@ const completeOnboarding = async (userId, role, data) => {
         await prisma.supplier.update({
             where: { userId },
             data: {
-                status: 'isVerified',
                 isVerified: true
             }
         });

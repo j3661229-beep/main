@@ -50,7 +50,8 @@ const getProducts = async ({ category, search, sort, district, lat, lng, radius 
     products = withDistance(products, userLat, userLng);
 
     if (userLat !== null && userLng !== null) {
-        products = products.filter((p) => p.supplierDistanceKm !== null && p.supplierDistanceKm <= radiusKm);
+        // Relaxed filtering: only exclude if distance is known AND exceeds radius
+        products = products.filter((p) => p.supplierDistanceKm === null || p.supplierDistanceKm <= radiusKm);
     }
 
     if (sort === 'nearest' && userLat !== null && userLng !== null) {
@@ -90,7 +91,7 @@ const getNearby = async ({ lat, lng, radius = 25 }) => {
     });
 
     return withDistance(products, userLat, userLng)
-        .filter((p) => p.supplierDistanceKm !== null && p.supplierDistanceKm <= radiusKm)
+        .filter((p) => p.supplierDistanceKm === null || p.supplierDistanceKm <= radiusKm)
         .sort((a, b) => a.supplierDistanceKm - b.supplierDistanceKm)
         .slice(0, 20);
 };

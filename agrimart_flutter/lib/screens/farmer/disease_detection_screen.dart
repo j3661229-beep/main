@@ -70,7 +70,7 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                         color: AppColors.error.withValues(alpha: 0.3))),
-                child: const Row(children: [
+                child: Row(children: [
                   Text('🔬', style: TextStyle(fontSize: 28)),
                   SizedBox(width: 12),
                   Expanded(

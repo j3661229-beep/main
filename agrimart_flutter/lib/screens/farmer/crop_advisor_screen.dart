@@ -83,7 +83,7 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                               child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                const Text('Gemini AI Advisor',
+                                  Text(l10n.cropAdvisor,
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 20,

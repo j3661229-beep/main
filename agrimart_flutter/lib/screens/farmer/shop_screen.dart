@@ -500,6 +500,7 @@ class _ProductCardSwiggy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () => context.push('/farmer/shop/product/${product['id']}'),
       child: Container(

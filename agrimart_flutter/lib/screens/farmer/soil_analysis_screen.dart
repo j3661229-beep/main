@@ -73,7 +73,7 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
                     color: AppColors.primarySurface,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: AppColors.primaryBorder)),
-                child: const Row(children: [
+                child: Row(children: [
                   const Text('🤖', style: TextStyle(fontSize: 28)),
                   const SizedBox(width: 12),
                   Expanded(
