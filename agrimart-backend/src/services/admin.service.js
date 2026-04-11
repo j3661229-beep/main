@@ -1,23 +1,29 @@
 const prisma = require('../config/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const cache = require('../utils/cache');
+
+const DASHBOARD_CACHE_TTL = 120; // 2 minutes
 
 // Admin login with password
 const adminLogin = async ({ phone, password }) => {
     const user = await prisma.user.findUnique({ where: { phone } });
     if (!user || user.role !== 'ADMIN') throw Object.assign(new Error('Invalid admin credentials'), { statusCode: 401 });
-    // In production, store hashed password; for now use env check
     if (password !== process.env.ADMIN_PASSWORD) throw Object.assign(new Error('Invalid password'), { statusCode: 401 });
     const token = jwt.sign({ userId: user.id, role: 'ADMIN' }, process.env.JWT_SECRET || 'dev_secret', { expiresIn: '12h' });
     return { user, token };
 };
 
-// Dashboard stats
+// Dashboard stats (cached 2 min)
 const getDashboardStats = async () => {
+    const cacheKey = 'admin:dashboard';
+    const cached = await cache.get(cacheKey);
+    if (cached) return cached;
+
     const [
         totalUsers, totalFarmers, totalSuppliers, totalDealers,
         totalOrders, totalRevenue, pendingOrders,
-        pendingSuppliers, totalProducts, newUsersThisMonth,
+        pendingSuppliers, pendingDealers, totalProducts, newUsersThisMonth,
     ] = await Promise.all([
         prisma.user.count({ where: { isActive: true } }),
         prisma.user.count({ where: { role: 'FARMER', isActive: true } }),
@@ -26,18 +32,17 @@ const getDashboardStats = async () => {
         prisma.order.count(),
         prisma.payment.aggregate({ where: { status: 'SUCCESS' }, _sum: { amount: true } }),
         prisma.order.count({ where: { status: { in: ['PENDING', 'PAYMENT_CONFIRMED'] } } }),
-        prisma.supplier.count({ where: { isVerified: false } }),
+        prisma.supplier.count({ where: { docStatus: 'PENDING' } }),
+        prisma.dealer.count({ where: { docStatus: 'PENDING' } }),
         prisma.product.count({ where: { isActive: true } }),
         prisma.user.count({ where: { createdAt: { gte: new Date(new Date().setDate(1)) } } }),
     ]);
 
-    // Recent orders
     const recentOrders = await prisma.order.findMany({
         take: 10, orderBy: { createdAt: 'desc' },
         include: { farmer: { include: { user: true } }, items: { include: { product: true } }, payment: true },
     });
 
-    // Revenue trend last 7 days
     const trend = await Promise.all(
         Array.from({ length: 7 }, (_, i) => {
             const start = new Date(); start.setDate(start.getDate() - i); start.setHours(0, 0, 0, 0);
@@ -47,11 +52,14 @@ const getDashboardStats = async () => {
         })
     );
 
-    return {
-        stats: { totalUsers, totalFarmers, totalSuppliers, totalDealers, totalOrders, totalRevenue: totalRevenue._sum.amount || 0, pendingOrders, pendingSuppliers, totalProducts, newUsersThisMonth },
+    const result = {
+        stats: { totalUsers, totalFarmers, totalSuppliers, totalDealers, totalOrders, totalRevenue: totalRevenue._sum.amount || 0, pendingOrders, pendingSuppliers, pendingDealers, totalProducts, newUsersThisMonth },
         recentOrders,
         revenueTrend: trend.reverse(),
     };
+
+    await cache.set(cacheKey, result, DASHBOARD_CACHE_TTL);
+    return result;
 };
 
 // Users
@@ -68,7 +76,7 @@ const getUsers = async ({ page, limit, skip }, { role, search, isActive }) => {
 };
 
 const getUser = async (id) => {
-    const user = await prisma.user.findUnique({ where: { id }, include: { farmer: { include: { orders: { take: 5 } } }, supplier: { include: { products: { take: 5 } } } } });
+    const user = await prisma.user.findUnique({ where: { id }, include: { farmer: { include: { orders: { take: 5 } } }, supplier: { include: { products: { take: 5 } } }, dealer: true } });
     if (!user) throw Object.assign(new Error('User not found'), { statusCode: 404 });
     return user;
 };
@@ -79,18 +87,19 @@ const toggleUserActive = async (id) => {
     return prisma.user.update({ where: { id }, data: { isActive: !user.isActive } });
 };
 
-// Supplier verification
+// ── Supplier Verification ──
 const getPendingSuppliers = async () => {
     return prisma.supplier.findMany({
-        where: { isVerified: false, rejectedAt: null },
+        where: { docStatus: 'PENDING' },
         include: { user: true },
         orderBy: { createdAt: 'desc' },
     });
 };
 
-const getAllSuppliers = async ({ page, limit, skip }, { search, isVerified }) => {
+const getAllSuppliers = async ({ page, limit, skip }, { search, isVerified, docStatus }) => {
     const where = {};
     if (isVerified !== undefined) where.isVerified = isVerified === 'true';
+    if (docStatus) where.docStatus = docStatus;
     if (search) {
         where.OR = [
             { businessName: { contains: search, mode: 'insensitive' } },
@@ -111,10 +120,72 @@ const getAllSuppliers = async ({ page, limit, skip }, { search, isVerified }) =>
 };
 
 const verifySupplier = async (supplierId, { action, reason }) => {
+    await cache.del('admin:dashboard');
     if (action === 'approve') {
-        return prisma.supplier.update({ where: { id: supplierId }, data: { isVerified: true, verifiedAt: new Date() } });
+        const supplier = await prisma.supplier.update({
+            where: { id: supplierId },
+            data: { isVerified: true, docStatus: 'APPROVED', verifiedAt: new Date() },
+            include: { user: true },
+        });
+        // Mark user as verified so they can access the app
+        await prisma.user.update({ where: { id: supplier.userId }, data: { isVerified: true } });
+        return supplier;
     } else if (action === 'reject') {
-        return prisma.supplier.update({ where: { id: supplierId }, data: { rejectedAt: new Date(), rejectedReason: reason } });
+        return prisma.supplier.update({
+            where: { id: supplierId },
+            data: { docStatus: 'REJECTED', rejectedAt: new Date(), rejectedReason: reason },
+        });
+    }
+    throw Object.assign(new Error('Action must be approve or reject'), { statusCode: 400 });
+};
+
+// ── Dealer Verification ──
+const getPendingDealers = async () => {
+    return prisma.dealer.findMany({
+        where: { docStatus: 'PENDING' },
+        include: { user: true },
+        orderBy: { createdAt: 'desc' },
+    });
+};
+
+const getAllDealers = async ({ page, limit, skip }, { search, isVerified, docStatus }) => {
+    const where = {};
+    if (isVerified !== undefined) where.isVerified = isVerified === 'true';
+    if (docStatus) where.docStatus = docStatus;
+    if (search) {
+        where.OR = [
+            { businessName: { contains: search, mode: 'insensitive' } },
+            { address: { contains: search, mode: 'insensitive' } },
+            { user: { name: { contains: search, mode: 'insensitive' } } },
+            { user: { phone: { contains: search } } }
+        ];
+    }
+    const [dealers, total] = await Promise.all([
+        prisma.dealer.findMany({
+            where, skip, take: limit,
+            orderBy: { createdAt: 'desc' },
+            include: { user: true, cropRates: { take: 5 } }
+        }),
+        prisma.dealer.count({ where })
+    ]);
+    return { dealers, total };
+};
+
+const verifyDealer = async (dealerId, { action, reason }) => {
+    await cache.del('admin:dashboard');
+    if (action === 'approve') {
+        const dealer = await prisma.dealer.update({
+            where: { id: dealerId },
+            data: { isVerified: true, docStatus: 'APPROVED', verifiedAt: new Date() },
+            include: { user: true },
+        });
+        await prisma.user.update({ where: { id: dealer.userId }, data: { isVerified: true } });
+        return dealer;
+    } else if (action === 'reject') {
+        return prisma.dealer.update({
+            where: { id: dealerId },
+            data: { docStatus: 'REJECTED', rejectedAt: new Date(), rejectedReason: reason },
+        });
     }
     throw Object.assign(new Error('Action must be approve or reject'), { statusCode: 400 });
 };
@@ -133,10 +204,12 @@ const getProducts = async ({ page, limit, skip }, { isApproved, category, search
 };
 
 const approveProduct = async (productId) => {
+    await cache.del('admin:dashboard');
     return prisma.product.update({ where: { id: productId }, data: { isApproved: true } });
 };
 
 const rejectProduct = async (productId) => {
+    await cache.del('admin:dashboard');
     return prisma.product.update({ where: { id: productId }, data: { isApproved: false, isActive: false } });
 };
 
@@ -164,4 +237,10 @@ const { createScheme, updateScheme, deleteScheme } = schemeService;
 const notifService = require('./notification.service');
 const { broadcastNotification } = notifService;
 
-module.exports = { adminLogin, getDashboardStats, getUsers, getUser, toggleUserActive, getPendingSuppliers, getAllSuppliers, verifySupplier, getProducts, approveProduct, rejectProduct, getAllOrders, createScheme, updateScheme, deleteScheme, broadcastNotification };
+module.exports = {
+    adminLogin, getDashboardStats, getUsers, getUser, toggleUserActive,
+    getPendingSuppliers, getAllSuppliers, verifySupplier,
+    getPendingDealers, getAllDealers, verifyDealer,
+    getProducts, approveProduct, rejectProduct, getAllOrders,
+    createScheme, updateScheme, deleteScheme, broadcastNotification
+};

@@ -2,6 +2,10 @@ const prisma = require('../config/database');
 const { uploadToSupabase } = require('../middleware/upload');
 const { haversineDistance } = require('../utils/helpers');
 const { sendNotification } = require('./onesignal.service');
+const cache = require('../utils/cache');
+
+const PRODUCT_CACHE_TTL = 120; // 2 minutes
+
 
 const toNumberOrNull = (v) => {
     if (v === undefined || v === null || v === '') return null;
@@ -41,6 +45,13 @@ const getProducts = async ({ category, search, sort, district, lat, lng, radius 
     const userLng = toNumberOrNull(lng);
     const radiusKm = toNumberOrNull(radius) ?? 50;
 
+    // Cache key for this specific query (location-independent for list)
+    const cacheKey = `products:list:${category || 'all'}:${search || ''}:${district || ''}:${sort || 'new'}:${page}:${limit}`;
+    if (!userLat && !userLng) {
+        const cached = await cache.get(cacheKey);
+        if (cached) return cached;
+    }
+
     let products = await prisma.product.findMany({
         where,
         include: { supplier: { include: { user: true } } },
@@ -50,7 +61,6 @@ const getProducts = async ({ category, search, sort, district, lat, lng, radius 
     products = withDistance(products, userLat, userLng);
 
     if (userLat !== null && userLng !== null) {
-        // Relaxed filtering: only exclude if distance is known AND exceeds radius
         products = products.filter((p) => p.supplierDistanceKm === null || p.supplierDistanceKm <= radiusKm);
     }
 
@@ -64,9 +74,15 @@ const getProducts = async ({ category, search, sort, district, lat, lng, radius 
 
     const total = products.length;
     const paginatedProducts = products.slice(skip, skip + limit);
+    const result = { products: paginatedProducts, total };
 
-    return { products: paginatedProducts, total };
+    if (!userLat && !userLng) {
+        await cache.set(cacheKey, result, PRODUCT_CACHE_TTL);
+    }
+
+    return result;
 };
+
 
 const getProduct = async (id) => {
     const product = await prisma.product.findUnique({
@@ -157,6 +173,15 @@ const getRecommended = async (farmerId) => {
     return withDistances.slice(0, 10);
 };
 
+const invalidateProductCache = async () => {
+    // Use a pattern-flush approach: delete known cache prefixes
+    // Since Upstash REST API doesn't support SCAN, we tag products cache on set
+    // Best practice: use a cache version key
+    try {
+        await cache.del('products:version');
+    } catch (e) { /* ignore */ }
+};
+
 const createProduct = async (supplierId, data) => {
     const product = await prisma.product.create({
         data: {
@@ -178,6 +203,8 @@ const createProduct = async (supplierId, data) => {
         include: { supplier: true },
     });
 
+    await invalidateProductCache();
+
     // Notify farmers in the same district (Don't await to keep response fast)
     prisma.farmer.findMany({
         where: { district: { contains: product.supplier.district, mode: 'insensitive' } },
@@ -196,10 +223,11 @@ const createProduct = async (supplierId, data) => {
     return product;
 };
 
+
 const updateProduct = async (supplierId, productId, data) => {
     const product = await prisma.product.findFirst({ where: { id: productId, supplierId } });
     if (!product) throw Object.assign(new Error('Product not found'), { statusCode: 404 });
-    return prisma.product.update({
+    const updated = await prisma.product.update({
         where: { id: productId },
         data: {
             name: data.name,
@@ -212,13 +240,18 @@ const updateProduct = async (supplierId, productId, data) => {
             isOrganic: data.isOrganic !== undefined ? data.isOrganic : undefined,
         },
     });
+    await invalidateProductCache();
+    return updated;
 };
 
 const deleteProduct = async (supplierId, productId) => {
     const product = await prisma.product.findFirst({ where: { id: productId, supplierId } });
     if (!product) throw Object.assign(new Error('Product not found'), { statusCode: 404 });
-    return prisma.product.update({ where: { id: productId }, data: { isActive: false } });
+    const result = await prisma.product.update({ where: { id: productId }, data: { isActive: false } });
+    await invalidateProductCache();
+    return result;
 };
+
 
 const uploadImages = async (supplierId, productId, files) => {
     const product = await prisma.product.findFirst({ where: { id: productId, supplierId } });

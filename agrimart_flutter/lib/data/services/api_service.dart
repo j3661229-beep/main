@@ -36,6 +36,10 @@ class ApiService {
 
   // ── Auth ──────────────────────────────────────────────────
 
+  Future<void> sendOTP({required String phone, required String role}) async {
+    await _dio.post('/auth/send-otp', data: {'phone': phone, 'role': role});
+  }
+
   Future<Map> completeOnboarding(Map<String, dynamic> data) async {
     final r = await _dio.post('/auth/onboarding', data: data);
     return r.data['data'];
@@ -281,9 +285,12 @@ class ApiService {
 
   // ── Trade Bookings ─────────────────────────────────────────
   Future<List> getDealerRates(
-      {required String district, required String crop}) async {
+      {required String district, String? crop}) async {
     final r = await _dio.get('/trade/rates',
-        queryParameters: {'district': district, 'crop': crop});
+        queryParameters: {
+          'district': district,
+          if (crop != null) 'crop': crop,
+        });
     return r.data['data'] ?? [];
   }
 
@@ -291,6 +298,23 @@ class ApiService {
     final r = await _dio.post('/trade/book', data: data);
     return r.data;
   }
+
+  /// Upload government verification document (SUPPLIER / DEALER only)
+  Future<Map> uploadGovtDoc({required dynamic file, required String docType}) async {
+    // file can be dart:io File or String path
+    final path = file is String ? file : file.path as String;
+    final formData = FormData.fromMap({
+      'document': await MultipartFile.fromFile(path, filename: path.split('/').last),
+      'docType': docType,
+    });
+    final r = await _dio.post(
+      '/upload/govt-doc',
+      data: formData,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+    return r.data['data'];
+  }
+
 
   // ── Notifications ─────────────────────────────────────────
   Future<Map> getNotifications() async {

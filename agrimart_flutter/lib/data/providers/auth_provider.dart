@@ -50,6 +50,28 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> sendOTP(String phone, String role) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await _api.sendOTP(phone: phone, role: role);
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: _parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<void> sendOTP(String phone, String role) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await _api.sendOTP(phone: phone, role: role);
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: _parseError(e));
+      rethrow;
+    }
+  }
+
   Future<UserModel?> signInWithGoogle(String role) async {
     state = state.copyWith(isLoading: true, error: null);
     try {

@@ -15,6 +15,8 @@ import 'package:flutter/services.dart';
 import 'shop_screen.dart';
 import 'mandi_prices_screen.dart';
 import 'profile_screen.dart';
+import 'dealer_tab_screen.dart';
+
 
 class FarmerHome extends ConsumerStatefulWidget {
   const FarmerHome({super.key});
@@ -53,9 +55,10 @@ class _FarmerHomeState extends ConsumerState<FarmerHome> {
     _HomeTab(),
     ShopScreen(),
     AITabContent(),
-    MandiPricesScreen(),
+    DealerTabScreen(),
     ProfileScreen(),
   ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -76,10 +79,11 @@ class _FarmerHomeState extends ConsumerState<FarmerHome> {
           FloatingNavItem(icon: '🏠', label: l10n.home),
           FloatingNavItem(icon: '🛒', label: l10n.shop, badge: cartCount > 0 ? cartCount : null),
           FloatingNavItem(icon: '🤖', label: l10n.kisanAi),
-          FloatingNavItem(icon: '📈', label: l10n.mandiPrices),
+          FloatingNavItem(icon: '🏪', label: 'Dealer'),
           FloatingNavItem(icon: '👤', label: l10n.profile),
         ],
       ),
+
     );
   }
 }

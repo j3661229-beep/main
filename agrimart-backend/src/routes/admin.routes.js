@@ -23,6 +23,11 @@ router.get('/suppliers/pending', adminController.getPendingSuppliers);
 router.get('/suppliers', adminController.getAllSuppliers);
 router.post('/suppliers/:id/verify', adminController.verifySupplier);
 
+// Dealers
+router.get('/dealers/pending', adminController.getPendingDealers);
+router.get('/dealers', adminController.getAllDealers);
+router.post('/dealers/:id/verify', adminController.verifyDealer);
+
 // Products
 router.get('/products', adminController.getProducts);
 router.patch('/products/:id/approve', adminController.approveProduct);

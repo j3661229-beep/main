@@ -123,6 +123,15 @@ export namespace $Enums {
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
+export const DocumentStatus: {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+};
+
+export type DocumentStatus = (typeof DocumentStatus)[keyof typeof DocumentStatus]
+
+
 export const ProductCategory: {
   SEEDS: 'SEEDS',
   FERTILIZER: 'FERTILIZER',
@@ -173,6 +182,10 @@ export type TradeStatus = (typeof TradeStatus)[keyof typeof TradeStatus]
 export type UserRole = $Enums.UserRole
 
 export const UserRole: typeof $Enums.UserRole
+
+export type DocumentStatus = $Enums.DocumentStatus
+
+export const DocumentStatus: typeof $Enums.DocumentStatus
 
 export type ProductCategory = $Enums.ProductCategory
 
@@ -6079,6 +6092,9 @@ export namespace Prisma {
     verifiedAt: Date | null
     rejectedAt: Date | null
     rejectedReason: string | null
+    govtDocUrl: string | null
+    govtDocType: string | null
+    docStatus: $Enums.DocumentStatus | null
     rating: number | null
     totalRatings: number | null
     bankAccountNo: string | null
@@ -6102,6 +6118,9 @@ export namespace Prisma {
     verifiedAt: Date | null
     rejectedAt: Date | null
     rejectedReason: string | null
+    govtDocUrl: string | null
+    govtDocType: string | null
+    docStatus: $Enums.DocumentStatus | null
     rating: number | null
     totalRatings: number | null
     bankAccountNo: string | null
@@ -6125,6 +6144,9 @@ export namespace Prisma {
     verifiedAt: number
     rejectedAt: number
     rejectedReason: number
+    govtDocUrl: number
+    govtDocType: number
+    docStatus: number
     rating: number
     totalRatings: number
     bankAccountNo: number
@@ -6164,6 +6186,9 @@ export namespace Prisma {
     verifiedAt?: true
     rejectedAt?: true
     rejectedReason?: true
+    govtDocUrl?: true
+    govtDocType?: true
+    docStatus?: true
     rating?: true
     totalRatings?: true
     bankAccountNo?: true
@@ -6187,6 +6212,9 @@ export namespace Prisma {
     verifiedAt?: true
     rejectedAt?: true
     rejectedReason?: true
+    govtDocUrl?: true
+    govtDocType?: true
+    docStatus?: true
     rating?: true
     totalRatings?: true
     bankAccountNo?: true
@@ -6210,6 +6238,9 @@ export namespace Prisma {
     verifiedAt?: true
     rejectedAt?: true
     rejectedReason?: true
+    govtDocUrl?: true
+    govtDocType?: true
+    docStatus?: true
     rating?: true
     totalRatings?: true
     bankAccountNo?: true
@@ -6320,6 +6351,9 @@ export namespace Prisma {
     verifiedAt: Date | null
     rejectedAt: Date | null
     rejectedReason: string | null
+    govtDocUrl: string | null
+    govtDocType: string | null
+    docStatus: $Enums.DocumentStatus
     rating: number
     totalRatings: number
     bankAccountNo: string | null
@@ -6362,6 +6396,9 @@ export namespace Prisma {
     verifiedAt?: boolean
     rejectedAt?: boolean
     rejectedReason?: boolean
+    govtDocUrl?: boolean
+    govtDocType?: boolean
+    docStatus?: boolean
     rating?: boolean
     totalRatings?: boolean
     bankAccountNo?: boolean
@@ -6389,6 +6426,9 @@ export namespace Prisma {
     verifiedAt?: boolean
     rejectedAt?: boolean
     rejectedReason?: boolean
+    govtDocUrl?: boolean
+    govtDocType?: boolean
+    docStatus?: boolean
     rating?: boolean
     totalRatings?: boolean
     bankAccountNo?: boolean
@@ -6413,6 +6453,9 @@ export namespace Prisma {
     verifiedAt?: boolean
     rejectedAt?: boolean
     rejectedReason?: boolean
+    govtDocUrl?: boolean
+    govtDocType?: boolean
+    docStatus?: boolean
     rating?: boolean
     totalRatings?: boolean
     bankAccountNo?: boolean
@@ -6453,6 +6496,9 @@ export namespace Prisma {
       verifiedAt: Date | null
       rejectedAt: Date | null
       rejectedReason: string | null
+      govtDocUrl: string | null
+      govtDocType: string | null
+      docStatus: $Enums.DocumentStatus
       rating: number
       totalRatings: number
       bankAccountNo: string | null
@@ -6869,6 +6915,9 @@ export namespace Prisma {
     readonly verifiedAt: FieldRef<"Supplier", 'DateTime'>
     readonly rejectedAt: FieldRef<"Supplier", 'DateTime'>
     readonly rejectedReason: FieldRef<"Supplier", 'String'>
+    readonly govtDocUrl: FieldRef<"Supplier", 'String'>
+    readonly govtDocType: FieldRef<"Supplier", 'String'>
+    readonly docStatus: FieldRef<"Supplier", 'DocumentStatus'>
     readonly rating: FieldRef<"Supplier", 'Float'>
     readonly totalRatings: FieldRef<"Supplier", 'Int'>
     readonly bankAccountNo: FieldRef<"Supplier", 'String'>
@@ -7285,6 +7334,11 @@ export namespace Prisma {
     longitude: number | null
     isVerified: boolean | null
     verifiedAt: Date | null
+    rejectedAt: Date | null
+    rejectedReason: string | null
+    govtDocUrl: string | null
+    govtDocType: string | null
+    docStatus: $Enums.DocumentStatus | null
     rating: number | null
     totalRatings: number | null
     createdAt: Date | null
@@ -7303,6 +7357,11 @@ export namespace Prisma {
     longitude: number | null
     isVerified: boolean | null
     verifiedAt: Date | null
+    rejectedAt: Date | null
+    rejectedReason: string | null
+    govtDocUrl: string | null
+    govtDocType: string | null
+    docStatus: $Enums.DocumentStatus | null
     rating: number | null
     totalRatings: number | null
     createdAt: Date | null
@@ -7321,6 +7380,11 @@ export namespace Prisma {
     longitude: number
     isVerified: number
     verifiedAt: number
+    rejectedAt: number
+    rejectedReason: number
+    govtDocUrl: number
+    govtDocType: number
+    docStatus: number
     rating: number
     totalRatings: number
     createdAt: number
@@ -7355,6 +7419,11 @@ export namespace Prisma {
     longitude?: true
     isVerified?: true
     verifiedAt?: true
+    rejectedAt?: true
+    rejectedReason?: true
+    govtDocUrl?: true
+    govtDocType?: true
+    docStatus?: true
     rating?: true
     totalRatings?: true
     createdAt?: true
@@ -7373,6 +7442,11 @@ export namespace Prisma {
     longitude?: true
     isVerified?: true
     verifiedAt?: true
+    rejectedAt?: true
+    rejectedReason?: true
+    govtDocUrl?: true
+    govtDocType?: true
+    docStatus?: true
     rating?: true
     totalRatings?: true
     createdAt?: true
@@ -7391,6 +7465,11 @@ export namespace Prisma {
     longitude?: true
     isVerified?: true
     verifiedAt?: true
+    rejectedAt?: true
+    rejectedReason?: true
+    govtDocUrl?: true
+    govtDocType?: true
+    docStatus?: true
     rating?: true
     totalRatings?: true
     createdAt?: true
@@ -7496,6 +7575,11 @@ export namespace Prisma {
     longitude: number | null
     isVerified: boolean
     verifiedAt: Date | null
+    rejectedAt: Date | null
+    rejectedReason: string | null
+    govtDocUrl: string | null
+    govtDocType: string | null
+    docStatus: $Enums.DocumentStatus
     rating: number
     totalRatings: number
     createdAt: Date
@@ -7533,6 +7617,11 @@ export namespace Prisma {
     longitude?: boolean
     isVerified?: boolean
     verifiedAt?: boolean
+    rejectedAt?: boolean
+    rejectedReason?: boolean
+    govtDocUrl?: boolean
+    govtDocType?: boolean
+    docStatus?: boolean
     rating?: boolean
     totalRatings?: boolean
     createdAt?: boolean
@@ -7555,6 +7644,11 @@ export namespace Prisma {
     longitude?: boolean
     isVerified?: boolean
     verifiedAt?: boolean
+    rejectedAt?: boolean
+    rejectedReason?: boolean
+    govtDocUrl?: boolean
+    govtDocType?: boolean
+    docStatus?: boolean
     rating?: boolean
     totalRatings?: boolean
     createdAt?: boolean
@@ -7574,6 +7668,11 @@ export namespace Prisma {
     longitude?: boolean
     isVerified?: boolean
     verifiedAt?: boolean
+    rejectedAt?: boolean
+    rejectedReason?: boolean
+    govtDocUrl?: boolean
+    govtDocType?: boolean
+    docStatus?: boolean
     rating?: boolean
     totalRatings?: boolean
     createdAt?: boolean
@@ -7609,6 +7708,11 @@ export namespace Prisma {
       longitude: number | null
       isVerified: boolean
       verifiedAt: Date | null
+      rejectedAt: Date | null
+      rejectedReason: string | null
+      govtDocUrl: string | null
+      govtDocType: string | null
+      docStatus: $Enums.DocumentStatus
       rating: number
       totalRatings: number
       createdAt: Date
@@ -8020,6 +8124,11 @@ export namespace Prisma {
     readonly longitude: FieldRef<"Dealer", 'Float'>
     readonly isVerified: FieldRef<"Dealer", 'Boolean'>
     readonly verifiedAt: FieldRef<"Dealer", 'DateTime'>
+    readonly rejectedAt: FieldRef<"Dealer", 'DateTime'>
+    readonly rejectedReason: FieldRef<"Dealer", 'String'>
+    readonly govtDocUrl: FieldRef<"Dealer", 'String'>
+    readonly govtDocType: FieldRef<"Dealer", 'String'>
+    readonly docStatus: FieldRef<"Dealer", 'DocumentStatus'>
     readonly rating: FieldRef<"Dealer", 'Float'>
     readonly totalRatings: FieldRef<"Dealer", 'Int'>
     readonly createdAt: FieldRef<"Dealer", 'DateTime'>
@@ -22849,6 +22958,9 @@ export namespace Prisma {
     verifiedAt: 'verifiedAt',
     rejectedAt: 'rejectedAt',
     rejectedReason: 'rejectedReason',
+    govtDocUrl: 'govtDocUrl',
+    govtDocType: 'govtDocType',
+    docStatus: 'docStatus',
     rating: 'rating',
     totalRatings: 'totalRatings',
     bankAccountNo: 'bankAccountNo',
@@ -22872,6 +22984,11 @@ export namespace Prisma {
     longitude: 'longitude',
     isVerified: 'isVerified',
     verifiedAt: 'verifiedAt',
+    rejectedAt: 'rejectedAt',
+    rejectedReason: 'rejectedReason',
+    govtDocUrl: 'govtDocUrl',
+    govtDocType: 'govtDocType',
+    docStatus: 'docStatus',
     rating: 'rating',
     totalRatings: 'totalRatings',
     createdAt: 'createdAt',
@@ -23211,6 +23328,20 @@ export namespace Prisma {
    * Reference to a field of type 'Float[]'
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'DocumentStatus'
+   */
+  export type EnumDocumentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'DocumentStatus[]'
+   */
+  export type ListEnumDocumentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentStatus[]'>
     
 
 
@@ -23601,6 +23732,9 @@ export namespace Prisma {
     verifiedAt?: DateTimeNullableFilter<"Supplier"> | Date | string | null
     rejectedAt?: DateTimeNullableFilter<"Supplier"> | Date | string | null
     rejectedReason?: StringNullableFilter<"Supplier"> | string | null
+    govtDocUrl?: StringNullableFilter<"Supplier"> | string | null
+    govtDocType?: StringNullableFilter<"Supplier"> | string | null
+    docStatus?: EnumDocumentStatusFilter<"Supplier"> | $Enums.DocumentStatus
     rating?: FloatFilter<"Supplier"> | number
     totalRatings?: IntFilter<"Supplier"> | number
     bankAccountNo?: StringNullableFilter<"Supplier"> | string | null
@@ -23627,6 +23761,9 @@ export namespace Prisma {
     verifiedAt?: SortOrderInput | SortOrder
     rejectedAt?: SortOrderInput | SortOrder
     rejectedReason?: SortOrderInput | SortOrder
+    govtDocUrl?: SortOrderInput | SortOrder
+    govtDocType?: SortOrderInput | SortOrder
+    docStatus?: SortOrder
     rating?: SortOrder
     totalRatings?: SortOrder
     bankAccountNo?: SortOrderInput | SortOrder
@@ -23656,6 +23793,9 @@ export namespace Prisma {
     verifiedAt?: DateTimeNullableFilter<"Supplier"> | Date | string | null
     rejectedAt?: DateTimeNullableFilter<"Supplier"> | Date | string | null
     rejectedReason?: StringNullableFilter<"Supplier"> | string | null
+    govtDocUrl?: StringNullableFilter<"Supplier"> | string | null
+    govtDocType?: StringNullableFilter<"Supplier"> | string | null
+    docStatus?: EnumDocumentStatusFilter<"Supplier"> | $Enums.DocumentStatus
     rating?: FloatFilter<"Supplier"> | number
     totalRatings?: IntFilter<"Supplier"> | number
     bankAccountNo?: StringNullableFilter<"Supplier"> | string | null
@@ -23682,6 +23822,9 @@ export namespace Prisma {
     verifiedAt?: SortOrderInput | SortOrder
     rejectedAt?: SortOrderInput | SortOrder
     rejectedReason?: SortOrderInput | SortOrder
+    govtDocUrl?: SortOrderInput | SortOrder
+    govtDocType?: SortOrderInput | SortOrder
+    docStatus?: SortOrder
     rating?: SortOrder
     totalRatings?: SortOrder
     bankAccountNo?: SortOrderInput | SortOrder
@@ -23713,6 +23856,9 @@ export namespace Prisma {
     verifiedAt?: DateTimeNullableWithAggregatesFilter<"Supplier"> | Date | string | null
     rejectedAt?: DateTimeNullableWithAggregatesFilter<"Supplier"> | Date | string | null
     rejectedReason?: StringNullableWithAggregatesFilter<"Supplier"> | string | null
+    govtDocUrl?: StringNullableWithAggregatesFilter<"Supplier"> | string | null
+    govtDocType?: StringNullableWithAggregatesFilter<"Supplier"> | string | null
+    docStatus?: EnumDocumentStatusWithAggregatesFilter<"Supplier"> | $Enums.DocumentStatus
     rating?: FloatWithAggregatesFilter<"Supplier"> | number
     totalRatings?: IntWithAggregatesFilter<"Supplier"> | number
     bankAccountNo?: StringNullableWithAggregatesFilter<"Supplier"> | string | null
@@ -23736,6 +23882,11 @@ export namespace Prisma {
     longitude?: FloatNullableFilter<"Dealer"> | number | null
     isVerified?: BoolFilter<"Dealer"> | boolean
     verifiedAt?: DateTimeNullableFilter<"Dealer"> | Date | string | null
+    rejectedAt?: DateTimeNullableFilter<"Dealer"> | Date | string | null
+    rejectedReason?: StringNullableFilter<"Dealer"> | string | null
+    govtDocUrl?: StringNullableFilter<"Dealer"> | string | null
+    govtDocType?: StringNullableFilter<"Dealer"> | string | null
+    docStatus?: EnumDocumentStatusFilter<"Dealer"> | $Enums.DocumentStatus
     rating?: FloatFilter<"Dealer"> | number
     totalRatings?: IntFilter<"Dealer"> | number
     createdAt?: DateTimeFilter<"Dealer"> | Date | string
@@ -23757,6 +23908,11 @@ export namespace Prisma {
     longitude?: SortOrderInput | SortOrder
     isVerified?: SortOrder
     verifiedAt?: SortOrderInput | SortOrder
+    rejectedAt?: SortOrderInput | SortOrder
+    rejectedReason?: SortOrderInput | SortOrder
+    govtDocUrl?: SortOrderInput | SortOrder
+    govtDocType?: SortOrderInput | SortOrder
+    docStatus?: SortOrder
     rating?: SortOrder
     totalRatings?: SortOrder
     createdAt?: SortOrder
@@ -23781,6 +23937,11 @@ export namespace Prisma {
     longitude?: FloatNullableFilter<"Dealer"> | number | null
     isVerified?: BoolFilter<"Dealer"> | boolean
     verifiedAt?: DateTimeNullableFilter<"Dealer"> | Date | string | null
+    rejectedAt?: DateTimeNullableFilter<"Dealer"> | Date | string | null
+    rejectedReason?: StringNullableFilter<"Dealer"> | string | null
+    govtDocUrl?: StringNullableFilter<"Dealer"> | string | null
+    govtDocType?: StringNullableFilter<"Dealer"> | string | null
+    docStatus?: EnumDocumentStatusFilter<"Dealer"> | $Enums.DocumentStatus
     rating?: FloatFilter<"Dealer"> | number
     totalRatings?: IntFilter<"Dealer"> | number
     createdAt?: DateTimeFilter<"Dealer"> | Date | string
@@ -23802,6 +23963,11 @@ export namespace Prisma {
     longitude?: SortOrderInput | SortOrder
     isVerified?: SortOrder
     verifiedAt?: SortOrderInput | SortOrder
+    rejectedAt?: SortOrderInput | SortOrder
+    rejectedReason?: SortOrderInput | SortOrder
+    govtDocUrl?: SortOrderInput | SortOrder
+    govtDocType?: SortOrderInput | SortOrder
+    docStatus?: SortOrder
     rating?: SortOrder
     totalRatings?: SortOrder
     createdAt?: SortOrder
@@ -23828,6 +23994,11 @@ export namespace Prisma {
     longitude?: FloatNullableWithAggregatesFilter<"Dealer"> | number | null
     isVerified?: BoolWithAggregatesFilter<"Dealer"> | boolean
     verifiedAt?: DateTimeNullableWithAggregatesFilter<"Dealer"> | Date | string | null
+    rejectedAt?: DateTimeNullableWithAggregatesFilter<"Dealer"> | Date | string | null
+    rejectedReason?: StringNullableWithAggregatesFilter<"Dealer"> | string | null
+    govtDocUrl?: StringNullableWithAggregatesFilter<"Dealer"> | string | null
+    govtDocType?: StringNullableWithAggregatesFilter<"Dealer"> | string | null
+    docStatus?: EnumDocumentStatusWithAggregatesFilter<"Dealer"> | $Enums.DocumentStatus
     rating?: FloatWithAggregatesFilter<"Dealer"> | number
     totalRatings?: IntWithAggregatesFilter<"Dealer"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Dealer"> | Date | string
@@ -25361,6 +25532,9 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     rejectedAt?: Date | string | null
     rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     bankAccountNo?: string | null
@@ -25387,6 +25561,9 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     rejectedAt?: Date | string | null
     rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     bankAccountNo?: string | null
@@ -25411,6 +25588,9 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25437,6 +25617,9 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25462,6 +25645,9 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     rejectedAt?: Date | string | null
     rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     bankAccountNo?: string | null
@@ -25484,6 +25670,9 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25507,6 +25696,9 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25526,6 +25718,11 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     createdAt?: Date | string
@@ -25547,6 +25744,11 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     createdAt?: Date | string
@@ -25566,6 +25768,11 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25587,6 +25794,11 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25607,6 +25819,11 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     createdAt?: Date | string
@@ -25624,6 +25841,11 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25642,6 +25864,11 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27356,6 +27583,13 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type EnumDocumentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentStatus | EnumDocumentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentStatusFilter<$PrismaModel> | $Enums.DocumentStatus
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -27402,6 +27636,9 @@ export namespace Prisma {
     verifiedAt?: SortOrder
     rejectedAt?: SortOrder
     rejectedReason?: SortOrder
+    govtDocUrl?: SortOrder
+    govtDocType?: SortOrder
+    docStatus?: SortOrder
     rating?: SortOrder
     totalRatings?: SortOrder
     bankAccountNo?: SortOrder
@@ -27432,6 +27669,9 @@ export namespace Prisma {
     verifiedAt?: SortOrder
     rejectedAt?: SortOrder
     rejectedReason?: SortOrder
+    govtDocUrl?: SortOrder
+    govtDocType?: SortOrder
+    docStatus?: SortOrder
     rating?: SortOrder
     totalRatings?: SortOrder
     bankAccountNo?: SortOrder
@@ -27455,6 +27695,9 @@ export namespace Prisma {
     verifiedAt?: SortOrder
     rejectedAt?: SortOrder
     rejectedReason?: SortOrder
+    govtDocUrl?: SortOrder
+    govtDocType?: SortOrder
+    docStatus?: SortOrder
     rating?: SortOrder
     totalRatings?: SortOrder
     bankAccountNo?: SortOrder
@@ -27482,6 +27725,16 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type EnumDocumentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentStatus | EnumDocumentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentStatusWithAggregatesFilter<$PrismaModel> | $Enums.DocumentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDocumentStatusFilter<$PrismaModel>
+    _max?: NestedEnumDocumentStatusFilter<$PrismaModel>
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -27522,6 +27775,11 @@ export namespace Prisma {
     longitude?: SortOrder
     isVerified?: SortOrder
     verifiedAt?: SortOrder
+    rejectedAt?: SortOrder
+    rejectedReason?: SortOrder
+    govtDocUrl?: SortOrder
+    govtDocType?: SortOrder
+    docStatus?: SortOrder
     rating?: SortOrder
     totalRatings?: SortOrder
     createdAt?: SortOrder
@@ -27547,6 +27805,11 @@ export namespace Prisma {
     longitude?: SortOrder
     isVerified?: SortOrder
     verifiedAt?: SortOrder
+    rejectedAt?: SortOrder
+    rejectedReason?: SortOrder
+    govtDocUrl?: SortOrder
+    govtDocType?: SortOrder
+    docStatus?: SortOrder
     rating?: SortOrder
     totalRatings?: SortOrder
     createdAt?: SortOrder
@@ -27565,6 +27828,11 @@ export namespace Prisma {
     longitude?: SortOrder
     isVerified?: SortOrder
     verifiedAt?: SortOrder
+    rejectedAt?: SortOrder
+    rejectedReason?: SortOrder
+    govtDocUrl?: SortOrder
+    govtDocType?: SortOrder
+    docStatus?: SortOrder
     rating?: SortOrder
     totalRatings?: SortOrder
     createdAt?: SortOrder
@@ -28900,6 +29168,10 @@ export namespace Prisma {
     set?: Date | string | null
   }
 
+  export type EnumDocumentStatusFieldUpdateOperationsInput = {
+    set?: $Enums.DocumentStatus
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -29829,6 +30101,13 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type NestedEnumDocumentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentStatus | EnumDocumentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentStatusFilter<$PrismaModel> | $Enums.DocumentStatus
+  }
+
   export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -29841,6 +30120,16 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumDocumentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentStatus | EnumDocumentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentStatusWithAggregatesFilter<$PrismaModel> | $Enums.DocumentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDocumentStatusFilter<$PrismaModel>
+    _max?: NestedEnumDocumentStatusFilter<$PrismaModel>
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -30016,6 +30305,9 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     rejectedAt?: Date | string | null
     rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     bankAccountNo?: string | null
@@ -30040,6 +30332,9 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     rejectedAt?: Date | string | null
     rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     bankAccountNo?: string | null
@@ -30066,6 +30361,11 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     createdAt?: Date | string
@@ -30085,6 +30385,11 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     createdAt?: Date | string
@@ -30236,6 +30541,9 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30260,6 +30568,9 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30292,6 +30603,11 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30311,6 +30627,11 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31361,6 +31682,9 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     rejectedAt?: Date | string | null
     rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     bankAccountNo?: string | null
@@ -31386,6 +31710,9 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     rejectedAt?: Date | string | null
     rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     bankAccountNo?: string | null
@@ -31511,6 +31838,9 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31536,6 +31866,9 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32272,6 +32605,9 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     rejectedAt?: Date | string | null
     rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     bankAccountNo?: string | null
@@ -32297,6 +32633,9 @@ export namespace Prisma {
     verifiedAt?: Date | string | null
     rejectedAt?: Date | string | null
     rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     bankAccountNo?: string | null
@@ -32465,6 +32804,9 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32490,6 +32832,9 @@ export namespace Prisma {
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33115,6 +33460,11 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     createdAt?: Date | string
@@ -33135,6 +33485,11 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     createdAt?: Date | string
@@ -33169,6 +33524,11 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33189,6 +33549,11 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33260,6 +33625,11 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     createdAt?: Date | string
@@ -33280,6 +33650,11 @@ export namespace Prisma {
     longitude?: number | null
     isVerified?: boolean
     verifiedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    rejectedReason?: string | null
+    govtDocUrl?: string | null
+    govtDocType?: string | null
+    docStatus?: $Enums.DocumentStatus
     rating?: number
     totalRatings?: number
     createdAt?: Date | string
@@ -33373,6 +33748,11 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33393,6 +33773,11 @@ export namespace Prisma {
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    govtDocType?: NullableStringFieldUpdateOperationsInput | string | null
+    docStatus?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     rating?: FloatFieldUpdateOperationsInput | number
     totalRatings?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

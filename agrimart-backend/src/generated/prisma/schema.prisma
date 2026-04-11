@@ -17,6 +17,12 @@ enum UserRole {
   ADMIN
 }
 
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum OrderStatus {
   PENDING
   PAYMENT_CONFIRMED
@@ -100,50 +106,58 @@ model Farmer {
 }
 
 model Supplier {
-  id             String      @id @default(cuid())
-  userId         String      @unique
+  id             String         @id @default(cuid())
+  userId         String         @unique
   businessName   String
   gstNumber      String?
   address        String
   district       String
-  state          String      @default("Maharashtra")
+  state          String         @default("Maharashtra")
   pincode        String
   latitude       Float?
   longitude      Float?
-  isVerified     Boolean     @default(false)
+  isVerified     Boolean        @default(false)
   verifiedAt     DateTime?
   rejectedAt     DateTime?
   rejectedReason String?
-  rating         Float       @default(0)
-  totalRatings   Int         @default(0)
+  govtDocUrl     String?
+  govtDocType    String?
+  docStatus      DocumentStatus @default(PENDING)
+  rating         Float          @default(0)
+  totalRatings   Int            @default(0)
   bankAccountNo  String?
   ifscCode       String?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   products       Product[]
   orderItems     OrderItem[]
 }
 
 model Dealer {
-  id            String           @id @default(cuid())
-  userId        String           @unique
-  businessName  String
-  address       String
-  district      String
-  state         String           @default("Maharashtra")
-  pincode       String
-  latitude      Float?
-  longitude     Float?
-  isVerified    Boolean          @default(false)
-  verifiedAt    DateTime?
-  rating        Float            @default(0)
-  totalRatings  Int              @default(0)
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  cropRates     DealerCropRate[]
-  tradeBookings TradeBooking[]
+  id             String           @id @default(cuid())
+  userId         String           @unique
+  businessName   String
+  address        String
+  district       String
+  state          String           @default("Maharashtra")
+  pincode        String
+  latitude       Float?
+  longitude      Float?
+  isVerified     Boolean          @default(false)
+  verifiedAt     DateTime?
+  rejectedAt     DateTime?
+  rejectedReason String?
+  govtDocUrl     String?
+  govtDocType    String?
+  docStatus      DocumentStatus   @default(PENDING)
+  rating         Float            @default(0)
+  totalRatings   Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cropRates      DealerCropRate[]
+  tradeBookings  TradeBooking[]
 }
 
 model Product {

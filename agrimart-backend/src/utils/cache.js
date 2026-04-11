@@ -1,31 +1,32 @@
-const NodeCache = require('node-cache');
-const logger = require('./logger');
-
-// TTL: 1 hour by default
-const myCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
+const redis = require('../config/redis');
+const logger = require('../utils/logger');
 
 const get = async (key) => {
     try {
-        return myCache.get(key);
+        const val = await redis.get(key);
+        if (val === null || val === undefined) return null;
+        if (typeof val === 'object') return val; // Upstash already deserializes JSON
+        try { return JSON.parse(val); } catch { return val; }
     } catch (e) {
-        logger.error(`Cache Get Error: ${e.message}`);
+        logger.error(`Cache Get Error [${key}]: ${e.message}`);
         return null;
     }
 };
 
 const set = async (key, value, ttl = 3600) => {
     try {
-        return myCache.set(key, value, ttl);
+        const payload = typeof value === 'string' ? value : JSON.stringify(value);
+        await redis.setWithExpiry(key, ttl, payload);
     } catch (e) {
-        logger.error(`Cache Set Error: ${e.message}`);
+        logger.error(`Cache Set Error [${key}]: ${e.message}`);
     }
 };
 
-const del = async (key) => {
+const del = async (...keys) => {
     try {
-        return myCache.del(key);
+        if (keys.length > 0) await redis.del(...keys);
     } catch (e) {
-        logger.error(`Cache Del Error: ${e.message}`);
+        logger.error(`Cache Del Error [${keys.join(',')}]: ${e.message}`);
     }
 };
 

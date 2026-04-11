@@ -180,6 +180,9 @@ exports.Prisma.SupplierScalarFieldEnum = {
   verifiedAt: 'verifiedAt',
   rejectedAt: 'rejectedAt',
   rejectedReason: 'rejectedReason',
+  govtDocUrl: 'govtDocUrl',
+  govtDocType: 'govtDocType',
+  docStatus: 'docStatus',
   rating: 'rating',
   totalRatings: 'totalRatings',
   bankAccountNo: 'bankAccountNo',
@@ -200,6 +203,11 @@ exports.Prisma.DealerScalarFieldEnum = {
   longitude: 'longitude',
   isVerified: 'isVerified',
   verifiedAt: 'verifiedAt',
+  rejectedAt: 'rejectedAt',
+  rejectedReason: 'rejectedReason',
+  govtDocUrl: 'govtDocUrl',
+  govtDocType: 'govtDocType',
+  docStatus: 'docStatus',
   rating: 'rating',
   totalRatings: 'totalRatings',
   createdAt: 'createdAt',
@@ -418,6 +426,12 @@ exports.UserRole = exports.$Enums.UserRole = {
   SUPPLIER: 'SUPPLIER',
   DEALER: 'DEALER',
   ADMIN: 'ADMIN'
+};
+
+exports.DocumentStatus = exports.$Enums.DocumentStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
 };
 
 exports.ProductCategory = exports.$Enums.ProductCategory = {

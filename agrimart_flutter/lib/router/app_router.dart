@@ -8,6 +8,8 @@ import '../screens/auth/login_screen.dart';
 import '../screens/auth/onboarding_screen.dart';
 import '../screens/auth/profile_setup_screen.dart';
 import '../screens/auth/language_selection_screen.dart';
+import '../screens/auth/doc_upload_screen.dart';
+import '../screens/auth/pending_approval_screen.dart';
 import '../screens/farmer/farmer_home.dart';
 import '../screens/farmer/shop_screen.dart';
 import '../screens/farmer/product_detail_screen.dart';
@@ -31,6 +33,7 @@ import '../screens/shared/notifications_screen.dart';
 import '../screens/dealer/dealer_home.dart';
 import '../screens/dealer/manage_rates_screen.dart';
 import '../screens/dealer/view_bookings_screen.dart';
+
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
@@ -57,16 +60,36 @@ final routerProvider = Provider<GoRouter>((ref) {
         return null;
       }
       if (authState.isAuthenticated) {
-        if (!authState.user!.isVerified && state.matchedLocation != '/auth/setup') {
-          return '/auth/setup';
+        final user = authState.user!;
+
+        // Supplier/Dealer without uploaded doc → doc upload
+        final supplier = user.supplier as Map?;
+        final dealer = user.dealer as Map?;
+        final supplierDocStatus = supplier?['docStatus'] as String?;
+        final dealerDocStatus = dealer?['docStatus'] as String?;
+        final hasUploadedDoc = (supplier?['govtDocUrl'] != null) || (dealer?['govtDocUrl'] != null);
+        final isPending = (supplierDocStatus == 'PENDING' && hasUploadedDoc) ||
+                         (dealerDocStatus == 'PENDING' && hasUploadedDoc);
+        final needsDocUpload = !user.isFarmer && !hasUploadedDoc && user.isAuthenticated;
+
+        if (!user.isVerified && state.matchedLocation == '/auth/setup') return null;
+        if (!user.isVerified && state.matchedLocation == '/auth/doc-upload') return null;
+        if (!user.isVerified && state.matchedLocation == '/auth/pending') return null;
+        
+        if (!user.isVerified && needsDocUpload && state.matchedLocation != '/auth/setup') {
+          return '/auth/doc-upload';
         }
-        if (authState.user!.isVerified && (state.matchedLocation.startsWith('/auth') || state.matchedLocation == '/splash')) {
-          if (authState.user!.isFarmer) return '/farmer';
-          if (authState.user!.isDealer) return '/dealer';
+        if (!user.isVerified && isPending) return '/auth/pending';
+        if (!user.isVerified && state.matchedLocation != '/auth/setup') return '/auth/setup';
+
+        if (user.isVerified && (state.matchedLocation.startsWith('/auth') || state.matchedLocation == '/splash')) {
+          if (user.isFarmer) return '/farmer';
+          if (user.isDealer) return '/dealer';
           return '/supplier';
         }
       }
       return null;
+
     },
     errorBuilder: (ctx, state) => Scaffold(
       body: Center(child: Text('Page not found: ${state.uri}', style: const TextStyle(fontSize: 16))),
@@ -83,6 +106,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       _fadedRoute('/auth/onboarding', const OnboardingScreen()),
       _fadedRoute('/auth/setup', const ProfileSetupScreen()),
       _fadedRoute('/auth/language', const LanguageSelectionScreen()),
+      _fadedRoute('/auth/doc-upload', const DocUploadScreen()),
+      _fadedRoute('/auth/pending', const PendingApprovalScreen()),
+
 
       // Farmer
       _fadedRoute('/farmer', const FarmerHome()),

@@ -15,6 +15,7 @@ const getUsers = async (req, res, next) => {
 const getUser = async (req, res, next) => { try { success(res, await adminService.getUser(req.params.id)); } catch (e) { next(e); } };
 const toggleUserActive = async (req, res, next) => { try { success(res, await adminService.toggleUserActive(req.params.id), 'User status updated'); } catch (e) { next(e); } };
 
+// Suppliers
 const getPendingSuppliers = async (req, res, next) => { try { success(res, await adminService.getPendingSuppliers()); } catch (e) { next(e); } };
 const getAllSuppliers = async (req, res, next) => {
     try {
@@ -25,6 +26,18 @@ const getAllSuppliers = async (req, res, next) => {
 };
 const verifySupplier = async (req, res, next) => { try { success(res, await adminService.verifySupplier(req.params.id, req.body), 'Supplier updated'); } catch (e) { next(e); } };
 
+// Dealers
+const getPendingDealers = async (req, res, next) => { try { success(res, await adminService.getPendingDealers()); } catch (e) { next(e); } };
+const getAllDealers = async (req, res, next) => {
+    try {
+        const pag = getPagination(req.query);
+        const { dealers, total } = await adminService.getAllDealers(pag, req.query);
+        paginated(res, dealers, pag.page, pag.limit, total);
+    } catch (e) { next(e); }
+};
+const verifyDealer = async (req, res, next) => { try { success(res, await adminService.verifyDealer(req.params.id, req.body), 'Dealer updated'); } catch (e) { next(e); } };
+
+// Products
 const getProducts = async (req, res, next) => {
     try {
         const pag = getPagination(req.query);
@@ -48,4 +61,10 @@ const updateScheme = async (req, res, next) => { try { success(res, await adminS
 const deleteScheme = async (req, res, next) => { try { success(res, await adminService.deleteScheme(req.params.id), 'Scheme deleted'); } catch (e) { next(e); } };
 const broadcastNotification = async (req, res, next) => { try { success(res, await adminService.broadcastNotification(req.body), 'Notifications sent'); } catch (e) { next(e); } };
 
-module.exports = { adminLogin, getDashboard, getUsers, getUser, toggleUserActive, getPendingSuppliers, getAllSuppliers, verifySupplier, getProducts, approveProduct, rejectProduct, getAllOrders, createScheme, updateScheme, deleteScheme, broadcastNotification };
+module.exports = {
+    adminLogin, getDashboard, getUsers, getUser, toggleUserActive,
+    getPendingSuppliers, getAllSuppliers, verifySupplier,
+    getPendingDealers, getAllDealers, verifyDealer,
+    getProducts, approveProduct, rejectProduct, getAllOrders,
+    createScheme, updateScheme, deleteScheme, broadcastNotification
+};
