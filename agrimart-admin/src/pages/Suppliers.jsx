@@ -15,6 +15,7 @@ export default function Suppliers() {
     const [rejectReason, setRejectReason] = useState('');
     const [tab, setTab] = useState('pending'); // 'pending' | 'all'
     const [search, setSearch] = useState('');
+    const [actionLoading, setActionLoading] = useState(null); // 'approve-{id}' | 'reject-{id}'
 
     const load = () => {
         setLoading(true);
@@ -28,6 +29,7 @@ export default function Suppliers() {
     useEffect(() => { load(); }, [tab, search]);
 
     const handleVerify = async (id, action) => {
+        setActionLoading(`${action}-${id}`);
         try {
             await verifySupplier(id, { action, reason: rejectReason });
             toast.success(`Supplier ${action === 'approve' ? '✅ approved' : '❌ rejected'}`);
@@ -35,6 +37,7 @@ export default function Suppliers() {
             setRejectReason('');
             load();
         } catch { toast.error('Action failed'); }
+        finally { setActionLoading(null); }
     };
 
     return (
@@ -121,10 +124,20 @@ export default function Suppliers() {
                                         <td>
                                             <div className="flex-center gap-8">
                                                 {s.verificationStatus !== 'VERIFIED' && (
-                                                    <button className="btn btn-sm btn-success" onClick={() => handleVerify(s.id, 'approve')}>✅ Approve</button>
+                                                    <button
+                                                        className="btn btn-sm btn-success"
+                                                        disabled={actionLoading === `approve-${s.id}`}
+                                                        onClick={() => handleVerify(s.id, 'approve')}
+                                                    >
+                                                        {actionLoading === `approve-${s.id}` ? <><span className="btn-spinner" /> Approving…</> : '✅ Approve'}
+                                                    </button>
                                                 )}
                                                 {s.verificationStatus !== 'REJECTED' && (
-                                                    <button className="btn btn-sm btn-danger" onClick={() => setSelected(s)}>❌ Reject</button>
+                                                    <button
+                                                        className="btn btn-sm btn-danger"
+                                                        disabled={!!actionLoading}
+                                                        onClick={() => setSelected(s)}
+                                                    >❌ Reject</button>
                                                 )}
                                                 {s.verificationStatus === 'VERIFIED' && s.verificationStatus !== 'REJECTED' && (
                                                     <span className="text-xs text-secondary">Verified</span>
@@ -141,11 +154,11 @@ export default function Suppliers() {
 
             {/* Reject modal */}
             {selected && (
-                <div className="modal-overlay" onClick={() => setSelected(null)}>
+                <div className="modal-overlay" onClick={() => !actionLoading && setSelected(null)}>
                     <div className="modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h3 className="modal-title">Reject Supplier</h3>
-                            <button style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20 }} onClick={() => setSelected(null)}>✕</button>
+                            <button style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20 }} onClick={() => !actionLoading && setSelected(null)}>✕</button>
                         </div>
                         <div className="modal-body">
                             <p style={{ marginBottom: 16, color: 'var(--text-secondary)' }}>
@@ -163,8 +176,14 @@ export default function Suppliers() {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button className="btn btn-outline" onClick={() => setSelected(null)}>Cancel</button>
-                            <button className="btn btn-danger" onClick={() => handleVerify(selected.id, 'reject')}>Confirm Reject</button>
+                            <button className="btn btn-outline" disabled={!!actionLoading} onClick={() => setSelected(null)}>Cancel</button>
+                            <button
+                                className="btn btn-danger"
+                                disabled={actionLoading === `reject-${selected.id}`}
+                                onClick={() => handleVerify(selected.id, 'reject')}
+                            >
+                                {actionLoading === `reject-${selected.id}` ? <><span className="btn-spinner" /> Rejecting…</> : 'Confirm Reject'}
+                            </button>
                         </div>
                     </div>
                 </div>

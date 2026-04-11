@@ -77,6 +77,8 @@ model Session {
   expiresAt DateTime
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Farmer {
@@ -132,6 +134,10 @@ model Supplier {
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   products       Product[]
   orderItems     OrderItem[]
+
+  @@index([isVerified])
+  @@index([latitude, longitude])
+  @@index([district])
 }
 
 model Dealer {
@@ -158,6 +164,9 @@ model Dealer {
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   cropRates      DealerCropRate[]
   tradeBookings  TradeBooking[]
+
+  @@index([district])
+  @@index([latitude, longitude])
 }
 
 model Product {
@@ -231,6 +240,7 @@ model Order {
 
   @@index([farmerId])
   @@index([status])
+  @@index([farmerId, status])
 }
 
 model OrderItem {
@@ -315,6 +325,9 @@ model Notification {
   data      Json?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isRead])
 }
 
 model GovernmentScheme {
@@ -383,4 +396,8 @@ model TradeBooking {
   updatedAt       DateTime    @updatedAt
   farmer          Farmer      @relation(fields: [farmerId], references: [id])
   dealer          Dealer      @relation(fields: [dealerId], references: [id])
+
+  @@index([dealerId])
+  @@index([farmerId])
+  @@index([dealerId, status])
 }

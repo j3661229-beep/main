@@ -1,5 +1,7 @@
 const prisma = require('../config/database');
 const logger = require('../utils/logger');
+const { getPagination } = require('../utils/helpers');
+const { paginated } = require('../utils/apiResponse');
 
 // Get all rates for the logged-in dealer
 exports.getMyRates = async (req, res) => {
@@ -7,11 +9,18 @@ exports.getMyRates = async (req, res) => {
         const dealer = await prisma.dealer.findUnique({ where: { userId: req.user.id } });
         if (!dealer) return res.status(404).json({ message: 'Dealer profile not found' });
 
-        const rates = await prisma.dealerCropRate.findMany({
-            where: { dealerId: dealer.id },
-            orderBy: { updatedAt: 'desc' }
-        });
-        res.json({ rates });
+        const { page, limit, skip } = getPagination(req.query);
+
+        const [rates, total] = await Promise.all([
+            prisma.dealerCropRate.findMany({
+                where: { dealerId: dealer.id },
+                skip, take: limit,
+                orderBy: { updatedAt: 'desc' }
+            }),
+            prisma.dealerCropRate.count({ where: { dealerId: dealer.id } })
+        ]);
+        
+        paginated(res, rates, page, limit, total);
     } catch (error) {
         logger.error('Error in getMyRates:', error);
         res.status(500).json({ message: 'Server error' });
@@ -62,12 +71,19 @@ exports.getMyBookings = async (req, res) => {
         const dealer = await prisma.dealer.findUnique({ where: { userId: req.user.id } });
         if (!dealer) return res.status(404).json({ message: 'Dealer profile not found' });
 
-        const bookings = await prisma.tradeBooking.findMany({
-            where: { dealerId: dealer.id },
-            include: { farmer: { include: { user: true } } },
-            orderBy: { slotDate: 'asc' }
-        });
-        res.json({ bookings });
+        const { page, limit, skip } = getPagination(req.query);
+
+        const [bookings, total] = await Promise.all([
+            prisma.tradeBooking.findMany({
+                where: { dealerId: dealer.id },
+                skip, take: limit,
+                include: { farmer: { include: { user: true } } },
+                orderBy: { slotDate: 'asc' }
+            }),
+            prisma.tradeBooking.count({ where: { dealerId: dealer.id } })
+        ]);
+        
+        paginated(res, bookings, page, limit, total);
     } catch (error) {
         logger.error('Error in getMyBookings:', error);
         res.status(500).json({ message: 'Server error' });

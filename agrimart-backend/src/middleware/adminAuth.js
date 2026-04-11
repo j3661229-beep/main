@@ -12,7 +12,7 @@ const requireAdmin = async (req, res, next) => {
             return error(res, 'Admin authorization required', 401);
         }
         const token = header.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret_change_in_production');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret');
 
         const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
         if (!user || user.role !== 'ADMIN' || !user.isActive) {

@@ -67,7 +67,7 @@ export default function Notifications() {
                     </div>
 
                     <button className="btn btn-primary w-full" style={{ justifyContent: 'center' }} onClick={handleSend} disabled={sending}>
-                        {sending ? '⏳ Sending…' : '🚀 Send Broadcast'}
+                        {sending ? <><span className="btn-spinner" /> Sending…</> : '🚀 Send Broadcast'}
                     </button>
 
                     {sentCount !== null && (

@@ -60,9 +60,11 @@ const getPrices = async ({ district, crop, page = 1, limit = 20 }) => {
         }
     }
 
-    const result = { prices, updatedAt: new Date().toISOString(), source: 'AGMARKNET - data.gov.in' };
-    await redis.setWithExpiry(cacheKey, 1800, JSON.stringify(result)); // Cache 30 mins
-    await redis.setWithExpiry(`${cacheKey}:stale`, 86400, JSON.stringify(result)); // Stale cache for 24 hours
+    const skip = (page - 1) * limit;
+    const paginatedPrices = prices.slice(skip, skip + limit);
+    const result = { prices: paginatedPrices, total: prices.length, updatedAt: new Date().toISOString(), source: 'AGMARKNET - data.gov.in' };
+    await redis.setWithExpiry(cacheKey, 1800, JSON.stringify({ prices, total: prices.length, updatedAt: result.updatedAt, source: result.source })); // Cache full for 30 mins
+    await redis.setWithExpiry(`${cacheKey}:stale`, 86400, JSON.stringify({ prices, total: prices.length, updatedAt: result.updatedAt, source: result.source })); // Stale cache for 24 hours
     return result;
 };
 

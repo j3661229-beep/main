@@ -10,6 +10,7 @@ export default function Schemes() {
     const [modal, setModal] = useState(null); // null | 'create' | scheme-object
     const [form, setForm] = useState(EMPTY);
     const [saving, setSaving] = useState(false);
+    const [actionLoading, setActionLoading] = useState(null); // 'delete-{id}'
 
     useEffect(() => {
         // public endpoint — no admin auth needed
@@ -46,11 +47,13 @@ export default function Schemes() {
 
     const handleDelete = async (id) => {
         if (!confirm('Delete this scheme?')) return;
+        setActionLoading(`delete-${id}`);
         try {
             await deleteScheme(id);
             setSchemes(s => s.filter(x => x.id !== id));
             toast.success('Scheme deleted');
         } catch { toast.error('Delete failed'); }
+        finally { setActionLoading(null); }
     };
 
     return (
@@ -85,7 +88,13 @@ export default function Schemes() {
                                 </div>
                                 <div className="flex-center gap-8">
                                     <button className="btn btn-sm btn-outline" onClick={() => openEdit(s)}>✏️ Edit</button>
-                                    <button className="btn btn-sm btn-danger" onClick={() => handleDelete(s.id)}>🗑️</button>
+                                    <button
+                                        className="btn btn-sm btn-danger"
+                                        disabled={actionLoading === `delete-${s.id}`}
+                                        onClick={() => handleDelete(s.id)}
+                                    >
+                                        {actionLoading === `delete-${s.id}` ? <><span className="btn-spinner" /> Deleting…</> : '🗑️'}
+                                    </button>
                                 </div>
                             </div>
                         ))}
@@ -95,11 +104,11 @@ export default function Schemes() {
 
             {/* Modal */}
             {modal !== null && (
-                <div className="modal-overlay" onClick={() => setModal(null)}>
+                <div className="modal-overlay" onClick={() => !saving && setModal(null)}>
                     <div className="modal" style={{ maxWidth: 600 }} onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h3 className="modal-title">{modal === 'create' ? 'Add Scheme' : 'Edit Scheme'}</h3>
-                            <button style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20 }} onClick={() => setModal(null)}>✕</button>
+                            <button style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20 }} onClick={() => !saving && setModal(null)}>✕</button>
                         </div>
                         <div className="modal-body">
                             {[['title', 'Scheme Title'], ['ministry', 'Ministry'], ['benefits', 'Benefits'], ['eligibility', 'Eligibility Criteria'], ['documents', 'Documents Required (comma-separated)'], ['applyUrl', 'Apply URL'], ['deadline', 'Deadline']].map(([key, label]) => (
@@ -120,8 +129,10 @@ export default function Schemes() {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button className="btn btn-outline" onClick={() => setModal(null)}>Cancel</button>
-                            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save Scheme'}</button>
+                            <button className="btn btn-outline" disabled={saving} onClick={() => setModal(null)}>Cancel</button>
+                            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+                                {saving ? <><span className="btn-spinner" /> Saving…</> : 'Save Scheme'}
+                            </button>
                         </div>
                     </div>
                 </div>

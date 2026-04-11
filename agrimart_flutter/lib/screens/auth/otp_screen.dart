@@ -49,7 +49,7 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
         language: 'marathi',
         role: widget.role,
       );
-      if (mounted) context.go(user.isFarmer ? '/farmer' : '/supplier');
+      if (mounted) context.go(user.isFarmer ? '/farmer' : user.isDealer ? '/dealer' : '/supplier');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Invalid OTP. Try again.'), backgroundColor: AppColors.error),

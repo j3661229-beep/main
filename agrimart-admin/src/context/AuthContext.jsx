@@ -18,8 +18,10 @@ export function AuthProvider({ children }) {
 
     const login = async (phone, password) => {
         const res = await apiLogin({ phone, password });
-        // Interceptor unwraps axios res.data → { success, message, data: { token, user } }
-        const { token, user } = res.data;
+        // Interceptor already unwraps axios res.data, so `res` IS the backend JSON body:
+        // { success: true, message: '...', data: { token, user } }
+        const { token, user } = res.data || res;
+        if (!token) throw new Error('Login failed — no token received');
         localStorage.setItem('admin_token', token);
         localStorage.setItem('admin_user', JSON.stringify(user));
         setAdmin(user);

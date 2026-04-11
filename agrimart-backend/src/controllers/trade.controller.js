@@ -1,5 +1,7 @@
 const prisma = require('../config/database');
 const logger = require('../utils/logger');
+const { getPagination } = require('../utils/helpers');
+const { paginated } = require('../utils/apiResponse');
 
 // Fetch dealers for a district and crop
 exports.getDealerRates = async (req, res) => {
@@ -9,21 +11,28 @@ exports.getDealerRates = async (req, res) => {
             return res.status(400).json({ success: false, message: 'District and crop are required' });
         }
 
-        const rates = await prisma.dealerCropRate.findMany({
-            where: {
-                district: { equals: district, mode: 'insensitive' },
-                cropName: { equals: crop, mode: 'insensitive' },
-                isActive: true
-            },
-            include: {
-                supplier: {
-                    include: { user: { select: { name: true, phone: true } } }
-                }
-            },
-            orderBy: { pricePerQuintal: 'desc' }
-        });
+        const { page, limit, skip } = getPagination(req.query);
+        const whereClause = {
+            district: { equals: district, mode: 'insensitive' },
+            cropName: { equals: crop, mode: 'insensitive' },
+            isActive: true
+        };
 
-        res.json({ success: true, data: rates });
+        const [rates, total] = await Promise.all([
+            prisma.dealerCropRate.findMany({
+                where: whereClause,
+                skip, take: limit,
+                include: {
+                    supplier: {
+                        include: { user: { select: { name: true, phone: true } } }
+                    }
+                },
+                orderBy: { pricePerQuintal: 'desc' }
+            }),
+            prisma.dealerCropRate.count({ where: whereClause })
+        ]);
+
+        paginated(res, rates, page, limit, total);
     } catch (error) {
         logger.error(`Get dealer rates error: ${error.message}`);
         res.status(500).json({ success: false, message: error.message });

@@ -40,7 +40,12 @@ const getDashboardStats = async () => {
 
     const recentOrders = await prisma.order.findMany({
         take: 10, orderBy: { createdAt: 'desc' },
-        include: { farmer: { include: { user: true } }, items: { include: { product: true } }, payment: true },
+        select: {
+            id: true, totalAmount: true, status: true, paymentStatus: true, createdAt: true,
+            farmer: { select: { user: { select: { name: true, phone: true } } } },
+            items: { select: { quantity: true, price: true, product: { select: { name: true } } } },
+            payment: { select: { status: true, method: true, amount: true } },
+        },
     });
 
     const trend = await Promise.all(

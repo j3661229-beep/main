@@ -737,6 +737,24 @@ tbody tr:last-child {
   animation: spin 0.7s linear infinite;
 }
 
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.btn-outline .btn-spinner,
+.btn-sm.btn-outline .btn-spinner {
+  border-color: rgba(0, 0, 0, 0.15);
+  border-top-color: var(--color-primary);
+}
+
 .page-loader {
   display: flex;
   align-items: center;

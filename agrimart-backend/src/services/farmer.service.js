@@ -55,11 +55,14 @@ const getDashboard = async (farmerId) => {
         return null;
     })();
 
-    // Nearby products Promise
+    // Nearby products Promise — lean select
     const nearbyProductsPromise = prisma.product.findMany({
         where: { isActive: true, isApproved: true, stockQuantity: { gt: 0 } },
         take: 6,
-        include: { supplier: { include: { user: true } } },
+        select: {
+            id: true, name: true, price: true, unit: true, images: true, isOrganic: true, brand: true,
+            supplier: { select: { id: true, businessName: true, district: true, user: { select: { name: true } } } },
+        },
         orderBy: { createdAt: 'desc' },
     });
 
@@ -89,7 +92,7 @@ const getOrders = async (farmerId, { page, limit, skip }) => {
             where: { farmerId },
             skip, take: limit,
             orderBy: { createdAt: 'desc' },
-            include: { items: { include: { product: true, supplier: { include: { user: true } } } }, payment: true },
+            include: { items: { include: { product: { select: { id: true, name: true, price: true, images: true, unit: true } }, supplier: { select: { id: true, businessName: true, user: { select: { name: true } } } } } }, payment: true },
         }),
         prisma.order.count({ where: { farmerId } }),
     ]);

@@ -33,6 +33,8 @@ import '../screens/shared/notifications_screen.dart';
 import '../screens/dealer/dealer_home.dart';
 import '../screens/dealer/manage_rates_screen.dart';
 import '../screens/dealer/view_bookings_screen.dart';
+import '../screens/dealer/dealer_slots_screen.dart';
+import '../screens/dealer/dealer_working_days_screen.dart';
 
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -145,6 +147,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       _fadedRoute('/dealer', const DealerHome()),
       _fadedRoute('/dealer/rates', const ManageRatesScreen()),
       _fadedRoute('/dealer/bookings', const DealerBookingsScreen()),
+      _fadedRoute('/dealer/slots', const DealerSlotsScreen()),
+      _fadedRoute('/dealer/working-days', const DealerWorkingDaysScreen()),
     ],
   );
 

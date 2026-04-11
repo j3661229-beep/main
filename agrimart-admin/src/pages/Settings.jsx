@@ -150,7 +150,7 @@ export default function Settings() {
 
                 <div className="flex-end mt-24">
                     <button className="btn btn-primary btn-lg" type="submit" disabled={loading}>
-                        {loading ? 'Saving...' : '💾 Save All Settings'}
+                        {loading ? <><span className="btn-spinner" /> Saving...</> : '💾 Save All Settings'}
                     </button>
                 </div>
             </form>

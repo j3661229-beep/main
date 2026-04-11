@@ -9,6 +9,7 @@ export default function Users() {
     const [search, setSearch] = useState('');
     const [role, setRole] = useState('');
     const [page, setPage] = useState(1);
+    const [actionLoading, setActionLoading] = useState(null); // 'toggle-{id}'
 
     const load = () => {
         setLoading(true);
@@ -21,11 +22,13 @@ export default function Users() {
     useEffect(() => { load(); }, [page, search, role]);
 
     const handleToggle = async (id) => {
+        setActionLoading(`toggle-${id}`);
         try {
             const res = await toggleUser(id);
             setUsers(u => u.map(x => x.id === id ? { ...x, isActive: res.data.isActive } : x));
             toast.success('User status updated');
         } catch { toast.error('Failed to update user'); }
+        finally { setActionLoading(null); }
     };
 
     return (
@@ -83,9 +86,13 @@ export default function Users() {
                                         <td>
                                             <button
                                                 className={`btn btn-sm ${u.isActive ? 'btn-danger' : 'btn-success'}`}
+                                                disabled={actionLoading === `toggle-${u.id}`}
                                                 onClick={() => handleToggle(u.id)}
                                             >
-                                                {u.isActive ? '🚫 Block' : '✅ Unblock'}
+                                                {actionLoading === `toggle-${u.id}`
+                                                    ? <><span className="btn-spinner" /> {u.isActive ? 'Blocking…' : 'Unblocking…'}</>
+                                                    : (u.isActive ? '🚫 Block' : '✅ Unblock')
+                                                }
                                             </button>
                                         </td>
                                     </tr>

@@ -367,3 +367,17 @@ final supplierOrdersProvider =
 final supplierProductsProvider = FutureProvider<List>((ref) async {
   return ApiService.instance.getSupplierProducts();
 });
+
+// ── Dealer ────────────────────────────────────────────────
+final dealerDashboardProvider = FutureProvider<Map>((ref) async {
+  return ApiService.instance.getDealerDashboard();
+});
+
+final dealerRatesProvider = FutureProvider<List>((ref) async {
+  return ApiService.instance.getDealerMyRates();
+});
+
+final dealerBookingsProvider = FutureProvider<List>((ref) async {
+  return ApiService.instance.getDealerMyBookings();
+});
+

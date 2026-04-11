@@ -315,6 +315,45 @@ class ApiService {
     return r.data['data'];
   }
 
+  // ── Dealer ────────────────────────────────────────────────
+  Future<Map> getDealerDashboard() async {
+    final rates = await getDealerMyRates();
+    final bookings = await getDealerMyBookings();
+    final pendingCount = (bookings as List).where((b) => b['status'] == 'PENDING').length;
+    final todayCount = (bookings).where((b) {
+      final d = DateTime.tryParse(b['slotDate'] ?? '');
+      return d != null && d.day == DateTime.now().day && d.month == DateTime.now().month;
+    }).length;
+    return {
+      'activeRates': (rates as List).where((r) => r['isActive'] == true).length,
+      'pendingBookings': pendingCount,
+      'todaySlots': todayCount,
+      'totalBookings': bookings.length,
+      'rates': rates,
+      'bookings': bookings,
+    };
+  }
+
+  Future<List> getDealerMyRates() async {
+    final r = await _dio.get('/dealer/rates');
+    return r.data['rates'] ?? [];
+  }
+
+  Future<Map> updateDealerRate(Map<String, dynamic> data) async {
+    final r = await _dio.post('/dealer/rates', data: data);
+    return r.data['rate'] ?? r.data['data'] ?? {};
+  }
+
+  Future<List> getDealerMyBookings() async {
+    final r = await _dio.get('/dealer/bookings');
+    return r.data['bookings'] ?? [];
+  }
+
+  Future<Map> updateDealerBookingStatus(String id, String status) async {
+    final r = await _dio.patch('/dealer/bookings/$id', data: {'status': status});
+    return r.data['booking'] ?? r.data['data'] ?? {};
+  }
+
 
   // ── Notifications ─────────────────────────────────────────
   Future<Map> getNotifications() async {

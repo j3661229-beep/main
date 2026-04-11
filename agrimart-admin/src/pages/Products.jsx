@@ -12,6 +12,7 @@ export default function Products() {
     const [category, setCategory] = useState('');
     const [approved, setApproved] = useState('');
     const [page, setPage] = useState(1);
+    const [actionLoading, setActionLoading] = useState(null); // 'approve-{id}' | 'reject-{id}'
 
     const load = () => {
         setLoading(true);
@@ -24,19 +25,23 @@ export default function Products() {
     useEffect(() => { load(); }, [page, search, category, approved]);
 
     const handleApprove = async (id) => {
+        setActionLoading(`approve-${id}`);
         try {
             await approveProduct(id);
             setProducts(p => p.map(x => x.id === id ? { ...x, isApproved: true } : x));
             toast.success('Product approved');
         } catch { toast.error('Failed'); }
+        finally { setActionLoading(null); }
     };
 
     const handleReject = async (id) => {
+        setActionLoading(`reject-${id}`);
         try {
             await rejectProduct(id);
             setProducts(p => p.filter(x => x.id !== id));
             toast.success('Product rejected');
         } catch { toast.error('Failed'); }
+        finally { setActionLoading(null); }
     };
 
     return (
@@ -89,11 +94,29 @@ export default function Products() {
                                         <td>
                                             {!p.isApproved ? (
                                                 <div className="flex-center gap-8">
-                                                    <button className="btn btn-sm btn-success" onClick={() => handleApprove(p.id)}>Approve</button>
-                                                    <button className="btn btn-sm btn-danger" onClick={() => handleReject(p.id)}>Reject</button>
+                                                    <button
+                                                        className="btn btn-sm btn-success"
+                                                        disabled={actionLoading === `approve-${p.id}`}
+                                                        onClick={() => handleApprove(p.id)}
+                                                    >
+                                                        {actionLoading === `approve-${p.id}` ? <><span className="btn-spinner" /> Approving…</> : 'Approve'}
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-danger"
+                                                        disabled={actionLoading === `reject-${p.id}`}
+                                                        onClick={() => handleReject(p.id)}
+                                                    >
+                                                        {actionLoading === `reject-${p.id}` ? <><span className="btn-spinner" /> Rejecting…</> : 'Reject'}
+                                                    </button>
                                                 </div>
                                             ) : (
-                                                <button className="btn btn-sm btn-outline" onClick={() => handleReject(p.id)}>Remove</button>
+                                                <button
+                                                    className="btn btn-sm btn-outline"
+                                                    disabled={actionLoading === `reject-${p.id}`}
+                                                    onClick={() => handleReject(p.id)}
+                                                >
+                                                    {actionLoading === `reject-${p.id}` ? <><span className="btn-spinner" /> Removing…</> : 'Remove'}
+                                                </button>
                                             )}
                                         </td>
                                     </tr>

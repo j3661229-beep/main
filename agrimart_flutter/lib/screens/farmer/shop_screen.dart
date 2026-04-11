@@ -27,6 +27,47 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
   String _sort = 'createdAt';
   final _searchCtrl = TextEditingController();
   Position? _position;
+  // Location toggle state
+  String? _customLocationName;  // null = GPS mode
+  double? _customLat;
+  double? _customLng;
+
+  static const List<Map<String, dynamic>> _maharashtraDistricts = [
+    {'name': 'Nashik', 'lat': 20.0063, 'lng': 73.7895},
+    {'name': 'Pune', 'lat': 18.5204, 'lng': 73.8567},
+    {'name': 'Nagpur', 'lat': 21.1458, 'lng': 79.0882},
+    {'name': 'Mumbai', 'lat': 19.0760, 'lng': 72.8777},
+    {'name': 'Aurangabad', 'lat': 19.8762, 'lng': 75.3433},
+    {'name': 'Kolhapur', 'lat': 16.7050, 'lng': 74.2433},
+    {'name': 'Solapur', 'lat': 17.6599, 'lng': 75.9064},
+    {'name': 'Sangli', 'lat': 16.8524, 'lng': 74.5815},
+    {'name': 'Satara', 'lat': 17.6805, 'lng': 74.0183},
+    {'name': 'Ahmednagar', 'lat': 19.0948, 'lng': 74.7480},
+    {'name': 'Jalgaon', 'lat': 21.0077, 'lng': 75.5626},
+    {'name': 'Dhule', 'lat': 20.9042, 'lng': 74.7749},
+    {'name': 'Nanded', 'lat': 19.1383, 'lng': 77.3210},
+    {'name': 'Latur', 'lat': 18.3968, 'lng': 76.5604},
+    {'name': 'Amravati', 'lat': 20.9374, 'lng': 77.7796},
+    {'name': 'Wardha', 'lat': 20.7453, 'lng': 78.6022},
+    {'name': 'Chandrapur', 'lat': 19.9615, 'lng': 79.2961},
+    {'name': 'Beed', 'lat': 18.9890, 'lng': 75.7600},
+    {'name': 'Osmanabad', 'lat': 18.1860, 'lng': 76.0350},
+    {'name': 'Parbhani', 'lat': 19.2610, 'lng': 76.7760},
+    {'name': 'Hingoli', 'lat': 19.7200, 'lng': 77.1500},
+    {'name': 'Jalna', 'lat': 19.8347, 'lng': 75.8816},
+    {'name': 'Ratnagiri', 'lat': 16.9944, 'lng': 73.3000},
+    {'name': 'Sindhudurg', 'lat': 16.3489, 'lng': 73.7555},
+    {'name': 'Thane', 'lat': 19.2183, 'lng': 72.9781},
+    {'name': 'Raigad', 'lat': 18.5166, 'lng': 73.1843},
+    {'name': 'Yavatmal', 'lat': 20.3888, 'lng': 78.1204},
+    {'name': 'Akola', 'lat': 20.7059, 'lng': 77.0025},
+    {'name': 'Washim', 'lat': 20.1042, 'lng': 77.1332},
+    {'name': 'Buldhana', 'lat': 20.5293, 'lng': 76.1843},
+    {'name': 'Gondia', 'lat': 21.4602, 'lng': 80.1920},
+    {'name': 'Bhandara', 'lat': 21.1669, 'lng': 79.6504},
+    {'name': 'Gadchiroli', 'lat': 20.1809, 'lng': 80.0000},
+    {'name': 'Nandurbar', 'lat': 21.3700, 'lng': 74.2400},
+  ];
 
   @override
   void initState() {
@@ -51,6 +92,34 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     }
   }
 
+  double? get _effectiveLat => _customLat ?? _position?.latitude;
+  double? get _effectiveLng => _customLng ?? _position?.longitude;
+  String get _effectiveLocationName => _customLocationName ?? (ref.read(authProvider).user?.farmer?['village'] as String? ?? 'Your Farm');
+
+  void _showLocationPicker() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _LocationPickerSheet(
+        currentLocation: _customLocationName,
+        districts: _maharashtraDistricts,
+        onUseGPS: () {
+          setState(() { _customLocationName = null; _customLat = null; _customLng = null; });
+          Navigator.pop(ctx);
+        },
+        onSelectDistrict: (district) {
+          setState(() {
+            _customLocationName = district['name'] as String;
+            _customLat = district['lat'] as double;
+            _customLng = district['lng'] as double;
+          });
+          Navigator.pop(ctx);
+        },
+      ),
+    );
+  }
+
   Map<String, dynamic>? _getCartItem(AsyncValue cart, String productId) {
     if (!cart.hasValue) return null;
     final data = cart.value;
@@ -71,15 +140,15 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       if (_category.isNotEmpty) 'category': _category,
       if (_search.isNotEmpty) 'search': _search,
       'sort': _sort,
-      if (_position != null) 'lat': _position!.latitude.toString(),
-      if (_position != null) 'lng': _position!.longitude.toString(),
+      if (_effectiveLat != null) 'lat': _effectiveLat.toString(),
+      if (_effectiveLng != null) 'lng': _effectiveLng.toString(),
     }).query;
 
     final products = ref.watch(productsProvider(q));
-    final nearbySuppliers = _position == null
+    final nearbySuppliers = _effectiveLat == null
         ? const AsyncValue<List>.data([])
         : ref.watch(nearbySuppliersProvider(
-            '${_position!.latitude},${_position!.longitude}',
+            '$_effectiveLat,$_effectiveLng',
           ));
     final cartAsync = ref.watch(cartProvider);
 
@@ -95,9 +164,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       }
     }
 
-    final user = ref.watch(authProvider).user;
-    final locationName = user?.farmer?['village'] as String? ?? 'Your Farm';
     final l10n = AppLocalizations.of(context)!;
+    final locationName = _effectiveLocationName;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -105,9 +173,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         color: AppColors.primary,
         onRefresh: () async {
           ref.invalidate(productsProvider(q));
-          if (_position != null) {
+          if (_effectiveLat != null) {
             ref.invalidate(nearbySuppliersProvider(
-              '${_position!.latitude},${_position!.longitude}',
+              '$_effectiveLat,$_effectiveLng',
             ));
           }
           try {
@@ -124,6 +192,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                   pinned: true,
                   delegate: _SwiggyHeaderDelegate(
                     locationName: locationName,
+                    isCustomLocation: _customLocationName != null,
                     searchCtrl: _searchCtrl,
                     searchQuery: _search,
                     onSearchChanged: (v) => setState(() => _search = v),
@@ -131,6 +200,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                       _searchCtrl.clear();
                       setState(() => _search = '');
                     },
+                    onLocationTap: _showLocationPicker,
                   ),
                 ),
                 SliverToBoxAdapter(
@@ -302,10 +372,10 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                     ),
                                   ),
                                 ),
-                                TextButton(
+                                if (_effectiveLat != null) TextButton(
                                   onPressed: () => ref.invalidate(
                                     nearbySuppliersProvider(
-                                      '${_position!.latitude},${_position!.longitude}',
+                                      '$_effectiveLat,$_effectiveLng',
                                     ),
                                   ),
                                   child: const Text('Retry'),
@@ -894,17 +964,21 @@ class _SortChip extends StatelessWidget {
 
 class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
   final String locationName;
+  final bool isCustomLocation;
   final TextEditingController searchCtrl;
   final String searchQuery;
   final ValueChanged<String> onSearchChanged;
   final VoidCallback onClearSearch;
+  final VoidCallback onLocationTap;
 
   _SwiggyHeaderDelegate(
       {required this.locationName,
+      this.isCustomLocation = false,
       required this.searchCtrl,
       required this.searchQuery,
       required this.onSearchChanged,
-      required this.onClearSearch});
+      required this.onClearSearch,
+      required this.onLocationTap});
 
   @override
   Widget build(
@@ -932,28 +1006,33 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.location_on,
-                        color: Colors.white, size: 28),
+                    Icon(isCustomLocation ? Icons.pin_drop : Icons.location_on,
+                        color: isCustomLocation ? const Color(0xFFFBBF24) : Colors.white, size: 28),
                     const SizedBox(width: 8),
-                    Column(
+                    Expanded(child: GestureDetector(
+                      onTap: onLocationTap,
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            children: const [
-                              Text('Pickup from Store',
-                                  style: TextStyle(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(isCustomLocation ? 'Browsing' : 'Pickup from Store',
+                                  style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w800,
                                       fontSize: 16)),
-                              Icon(Icons.keyboard_arrow_down,
-                                  color: Colors.white, size: 20)
+                              const Icon(Icons.keyboard_arrow_down,
+                                  color: Colors.white, size: 20),
                             ],
                           ),
                           Text(locationName,
-                              style: const TextStyle(
-                                  color: Colors.white70, fontSize: 12)),
-                        ]),
-                    const Spacer(),
+                              style: TextStyle(
+                                  color: isCustomLocation ? const Color(0xFFFBBF24) : Colors.white70, fontSize: 12),
+                              overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
+                    )),
                     Container(
                       width: 40,
                       height: 40,
@@ -1013,4 +1092,138 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
       true;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LOCATION PICKER BOTTOM SHEET
+// ─────────────────────────────────────────────────────────────────────────────
+class _LocationPickerSheet extends StatefulWidget {
+  final String? currentLocation;
+  final List<Map<String, dynamic>> districts;
+  final VoidCallback onUseGPS;
+  final Function(Map<String, dynamic>) onSelectDistrict;
+
+  const _LocationPickerSheet({
+    this.currentLocation,
+    required this.districts,
+    required this.onUseGPS,
+    required this.onSelectDistrict,
+  });
+
+  @override
+  State<_LocationPickerSheet> createState() => _LocationPickerSheetState();
+}
+
+class _LocationPickerSheetState extends State<_LocationPickerSheet> {
+  String _filter = '';
+  final _filterCtrl = TextEditingController();
+
+  List<Map<String, dynamic>> get _filtered {
+    if (_filter.isEmpty) return widget.districts;
+    return widget.districts.where((d) => (d['name'] as String).toLowerCase().contains(_filter.toLowerCase())).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.7,
+      decoration: const BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: Column(
+        children: [
+          // Handle
+          const SizedBox(height: 12),
+          Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(4))),
+          const SizedBox(height: 20),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Choose Location', style: AppTextStyles.headingXL),
+              const SizedBox(height: 4),
+              Text('Browse products from a different area', style: AppTextStyles.bodySM.copyWith(color: AppColors.textSecondary)),
+            ]),
+          ),
+          const SizedBox(height: 20),
+
+          // GPS option
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: GestureDetector(
+              onTap: widget.onUseGPS,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: widget.currentLocation == null ? AppColors.primarySurface : Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: widget.currentLocation == null ? AppColors.primary : AppColors.border),
+                ),
+                child: Row(children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: widget.currentLocation == null ? AppColors.primary : AppColors.surfaceVariant, shape: BoxShape.circle),
+                    child: Icon(Icons.my_location, color: widget.currentLocation == null ? Colors.white : AppColors.textSecondary, size: 20),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('📍 Use Current Location', style: AppTextStyles.headingSM),
+                    Text('Products near your GPS location', style: AppTextStyles.caption),
+                  ])),
+                  if (widget.currentLocation == null) const Icon(Icons.check_circle, color: AppColors.primary, size: 22),
+                ]),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Search
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: TextField(
+              controller: _filterCtrl,
+              decoration: InputDecoration(
+                hintText: 'Search district...',
+                prefixIcon: const Icon(Icons.search, color: AppColors.textTertiary),
+                suffixIcon: _filter.isNotEmpty ? IconButton(icon: const Icon(Icons.clear, size: 18), onPressed: () { _filterCtrl.clear(); setState(() => _filter = ''); }) : null,
+              ),
+              onChanged: (v) => setState(() => _filter = v),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // District list
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              itemCount: _filtered.length,
+              itemBuilder: (context, i) {
+                final d = _filtered[i];
+                final isSelected = widget.currentLocation == d['name'];
+                return GestureDetector(
+                  onTap: () => widget.onSelectDistrict(d),
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.primarySurface : Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: isSelected ? AppColors.primary : AppColors.border.withValues(alpha: 0.5)),
+                    ),
+                    child: Row(children: [
+                      Text('📌', style: const TextStyle(fontSize: 18)),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(d['name'] as String, style: AppTextStyles.headingSM.copyWith(color: isSelected ? AppColors.primary : AppColors.textPrimary))),
+                      if (isSelected) const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
+                    ]),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

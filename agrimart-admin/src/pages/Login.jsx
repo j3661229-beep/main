@@ -1,13 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
 import toast from 'react-hot-toast';
 
 
 export default function Login() {
-    const { login } = useAuth();
+    const { login, admin } = useAuth();
+    const navigate = useNavigate();
     const [form, setForm] = useState({ phone: '+919999999999', password: 'AgriMart@Admin2024' });
     const [loading, setLoading] = useState(false);
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (admin || localStorage.getItem('admin_token')) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [admin, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -15,8 +24,8 @@ export default function Login() {
         try {
             await login(form.phone, form.password);
             toast.success('Welcome back, Admin!');
-            // Hard redirect — bypasses React state race condition entirely
-            window.location.href = '/dashboard';
+            // Use React Router navigate — preserves auth state without full page reload
+            navigate('/dashboard', { replace: true });
         } catch (err) {
             toast.error(err?.message || err?.error || 'Login failed');
             setLoading(false);
@@ -88,7 +97,7 @@ export default function Login() {
                         className="btn btn-primary"
                         style={{ width: '100%', justifyContent: 'center', padding: '13px', fontSize: '16px', marginTop: 8 }}
                     >
-                        {loading ? 'Signing in…' : '🔓 Sign In'}
+                        {loading ? <><span className="btn-spinner" /> Signing in…</> : '🔓 Sign In'}
                     </button>
                 </form>
 
