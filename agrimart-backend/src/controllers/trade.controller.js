@@ -3,19 +3,19 @@ const logger = require('../utils/logger');
 const { getPagination } = require('../utils/helpers');
 const { paginated } = require('../utils/apiResponse');
 
-// Fetch dealers for a district and crop
+// Fetch dealers for a district (and optionally a specific crop)
 exports.getDealerRates = async (req, res) => {
     try {
         const { district, crop } = req.query;
-        if (!district || !crop) {
-            return res.status(400).json({ success: false, message: 'District and crop are required' });
+        if (!district) {
+            return res.status(400).json({ success: false, message: 'District is required' });
         }
 
         const { page, limit, skip } = getPagination(req.query);
         const whereClause = {
             district: { equals: district, mode: 'insensitive' },
-            cropName: { equals: crop, mode: 'insensitive' },
-            isActive: true
+            isActive: true,
+            ...(crop ? { cropName: { equals: crop, mode: 'insensitive' } } : {}),
         };
 
         const [rates, total] = await Promise.all([
@@ -23,7 +23,7 @@ exports.getDealerRates = async (req, res) => {
                 where: whereClause,
                 skip, take: limit,
                 include: {
-                    supplier: {
+                    dealer: {
                         include: { user: { select: { name: true, phone: true } } }
                     }
                 },
@@ -38,6 +38,7 @@ exports.getDealerRates = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 
 // Book a trade slot
 exports.bookTradeSlot = async (req, res) => {

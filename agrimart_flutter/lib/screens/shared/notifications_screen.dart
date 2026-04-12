@@ -20,7 +20,7 @@ class NotificationsScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => AppErrorState(
           message: e.toString(),
-          onRetry: () => ref.read(notificationsProvider.notifier).load(),
+          onRetry: () => ref.refresh(notificationsProvider),
         ),
         data: (data) {
           final list = data['data'] as List? ?? [];

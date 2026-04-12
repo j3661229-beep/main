@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import '../../data/services/api_service.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../core/theme/app_colors.dart';
@@ -8,7 +10,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
 
-// Provider for dealer crop rates
+// Provider for dealer crop rates — district only, all crops
 final dealerRatesProvider = FutureProvider.family<List, String>((ref, district) async {
   if (district.isEmpty) return [];
   return ApiService.instance.getDealerRates(district: district);
@@ -22,7 +24,8 @@ class DealerTabScreen extends ConsumerStatefulWidget {
 }
 
 class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
-  String _district = 'Dhule';
+  String _district = '';
+  bool _isDetectingLocation = false;
 
   static const _districts = [
     'Dhule', 'Nashik', 'Pune', 'Jalgaon', 'Aurangabad',
@@ -30,14 +33,79 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
     'Konkan Division', 'Mumbai', 'Mumbai Suburban', 'Other',
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initDistrict());
+  }
+
+  /// Auto-detect district from GPS, fallback to farmer profile, then default
+  Future<void> _initDistrict() async {
+    // First use farmer's profile district if available
+    final farmerDistrict = ref.read(authProvider).user?.farmer?['district'] as String?;
+    if (farmerDistrict != null && farmerDistrict.isNotEmpty) {
+      setState(() => _district = farmerDistrict);
+    }
+
+    // Then try to get GPS-based district (overrides profile if successful)
+    await _detectNearestDistrict();
+  }
+
+  Future<void> _detectNearestDistrict() async {
+    setState(() => _isDetectingLocation = true);
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        _fallbackDistrict();
+        return;
+      }
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        _fallbackDistrict();
+        return;
+      }
+
+      final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      final placemarks = await placemarkFromCoordinates(pos.latitude, pos.longitude);
+
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        // subAdministrativeArea is typically the district
+        final detected = place.subAdministrativeArea ?? place.administrativeArea ?? '';
+
+        // Match to known districts (fuzzy)
+        final matched = _districts.firstWhere(
+          (d) => detected.toLowerCase().contains(d.toLowerCase()) || d.toLowerCase().contains(detected.toLowerCase().split(' ').first),
+          orElse: () => '',
+        );
+
+        if (matched.isNotEmpty && mounted) {
+          setState(() => _district = matched);
+        } else {
+          _fallbackDistrict();
+        }
+      } else {
+        _fallbackDistrict();
+      }
+    } catch (_) {
+      _fallbackDistrict();
+    } finally {
+      if (mounted) setState(() => _isDetectingLocation = false);
+    }
+  }
+
+  void _fallbackDistrict() {
+    if (_district.isEmpty) setState(() => _district = _districts.first);
+  }
+
+  String get _effectiveDistrict => _district.isNotEmpty ? _district : _districts.first;
 
   @override
   Widget build(BuildContext context) {
-    final auth = ref.watch(authProvider);
-    final farmerDistrict = auth.user?.farmer?['district'] as String?;
-    final effectiveDistrict = _district.isNotEmpty ? _district : (farmerDistrict ?? 'Dhule');
-
-    final rates = ref.watch(dealerRatesProvider(effectiveDistrict));
+    final rates = ref.watch(dealerRatesProvider(_effectiveDistrict));
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -73,12 +141,28 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
                         child: const Text('🏪', style: TextStyle(fontSize: 26)),
                       ),
                       const SizedBox(width: 14),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Dealer Prices', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -0.5)),
-                          Text('Live crop buying rates', style: TextStyle(fontSize: 13, color: Colors.white70, fontWeight: FontWeight.w500)),
-                        ],
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Dealer Prices', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -0.5)),
+                            Text('Nearby dealers • Live rates', style: TextStyle(fontSize: 13, color: Colors.white70, fontWeight: FontWeight.w500)),
+                          ],
+                        ),
+                      ),
+                      // Location detect button
+                      GestureDetector(
+                        onTap: _isDetectingLocation ? null : _detectNearestDistrict,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: _isDetectingLocation
+                              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                              : const Icon(Icons.my_location, color: Colors.white, size: 20),
+                        ),
                       ),
                     ],
                   ),
@@ -94,7 +178,7 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        value: effectiveDistrict,
+                        value: _districts.contains(_effectiveDistrict) ? _effectiveDistrict : _districts.first,
                         dropdownColor: const Color(0xFF283593),
                         iconEnabledColor: Colors.white,
                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15),
@@ -106,6 +190,17 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
                       ),
                     ),
                   ),
+
+                  if (_isDetectingLocation) ...[
+                    const SizedBox(height: 10),
+                    const Row(
+                      children: [
+                        Icon(Icons.location_searching, color: Colors.white54, size: 14),
+                        SizedBox(width: 6),
+                        Text('Finding nearest dealers…', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -122,14 +217,14 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
               ),
               error: (e, _) => AppErrorState(
                 message: e.toString(),
-                onRetry: () => ref.invalidate(dealerRatesProvider(effectiveDistrict)),
+                onRetry: () => ref.invalidate(dealerRatesProvider(_effectiveDistrict)),
               ),
               data: (data) {
                 if (data.isEmpty) {
-                  return const AppEmptyState(
+                  return AppEmptyState(
                     icon: '🏪',
-                    title: 'No Dealer Rates Found',
-                    subtitle: 'Try selecting a different district.',
+                    title: 'No Dealers in $_effectiveDistrict',
+                    subtitle: 'Try selecting a nearby district from the dropdown.',
                   );
                 }
 
@@ -149,13 +244,12 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
                       Row(
                         children: [
                           Container(
-                            width: 8,
-                            height: 8,
+                            width: 8, height: 8,
                             decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            'Live rates • ${effectiveDistrict} district',
+                            'Live rates • $_effectiveDistrict district',
                             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textTertiary),
                           ),
                         ],
@@ -164,11 +258,11 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
                       ...grouped.entries.map((entry) => _CropRateCard(
                         cropName: entry.key,
                         rates: entry.value,
-                        district: effectiveDistrict,
+                        district: _effectiveDistrict,
                         onBookSlot: (dealerId, rate) {
                           context.push('/farmer/trade/book', extra: {
                             'cropName': entry.key,
-                            'district': effectiveDistrict,
+                            'district': _effectiveDistrict,
                           });
                         },
                       )),
@@ -212,7 +306,6 @@ class _CropRateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bestRate = rates.map((r) => (r['pricePerQuintal'] as num).toDouble()).reduce((a, b) => a > b ? a : b);
-    final lowestRate = rates.map((r) => (r['pricePerQuintal'] as num).toDouble()).reduce((a, b) => a < b ? a : b);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -258,8 +351,10 @@ class _CropRateCard extends StatelessWidget {
 
           // Dealer list
           ...rates.map((rate) {
-            final dealerName = (rate['dealer'] as Map?)?['businessName'] as String? ??
-                (rate['dealer'] as Map?)?['user']?['name'] as String? ?? 'Local Dealer';
+            final dealerMap = rate['dealer'] as Map?;
+            final dealerName = dealerMap?['businessName'] as String?
+                ?? dealerMap?['user']?['name'] as String?
+                ?? 'Local Dealer';
             final price = (rate['pricePerQuintal'] as num).toDouble();
             final isBest = price == bestRate;
 
@@ -268,8 +363,7 @@ class _CropRateCard extends StatelessWidget {
               child: Row(
                 children: [
                   Container(
-                    width: 40,
-                    height: 40,
+                    width: 40, height: 40,
                     decoration: BoxDecoration(
                       color: isBest ? AppColors.primarySurface : AppColors.surface,
                       borderRadius: BorderRadius.circular(12),
@@ -283,7 +377,7 @@ class _CropRateCard extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Text(dealerName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary)),
+                            Flexible(child: Text(dealerName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary), overflow: TextOverflow.ellipsis)),
                             if (isBest) ...[
                               const SizedBox(width: 6),
                               Container(
