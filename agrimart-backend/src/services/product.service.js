@@ -115,19 +115,41 @@ const getProducts = async ({ category, search, sort, district, lat, lng, radius 
         take: 200, // Safety cap — never load more than 200 rows
     });
 
-    products = withDistance(products, userLat, userLng);
+    if (products.length === 0 && userLat !== null && userLng !== null) {
+        // Fallback: If no products in radius, search globally and sort by nearest
+        const fallbackWhere = { isActive: true, isApproved: true, stockQuantity: { gt: 0 } };
+        if (category) fallbackWhere.category = category.toUpperCase();
+        if (where.OR) fallbackWhere.OR = where.OR;
+        
+        products = await prisma.product.findMany({
+            where: fallbackWhere,
+            select: PRODUCT_CARD_SELECT,
+            orderBy: sort === 'price_asc' ? { price: 'asc' } : sort === 'price_desc' ? { price: 'desc' } : { createdAt: 'desc' },
+            take: 200,
+        });
 
-    // Fine-grain haversine filter after bounding box
-    if (userLat !== null && userLng !== null) {
-        products = products.filter((p) => p.supplierDistanceKm === null || p.supplierDistanceKm <= radiusKm);
-    }
-
-    if (sort === 'nearest' && userLat !== null && userLng !== null) {
+        products = withDistance(products, userLat, userLng);
+        // Force sort by nearest for the fallback
         products.sort((a, b) => {
             const ad = a.supplierDistanceKm ?? Number.POSITIVE_INFINITY;
             const bd = b.supplierDistanceKm ?? Number.POSITIVE_INFINITY;
             return ad - bd;
         });
+    } else {
+        products = withDistance(products, userLat, userLng);
+
+        // Fine-grain haversine filter after bounding box
+        if (userLat !== null && userLng !== null) {
+            products = products.filter((p) => p.supplierDistanceKm === null || p.supplierDistanceKm <= radiusKm);
+        }
+
+        if (sort === 'nearest' && userLat !== null && userLng !== null) {
+            products.sort((a, b) => {
+                const ad = a.supplierDistanceKm ?? Number.POSITIVE_INFINITY;
+                const bd = b.supplierDistanceKm ?? Number.POSITIVE_INFINITY;
+                return ad - bd;
+            });
+        }
     }
 
     const total = products.length;

@@ -42,7 +42,12 @@ class ApiService {
 
   Future<Map> completeOnboarding(Map<String, dynamic> data) async {
     final r = await _dio.post('/auth/onboarding', data: data);
-    return r.data['data'];
+    return r.data;
+  }
+
+  Future<Map> getMe() async {
+    final r = await _dio.get('/auth/me');
+    return r.data;
   }
 
   Future<Map> googleSignIn(Map<String, dynamic> data) async {

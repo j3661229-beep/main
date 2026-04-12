@@ -51,14 +51,13 @@ class _FarmerHomeState extends ConsumerState<FarmerHome> {
     );
   }
 
-  final _tabs = const [
-    _HomeTab(),
-    ShopScreen(),
-    AITabContent(),
-    DealerTabScreen(),
-    ProfileScreen(),
+  late final _tabs = [
+    _HomeTab(onSwitchToDealer: () => _onTabChanged(3)),
+    const ShopScreen(),
+    const AITabContent(),
+    const DealerTabScreen(),
+    const ProfileScreen(),
   ];
-
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +217,8 @@ class _OrderShimmer extends StatelessWidget {
 
 // ── Home Tab ──────────────────────────────────────────────
 class _HomeTab extends ConsumerWidget {
-  const _HomeTab();
+  final VoidCallback onSwitchToDealer;
+  const _HomeTab({required this.onSwitchToDealer});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -331,7 +331,7 @@ class _HomeTab extends ConsumerWidget {
                 const SizedBox(height: 20),
 
                 // Featured "Sell" Card
-                _SellCropsCard(onTap: () => context.push('/farmer/mandi')),
+                _SellCropsCard(onTap: onSwitchToDealer),
 
                 const SizedBox(height: 20),
 

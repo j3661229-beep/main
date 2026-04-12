@@ -40,8 +40,21 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final token = await _storage.read(key: AppConstants.tokenKey);
       final userJson = await _storage.read(key: AppConstants.userKey);
       if (token != null && userJson != null) {
-        final user = UserModel.fromJson(jsonDecode(userJson));
+        // Load fast from cache
+        var user = UserModel.fromJson(jsonDecode(userJson));
         state = AuthState(user: user, isAuthenticated: true);
+        
+        // Fetch fresh data in background to fix verification status loops
+        try {
+          final res = await _api.getMe();
+          if (res['success'] == true && res['data'] != null) {
+            user = UserModel.fromJson(res['data']);
+            await _storage.write(key: AppConstants.userKey, value: jsonEncode(res['data']));
+            state = AuthState(user: user, isAuthenticated: true);
+          }
+        } catch (_) {
+          // Ignore network errors at init, keep cached data
+        }
       } else {
         state = const AuthState();
       }
