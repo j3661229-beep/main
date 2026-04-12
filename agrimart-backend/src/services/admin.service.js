@@ -134,6 +134,16 @@ const verifySupplier = async (supplierId, { action, reason }) => {
         });
         // Mark user as verified so they can access the app
         await prisma.user.update({ where: { id: supplier.userId }, data: { isVerified: true } });
+        
+        // Notify via OneSignal & DB
+        const { sendNotification } = require('./onesignal.service');
+        const notifService = require('./notification.service');
+        const title = 'Account Verified! ✅';
+        const body = 'Your government document has been verified. You can now access all supplier features.';
+        
+        sendNotification({ users: [supplier.userId], title, message: body, data: { type: 'GENERAL' } });
+        await notifService.createNotification(supplier.userId, { title, body, type: 'GENERAL' });
+
         return supplier;
     } else if (action === 'reject') {
         return prisma.supplier.update({
@@ -185,6 +195,16 @@ const verifyDealer = async (dealerId, { action, reason }) => {
             include: { user: true },
         });
         await prisma.user.update({ where: { id: dealer.userId }, data: { isVerified: true } });
+        
+        // Notify via OneSignal & DB
+        const { sendNotification } = require('./onesignal.service');
+        const notifService = require('./notification.service');
+        const title = 'Account Verified! ✅';
+        const body = 'Your government document has been verified. You can now access all dealer features.';
+        
+        sendNotification({ users: [dealer.userId], title, message: body, data: { type: 'GENERAL' } });
+        await notifService.createNotification(dealer.userId, { title, body, type: 'GENERAL' });
+
         return dealer;
     } else if (action === 'reject') {
         return prisma.dealer.update({

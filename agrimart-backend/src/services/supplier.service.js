@@ -102,11 +102,23 @@ const updateOrderStatus = async (supplierId, itemId, status) => {
         DELIVERED: 'has been picked up'
     };
     if (statusLabels[status]) {
+        const title = `Order Update: ${updatedItem.product.name}`;
+        const message = `Your item ${statusLabels[status]}. Visit the shop soon!`;
+        
         sendNotification({
             users: [updatedItem.order.farmer.userId],
-            title: `Order Update: ${updatedItem.product.name}`,
-            message: `Your item ${statusLabels[status]}. Visit the shop soon!`,
+            title,
+            message,
             data: { orderId: updatedItem.orderId, type: 'ORDER' }
+        });
+
+        // Save to DB so it shows up in in-app notifications screen
+        const notifService = require('./notification.service');
+        await notifService.createNotification(updatedItem.order.farmer.userId, { 
+            title, 
+            body: message, 
+            type: 'ORDER', 
+            data: { orderId: updatedItem.orderId } 
         });
     }
 

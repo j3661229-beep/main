@@ -406,7 +406,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                 // Products Grid
                 SliverPadding(
                   padding:
-                      EdgeInsets.fromLTRB(16, 0, 16, totalItems > 0 ? 100 : 20),
+                      EdgeInsets.fromLTRB(16, 0, 16, totalItems > 0 ? 180 : 100),
                   sliver: products.when(
                     loading: () =>
                         const SliverToBoxAdapter(child: AppShimmerGrid()),
@@ -428,7 +428,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 0.65,
+                          childAspectRatio: 0.75, // Better space utilization
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                         ),

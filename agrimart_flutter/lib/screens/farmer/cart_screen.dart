@@ -195,27 +195,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 AppButton(
                   label: 'Proceed to Checkout →',
                   isLoading: _isCheckingOut,
-                  onPressed: () async {
-                    setState(() => _isCheckingOut = true);
-                    try {
-                      final api = ApiService.instance;
-                      await api.clearCart();
-                      for (final item in items) {
-                         await api.addToCart(
-                           productId: item['product']?['id'] ?? item['product']?['_id'] ?? item['productId'], 
-                           quantity: item['quantity']
-                         );
-                      }
-                      if (context.mounted) {
-                        context.push('/farmer/checkout');
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        AppSnackbar.error(context, 'Could not sync cart. Please try again.');
-                      }
-                    } finally {
-                      if (mounted) setState(() => _isCheckingOut = false);
-                    }
+                  onPressed: () {
+                    context.push('/farmer/checkout');
                   },
                 ),
               ])),

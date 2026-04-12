@@ -267,6 +267,7 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
                           });
                         },
                       )),
+                      const SizedBox(height: 100),
                     ],
                   ),
                 );

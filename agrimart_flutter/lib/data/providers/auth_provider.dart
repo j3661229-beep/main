@@ -48,8 +48,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
         try {
           final res = await _api.getMe();
           if (res['success'] == true && res['data'] != null) {
-            user = UserModel.fromJson(res['data']);
-            await _storage.write(key: AppConstants.userKey, value: jsonEncode(res['data']));
+            final freshUserJson = res['data']['user'] ?? res['data'];
+            user = UserModel.fromJson(freshUserJson);
+            await _storage.write(key: AppConstants.userKey, value: jsonEncode(freshUserJson));
             state = AuthState(user: user, isAuthenticated: true);
           }
         } catch (_) {
@@ -110,21 +111,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final res = await _api.completeOnboarding(data);
-      // The API returns the full user object including the updated profile and isVerified: true
-      // We don't get a new token here (don't strictly need one for `isVerified` change)
-      // but we *do* need to update the cached user.
-      if (res['user'] == null) {
-          // If the backend returns wrapped or unwrapped user
-          final userData = Map<String, dynamic>.from(res);
-          final user = UserModel.fromJson(userData);
-          await _storage.write(key: AppConstants.userKey, value: jsonEncode(res));
-          state = AuthState(user: user, isAuthenticated: true);
-      } else {
-          final userData = Map<String, dynamic>.from(res['user'] as Map);
-          final user = UserModel.fromJson(userData);
-          await _storage.write(key: AppConstants.userKey, value: jsonEncode(res['user']));
-          state = AuthState(user: user, isAuthenticated: true);
-      }
+      final freshUserJson = res['data']?['user'] ?? res['data'] ?? res['user'] ?? res;
+      
+      final userData = Map<String, dynamic>.from(freshUserJson);
+      final user = UserModel.fromJson(userData);
+      await _storage.write(key: AppConstants.userKey, value: jsonEncode(userData));
+      state = AuthState(user: user, isAuthenticated: true);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: _parseError(e));
       rethrow;
