@@ -9,4 +9,7 @@ router.get('/rates', tradeController.getDealerRates);
 // POST /api/trade/book
 router.post('/book', authenticate, tradeController.bookTradeSlot);
 
+// GET /api/trade/bookings
+router.get('/bookings', authenticate, tradeController.getFarmerBookings);
+
 module.exports = router;

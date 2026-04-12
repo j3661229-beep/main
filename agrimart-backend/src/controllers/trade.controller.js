@@ -68,3 +68,33 @@ exports.bookTradeSlot = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+// Get trade bookings for the logged-in farmer
+exports.getFarmerBookings = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const farmer = await prisma.farmer.findUnique({ where: { userId } });
+        if (!farmer) return res.status(404).json({ success: false, message: 'Farmer profile not found' });
+
+        const { page, limit, skip } = getPagination(req.query);
+
+        const [bookings, total] = await Promise.all([
+            prisma.tradeBooking.findMany({
+                where: { farmerId: farmer.id },
+                skip, take: limit,
+                include: {
+                    dealer: {
+                        include: { user: { select: { name: true, phone: true } } }
+                    }
+                },
+                orderBy: { createdAt: 'desc' }
+            }),
+            prisma.tradeBooking.count({ where: { farmerId: farmer.id } })
+        ]);
+
+        paginated(res, bookings, page, limit, total);
+    } catch (error) {
+        logger.error(`Get farmer bookings error: ${error.message}`);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};

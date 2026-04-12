@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/providers/locale_provider.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
@@ -90,6 +91,10 @@ class ProfileScreen extends ConsumerWidget {
                     'Manage saved locations', () {
                   _showStubSheet(context, '📍 Farm Locations', 
                       'Add or edit your village and operational pin codes for seamless order delivery and accurate weather alerts.');
+                }),
+                _buildItem(Icons.calendar_month_outlined, 'My Delivery Slots',
+                    'View your booked slots with dealers', () {
+                  context.push('/farmer/trade/bookings');
                 }),
                 _buildItem(
                     Icons.notifications_outlined,

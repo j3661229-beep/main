@@ -299,6 +299,11 @@ class ApiService {
     return r.data;
   }
 
+  Future<List> getFarmerTradeBookings() async {
+    final r = await _dio.get('/trade/bookings');
+    return r.data['data'] ?? [];
+  }
+
   /// Upload government verification document (SUPPLIER / DEALER only)
   Future<Map> uploadGovtDoc({required dynamic file, required String docType}) async {
     // file can be dart:io File or String path

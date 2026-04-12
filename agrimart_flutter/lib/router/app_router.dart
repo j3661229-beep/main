@@ -26,6 +26,7 @@ import '../screens/farmer/kisan_ai_screen.dart';
 import '../screens/farmer/schemes_screen.dart';
 import '../screens/farmer/profile_screen.dart';
 import '../screens/farmer/trade_booking_screen.dart';
+import '../screens/farmer/farmer_trade_bookings_screen.dart';
 import '../screens/supplier/supplier_home.dart';
 import '../screens/supplier/supplier_orders_screen.dart';
 import '../screens/supplier/add_product_screen.dart';
@@ -144,6 +145,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           dealerId: extra['dealerId'] ?? '',
         ));
       }),
+      _fadedRoute('/farmer/trade/bookings', const FarmerTradeBookingsScreen()),
       _fadedRoute('/notifications', const NotificationsScreen()),
 
       // Supplier

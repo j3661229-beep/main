@@ -278,6 +278,10 @@ final orderTrackingProvider =
   return ApiService.instance.getOrderTracking(orderId);
 });
 
+final farmerTradeBookingsProvider = FutureProvider<List>((ref) async {
+  return ApiService.instance.getFarmerTradeBookings();
+});
+
 // ── Farmer Dashboard ──────────────────────────────────────
 final farmerDashboardProvider = FutureProvider<Map>((ref) async {
   const cacheKey = 'farmer_dashboard';
