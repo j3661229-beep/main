@@ -43,7 +43,7 @@ exports.getDealerRates = async (req, res) => {
 // Book a trade slot
 exports.bookTradeSlot = async (req, res) => {
     try {
-        const { supplierId, cropName, approxQuintals, pricePerQuintal, slotDate, notes } = req.body;
+        const { dealerId, cropName, approxQuintals, pricePerQuintal, slotDate, notes } = req.body;
         // The farmer ID is attached by auth middleware
         const userId = req.user.id;
 
@@ -53,7 +53,7 @@ exports.bookTradeSlot = async (req, res) => {
         const booking = await prisma.tradeBooking.create({
             data: {
                 farmerId: farmer.id,
-                supplierId,
+                dealerId,
                 cropName,
                 approxQuintals: parseFloat(approxQuintals),
                 pricePerQuintal: parseFloat(pricePerQuintal),

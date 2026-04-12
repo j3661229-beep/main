@@ -25,6 +25,7 @@ import '../screens/farmer/mandi_prices_screen.dart';
 import '../screens/farmer/kisan_ai_screen.dart';
 import '../screens/farmer/schemes_screen.dart';
 import '../screens/farmer/profile_screen.dart';
+import '../screens/farmer/trade_booking_screen.dart';
 import '../screens/supplier/supplier_home.dart';
 import '../screens/supplier/supplier_orders_screen.dart';
 import '../screens/supplier/add_product_screen.dart';
@@ -135,6 +136,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       _fadedRoute('/farmer/kisan-ai', const KisanAiScreen()),
       _fadedRoute('/farmer/schemes', const SchemesScreen()),
       _fadedRoute('/farmer/profile', const ProfileScreen()),
+      GoRoute(path: '/farmer/trade/book', pageBuilder: (ctx, state) {
+        final Map extra = state.extra as Map? ?? {};
+        return _fadedPage(TradeBookingScreen(
+          cropName: extra['cropName'] ?? '',
+          district: extra['district'] ?? '',
+          dealerId: extra['dealerId'] ?? '',
+        ));
+      }),
       _fadedRoute('/notifications', const NotificationsScreen()),
 
       // Supplier

@@ -263,6 +263,7 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
                           context.push('/farmer/trade/book', extra: {
                             'cropName': entry.key,
                             'district': _effectiveDistrict,
+                            'dealerId': dealerId,
                           });
                         },
                       )),
@@ -305,7 +306,9 @@ class _CropRateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bestRate = rates.map((r) => (r['pricePerQuintal'] as num).toDouble()).reduce((a, b) => a > b ? a : b);
+    final bestRateObj = rates.reduce((a, b) => (a['pricePerQuintal'] as num).toDouble() > (b['pricePerQuintal'] as num).toDouble() ? a : b);
+    final bestRate = (bestRateObj['pricePerQuintal'] as num).toDouble();
+    final bestDealerId = bestRateObj['dealerId'] as String? ?? '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -408,7 +411,7 @@ class _CropRateCard extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () => onBookSlot('', bestRate),
+                onPressed: () => onBookSlot(bestDealerId, bestRate),
                 icon: const Text('📅', style: TextStyle(fontSize: 16)),
                 label: const Text('Book Delivery Slot', style: TextStyle(fontWeight: FontWeight.w700)),
                 style: ElevatedButton.styleFrom(

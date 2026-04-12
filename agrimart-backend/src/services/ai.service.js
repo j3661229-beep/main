@@ -9,7 +9,12 @@ const cache = require('../utils/cache');
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Primary model from env (allows Railway override without redeploy)
+const GEMINI_PRIMARY   = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const GEMINI_FALLBACK  = 'gemini-1.5-flash-latest';
+
 const SYSTEM_KISAN = `You are Kisan AI, an expert agricultural assistant for Indian farmers. Detect the user language (Marathi/Hindi/English) and ALWAYS reply in the SAME language. Help with: crop advice, disease identification, mandi prices, government schemes, fertilizer usage, weather-based tips. Use simple words farmers understand. Be practical and specific. Avoid complex jargon. Format answers with clear steps when giving instructions. Mention local mandi names when relevant.`;
+
 
 const parseJSON = (text) => {
     try {
@@ -25,7 +30,7 @@ const parseJSON = (text) => {
 const generateWithFallback = async (prompt, imageBase64 = null) => {
     let lastError;
 
-    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash"];
+    const modelsToTry = [GEMINI_PRIMARY, GEMINI_FALLBACK];
 
     const contents = imageBase64 ? [prompt, { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }] : prompt;
 
@@ -141,7 +146,8 @@ const chat = async (userId, { message, history = [], language = 'English' }) => 
             parts: [{ text: msg.content }]
         }));
 
-    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash"];
+    const modelsToTry = [GEMINI_PRIMARY, GEMINI_FALLBACK];
+
 
 
     for (const modelName of modelsToTry) {

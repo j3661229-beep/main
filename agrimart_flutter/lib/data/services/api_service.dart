@@ -336,7 +336,7 @@ class ApiService {
 
   Future<List> getDealerMyRates() async {
     final r = await _dio.get('/dealer/rates');
-    return r.data['rates'] ?? [];
+    return r.data['data'] ?? [];
   }
 
   Future<Map> updateDealerRate(Map<String, dynamic> data) async {
@@ -346,7 +346,7 @@ class ApiService {
 
   Future<List> getDealerMyBookings() async {
     final r = await _dio.get('/dealer/bookings');
-    return r.data['bookings'] ?? [];
+    return r.data['data'] ?? [];
   }
 
   Future<Map> updateDealerBookingStatus(String id, String status) async {
