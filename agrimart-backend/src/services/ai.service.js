@@ -25,7 +25,8 @@ const parseJSON = (text) => {
 const generateWithFallback = async (prompt, imageBase64 = null) => {
     let lastError;
 
-    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro"];
+    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash"];
+
     const contents = imageBase64 ? [prompt, { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }] : prompt;
 
     for (const modelName of modelsToTry) {
@@ -140,7 +141,8 @@ const chat = async (userId, { message, history = [], language = 'English' }) => 
             parts: [{ text: msg.content }]
         }));
 
-    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro"];
+    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash"];
+
 
     for (const modelName of modelsToTry) {
         try {
