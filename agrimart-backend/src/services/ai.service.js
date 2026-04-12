@@ -139,35 +139,48 @@ const chat = async (userId, { message, history = [], language = 'English' }) => 
 
     const personaInstruction = `${SYSTEM_KISAN}\n${farmerContext}\nRespond in ${language}. Keep sentences short and clear for voice playback.`;
 
-    const geminiHistory = history
-        .filter(msg => msg.role !== 'system') // Skip system notes in history
+    const groqHistory = history
+        .filter(msg => msg.role !== 'system')
         .map(msg => ({
-            role: msg.role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: msg.content }]
+            role: (msg.role === 'model' || msg.role === 'assistant') ? 'assistant' : 'user',
+            content: msg.content
         }));
 
-    const modelsToTry = [GEMINI_PRIMARY, GEMINI_FALLBACK];
+    const messages = [
+        { role: 'system', content: personaInstruction },
+        ...groqHistory,
+        { role: 'user', content: message }
+    ];
 
+    const modelsToTry = ['llama3-70b-8192', 'llama3-8b-8192'];
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
+    if (!GROQ_API_KEY) {
+        throw new Error("GROQ_API_KEY is not defined in environment variables.");
+    }
 
     for (const modelName of modelsToTry) {
         try {
-            const model = genAI.getGenerativeModel({
+            const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
                 model: modelName,
-                systemInstruction: personaInstruction
+                messages: messages,
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${GROQ_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
             });
-            const chatSession = model.startChat({ history: geminiHistory });
-            const result = await chatSession.sendMessage(message);
 
-            logger.info(`AI Chat successfully used Gemini model: ${modelName}`);
-            return { reply: result.response.text(), tokensUsed: null, source: 'gemini' };
+            logger.info(`AI Chat successfully used Groq model: ${modelName}`);
+            return { reply: response.data.choices[0].message.content, tokensUsed: response.data.usage?.total_tokens, source: 'groq' };
         } catch (e) {
-            logger.warn(`Model [${modelName}] failed in Kisan Chat: ${e.message}`);
+            const errStr = e.response?.data ? JSON.stringify(e.response.data) : e.message;
+            logger.warn(`Model [${modelName}] failed in Groq Chat: ${errStr}`);
             lastError = e;
         }
     }
 
-    throw lastError || new Error("AI Chat unavailable. All fallback models failed.");
+    throw lastError || new Error("AI Chat unavailable. All Groq fallback models failed.");
 };
 
 const cropCalendar = async ({ month, district, crops, language = 'English' }) => {
