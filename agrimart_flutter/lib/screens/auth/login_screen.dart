@@ -38,7 +38,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
     final auth = ref.read(authProvider);
     if (auth.isLoading) return;
     try {
-      await ref.read(authProvider.notifier).sendOTP(_phoneCtrl.text.trim(), widget.role);
+      await ref.read(authProvider.notifier).sendOTP(phone: _phoneCtrl.text.trim(), role: widget.role);
       if (mounted) {
         context.push('/auth/otp', extra: {'phone': _phoneCtrl.text.trim(), 'role': widget.role});
       }

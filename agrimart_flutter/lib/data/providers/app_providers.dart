@@ -124,17 +124,18 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
   Future<void> load() async {
     state = const AsyncValue.loading();
     try {
+      // 1. Instant load from cache
       final cached = CacheManager.get('local_cart');
       if (cached != null) {
-        // Safe deep cast
-        final decoded = jsonDecode(jsonEncode(cached));
-        state = AsyncValue.data(
-            decoded is Map ? decoded as Map<String, dynamic> : {'items': []});
-      } else {
-        state = const AsyncValue.data({'items': []});
+        state = AsyncValue.data(jsonDecode(jsonEncode(cached)));
       }
+
+      // 2. Refresh from server (Source of Truth)
+      final serverCart = await ApiService.instance.getCart();
+      state = AsyncValue.data(serverCart);
+      await CacheManager.save('local_cart', serverCart);
     } catch (e, s) {
-      state = AsyncValue.error(e, s);
+      if (!state.hasValue) state = AsyncValue.error(e, s);
     }
   }
 
@@ -177,8 +178,9 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
 
     // 2. API Call in background
     try {
-      await ApiService.instance
+      final updatedCart = await ApiService.instance
           .addToCart(productId: productId, quantity: quantity);
+      state = AsyncValue.data(updatedCart);
       await _saveLocal();
     } catch (e) {
       // 3. Rollback on failure
@@ -204,7 +206,8 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
       HapticFeedback.selectionClick();
 
       try {
-        await ApiService.instance.updateCartItem(itemId, quantity);
+        final updatedCart = await ApiService.instance.updateCartItem(itemId, quantity);
+        state = AsyncValue.data(updatedCart);
         await _saveLocal();
       } catch (e) {
         state = previousState;
@@ -227,7 +230,8 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
     HapticFeedback.mediumImpact();
 
     try {
-      await ApiService.instance.removeCartItem(itemId);
+      final updatedCart = await ApiService.instance.removeCartItem(itemId);
+      state = AsyncValue.data(updatedCart);
       await _saveLocal();
     } catch (e) {
       state = previousState;
@@ -323,7 +327,10 @@ final weatherProvider = FutureProvider<Map>((ref) async {
   }
 
   Position pos = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.medium);
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 15),
+      ));
   return ApiService.instance.getWeather(lat: pos.latitude, lng: pos.longitude);
 });
 

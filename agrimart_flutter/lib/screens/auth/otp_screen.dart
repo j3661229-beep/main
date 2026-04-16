@@ -127,7 +127,7 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
                     else
                       TextButton(
                         onPressed: () {
-                          ref.read(authProvider.notifier).sendOTP(widget.phone, widget.role);
+                          ref.read(authProvider.notifier).sendOTP(phone: widget.phone, role: widget.role);
                           setState(() => _resendTimer = 30);
                           _startTimer();
                         },

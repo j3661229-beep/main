@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../errors/app_exceptions.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 
@@ -106,7 +107,7 @@ class AppErrorState extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              message,
+              extractUserFacingError(Exception(message)),
               style: AppTextStyles.bodyMD.copyWith(color: AppColors.textTertiary),
               textAlign: TextAlign.center,
             ),

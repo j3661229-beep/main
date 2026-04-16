@@ -30,8 +30,21 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
   static const _districts = [
     'Dhule', 'Nashik', 'Pune', 'Jalgaon', 'Aurangabad',
     'Ahmednagar', 'Kolhapur', 'Solapur', 'Nagpur', 'Amravati',
-    'Konkan Division', 'Mumbai', 'Mumbai Suburban', 'Other',
+    'Mumbai', 'Thane', 'Raigad', 'Ratnagiri', 'Sindhudurg', 'Other',
   ];
+
+  // Map known geocoding aliases to proper district names
+  static const Map<String, String> _districtAliases = {
+    'konkan division': 'Mumbai',
+    'konkan': 'Mumbai',
+    'mumbai suburban': 'Mumbai',
+    'greater mumbai': 'Mumbai',
+    'brihan mumbai': 'Mumbai',
+    'navi mumbai': 'Thane',
+    'aurangabad': 'Aurangabad',
+    'parbhani': 'Aurangabad',
+    'osmanabad': 'Aurangabad',
+  };
 
   @override
   void initState() {
@@ -68,22 +81,36 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
         return;
       }
 
-      final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
       final placemarks = await placemarkFromCoordinates(pos.latitude, pos.longitude);
 
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
         // subAdministrativeArea is typically the district
-        final detected = place.subAdministrativeArea ?? place.administrativeArea ?? '';
+        final rawDetected = (place.subAdministrativeArea ?? place.administrativeArea ?? '').trim();
+        final detected = rawDetected.toLowerCase();
 
-        // Match to known districts (fuzzy)
-        final matched = _districts.firstWhere(
-          (d) => detected.toLowerCase().contains(d.toLowerCase()) || d.toLowerCase().contains(detected.toLowerCase().split(' ').first),
+        // Check aliases first (fixes Konkan Division → Mumbai)
+        String? resolved;
+        for (final alias in _districtAliases.entries) {
+          if (detected.contains(alias.key)) {
+            resolved = alias.value;
+            break;
+          }
+        }
+        resolved ??= _districts.firstWhere(
+          (d) => detected.contains(d.toLowerCase()) ||
+                 d.toLowerCase().contains(detected.split(' ').first),
           orElse: () => '',
         );
 
-        if (matched.isNotEmpty && mounted) {
-          setState(() => _district = matched);
+        if (resolved.isNotEmpty && _districts.contains(resolved) && mounted) {
+          setState(() => _district = resolved!);
         } else {
           _fallbackDistrict();
         }

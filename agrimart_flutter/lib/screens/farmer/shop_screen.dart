@@ -1,8 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:animate_do/animate_do.dart';
 import '../../data/providers/app_providers.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../core/theme/app_colors.dart';
@@ -78,23 +81,81 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
   Future<void> _determinePosition() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return;
+      if (!serviceEnabled) {
+        // Try to open settings if service not enabled
+        if (mounted) {
+          AppSnackbar.info(context, 'Please enable GPS/Location services');
+        }
+        return;
+      }
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) return;
       }
-      if (permission == LocationPermission.deniedForever) return;
-      final pos = await Geolocator.getCurrentPosition();
-      setState(() => _position = pos);
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          AppSnackbar.info(context, 'Location permission denied. Go to Settings to enable.');
+        }
+        return;
+      }
+      // ✅ Use HIGH accuracy + timeout to get precise GPS fix (fixes Konkan Division bug)
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+      if (mounted) setState(() => _position = pos);
+      debugPrint('✅ Location: ${pos.latitude}, ${pos.longitude}');
+    } on LocationServiceDisabledException {
+      debugPrint('Location service disabled');
+    } on PermissionDeniedException catch (e) {
+      debugPrint('Permission denied: $e');
     } catch (e) {
-      debugPrint('Location error: $e');
+      // Fallback: try with balanced power (less accurate but faster)
+      try {
+        final pos = await Geolocator.getLastKnownPosition() ??
+            await Geolocator.getCurrentPosition(
+              locationSettings: const LocationSettings(
+                accuracy: LocationAccuracy.medium,
+              ),
+            );
+        if (mounted) setState(() => _position = pos);
+      } catch (_) {
+        debugPrint('Location fallback failed: $_');
+      }
     }
   }
 
   double? get _effectiveLat => _customLat ?? _position?.latitude;
   double? get _effectiveLng => _customLng ?? _position?.longitude;
-  String get _effectiveLocationName => _customLocationName ?? (ref.read(authProvider).user?.farmer?['village'] as String? ?? 'Your Farm');
+  String get _effectiveLocationName {
+    if (_customLocationName != null) return _customLocationName!;
+    if (_position != null) {
+      // Show approximate coordinates label while geocoding not available
+      // Use nearest district lookup for display
+      return _findNearestDistrict(_position!.latitude, _position!.longitude) ?? 
+             'GPS: ${_position!.latitude.toStringAsFixed(3)}, ${_position!.longitude.toStringAsFixed(3)}';
+    }
+    return 'Detecting location...';
+  }
+
+  String? _findNearestDistrict(double lat, double lng) {
+    double minDist = double.infinity;
+    String? nearest;
+    for (final d in _maharashtraDistricts) {
+      final dlat = (d['lat'] as double) - lat;
+      final dlng = (d['lng'] as double) - lng;
+      final dist = dlat * dlat + dlng * dlng;
+      if (dist < minDist) {
+        minDist = dist;
+        nearest = d['name'] as String;
+      }
+    }
+    // Only return if reasonably close (within ~50km)
+    return minDist < 0.25 ? nearest : null;
+  }
 
   void _showLocationPicker() {
     showModalBottomSheet(
@@ -412,7 +473,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                         const SliverToBoxAdapter(child: AppShimmerGrid()),
                     error: (e, _) => SliverToBoxAdapter(
                         child: AppErrorState(
-                            message: e.toString(),
+                            message: _extractErrorMessage(e),
                             onRetry: () =>
                                 ref.invalidate(productsProvider(q)))),
                     data: (data) {
@@ -552,6 +613,34 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       ),
     );
   }
+
+  /// Extracts a clean user-facing message from any exception (avoids DioClientException dump)
+  static String _extractErrorMessage(Object e) {
+    final s = e.toString();
+    // DioException wraps AppException in .message — extract it
+    if (s.contains('DioException') || s.contains('DioError') || s.contains('ClientException')) {
+      // Try to find our clean message after common prefixes
+      final patterns = [
+        RegExp(r'message: (.+?)(?:\.|,|\n|\]|$)'),
+        RegExp(r'AppException: (.+?)(?:\.|,|\n|$)'),
+        RegExp(r'ServerException: (.+?)(?:\.|,|\n|$)'),
+        RegExp(r'NetworkException: (.+?)(?:\.|,|\n|$)'),
+      ];
+      for (final p in patterns) {
+        final m = p.firstMatch(s);
+        if (m != null && m.group(1) != null && m.group(1)!.trim().isNotEmpty) {
+          return m.group(1)!.trim();
+        }
+      }
+      if (s.contains('SocketException') || s.contains('connection')) {
+        return 'No internet connection. Please check your network.';
+      }
+      return 'Server error. Please try again.';
+    }
+    // Already a clean AppException
+    if (s.length < 120) return s;
+    return 'Something went wrong. Please retry.';
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -571,13 +660,18 @@ class _ProductCardSwiggy extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return GestureDetector(
-      onTap: () => context.push('/farmer/shop/product/${product['id']}'),
+    return FadeInUp(
       child: Container(
         decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: AppColors.softShadow,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 15,
+                offset: const Offset(0, 10),
+              )
+            ],
             border: Border.all(color: AppColors.border.withValues(alpha: 0.4))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           // Image Area
@@ -588,7 +682,7 @@ class _ProductCardSwiggy extends StatelessWidget {
                   tag: 'product_${product['id']}',
                   child: ClipRRect(
                     borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(19)),
+                        const BorderRadius.vertical(top: Radius.circular(23)),
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
@@ -610,6 +704,21 @@ class _ProductCardSwiggy extends StatelessWidget {
                     ),
                   ),
                 ),
+                // Gradient Overlay
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.1),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
                 if (product['isOrganic'] == true)
                   Positioned(
                     top: 10,
@@ -619,7 +728,7 @@ class _ProductCardSwiggy extends StatelessWidget {
                             horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)
                             ]),
@@ -642,18 +751,22 @@ class _ProductCardSwiggy extends StatelessWidget {
 
           // Details Area
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(product['name'] ?? '',
                     style: AppTextStyles.headingSM
-                        .copyWith(fontSize: 13, height: 1.2, fontWeight: FontWeight.w800),
+                        .copyWith(fontSize: 15, height: 1.2, fontWeight: FontWeight.w800),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text('${product['brand'] ?? 'Local'} • ${product['unit']}',
-                    style: AppTextStyles.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w600)),
+                    style: AppTextStyles.caption.copyWith(
+                      fontSize: 11, 
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textTertiary,
+                    )),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -849,68 +962,145 @@ class _NearbySupplierCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final products = supplier['products'] as List? ?? [];
-    return Container(
-      width: 230,
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    final l10n = AppLocalizations.of(context)!;
+
+    return FadeInLeft(
+      child: Container(
+        width: 250,
+        margin: const EdgeInsets.only(right: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            )
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Supplier Info Header
               Container(
-                width: 36,
-                height: 36,
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.primarySurface,
-                  borderRadius: BorderRadius.circular(8),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.primarySurface.withValues(alpha: 0.3),
+                      Colors.white,
+                    ],
+                  ),
                 ),
-                child: const Center(child: Text('🏬')),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          )
+                        ],
+                      ),
+                      child: const Center(child: Text('🏬', style: TextStyle(fontSize: 20))),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            supplier['businessName']?.toString() ?? l10n.store,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.headingSM.copyWith(fontSize: 15),
+                          ),
+                          Text(
+                            '${supplier['distanceKm'] ?? '--'} km away',
+                            style: AppTextStyles.caption.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  supplier['businessName']?.toString() ?? 'Nearby Supplier',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.headingSM,
+              
+              // Featured Products
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: products.isNotEmpty
+                    ? Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: products.take(2).map((p) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: AppColors.primarySurface.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text('🌱', style: TextStyle(fontSize: 12)),
+                                const SizedBox(width: 4),
+                                Text(
+                                  p['name']?.toString() ?? 'Product',
+                                  style: AppTextStyles.caption.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      )
+                    : Text(
+                        l10n.noProductsAvailable,
+                        style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+                      ),
+              ),
+              
+              // View Button
+              const Spacer(),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Container(
+                  width: double.infinity,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppColors.primarySurface,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      l10n.viewShop,
+                      style: AppTextStyles.labelMD.copyWith(color: AppColors.primary),
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            '${supplier['distanceKm'] ?? '--'} km away',
-            style: AppTextStyles.caption.copyWith(color: AppColors.primary),
-          ),
-          const SizedBox(height: 10),
-          if (products.isNotEmpty)
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: products.take(3).map((p) {
-                return Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.primarySurface,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    p['name']?.toString() ?? 'Product',
-                    style: AppTextStyles.caption,
-                  ),
-                );
-              }).toList(),
-            )
-          else
-            const Text('No active products', style: AppTextStyles.caption),
-        ],
+        ),
       ),
     );
   }
@@ -939,20 +1129,31 @@ class _SortChip extends StatelessWidget {
             onTap();
           },
           borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               color: selected ? AppColors.primary : Colors.white,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: selected ? AppColors.primary : AppColors.border,
               ),
+              boxShadow: selected
+                  ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      )
+                    ]
+                  : null,
             ),
             child: Text(
               label,
-              style: AppTextStyles.labelMD.copyWith(
-                color: selected ? Colors.white : AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
+              style: TextStyle(
+                color: selected ? Colors.white : AppColors.textPrimary,
+                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 13,
               ),
             ),
           ),
@@ -983,106 +1184,169 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    // Calculate expansion ratio 0.0 -> 1.0 (1.0 is fully shrunk)
     final progress = shrinkOffset / maxExtent;
-    return Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-              colors: [AppColors.primary, AppColors.primaryDark]),
-          boxShadow: progress > 0.8
-              ? [
-                  BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10)
-                ]
-              : null,
+    final l10n = AppLocalizations.of(context)!;
+
+    return Stack(
+      children: [
+        // Glassmorphism Background
+        ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.primary.withValues(alpha: 0.95),
+                    AppColors.primaryDark.withValues(alpha: 0.9),
+                  ],
+                ),
+                boxShadow: progress > 0.8
+                    ? [
+                        BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4))
+                      ]
+                    : null,
+              ),
+            ),
+          ),
         ),
-        padding: EdgeInsets.fromLTRB(
-            16, MediaQuery.of(context).padding.top + 16, 16, 16),
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
               children: [
                 Row(
                   children: [
-                    Icon(isCustomLocation ? Icons.pin_drop : Icons.location_on,
-                        color: isCustomLocation ? const Color(0xFFFBBF24) : Colors.white, size: 28),
+                    FadeInLeft(
+                      child: Icon(
+                        isCustomLocation ? Icons.pin_drop : Icons.location_on,
+                        color: isCustomLocation ? const Color(0xFFFBBF24) : Colors.white, 
+                        size: 28
+                      ),
+                    ),
                     const SizedBox(width: 8),
-                    Expanded(child: GestureDetector(
-                      onTap: onLocationTap,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(isCustomLocation ? 'Browsing' : 'Pickup from Store',
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: onLocationTap,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  isCustomLocation ? l10n.browsing : l10n.pickupLocation,
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w800,
-                                      fontSize: 16)),
-                              const Icon(Icons.keyboard_arrow_down,
-                                  color: Colors.white, size: 20),
-                            ],
-                          ),
-                          Text(locationName,
+                                      fontSize: 16)
+                                ),
+                                const Icon(Icons.keyboard_arrow_down,
+                                    color: Colors.white, size: 20),
+                              ],
+                            ),
+                            Text(
+                              locationName,
                               style: TextStyle(
-                                  color: isCustomLocation ? const Color(0xFFFBBF24) : Colors.white70, fontSize: 12),
-                              overflow: TextOverflow.ellipsis),
-                        ],
+                                  color: isCustomLocation ? const Color(0xFFFBBF24) : Colors.white70, 
+                                  fontSize: 12
+                              ),
+                              overflow: TextOverflow.ellipsis
+                            ),
+                          ],
+                        ),
                       ),
-                    )),
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                          color: Colors.white24, shape: BoxShape.circle),
-                      child: const Icon(Icons.person, color: Colors.white),
+                    ),
+                    FadeInRight(
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2), 
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.1))
+                        ),
+                        child: const Icon(Icons.person_outline, color: Colors.white),
+                      ),
                     )
                   ],
                 ),
-                ScaleTransition(
-                    scale: AlwaysStoppedAnimation(1.0 - (progress * 0.5)),
-                    child: FadeTransition(
-                      opacity: AlwaysStoppedAnimation(1.0 - progress),
-                      child: const SizedBox(height: 20),
-                    )),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
+                
+                // Content that fades out as we shrink
+                if (progress < 0.5)
+                  Expanded(
+                    child: FadeIn(
+                      duration: const Duration(milliseconds: 300),
+                      child: const Center(
+                        child: Text(
+                          '', // Placeholder for potential tagline
+                          style: TextStyle(color: Colors.white, fontSize: 13),
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  const Spacer(),
+                
+                // Search Bar
+                FadeInUp(
+                  duration: const Duration(milliseconds: 600),
+                  child: Container(
+                    height: 54,
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        )
+                      ],
+                    ),
                     child: TextField(
                       controller: searchCtrl,
+                      onChanged: onSearchChanged,
                       decoration: InputDecoration(
                         fillColor: Colors.white,
                         filled: true,
-                        hintText: 'Search for seeds, fertilizers...',
+                        hintText: l10n.searchProducts,
                         prefixIcon: const Icon(Icons.search,
                             color: AppColors.primary, size: 24),
                         suffixIcon: searchQuery.isNotEmpty
                             ? IconButton(
-                                icon: const Icon(Icons.clear,
-                                    color: Colors.grey, size: 20),
-                                onPressed: onClearSearch)
-                            : const Padding(
-                                padding: EdgeInsets.all(12),
-                                child:
-                                    Text('🎙️', style: TextStyle(fontSize: 16)),
-                              ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 0),
+                                icon: const Icon(Icons.clear, color: AppColors.textTertiary),
+                                onPressed: onClearSearch,
+                              )
+                            : null,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none),
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                        ),
                       ),
-                      onChanged: onSearchChanged,
                     ),
                   ),
                 ),
               ],
-            )
-          ],
-        ));
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   @override

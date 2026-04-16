@@ -82,7 +82,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     setState(() => _isLocating = true);
 
     try {
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
       List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       
       if (placemarks.isNotEmpty) {

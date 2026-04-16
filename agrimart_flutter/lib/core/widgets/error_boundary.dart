@@ -16,13 +16,32 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
   @override
   void initState() {
     super.initState();
+    // Hook into Flutter's ErrorWidget to catch UI crashes
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      if (mounted) {
+        setState(() {
+          _error = details.exception;
+        });
+      }
+      FirebaseCrashlytics.instance.recordFlutterError(details);
+      return Container(); // Placeholder while we transition
+    };
   }
 
-  void _handleError(Object error, StackTrace stackTrace) {
-    setState(() {
-      _error = error;
-    });
-    FirebaseCrashlytics.instance.recordError(error, stackTrace);
+  static String _extractCleanMessage(Object e) {
+    final s = e.toString();
+    if (s.contains('DioException') || s.contains('DioError')) {
+      final patterns = [
+        RegExp(r'message: (.+?)(?:\.|,|\n|\]|$)'),
+        RegExp(r'AppException: (.+?)(?:\.|,|\n|$)'),
+      ];
+      for (final p in patterns) {
+        final m = p.firstMatch(s);
+        if (m != null && m.group(1) != null) return m.group(1)!.trim();
+      }
+      return 'Server error. Please try again.';
+    }
+    return s.length < 100 ? s : 'Something went wrong.';
   }
 
   @override
@@ -30,6 +49,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
     if (_error != null) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
+        theme: ThemeData(useMaterial3: true),
         home: Scaffold(
           body: Container(
             padding: const EdgeInsets.all(24),
@@ -47,20 +67,19 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
                 const Icon(Icons.error_outline_rounded, size: 80, color: Color(0xFFE02424)),
                 const SizedBox(height: 24),
                 Text(
-                  'Kahi tari chukle aahe!', // Something went wrong (Marathi)
+                  'काहीतरी चुकले आहे!', // Something went wrong (Marathi)
                   style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold, color: const Color(0xFF1F2937)),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Aamhi hyala durusta karneyacha prayatna karat aahot. Kripaya app punha chalu kara.',
+                  'आम्ही याला दुरुस्त करण्याचा प्रयत्न करत आहोत. कृपया ॲप पुन्हा सुरू करा.', // Marathi message
                   style: GoogleFonts.inter(fontSize: 16, color: const Color(0xFF4B5563)),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: () {
-                    // Force restart conceptually or just clear error state for now
                     setState(() { _error = null; });
                   },
                   style: ElevatedButton.styleFrom(
@@ -69,7 +88,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: const Text('Restart App'),
+                  child: const Text('पुन्हा प्रयत्न करा'), // Retry
                 ),
               ],
             ),
@@ -85,7 +104,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
 // Global error handler utility
 void setUpErrorHandling() {
   FlutterError.onError = (details) {
-    FlutterError.presentError(details);
     FirebaseCrashlytics.instance.recordFlutterError(details);
+    FlutterError.presentError(details);
   };
 }

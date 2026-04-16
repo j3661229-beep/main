@@ -1,120 +1,111 @@
 const prisma = require('../config/database');
-const razorpay = require('../config/razorpay');
-const { toPaise, generateOrderId, verifyRazorpaySignature, verifyWebhookSignature } = require('../utils/helpers');
+const { sendNotification } = require('./onesignal.service');
 const logger = require('../utils/logger');
 
-let twilioClient;
-if (process.env.TWILIO_ACCOUNT_SID) {
-    twilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-}
+// ── UPI Payment Verification ────────────────────────────────────────────────
+/**
+ * Farmer submits UTR after paying via UPI to the supplier directly.
+ * Order is marked PAYMENT_CONFIRMED. Supplier verifies from their side.
+ */
+const verifyUpiPayment = async (orderId, farmerId, utrNumber) => {
+    if (!utrNumber || utrNumber.trim().length < 6) {
+        throw Object.assign(new Error('Invalid UTR number. Please enter the 12-22 digit reference from your UPI app.'), { statusCode: 400 });
+    }
 
-const redis = require('../config/redis');
-
-const createPaymentOrder = async (orderId) => {
-    const order = await prisma.order.findUnique({ where: { id: orderId } });
+    const order = await prisma.order.findFirst({
+        where: { id: orderId, farmerId },
+        include: { items: { include: { supplier: { include: { user: true } } } } }
+    });
     if (!order) throw Object.assign(new Error('Order not found'), { statusCode: 404 });
+    if (order.paymentStatus !== 'PENDING') {
+        throw Object.assign(new Error('Payment already processed for this order'), { statusCode: 400 });
+    }
 
-    const rzpOrder = await razorpay.orders.create({
-        amount: toPaise(order.totalAmount),
-        currency: 'INR',
-        receipt: generateOrderId(),
-        notes: { orderId },
-    });
-
-    await prisma.order.update({ where: { id: orderId }, data: { razorpayOrderId: rzpOrder.id } });
-    await prisma.payment.upsert({
-        where: { orderId },
-        create: { orderId, razorpayOrderId: rzpOrder.id, amount: order.totalAmount, status: 'PENDING' },
-        update: { razorpayOrderId: rzpOrder.id },
-    });
-
-    return { razorpayOrderId: rzpOrder.id, amount: order.totalAmount, currency: 'INR', keyId: process.env.RAZORPAY_KEY_ID };
-};
-
-const verifyPayment = async ({ razorpayOrderId, razorpayPaymentId, razorpaySignature }) => {
-    const isValid = verifyRazorpaySignature(razorpayOrderId, razorpayPaymentId, razorpaySignature);
-    if (!isValid) throw Object.assign(new Error('Payment verification failed — invalid signature'), { statusCode: 400 });
-
-    const order = await prisma.order.findFirst({ where: { razorpayOrderId } });
-    if (!order) throw Object.assign(new Error('Order not found for this payment'), { statusCode: 404 });
-
+    // Save UTR and mark payment confirmed
     await prisma.$transaction([
-        prisma.order.update({ where: { id: order.id }, data: { status: 'PAYMENT_CONFIRMED', paymentId: razorpayPaymentId, paymentStatus: 'SUCCESS' } }),
-        prisma.payment.update({ where: { orderId: order.id }, data: { status: 'SUCCESS', razorpayPaymentId, method: 'razorpay' } }),
+        prisma.order.update({
+            where: { id: orderId },
+            data: {
+                utrNumber: utrNumber.trim(),
+                paymentMethod: 'upi',
+                status: 'PAYMENT_CONFIRMED',
+                paymentStatus: 'SUCCESS',
+            }
+        }),
+        prisma.payment.upsert({
+            where: { orderId },
+            create: { orderId, amount: order.totalAmount, status: 'SUCCESS', method: 'upi' },
+            update: { status: 'SUCCESS', method: 'upi' },
+        }),
     ]);
 
     // Deduct stock
-    const items = await prisma.orderItem.findMany({ where: { orderId: order.id } });
-    for (const item of items) {
-        await prisma.product.update({ where: { id: item.productId }, data: { stockQuantity: { decrement: item.quantity } } });
+    for (const item of order.items) {
+        await prisma.product.update({
+            where: { id: item.productId },
+            data: { stockQuantity: { decrement: item.quantity } }
+        });
     }
 
-    // Notify farmer via WhatsApp
-    if (twilioClient) {
-        const farmer = await prisma.farmer.findUnique({ where: { id: order.farmerId }, include: { user: true } });
-        try {
-            await twilioClient.messages.create({
-                from: process.env.TWILIO_WHATSAPP_FROM,
-                to: `whatsapp:${farmer.user.phone}`,
-                body: `✅ AgriMart: Payment of ₹${order.totalAmount} confirmed for order #${order.id.slice(-6)}. Your items will be dispatched shortly.`,
-            });
-        } catch (e) { logger.error('WhatsApp notify error:', e.message); }
+    // Notify each supplier to verify UTR in their panel
+    const supplierIds = [...new Set(order.items.map(i => i.supplier.userId))];
+    if (supplierIds.length > 0) {
+        sendNotification({
+            users: supplierIds,
+            title: '💰 New UPI Payment Received',
+            message: `Order #${orderId.slice(-6).toUpperCase()} — UTR: ${utrNumber.trim()}. Please verify in your panel.`,
+            data: { orderId, type: 'PAYMENT' }
+        });
     }
 
-    return { orderId: order.id, status: 'PAYMENT_CONFIRMED' };
+    return { orderId, status: 'PAYMENT_CONFIRMED', utrNumber: utrNumber.trim() };
 };
 
-const getPayment = async (orderId) => {
-    const payment = await prisma.payment.findUnique({ where: { orderId }, include: { order: true } });
-    if (!payment) throw Object.assign(new Error('Payment not found'), { statusCode: 404 });
-    return payment;
-};
-
-const handleWebhook = async (rawBody, signature) => {
-    if (!verifyWebhookSignature(rawBody, signature)) {
-        throw Object.assign(new Error('Invalid webhook signature'), { statusCode: 400 });
-    }
-    const event = JSON.parse(rawBody);
-
-    // Idempotency Check using Redis
-    const paymentId = event.payload?.payment?.entity?.id || 'unknown';
-    if (redis && paymentId !== 'unknown') {
-        const alreadyDone = await redis.get(`webhook:${paymentId}`);
-        if (alreadyDone) {
-            logger.info(`Duplicate webhook ignored: ${paymentId}`);
-            return { received: true };
+// ── Get Supplier UPI Details for Order ─────────────────────────────────────
+/**
+ * Returns UPI IDs of all suppliers in the cart grouped by supplier,
+ * so the checkout screen can show them to the farmer.
+ */
+const getOrderSupplierUpiDetails = async (orderId, farmerId) => {
+    const order = await prisma.order.findFirst({
+        where: { id: orderId, farmerId },
+        include: {
+            items: {
+                include: {
+                    supplier: { select: { id: true, businessName: true, upiId: true, district: true } },
+                    product: { select: { name: true, price: true } }
+                }
+            }
         }
-    }
+    });
+    if (!order) throw Object.assign(new Error('Order not found'), { statusCode: 404 });
 
-    logger.info('Razorpay webhook:', event.event);
-
-    if (event.event === 'payment.failed') {
-        const payment = event.payload.payment.entity;
-        const order = await prisma.order.findFirst({ where: { razorpayOrderId: payment.order_id } });
-        if (order) {
-            await prisma.order.update({ where: { id: order.id }, data: { paymentStatus: 'FAILED' } });
-            await prisma.payment.update({ where: { orderId: order.id }, data: { status: 'FAILED', failureReason: payment.error_description } });
+    // Group by supplier
+    const supplierMap = {};
+    for (const item of order.items) {
+        const sid = item.supplier.id;
+        if (!supplierMap[sid]) {
+            supplierMap[sid] = {
+                supplierId: sid,
+                businessName: item.supplier.businessName,
+                upiId: item.supplier.upiId || null,
+                district: item.supplier.district,
+                items: [],
+                subtotal: 0,
+            };
         }
+        supplierMap[sid].items.push({ name: item.product.name, qty: item.quantity, price: item.price });
+        supplierMap[sid].subtotal += item.price;
     }
 
-    // Mark as processed in Redis (24hr TTL)
-    if (redis && paymentId !== 'unknown') {
-        await redis.setWithExpiry(`webhook:${paymentId}`, 86400, '1');
-    }
-
-    return { received: true };
+    return {
+        orderId,
+        totalAmount: order.totalAmount,
+        suppliers: Object.values(supplierMap),
+    };
 };
 
-const requestRefund = async ({ orderId, amount, reason }) => {
-    const payment = await prisma.payment.findUnique({ where: { orderId } });
-    if (!payment || payment.status !== 'SUCCESS') throw Object.assign(new Error('No valid payment to refund'), { statusCode: 400 });
-
-    const refund = await razorpay.payments.refund(payment.razorpayPaymentId, { amount: toPaise(amount || payment.amount), notes: { reason } });
-    await prisma.payment.update({ where: { orderId }, data: { status: 'REFUNDED', refundId: refund.id, refundAmount: amount || payment.amount, refundReason: reason } });
-    await prisma.order.update({ where: { id: orderId }, data: { status: 'REFUNDED', paymentStatus: 'REFUNDED' } });
-    return refund;
-};
-
+// ── COD ─────────────────────────────────────────────────────────────────────
 const confirmCashOnDelivery = async (orderId, farmerId) => {
     const order = await prisma.order.findFirst({ where: { id: orderId, farmerId } });
     if (!order) throw Object.assign(new Error('Order not found'), { statusCode: 404 });
@@ -130,10 +121,17 @@ const confirmCashOnDelivery = async (orderId, farmerId) => {
 
     await prisma.order.update({
         where: { id: orderId },
-        data: { status: 'PROCESSING', paymentStatus: 'PENDING' },
+        data: { status: 'PROCESSING', paymentStatus: 'PENDING', paymentMethod: 'cod' },
     });
 
     return { orderId, status: 'PROCESSING', paymentMethod: 'cod' };
 };
 
-module.exports = { createPaymentOrder, verifyPayment, getPayment, handleWebhook, requestRefund, confirmCashOnDelivery };
+// ── Get Payment ──────────────────────────────────────────────────────────────
+const getPayment = async (orderId) => {
+    const payment = await prisma.payment.findUnique({ where: { orderId }, include: { order: true } });
+    if (!payment) throw Object.assign(new Error('Payment not found'), { statusCode: 404 });
+    return payment;
+};
+
+module.exports = { verifyUpiPayment, getOrderSupplierUpiDetails, confirmCashOnDelivery, getPayment };

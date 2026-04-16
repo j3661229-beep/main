@@ -64,11 +64,43 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> sendOTP(String phone, String role) async {
+  Future<void> sendOTP({required String phone, required String role}) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
       await _api.sendOTP(phone: phone, role: role);
       state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: _parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<UserModel> verifyOTP({
+    required String phone,
+    required String otp,
+    String? name,
+    String? role,
+    String? language,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final data = await _api.verifyOTP(
+        phone: phone,
+        otp: otp,
+        name: name,
+        role: role,
+        language: language,
+      );
+
+      final token = data['token'] as String;
+      final user = UserModel.fromJson(data['user']);
+      
+      await _storage.write(key: AppConstants.tokenKey, value: token);
+      await _storage.write(key: AppConstants.refreshTokenKey, value: data['refreshToken'] ?? '');
+      await _storage.write(key: AppConstants.userKey, value: jsonEncode(data['user']));
+      
+      state = AuthState(user: user, isAuthenticated: true);
+      return user;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: _parseError(e));
       rethrow;

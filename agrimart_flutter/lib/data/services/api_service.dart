@@ -40,6 +40,23 @@ class ApiService {
     await _dio.post('/auth/send-otp', data: {'phone': phone, 'role': role});
   }
 
+  Future<Map> verifyOTP({
+    required String phone,
+    required String otp,
+    String? name,
+    String? role,
+    String? language,
+  }) async {
+    final r = await _dio.post('/auth/verify-otp', data: {
+      'phone': phone,
+      'otp': otp,
+      if (name != null) 'name': name,
+      if (role != null) 'role': role,
+      if (language != null) 'language': language,
+    });
+    return r.data['data']; // Expected { token, user, refreshToken }
+  }
+
   Future<Map> completeOnboarding(Map<String, dynamic> data) async {
     final r = await _dio.post('/auth/onboarding', data: data);
     return r.data;
@@ -444,16 +461,16 @@ class _AuthInterceptor extends Interceptor {
             final newToken = res.data['data']['token'];
             await _storage.write(key: AppConstants.tokenKey, value: newToken);
 
-            // Retry the original request
-            err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-            final retry = await dio.fetch(err.requestOptions);
+            // Retry original request
+            final options = err.requestOptions;
+            options.headers['Authorization'] = 'Bearer $newToken';
+            final retry = await dio.fetch(options);
             return handler.resolve(retry);
           }
         } catch (_) {
-          await _storage.deleteAll();
+          // If refresh fails, we don't nuke everything blindly, we just let the 401 pass
+          // The UI/State management will handle redirecting to login if needed
         }
-      } else {
-        await _storage.deleteAll();
       }
     }
     handler.next(err);

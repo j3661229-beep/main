@@ -24,7 +24,7 @@ class _PhoneScreenState extends ConsumerState<PhoneScreen> {
   Future<void> _sendOTP() async {
     if (!_formKey.currentState!.validate()) return;
     try {
-      await ref.read(authProvider.notifier).sendOTP(_phoneCtrl.text.trim(), widget.role);
+      await ref.read(authProvider.notifier).sendOTP(phone: _phoneCtrl.text.trim(), role: widget.role);
       if (mounted) {
         context.push('/auth/otp', extra: {'phone': _phoneCtrl.text.trim(), 'role': widget.role});
       }

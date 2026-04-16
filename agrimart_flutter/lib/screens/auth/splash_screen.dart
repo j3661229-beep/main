@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
-
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
   @override
@@ -44,18 +44,26 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
     _navigate();
   }
 
-  void _navigate() {
+  Future<void> _navigate() async {
+    final prefs = await SharedPreferences.getInstance();
+    final hasChosenLang = (prefs.getString('selected_locale') ?? '').isNotEmpty;
+
+    if (!hasChosenLang && mounted) {
+      context.go('/auth/language');
+      return;
+    }
+
     final auth = ref.read(authProvider);
     if (auth.isAuthenticated && auth.user != null) {
       if (auth.user!.isFarmer) {
-        context.go('/farmer');
+        if (mounted) context.go('/farmer');
       } else if (auth.user!.isDealer) {
-        context.go('/dealer');
+        if (mounted) context.go('/dealer');
       } else {
-        context.go('/supplier');
+        if (mounted) context.go('/supplier');
       }
     } else {
-      context.go('/auth/role');
+      if (mounted) context.go('/auth/role');
     }
   }
 
