@@ -264,6 +264,8 @@ exports.Prisma.OrderScalarFieldEnum = {
   deliveryLat: 'deliveryLat',
   deliveryLng: 'deliveryLng',
   notes: 'notes',
+  utrNumber: 'utrNumber',
+  paymentMethod: 'paymentMethod',
   deliveredAt: 'deliveredAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

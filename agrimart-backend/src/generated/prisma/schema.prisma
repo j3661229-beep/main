@@ -231,6 +231,8 @@ model Order {
   deliveryLat     Float?
   deliveryLng     Float?
   notes           String?
+  utrNumber       String?
+  paymentMethod   String        @default("cod")
   deliveredAt     DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt

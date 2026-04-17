@@ -699,6 +699,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search crops or markets'**
   String get searchProducts;
+
+  /// No description provided for @orderTracking.
+  ///
+  /// In en, this message translates to:
+  /// **'Order Tracking'**
+  String get orderTracking;
+
+  /// No description provided for @pickupLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'PICKUP LOCATION'**
+  String get pickupLocation;
+
+  /// No description provided for @navigateToStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigate to Store'**
+  String get navigateToStore;
+
+  /// No description provided for @store.
+  ///
+  /// In en, this message translates to:
+  /// **'Store'**
+  String get store;
+
+  /// No description provided for @trackingHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracking History'**
+  String get trackingHistory;
+
+  /// No description provided for @orderItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Order Items'**
+  String get orderItems;
+
+  /// No description provided for @pickupProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup Progress'**
+  String get pickupProgress;
+
+  /// No description provided for @ready.
+  ///
+  /// In en, this message translates to:
+  /// **'ready'**
+  String get ready;
+
+  /// No description provided for @locationNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Store location not available'**
+  String get locationNotAvailable;
+
+  /// No description provided for @mapsNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open Maps app'**
+  String get mapsNotAvailable;
+
+  /// No description provided for @browsing.
+  ///
+  /// In en, this message translates to:
+  /// **'Browsing'**
+  String get browsing;
+
+  /// No description provided for @viewShop.
+  ///
+  /// In en, this message translates to:
+  /// **'View Shop'**
+  String get viewShop;
+
+  /// No description provided for @noProductsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No products available'**
+  String get noProductsAvailable;
 }
 
 class _AppLocalizationsDelegate

@@ -98,5 +98,18 @@
   "pending": "प्रलंबित",
   "farm": "शेत",
   "servicesAi": "AI सेवा",
-  "searchProducts": "पिके किंवा बाजार शोधा"
+  "searchProducts": "पिके किंवा बाजार शोधा",
+  "orderTracking": "ऑर्डर ट्रॅकिंग",
+  "pickupLocation": "पिकअप ठिकाण",
+  "navigateToStore": "दुकानापर्यंत जा",
+  "store": "दुकान",
+  "trackingHistory": "ट्रॅकिंग इतिहास",
+  "orderItems": "ऑर्डर वस्तू",
+  "pickupProgress": "पिकअप प्रगती",
+  "ready": "तयार",
+  "locationNotAvailable": "दुकानाचे ठिकाण उपलब्ध नाही",
+  "mapsNotAvailable": "Maps अ‍ॅप उघडता आले नाही",
+  "browsing": "ब्राउझिंग",
+  "viewShop": "दुकान पहा",
+  "noProductsAvailable": "कोणतीही उत्पादने उपलब्ध नाहीत"
 }

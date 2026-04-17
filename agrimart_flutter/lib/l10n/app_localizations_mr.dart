@@ -312,4 +312,43 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get searchProducts => 'पिके किंवा बाजार शोधा';
+
+  @override
+  String get orderTracking => 'ऑर्डर ट्रॅकिंग';
+
+  @override
+  String get pickupLocation => 'पिकअप ठिकाण';
+
+  @override
+  String get navigateToStore => 'दुकानापर्यंत जा';
+
+  @override
+  String get store => 'दुकान';
+
+  @override
+  String get trackingHistory => 'ट्रॅकिंग इतिहास';
+
+  @override
+  String get orderItems => 'ऑर्डर वस्तू';
+
+  @override
+  String get pickupProgress => 'पिकअप प्रगती';
+
+  @override
+  String get ready => 'तयार';
+
+  @override
+  String get locationNotAvailable => 'दुकानाचे ठिकाण उपलब्ध नाही';
+
+  @override
+  String get mapsNotAvailable => 'Maps अ‍ॅप उघडता आले नाही';
+
+  @override
+  String get browsing => 'ब्राउझिंग';
+
+  @override
+  String get viewShop => 'दुकान पहा';
+
+  @override
+  String get noProductsAvailable => 'कोणतीही उत्पादने उपलब्ध नाहीत';
 }

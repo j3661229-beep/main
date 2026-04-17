@@ -313,4 +313,43 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get searchProducts => 'फसलें या बाजार खोजें';
+
+  @override
+  String get orderTracking => 'ऑर्डर ट्रैकिंग';
+
+  @override
+  String get pickupLocation => 'पिकअप स्थान';
+
+  @override
+  String get navigateToStore => 'दुकान तक जाएं';
+
+  @override
+  String get store => 'दुकान';
+
+  @override
+  String get trackingHistory => 'ट्रैकिंग इतिहास';
+
+  @override
+  String get orderItems => 'ऑर्डर वस्तुएं';
+
+  @override
+  String get pickupProgress => 'पिकअप प्रगति';
+
+  @override
+  String get ready => 'तैयार';
+
+  @override
+  String get locationNotAvailable => 'दुकान का स्थान उपलब्ध नहीं';
+
+  @override
+  String get mapsNotAvailable => 'Maps ऐप नहीं खुल सका';
+
+  @override
+  String get browsing => 'ब्राउजिंग';
+
+  @override
+  String get viewShop => 'दुकान देखें';
+
+  @override
+  String get noProductsAvailable => 'कोई उत्पाद उपलब्ध नहीं';
 }

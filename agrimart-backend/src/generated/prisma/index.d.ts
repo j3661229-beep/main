@@ -11682,6 +11682,8 @@ export namespace Prisma {
     deliveryLat: number | null
     deliveryLng: number | null
     notes: string | null
+    utrNumber: string | null
+    paymentMethod: string | null
     deliveredAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -11699,6 +11701,8 @@ export namespace Prisma {
     deliveryLat: number | null
     deliveryLng: number | null
     notes: string | null
+    utrNumber: string | null
+    paymentMethod: string | null
     deliveredAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -11716,6 +11720,8 @@ export namespace Prisma {
     deliveryLat: number
     deliveryLng: number
     notes: number
+    utrNumber: number
+    paymentMethod: number
     deliveredAt: number
     createdAt: number
     updatedAt: number
@@ -11747,6 +11753,8 @@ export namespace Prisma {
     deliveryLat?: true
     deliveryLng?: true
     notes?: true
+    utrNumber?: true
+    paymentMethod?: true
     deliveredAt?: true
     createdAt?: true
     updatedAt?: true
@@ -11764,6 +11772,8 @@ export namespace Prisma {
     deliveryLat?: true
     deliveryLng?: true
     notes?: true
+    utrNumber?: true
+    paymentMethod?: true
     deliveredAt?: true
     createdAt?: true
     updatedAt?: true
@@ -11781,6 +11791,8 @@ export namespace Prisma {
     deliveryLat?: true
     deliveryLng?: true
     notes?: true
+    utrNumber?: true
+    paymentMethod?: true
     deliveredAt?: true
     createdAt?: true
     updatedAt?: true
@@ -11885,6 +11897,8 @@ export namespace Prisma {
     deliveryLat: number | null
     deliveryLng: number | null
     notes: string | null
+    utrNumber: string | null
+    paymentMethod: string
     deliveredAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -11921,6 +11935,8 @@ export namespace Prisma {
     deliveryLat?: boolean
     deliveryLng?: boolean
     notes?: boolean
+    utrNumber?: boolean
+    paymentMethod?: boolean
     deliveredAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -11942,6 +11958,8 @@ export namespace Prisma {
     deliveryLat?: boolean
     deliveryLng?: boolean
     notes?: boolean
+    utrNumber?: boolean
+    paymentMethod?: boolean
     deliveredAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -11960,6 +11978,8 @@ export namespace Prisma {
     deliveryLat?: boolean
     deliveryLng?: boolean
     notes?: boolean
+    utrNumber?: boolean
+    paymentMethod?: boolean
     deliveredAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -11994,6 +12014,8 @@ export namespace Prisma {
       deliveryLat: number | null
       deliveryLng: number | null
       notes: string | null
+      utrNumber: string | null
+      paymentMethod: string
       deliveredAt: Date | null
       createdAt: Date
       updatedAt: Date
@@ -12404,6 +12426,8 @@ export namespace Prisma {
     readonly deliveryLat: FieldRef<"Order", 'Float'>
     readonly deliveryLng: FieldRef<"Order", 'Float'>
     readonly notes: FieldRef<"Order", 'String'>
+    readonly utrNumber: FieldRef<"Order", 'String'>
+    readonly paymentMethod: FieldRef<"Order", 'String'>
     readonly deliveredAt: FieldRef<"Order", 'DateTime'>
     readonly createdAt: FieldRef<"Order", 'DateTime'>
     readonly updatedAt: FieldRef<"Order", 'DateTime'>
@@ -23057,6 +23081,8 @@ export namespace Prisma {
     deliveryLat: 'deliveryLat',
     deliveryLng: 'deliveryLng',
     notes: 'notes',
+    utrNumber: 'utrNumber',
+    paymentMethod: 'paymentMethod',
     deliveredAt: 'deliveredAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -24274,6 +24300,8 @@ export namespace Prisma {
     deliveryLat?: FloatNullableFilter<"Order"> | number | null
     deliveryLng?: FloatNullableFilter<"Order"> | number | null
     notes?: StringNullableFilter<"Order"> | string | null
+    utrNumber?: StringNullableFilter<"Order"> | string | null
+    paymentMethod?: StringFilter<"Order"> | string
     deliveredAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     createdAt?: DateTimeFilter<"Order"> | Date | string
     updatedAt?: DateTimeFilter<"Order"> | Date | string
@@ -24294,6 +24322,8 @@ export namespace Prisma {
     deliveryLat?: SortOrderInput | SortOrder
     deliveryLng?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
+    utrNumber?: SortOrderInput | SortOrder
+    paymentMethod?: SortOrder
     deliveredAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -24317,6 +24347,8 @@ export namespace Prisma {
     deliveryLat?: FloatNullableFilter<"Order"> | number | null
     deliveryLng?: FloatNullableFilter<"Order"> | number | null
     notes?: StringNullableFilter<"Order"> | string | null
+    utrNumber?: StringNullableFilter<"Order"> | string | null
+    paymentMethod?: StringFilter<"Order"> | string
     deliveredAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     createdAt?: DateTimeFilter<"Order"> | Date | string
     updatedAt?: DateTimeFilter<"Order"> | Date | string
@@ -24337,6 +24369,8 @@ export namespace Prisma {
     deliveryLat?: SortOrderInput | SortOrder
     deliveryLng?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
+    utrNumber?: SortOrderInput | SortOrder
+    paymentMethod?: SortOrder
     deliveredAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -24362,6 +24396,8 @@ export namespace Prisma {
     deliveryLat?: FloatNullableWithAggregatesFilter<"Order"> | number | null
     deliveryLng?: FloatNullableWithAggregatesFilter<"Order"> | number | null
     notes?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    utrNumber?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    paymentMethod?: StringWithAggregatesFilter<"Order"> | string
     deliveredAt?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
@@ -26164,6 +26200,8 @@ export namespace Prisma {
     deliveryLat?: number | null
     deliveryLng?: number | null
     notes?: string | null
+    utrNumber?: string | null
+    paymentMethod?: string
     deliveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26184,6 +26222,8 @@ export namespace Prisma {
     deliveryLat?: number | null
     deliveryLng?: number | null
     notes?: string | null
+    utrNumber?: string | null
+    paymentMethod?: string
     deliveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26202,6 +26242,8 @@ export namespace Prisma {
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    utrNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: StringFieldUpdateOperationsInput | string
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26222,6 +26264,8 @@ export namespace Prisma {
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    utrNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: StringFieldUpdateOperationsInput | string
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26241,6 +26285,8 @@ export namespace Prisma {
     deliveryLat?: number | null
     deliveryLng?: number | null
     notes?: string | null
+    utrNumber?: string | null
+    paymentMethod?: string
     deliveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26257,6 +26303,8 @@ export namespace Prisma {
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    utrNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: StringFieldUpdateOperationsInput | string
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26274,6 +26322,8 @@ export namespace Prisma {
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    utrNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: StringFieldUpdateOperationsInput | string
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28064,6 +28114,8 @@ export namespace Prisma {
     deliveryLat?: SortOrder
     deliveryLng?: SortOrder
     notes?: SortOrder
+    utrNumber?: SortOrder
+    paymentMethod?: SortOrder
     deliveredAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -28087,6 +28139,8 @@ export namespace Prisma {
     deliveryLat?: SortOrder
     deliveryLng?: SortOrder
     notes?: SortOrder
+    utrNumber?: SortOrder
+    paymentMethod?: SortOrder
     deliveredAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -28104,6 +28158,8 @@ export namespace Prisma {
     deliveryLat?: SortOrder
     deliveryLng?: SortOrder
     notes?: SortOrder
+    utrNumber?: SortOrder
+    paymentMethod?: SortOrder
     deliveredAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -30843,6 +30899,8 @@ export namespace Prisma {
     deliveryLat?: number | null
     deliveryLng?: number | null
     notes?: string | null
+    utrNumber?: string | null
+    paymentMethod?: string
     deliveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -30861,6 +30919,8 @@ export namespace Prisma {
     deliveryLat?: number | null
     deliveryLng?: number | null
     notes?: string | null
+    utrNumber?: string | null
+    paymentMethod?: string
     deliveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31081,6 +31141,8 @@ export namespace Prisma {
     deliveryLat?: FloatNullableFilter<"Order"> | number | null
     deliveryLng?: FloatNullableFilter<"Order"> | number | null
     notes?: StringNullableFilter<"Order"> | string | null
+    utrNumber?: StringNullableFilter<"Order"> | string | null
+    paymentMethod?: StringFilter<"Order"> | string
     deliveredAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     createdAt?: DateTimeFilter<"Order"> | Date | string
     updatedAt?: DateTimeFilter<"Order"> | Date | string
@@ -32508,6 +32570,8 @@ export namespace Prisma {
     deliveryLat?: number | null
     deliveryLng?: number | null
     notes?: string | null
+    utrNumber?: string | null
+    paymentMethod?: string
     deliveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32527,6 +32591,8 @@ export namespace Prisma {
     deliveryLat?: number | null
     deliveryLng?: number | null
     notes?: string | null
+    utrNumber?: string | null
+    paymentMethod?: string
     deliveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32695,6 +32761,8 @@ export namespace Prisma {
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    utrNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: StringFieldUpdateOperationsInput | string
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32714,6 +32782,8 @@ export namespace Prisma {
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    utrNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: StringFieldUpdateOperationsInput | string
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32884,6 +32954,8 @@ export namespace Prisma {
     deliveryLat?: number | null
     deliveryLng?: number | null
     notes?: string | null
+    utrNumber?: string | null
+    paymentMethod?: string
     deliveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32903,6 +32975,8 @@ export namespace Prisma {
     deliveryLat?: number | null
     deliveryLng?: number | null
     notes?: string | null
+    utrNumber?: string | null
+    paymentMethod?: string
     deliveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32936,6 +33010,8 @@ export namespace Prisma {
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    utrNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: StringFieldUpdateOperationsInput | string
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32955,6 +33031,8 @@ export namespace Prisma {
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    utrNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: StringFieldUpdateOperationsInput | string
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33864,6 +33942,8 @@ export namespace Prisma {
     deliveryLat?: number | null
     deliveryLng?: number | null
     notes?: string | null
+    utrNumber?: string | null
+    paymentMethod?: string
     deliveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -33917,6 +33997,8 @@ export namespace Prisma {
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    utrNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: StringFieldUpdateOperationsInput | string
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33935,6 +34017,8 @@ export namespace Prisma {
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    utrNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: StringFieldUpdateOperationsInput | string
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33953,6 +34037,8 @@ export namespace Prisma {
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    utrNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: StringFieldUpdateOperationsInput | string
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

@@ -312,4 +312,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchProducts => 'Search crops or markets';
+
+  @override
+  String get orderTracking => 'Order Tracking';
+
+  @override
+  String get pickupLocation => 'PICKUP LOCATION';
+
+  @override
+  String get navigateToStore => 'Navigate to Store';
+
+  @override
+  String get store => 'Store';
+
+  @override
+  String get trackingHistory => 'Tracking History';
+
+  @override
+  String get orderItems => 'Order Items';
+
+  @override
+  String get pickupProgress => 'Pickup Progress';
+
+  @override
+  String get ready => 'ready';
+
+  @override
+  String get locationNotAvailable => 'Store location not available';
+
+  @override
+  String get mapsNotAvailable => 'Could not open Maps app';
+
+  @override
+  String get browsing => 'Browsing';
+
+  @override
+  String get viewShop => 'View Shop';
+
+  @override
+  String get noProductsAvailable => 'No products available';
 }

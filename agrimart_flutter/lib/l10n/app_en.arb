@@ -98,5 +98,18 @@
   "pending": "Pending",
   "farm": "Farm",
   "servicesAi": "AI Services",
-  "searchProducts": "Search crops or markets"
+  "searchProducts": "Search crops or markets",
+  "orderTracking": "Order Tracking",
+  "pickupLocation": "PICKUP LOCATION",
+  "navigateToStore": "Navigate to Store",
+  "store": "Store",
+  "trackingHistory": "Tracking History",
+  "orderItems": "Order Items",
+  "pickupProgress": "Pickup Progress",
+  "ready": "ready",
+  "locationNotAvailable": "Store location not available",
+  "mapsNotAvailable": "Could not open Maps app",
+  "browsing": "Browsing",
+  "viewShop": "View Shop",
+  "noProductsAvailable": "No products available"
 }

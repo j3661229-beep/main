@@ -98,5 +98,18 @@
   "pending": "लंबित",
   "farm": "खेत",
   "servicesAi": "AI सेवाएं",
-  "searchProducts": "फसलें या बाजार खोजें"
+  "searchProducts": "फसलें या बाजार खोजें",
+  "orderTracking": "ऑर्डर ट्रैकिंग",
+  "pickupLocation": "पिकअप स्थान",
+  "navigateToStore": "दुकान तक जाएं",
+  "store": "दुकान",
+  "trackingHistory": "ट्रैकिंग इतिहास",
+  "orderItems": "ऑर्डर वस्तुएं",
+  "pickupProgress": "पिकअप प्रगति",
+  "ready": "तैयार",
+  "locationNotAvailable": "दुकान का स्थान उपलब्ध नहीं",
+  "mapsNotAvailable": "Maps ऐप नहीं खुल सका",
+  "browsing": "ब्राउजिंग",
+  "viewShop": "दुकान देखें",
+  "noProductsAvailable": "कोई उत्पाद उपलब्ध नहीं"
 }
