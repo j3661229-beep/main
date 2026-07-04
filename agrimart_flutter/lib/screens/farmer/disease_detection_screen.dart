@@ -79,7 +79,7 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                           children: [
                         Text(l10n.diseaseDetection,
                             style: AppTextStyles.headingSM),
-                        const Text(
+                        Text(
                             'Photo of affected crop leaf/plant for AI disease identification and treatment recommendations.',
                             style: AppTextStyles.bodySM),
                       ]))
@@ -319,3 +319,4 @@ class _DiseaseDetailRow extends StatelessWidget {
     );
   }
 }
+

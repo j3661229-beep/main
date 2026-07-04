@@ -134,3 +134,4 @@ class FloatingNavItem {
     this.badge,
   });
 }
+

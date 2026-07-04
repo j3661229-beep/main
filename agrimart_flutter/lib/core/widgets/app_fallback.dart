@@ -128,3 +128,4 @@ class AppErrorState extends StatelessWidget {
     );
   }
 }
+

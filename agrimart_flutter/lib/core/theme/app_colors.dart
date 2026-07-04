@@ -1,89 +1,127 @@
-// AgriMart Brand Colors — matches website primary #2d6a4f
 import 'package:flutter/material.dart';
 
 class AppColors {
   AppColors._();
 
-  // Primary Green Palette
-  static const Color primary = Color(0xFF2D6A4F);
+  // ── Role Accents ────────────────────────────────────────
+  static const Color farmerAccent = Color(0xFF3D6B35);
+  static const Color farmerTint   = Color(0xFFE7F0E2);
+  static const Color supplierAccent = Color(0xFF1D4E63);
+  static const Color supplierTint   = Color(0xFFE3EDF1);
+  static const Color dealerAccent = Color(0xFFA85C1A);
+  static const Color dealerTint   = Color(0xFFF5E9DA);
+
+  // ── Backgrounds ─────────────────────────────────────────
+  static const Color background   = Color(0xFFF6F1E4);  // cream
+  static const Color surface      = Color(0xFFFFFFFF);
+  static const Color surfaceCard  = Color(0xFFFAF8F2);
+
+  // ── Text ────────────────────────────────────────────────
+  static const Color ink          = Color(0xFF1E2A1A);
+  static const Color muted        = Color(0xFF6B7568);
+  static const Color placeholder  = Color(0xFFB0AFA8);
+
+  // ── Semantic ────────────────────────────────────────────
+  static const Color danger       = Color(0xFFB3402F);
+  static const Color dangerTint   = Color(0xFFFDECE9);
+  static const Color success      = Color(0xFF2F7D4F);
+  static const Color successTint  = Color(0xFFE3F5EA);
+  static const Color warning      = Color(0xFFD97706);
+  static const Color warningTint  = Color(0xFFFEF3C7);
+  static const Color info         = Color(0xFF1D4E63);
+  static const Color infoTint     = Color(0xFFE3EDF1);
+
+  // ── Border ──────────────────────────────────────────────
+  static const Color border       = Color(0xFFE2DDD2);
+  static const Color borderFocus  = Color(0xFF3D6B35);
+
+  // ── Legacy aliases (keep for existing code) ──────────────
+  static const Color primary      = farmerAccent;
   static const Color primaryLight = Color(0xFF4DAC7A);
-  static const Color primaryDark = Color(0xFF1A4231);
-  static const Color primarySurface = Color(0xFFF0FAF4);
-  static const Color primaryBorder = Color(0xFFB7E1C9);
+  static const Color primaryDark  = Color(0xFF2A4C25);
+  static const Color primarySurface = farmerTint;
+  static const Color primaryBorder  = Color(0xFFB7D9AE);
+  static const Color white        = Color(0xFFFFFFFF);
+  static const Color textPrimary  = ink;
+  static const Color textSecondary = muted;
+  static const Color textTertiary  = placeholder;
+  static const Color textInverse   = Color(0xFFFFFFFF);
+  static const Color error         = danger;
+  static const Color errorSurface  = dangerTint;
+  static const Color successSurface = successTint;
 
-  // Accent / Highlight
-  static const Color amber = Color(0xFFF59E0B);
-  static const Color amberLight = Color(0xFFFBBF24);
-  static const Color amberSurface = Color(0xFFFEF9C3);
-
-  // Semantic Colors
-  static const Color success = Color(0xFF22C55E);
-  static const Color successSurface = Color(0xFFDCFCE7);
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color warningSurface = Color(0xFFFEF9C3);
-  static const Color error = Color(0xFFEF4444);
-  static const Color errorSurface = Color(0xFFFEE2E2);
-  static const Color info = Color(0xFF3B82F6);
-  static const Color infoSurface = Color(0xFFDBEAFE);
-
-  // Neutrals
-  static const Color white = Color(0xFFFFFFFF);
-  static const Color background = Color(0xFFF1F5F0);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceVariant = Color(0xFFF8FAF8);
-
-  // Text
-  static const Color textPrimary = Color(0xFF111827);
-  static const Color textSecondary = Color(0xFF6B7280);
-  static const Color textTertiary = Color(0xFF9CA3AF);
-  static const Color textInverse = Color(0xFFFFFFFF);
-
-  // Border
-  static const Color border = Color(0xFFE5E7EB);
-  static const Color borderDark = Color(0xFFD1D5DB);
-
-  // Category Colors
-  static const Color seeds = Color(0xFF10B981);
-  static const Color fertilizer = Color(0xFF3B82F6);
-  static const Color pesticide = Color(0xFFEF4444);
-  static const Color organic = Color(0xFF22C55E);
-  static const Color equipment = Color(0xFF8B5CF6);
-
-  // Gradient
-  static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFF1A4231), Color(0xFF2D6A4F), Color(0xFF4DAC7A)],
+  // ── Gradients ────────────────────────────────────────────
+  static const LinearGradient farmerGradient = LinearGradient(
+    colors: [Color(0xFF2A4C25), Color(0xFF3D6B35), Color(0xFF5A9247)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-
+  static const LinearGradient supplierGradient = LinearGradient(
+    colors: [Color(0xFF0F2E3D), Color(0xFF1D4E63), Color(0xFF2E6E87)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+  static const LinearGradient dealerGradient = LinearGradient(
+    colors: [Color(0xFF6B3A10), Color(0xFFA85C1A), Color(0xFFD4793A)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+  static const LinearGradient primaryGradient = farmerGradient;
   static const LinearGradient heroGradient = LinearGradient(
-    colors: [Color(0xFF112B1F), Color(0xFF2D6A4F)],
+    colors: [Color(0xFF1A2E17), Color(0xFF3D6B35)],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
-
-  static LinearGradient shimmerGradient = LinearGradient(
-    colors: [Color(0xFFE5E7EB), Color(0xFFF3F4F6), Color(0xFFE5E7EB)],
+  static LinearGradient shimmerGradient = const LinearGradient(
+    colors: [Color(0xFFEDE8DA), Color(0xFFF6F1E4), Color(0xFFEDE8DA)],
     stops: [0.0, 0.5, 1.0],
   );
 
-  // ── Premium Shadow System ──────────────────────────────────
+  // ── Shadows ──────────────────────────────────────────────
   static List<BoxShadow> softShadow = [
-    BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
-    BoxShadow(color: Colors.black.withValues(alpha: 0.01), blurRadius: 4, offset: const Offset(0, 2)),
+    BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 4)),
+    BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 4,  offset: const Offset(0, 2)),
   ];
-
   static List<BoxShadow> deepShadow = [
-    BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 20, offset: const Offset(0, 10)),
-    BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 4)),
+    BoxShadow(color: Colors.black.withValues(alpha: 0.14), blurRadius: 24, offset: const Offset(0, 12)),
+    BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8,  offset: const Offset(0,  4)),
   ];
-
   static List<BoxShadow> primaryShadow = [
-    BoxShadow(color: primary.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 6)),
+    BoxShadow(color: farmerAccent.withValues(alpha: 0.30), blurRadius: 16, offset: const Offset(0, 8)),
   ];
 
-  // ── Glassmorphism Colors ────────────────────────────────────
-  static const Color glassSurface = Color(0x99FFFFFF);
-  static const Color glassBorder = Color(0x33FFFFFF);
-  static const Color glassPrimary = Color(0x1A2D6A4F);
+  // ── Glass ────────────────────────────────────────────────
+  static const Color glassSurface = Color(0xCCFFFFFF);
+  static const Color glassBorder  = Color(0x33FFFFFF);
+
+  // ── Category Colors ──────────────────────────────────────
+  static const Color seeds      = Color(0xFF3D6B35);
+  static const Color fertilizer = Color(0xFF1D4E63);
+  static const Color pesticide  = Color(0xFFB3402F);
+  static const Color organic    = Color(0xFF2F7D4F);
+  static const Color equipment  = Color(0xFFA85C1A);
+
+  // ── Helpers ──────────────────────────────────────────────
+  static Color accentFor(String role) {
+    switch (role.toUpperCase()) {
+      case 'SUPPLIER': return supplierAccent;
+      case 'DEALER':   return dealerAccent;
+      default:         return farmerAccent;
+    }
+  }
+  static Color tintFor(String role) {
+    switch (role.toUpperCase()) {
+      case 'SUPPLIER': return supplierTint;
+      case 'DEALER':   return dealerTint;
+      default:         return farmerTint;
+    }
+  }
+  static LinearGradient gradientFor(String role) {
+    switch (role.toUpperCase()) {
+      case 'SUPPLIER': return supplierGradient;
+      case 'DEALER':   return dealerGradient;
+      default:         return farmerGradient;
+    }
+  }
 }
+

@@ -491,3 +491,4 @@ class _RateShimmer extends StatelessWidget {
     );
   }
 }
+

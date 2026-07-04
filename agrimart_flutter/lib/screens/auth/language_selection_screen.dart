@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/providers/locale_provider.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_theme.dart';
 import '../../data/providers/auth_provider.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
 
@@ -178,3 +177,5 @@ class _LanguageCard extends StatelessWidget {
     );
   }
 }
+
+

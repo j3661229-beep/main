@@ -82,7 +82,7 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
                           children: [
                         Text(l10n.soilAnalysis,
                             style: AppTextStyles.headingSM),
-                        const Text(
+                        Text(
                             'Take a photo of your soil to get instant analysis and crop recommendations powered by AI.',
                             style: AppTextStyles.bodySM),
                       ]))
@@ -165,7 +165,7 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
                 const SizedBox(height: 12),
                 const AppShimmer(width: double.infinity, height: 40),
                 const SizedBox(height: 20),
-                const Text('🔍 AI is analyzing your soil…',
+                Text('🔍 AI is analyzing your soil…',
                     style: AppTextStyles.headingSM),
                 Text('This takes about 5-10 seconds',
                     style: AppTextStyles.bodyXS
@@ -376,3 +376,4 @@ class _NPKMeter extends StatelessWidget {
     );
   }
 }
+

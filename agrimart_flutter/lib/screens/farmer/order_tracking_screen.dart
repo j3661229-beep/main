@@ -438,7 +438,7 @@ class _TimelineStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color dotColor = completed
-        ? (current ? AppColors.amber : AppColors.primary)
+        ? (current ? AppColors.warning : AppColors.primary)
         : AppColors.border;
 
     return IntrinsicHeight(
@@ -614,3 +614,4 @@ class _OrderItemRow extends StatelessWidget {
     );
   }
 }
+

@@ -95,7 +95,7 @@ class _DealerWorkingDaysScreenState extends State<DealerWorkingDaysScreen> {
                     margin: const EdgeInsets.symmetric(horizontal: 2),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: s.isOpen ? AppColors.primary : AppColors.surfaceVariant,
+                      color: s.isOpen ? AppColors.primary : AppColors.background,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: s.isOpen ? AppColors.primary : AppColors.border),
                     ),
@@ -124,7 +124,7 @@ class _DealerWorkingDaysScreenState extends State<DealerWorkingDaysScreen> {
                   Container(
                     width: 44, height: 44,
                     decoration: BoxDecoration(
-                      color: s.isOpen ? AppColors.primarySurface : AppColors.surfaceVariant,
+                      color: s.isOpen ? AppColors.primarySurface : AppColors.background,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(child: Text(s.short, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: s.isOpen ? AppColors.primary : AppColors.textTertiary))),
@@ -149,9 +149,9 @@ class _DealerWorkingDaysScreenState extends State<DealerWorkingDaysScreen> {
                       onTap: () => _pickTime(i, true),
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(color: AppColors.surfaceVariant, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.border)),
+                        decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.border)),
                         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          const Icon(Icons.wb_sunny_outlined, size: 16, color: AppColors.amber),
+                          Icon(Icons.wb_sunny_outlined, size: 16, color: AppColors.warning),
                           const SizedBox(width: 8),
                           Text(s.open.format(context), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
                         ]),
@@ -198,3 +198,4 @@ class _DaySchedule {
   final TimeOfDay open, close;
   const _DaySchedule({required this.day, required this.short, required this.isOpen, required this.open, required this.close});
 }
+

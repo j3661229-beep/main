@@ -187,12 +187,12 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
               child: ListView(padding: const EdgeInsets.all(20), children: [
             const Center(child: Text('🤖', style: TextStyle(fontSize: 64))),
             const SizedBox(height: 12),
-            const Text('Kisan AI Assistant',
+            Text('Kisan AI Assistant',
                 style: AppTextStyles.headingXL, textAlign: TextAlign.center),
-            const Text('Ask any farming question in Marathi, Hindi or English',
+            Text('Ask any farming question in Marathi, Hindi or English',
                 style: AppTextStyles.bodySM, textAlign: TextAlign.center),
             const SizedBox(height: 24),
-            const Text('Quick Questions:', style: AppTextStyles.headingSM),
+            Text('Quick Questions:', style: AppTextStyles.headingSM),
             const SizedBox(height: 12),
             ..._suggestions.map((s) => GestureDetector(
                   onTap: () => _send(s),
@@ -384,3 +384,4 @@ class _TypingDotsState extends State<_TypingDots>
                       color: AppColors.primary.withValues(alpha: _c.value),
                       shape: BoxShape.circle)))));
 }
+

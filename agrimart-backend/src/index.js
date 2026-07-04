@@ -54,9 +54,10 @@ const adminRoutes = require('./routes/admin.routes');
 const tradeRoutes = require('./routes/trade.routes');
 const dealerRoutes = require('./routes/dealer.routes');
 const uploadRoutes = require('./routes/upload.routes');
-
+const newsRoutes = require('./routes/news.routes');
 
 const app = express();
+
 const PORT = process.env.PORT || 3000;
 
 // Trust reverse proxy (Railway/Hostinger) so rate limiter doesn't block everyone
@@ -83,8 +84,6 @@ const apiLimiter = rateLimit({
 // Apply rate limiting to all /api routes
 app.use('/api/', apiLimiter);
 
-// Payment webhook needs raw body before JSON parsing
-app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -132,7 +131,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/trade', tradeRoutes);
 app.use('/api/dealer', dealerRoutes);
 app.use('/api/upload', uploadRoutes);
-
+app.use('/api/news', newsRoutes);
 
 // Error handling
 app.use(notFound);

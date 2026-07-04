@@ -43,14 +43,14 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Upload Document', style: AppTextStyles.headingLG),
+            Text('Upload Document', style: AppTextStyles.headingLG),
             const SizedBox(height: 20),
             ListTile(
               leading: Container(
                   width: 44, height: 44,
                   decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(12)),
                   child: const Center(child: Text('📷', style: TextStyle(fontSize: 22)))),
-              title: const Text('Take a Photo', style: AppTextStyles.headingMD),
+              title: Text('Take a Photo', style: AppTextStyles.headingMD),
               subtitle: const Text('Use your camera'),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
@@ -59,7 +59,7 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
                   width: 44, height: 44,
                   decoration: BoxDecoration(color: const Color(0xFFE3F2FD), borderRadius: BorderRadius.circular(12)),
                   child: const Center(child: Text('🖼️', style: TextStyle(fontSize: 22)))),
-              title: const Text('Choose from Gallery', style: AppTextStyles.headingMD),
+              title: Text('Choose from Gallery', style: AppTextStyles.headingMD),
               subtitle: const Text('Pick an existing image'),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
@@ -181,7 +181,7 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
                       ),
 
                       const SizedBox(height: 28),
-                      const Text('Document Type', style: AppTextStyles.labelLG),
+                      Text('Document Type', style: AppTextStyles.labelLG),
                       const SizedBox(height: 12),
 
                       // Document type selector
@@ -217,7 +217,7 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
                       ),
 
                       const SizedBox(height: 28),
-                      const Text('Upload Document', style: AppTextStyles.labelLG),
+                      Text('Upload Document', style: AppTextStyles.labelLG),
                       const SizedBox(height: 12),
 
                       // File picker
@@ -344,3 +344,4 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
     );
   }
 }
+

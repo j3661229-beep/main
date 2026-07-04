@@ -163,7 +163,7 @@ class ProfileScreen extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Select Language / भाषा निवडा', style: AppTextStyles.headingLG),
+              Text('Select Language / भाषा निवडा', style: AppTextStyles.headingLG),
               const SizedBox(height: 16),
               ...[
                 {'name': 'English', 'code': 'en'},
@@ -258,3 +258,4 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 }
+

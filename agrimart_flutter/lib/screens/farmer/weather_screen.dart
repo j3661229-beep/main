@@ -116,7 +116,7 @@ class WeatherScreen extends ConsumerWidget {
                               );
                             })
                           else
-                            const Text('No advisory available today.',
+                            Text('No advisory available today.',
                                 style: AppTextStyles.bodyMD),
                         ]),
                   );
@@ -185,3 +185,4 @@ class _TempCard extends StatelessWidget {
         Text(label, style: AppTextStyles.caption),
       ]);
 }
+

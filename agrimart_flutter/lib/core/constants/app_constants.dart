@@ -4,7 +4,7 @@ class AppConstants {
   // API
   // Using 172.20.10.2 to allow your physical device to connect to your PC's locally running backend
   // Alternatively, use 10.0.2.2 for Android Emulator or 127.0.0.1 for iOS simulator.
-  static const String baseUrl = 'http://10.10.56.253:3000/api';
+  static const String baseUrl = 'http://172.20.10.3:3000/api/v1';
 
   // Storage keys
   static const String tokenKey = 'auth_token';
@@ -58,10 +58,18 @@ class AppConstants {
     {'name': 'Maize', 'emoji': '🌽', 'nameMr': 'मका'},
   ];
 
-  // Language
+  // Language (both API format and legacy keys)
   static const Map<String, String> languages = {
-    'marathi': 'मराठी',
-    'hindi': 'हिंदी',
+    'en':      'English',
+    'hi':      'हिंदी',
+    'mr':      'मराठी',
     'english': 'English',
+    'hindi':   'हिंदी',
+    'marathi': 'मराठी',
   };
+
+  // Placeholder image asset
+  static const String placeholderImage = 'assets/images/placeholder.png';
 }
+
+

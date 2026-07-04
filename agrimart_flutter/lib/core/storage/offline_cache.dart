@@ -41,3 +41,4 @@ class OfflineCache {
     return cachedStr != null ? jsonDecode(cachedStr) as List<dynamic> : null;
   }
 }
+

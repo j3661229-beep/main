@@ -1,229 +1,182 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/providers/app_providers.dart';
-
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/widgets/app_shimmer.dart';
-import '../../core/widgets/app_fallback.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:shimmer/shimmer.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/shared_widgets.dart';
+import '../../../data/providers/app_providers.dart';
 
-class ProductDetailScreen extends ConsumerStatefulWidget {
+class ProductDetailScreen extends ConsumerWidget {
   final String productId;
   const ProductDetailScreen({super.key, required this.productId});
 
   @override
-  ConsumerState<ProductDetailScreen> createState() => _ProductDetailScreenState();
-}
-
-class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
-  int _quantity = 1;
-
-  @override
-  Widget build(BuildContext context) {
-    final product = ref.watch(productDetailProvider(widget.productId));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final productAsync = ref.watch(productDetailProvider(productId));
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: product.when(
-        loading: () => const Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [
-              AppShimmer(width: double.infinity, height: 280, borderRadius: 16),
-              SizedBox(height: 16),
-              AppShimmer(width: double.infinity, height: 24),
-              SizedBox(height: 8),
-              AppShimmer(width: 180, height: 16),
-              SizedBox(height: 16),
-              AppShimmer(width: double.infinity, height: 120),
-            ],
-          ),
+      body: productAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.farmerAccent)),
+        error: (e, _) => Scaffold(
+          appBar: AppBar(leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded))),
+          body: Center(child: Text('Could not load product', style: GoogleFonts.inter(color: AppColors.muted))),
         ),
-        error: (e, _) => AppErrorState(
-          message: e.toString(), 
-          onRetry: () => ref.invalidate(productDetailProvider(widget.productId))
-        ),
-        data: (p) => Stack(children: [
-          CustomScrollView(slivers: [
-            SliverAppBar(
-              expandedHeight: 280,
-              backgroundColor: AppColors.surface,
-              pinned: true,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Hero(
-                  tag: 'product_${widget.productId}',
+        data: (product) {
+          final name        = product['name'] ?? 'Product';
+          final description = product['description'] ?? '';
+          final price       = (product['price'] as num?) ?? 0;
+          final unit        = product['unit'] ?? 'unit';
+          final stock       = product['stockQuantity'] ?? product['stock'] ?? 0;
+          final supplier    = product['supplier']?['businessName'] ?? 'Supplier';
+          final category    = product['category'] ?? '';
+          final images      = (product['images'] as List?)?.cast<String>() ?? [];
+          final imageUrl    = product['imageUrl'] ?? (images.isNotEmpty ? images[0] : null);
+
+          return CustomScrollView(
+            slivers: [
+              // ── Image SliverAppBar ─────────────────────
+              SliverAppBar(
+                expandedHeight: 300,
+                pinned: true,
+                backgroundColor: AppColors.farmerAccent,
+                leading: GestureDetector(
+                  onTap: () => context.pop(),
                   child: Container(
-                    color: AppColors.primarySurface,
-                    child: p['images'] is List && (p['images'] as List).isNotEmpty
-                        ? CachedNetworkImage(
-                            imageUrl: p['images'][0],
-                            memCacheWidth: 1000,
-                            fit: BoxFit.contain,
-                            placeholder: (context, url) => Shimmer.fromColors(
-                              baseColor: Colors.grey[300]!,
-                              highlightColor: Colors.grey[100]!,
-                              child: Container(color: Colors.white),
-                            ),
-                            errorWidget: (_, __, ___) => const Center(child: Text('🌿', style: TextStyle(fontSize: 80))),
-                          )
-                        : const Center(
-                            child: Text('🌿', style: TextStyle(fontSize: 80))),
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(10)),
+                    child: const Icon(Icons.arrow_back_rounded, color: AppColors.ink),
                   ),
                 ),
+                flexibleSpace: FlexibleSpaceBar(
+                  background: imageUrl != null
+                      ? CachedNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover,
+                          placeholder: (_, __) => Container(color: AppColors.farmerTint, child: const Center(child: Text('🌱', style: TextStyle(fontSize: 80)))),
+                          errorWidget: (_, __, ___) => Container(color: AppColors.farmerTint, child: const Center(child: Text('🌱', style: TextStyle(fontSize: 80)))))
+                      : Container(color: AppColors.farmerTint, child: const Center(child: Text('🌱', style: TextStyle(fontSize: 80)))),
+                ),
               ),
-            ),
-            SliverToBoxAdapter(
-                child: Container(
-              color: AppColors.background,
-              child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(children: [
-                          Expanded(
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                if (p['isOrganic'] == true)
-                                  const Text('🌱 ORGANIC',
-                                      style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w700,
-                                          color: AppColors.success,
-                                          letterSpacing: 0.5)),
-                                Text(p['name'] ?? '',
-                                    style: AppTextStyles.headingXL),
-                                if (p['nameMarathi'] != null)
-                                  Text(p['nameMarathi'],
-                                      style: AppTextStyles.bodySM),
-                              ])),
-                          Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text('₹${p['price']}',
-                                    style: AppTextStyles.price),
-                                Text('/${p['unit']}',
-                                    style: AppTextStyles.caption),
-                              ]),
-                        ]),
-                        const SizedBox(height: 12),
-                        Row(children: [
-                          _InfoChip('🏭 ${p['brand'] ?? 'N/A'}'),
-                          const SizedBox(width: 8),
-                          _InfoChip('📦 Stock: ${p['stockQuantity']}'),
-                          const SizedBox(width: 8),
-                          _InfoChip('🏬 In-Store Pickup'),
-                        ]),
-                        const SizedBox(height: 20),
-                        const Text('Description',
-                            style: AppTextStyles.headingMD),
-                        const SizedBox(height: 6),
-                        Text(
-                          p['description'] ?? '',
-                          style: AppTextStyles.bodyMD
-                              .copyWith(color: AppColors.textSecondary),
-                        ),
-                        const SizedBox(height: 100),
-                      ])),
-            )),
-          ]),
-          // Bottom add to cart
-          Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: AppColors.surface, boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 12,
-                      offset: const Offset(0, -4))
-                ]),
-                child: SafeArea(
-                    child: Row(children: [
-                  // Quantity Selector
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.primarySurface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primaryBorder),
+
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Details ───────────────────────────
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.border),
+                        boxShadow: AppColors.softShadow,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (category.isNotEmpty)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(color: AppColors.farmerTint, borderRadius: BorderRadius.circular(20)),
+                              child: Text(category, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.farmerAccent)),
+                            ),
+                          Text(name, style: GoogleFonts.spaceGrotesk(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.ink)),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Text(formatRupee(price), style: GoogleFonts.spaceGrotesk(fontSize: 28, fontWeight: FontWeight.w800, color: AppColors.farmerAccent)),
+                              const SizedBox(width: 6),
+                              Text('/ $unit', style: GoogleFonts.inter(fontSize: 14, color: AppColors.muted)),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              _InfoPill(label: 'Sold by', value: supplier),
+                              const SizedBox(width: 10),
+                              _InfoPill(label: 'Stock', value: '$stock units', color: stock > 0 ? AppColors.success : AppColors.danger),
+                            ],
+                          ),
+                          if (description.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            const Divider(color: AppColors.border),
+                            const SizedBox(height: 12),
+                            Text('Description', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.muted)),
+                            const SizedBox(height: 8),
+                            Text(description, style: GoogleFonts.inter(fontSize: 14, color: AppColors.ink, height: 1.6)),
+                          ],
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove, size: 20),
-                          color: AppColors.primary,
-                          onPressed: () {
-                            if (_quantity > 1) {
-                              setState(() => _quantity--);
-                            }
-                          },
-                        ),
-                        Text('$_quantity', style: AppTextStyles.headingMD),
-                        IconButton(
-                          icon: const Icon(Icons.add, size: 20),
-                          color: AppColors.primary,
-                          onPressed: () {
-                            if (_quantity < (p['stockQuantity'] as int? ?? 99)) {
-                              setState(() => _quantity++);
-                            }
-                          },
-                        ),
-                      ],
+
+                    // ── Add to Cart ───────────────────────
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                      child: Column(
+                        children: [
+                          AppButton(
+                            label: 'Add to Cart',
+                            onTap: stock > 0 ? () {
+                              ref.read(cartProvider.notifier).addItem(Map<String, dynamic>.from(product), 1);
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text('Added to cart ✓', style: GoogleFonts.inter(color: Colors.white)),
+                                backgroundColor: AppColors.farmerAccent,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                duration: const Duration(seconds: 1),
+                              ));
+                            } : null,
+                            color: AppColors.farmerAccent,
+                            icon: Icons.add_shopping_cart_outlined,
+                          ),
+                          const SizedBox(height: 10),
+                          AppButton(
+                            label: 'Buy Now',
+                            onTap: stock > 0 ? () {
+                              ref.read(cartProvider.notifier).addItem(Map<String, dynamic>.from(product), 1);
+                              context.push('/farmer/cart');
+                            } : null,
+                            color: AppColors.farmerAccent,
+                            isOutlined: true,
+                            icon: Icons.flash_on_rounded,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                      child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    onPressed: () async {
-                      try {
-                        await ref
-                            .read(cartProvider.notifier)
-                            .addItem(Map<String, dynamic>.from(p), _quantity);
-                            if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text('Reserved $_quantity unit(s) ✅'),
-                                  backgroundColor: AppColors.primary));
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text('Failed: $e'),
-                                  backgroundColor: AppColors.error));
-                        }
-                      }
-                    },
-                    child: const Text('Reserve for Pickup 🏬', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  )),
-                ])),
-              )),
-        ]),
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class _InfoChip extends StatelessWidget {
-  final String text;
-  const _InfoChip(this.text);
+class _InfoPill extends StatelessWidget {
+  final String label, value;
+  final Color? color;
+  const _InfoPill({required this.label, required this.value, this.color});
   @override
   Widget build(BuildContext context) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-          color: AppColors.primarySurface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.primaryBorder)),
-      child: Text(text,
-          style: AppTextStyles.caption.copyWith(color: AppColors.primary)));
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    decoration: BoxDecoration(
+      color: AppColors.background,
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(color: AppColors.border),
+    ),
+    child: RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(text: '$label: ', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+          TextSpan(text: value, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: color ?? AppColors.ink)),
+        ],
+      ),
+    ),
+  );
 }
+

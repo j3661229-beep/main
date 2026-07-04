@@ -176,7 +176,7 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
               border: Border(bottom: BorderSide(color: AppColors.border))),
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            const Text('AI Top Recommendations',
+            Text('AI Top Recommendations',
                 style: AppTextStyles.headingSM),
             TextButton.icon(
                 onPressed: () => setState(() => _recommendations = []),
@@ -326,3 +326,4 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
         ])
       ]);
 }
+

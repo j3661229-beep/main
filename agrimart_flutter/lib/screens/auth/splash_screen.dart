@@ -87,18 +87,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
                   Container(
                     width: 100, height: 100,
                     decoration: BoxDecoration(
-                      color: AppColors.amberLight,
+                      color: AppColors.farmerTint,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: AppColors.amber.withOpacity(0.4), blurRadius: 24, spreadRadius: 4)],
+                      boxShadow: [BoxShadow(color: AppColors.farmerAccent.withValues(alpha: 0.4), blurRadius: 24, spreadRadius: 4)],
                     ),
                     child: const Center(child: Text('🌾', style: TextStyle(fontSize: 52))),
                   ),
                   const SizedBox(height: 24),
                   const Text('AgriMart', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.5)),
                   const SizedBox(height: 8),
-                  Text('शेतकऱ्यांचा विश्वासू साथीदार', style: TextStyle(fontSize: 15, color: Colors.white.withOpacity(0.7), fontWeight: FontWeight.w500)),
+                  Text('शेतकऱ्यांचा विश्वासू साथीदार', style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w500)),
                   const SizedBox(height: 48),
-                  SizedBox(width: 32, height: 32, child: CircularProgressIndicator(color: Colors.white.withOpacity(0.4), strokeWidth: 2)),
+                  SizedBox(width: 32, height: 32, child: CircularProgressIndicator(color: Colors.white.withValues(alpha: 0.4), strokeWidth: 2)),
                 ],
               ),
             ),
@@ -108,3 +108,4 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
     );
   }
 }
+

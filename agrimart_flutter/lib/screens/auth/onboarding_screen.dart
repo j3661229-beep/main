@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_theme.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -32,7 +31,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             final p = _pages[i];
             return Container(
               decoration: BoxDecoration(gradient: LinearGradient(
-                colors: [Color(p['color'] as int), Color(p['color'] as int).withOpacity(0.7)],
+                colors: [Color(p['color'] as int), Color(p['color'] as int).withValues(alpha: 0.7)],
                 begin: Alignment.topCenter, end: Alignment.bottomCenter,
               )),
               child: SafeArea(
@@ -41,12 +40,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   const SizedBox(height: 40),
                   Text(p['title'] as String, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.5)),
                   const SizedBox(height: 4),
-                  Text(p['subtitle'] as String, style: TextStyle(fontSize: 15, color: Colors.white.withOpacity(0.7), fontWeight: FontWeight.w500)),
+                  Text(p['subtitle'] as String, style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w500)),
                   const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Text(p['body'] as String, textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 15, color: Colors.white.withOpacity(0.75), height: 1.5)),
+                      style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.75), height: 1.5)),
                   ),
                 ]),
               ),
@@ -61,7 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               width: _page == i ? 24 : 8, height: 8,
               margin: const EdgeInsets.symmetric(horizontal: 3),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(_page == i ? 1 : 0.4),
+                color: Colors.white.withValues(alpha: _page == i ? 1 : 0.4),
                 borderRadius: BorderRadius.circular(4),
               ),
             )
@@ -86,3 +85,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+
+
+

@@ -1,228 +1,200 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/services/api_service.dart';
-import '../../data/providers/app_providers.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/widgets/app_fallback.dart';
-import '../../core/widgets/app_shimmer.dart';
-import '../../core/widgets/app_snackbar.dart';
-import '../../core/widgets/app_button.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/shared_widgets.dart';
+import '../../../data/providers/app_providers.dart';
 
-class CartScreen extends ConsumerStatefulWidget {
+class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
 
   @override
-  ConsumerState<CartScreen> createState() => _CartScreenState();
-}
-
-class _CartScreenState extends ConsumerState<CartScreen> {
-  bool _isCheckingOut = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final cart = ref.watch(cartProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cartAsync = ref.watch(cartProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-          title: const Text('🛒 My Cart', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)), 
-          backgroundColor: AppColors.primary,
-          elevation: 0,
-          centerTitle: true),
-      body: cart.when(
-        loading: () => const AppShimmerList(itemCount: 5),
-        error: (e, _) => AppErrorState(
-          message: e.toString(),
-          onRetry: () => ref.read(cartProvider.notifier).load(),
-        ),
-        data: (data) {
-          final items = data['items'] as List? ?? [];
+        backgroundColor: AppColors.background,
+        title: Text('My Cart', style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700)),
+        leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
+      ),
+      body: cartAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.farmerAccent)),
+        error: (e, _) => EmptyState(emoji: '⚠️', title: 'Could not load cart', subtitle: e.toString()),
+        data: (cart) {
+          final items = (cart['items'] as List?) ?? [];
           if (items.isEmpty) {
-            return RefreshIndicator(
-              color: AppColors.primary,
-              onRefresh: () => ref.read(cartProvider.notifier).load(),
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.65,
-                    child: AppEmptyState(
-                      icon: '🛒',
-                      title: 'Your cart is empty',
-                      subtitle:
-                          'Browse the shop and add seeds, fertilizer, and more.',
-                      actionLabel: 'Browse shop',
-                      onAction: () => context.go('/farmer/shop'),
-                    ),
-                  ),
-                ],
-              ),
-            );
+            return const EmptyState(emoji: '🛒', title: 'Cart is empty', subtitle: 'Add items from the market to continue');
           }
 
-          final total = items.fold<double>(
-              0,
-              (sum, item) =>
-                  sum +
-                  ((item['product']?['price'] as num? ?? 0) *
-                      (item['quantity'] as num? ?? 1)));
+          // Calculate total
+          double total = 0;
+          for (final item in items) {
+            final price = (item['product']?['price'] as num?) ?? (item['price'] as num?) ?? 0;
+            final qty   = (item['quantity'] as num?) ?? 0;
+            total += price * qty;
+          }
 
-          return Column(children: [
-            Expanded(
-                child: RefreshIndicator(
-              color: AppColors.primary,
-              onRefresh: () => ref.read(cartProvider.notifier).load(),
-              child: ListView.builder(
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: BouncingScrollPhysics(),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              itemCount: items.length,
-              itemBuilder: (ctx, i) {
-                final item = items[i] as Map;
-                final product = item['product'] as Map? ?? {};
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4)
-                        )
-                      ],
-                      border: Border.all(color: AppColors.border.withValues(alpha: 0.5))),
-                  child: Row(children: [
-                    Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          color: AppColors.primarySurface,
-                          borderRadius: BorderRadius.circular(16)
-                        ),
-                        child: const Center(
-                            child:
-                                Text('🌿', style: TextStyle(fontSize: 32)))),
-                    const SizedBox(width: 14),
-                    Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                          Text(product['name'] ?? '',
-                              style: AppTextStyles.headingSM.copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
-                          const SizedBox(height: 4),
-                          Text('₹${product['price']} /${product['unit']}',
-                              style: AppTextStyles.priceSmall
-                                  .copyWith(fontSize: 13, color: AppColors.textSecondary)),
-                        ])),
-                    const SizedBox(width: 8),
-                    // Qty control
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                        _QtyBtn(
-                            icon: Icons.remove,
-                            onTap: () {
-                              HapticFeedback.selectionClick();
-                              final currentQty = (item['quantity'] as num).toInt();
-                              if (currentQty <= 1) {
-                                ref
-                                    .read(cartProvider.notifier)
-                                    .removeItem(item['id']);
-                              } else {
-                                ref.read(cartProvider.notifier).updateItem(
-                                    item['id'], currentQty - 1);
-                              }
-                            }),
-                        Container(
-                          width: 32,
-                          alignment: Alignment.center,
-                          child: Text('${item['quantity']}',
-                                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
-                        ),
-                        _QtyBtn(
-                            icon: Icons.add,
-                            onTap: () {
-                              HapticFeedback.selectionClick();
-                              ref.read(cartProvider.notifier).updateItem(
-                                  item['id'],
-                                  (item['quantity'] as num).toInt() + 1);
-                            }),
-                      ]),
-                    ),
-                  ]),
-                );
-              },
-            ),
-            )),
-
-            // Checkout bar
-            Container(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
-              decoration: BoxDecoration(
-                color: Colors.white, 
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-                boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 20,
-                    offset: const Offset(0, -10))
-              ]),
-              child: SafeArea(
-                  child: Column(children: [
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Total to Pay', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-                      Text('₹${total.toStringAsFixed(0)}',
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5, color: AppColors.primaryDark)),
-                    ]),
-                const SizedBox(height: 20),
-                AppButton(
-                  label: 'Proceed to Checkout →',
-                  isLoading: _isCheckingOut,
-                  onPressed: () {
-                    context.push('/farmer/checkout');
-                  },
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (_, i) => _CartItem(item: items[i]),
                 ),
-              ])),
-            ),
-          ]);
+              ),
+
+              // ── Summary + Checkout ─────────────────────────
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  boxShadow: AppColors.deepShadow,
+                ),
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Subtotal (${items.length} items)', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
+                          Text(formatRupee(total), style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink)),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Delivery', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
+                          Text(total >= 500 ? 'FREE' : formatRupee(50), style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.success)),
+                        ],
+                      ),
+                      const Divider(height: 20, color: AppColors.border),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Total', style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink)),
+                          Text(formatRupee(total >= 500 ? total : total + 50), style: GoogleFonts.spaceGrotesk(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.farmerAccent)),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      AppButton(
+                        label: 'Proceed to Pay',
+                        onTap: () => context.push('/farmer/payment'),
+                        color: AppColors.farmerAccent,
+                        icon: Icons.payment_outlined,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
         },
       ),
     );
   }
 }
 
-class _QtyBtn extends StatelessWidget {
+class _CartItem extends ConsumerWidget {
+  final Map item;
+  const _CartItem({required this.item});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final product = item['product'] as Map? ?? {};
+    final name    = product['name'] ?? item['productName'] ?? 'Product';
+    final imageUrl = product['imageUrl'] ?? product['images']?[0];
+    final price   = (product['price'] as num?) ?? (item['price'] as num?) ?? 0;
+    final qty     = (item['quantity'] as num?) ?? 1;
+    final itemId  = item['id'] as String? ?? '';
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
+        boxShadow: AppColors.softShadow,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            // Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: imageUrl != null
+                  ? CachedNetworkImage(imageUrl: imageUrl, width: 70, height: 70, fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) => Container(width: 70, height: 70, color: AppColors.farmerTint, child: const Center(child: Text('🌱', style: TextStyle(fontSize: 28)))))
+                  : Container(width: 70, height: 70, color: AppColors.farmerTint, child: const Center(child: Text('🌱', style: TextStyle(fontSize: 28)))),
+            ),
+            const SizedBox(width: 12),
+            // Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.ink), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 4),
+                  Text(formatRupee(price), style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.farmerAccent)),
+                ],
+              ),
+            ),
+            // Qty stepper
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.border),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  _StepBtn(
+                    icon: Icons.remove,
+                    onTap: () {
+                      if (qty <= 1) {
+                        ref.read(cartProvider.notifier).removeItem(itemId);
+                      } else {
+                        ref.read(cartProvider.notifier).updateItem(itemId, qty.toInt() - 1);
+                      }
+                    },
+                  ),
+                  Container(
+                    width: 32,
+                    alignment: Alignment.center,
+                    child: Text('$qty', style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink)),
+                  ),
+                  _StepBtn(
+                    icon: Icons.add,
+                    onTap: () => ref.read(cartProvider.notifier).updateItem(itemId, qty.toInt() + 1),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StepBtn extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-  const _QtyBtn({required this.icon, required this.onTap});
+  const _StepBtn({required this.icon, required this.onTap});
   @override
-  Widget build(BuildContext context) => Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(8),
-          child: SizedBox(
-            width: 40,
-            height: 40,
-            child: Icon(icon, size: 18, color: AppColors.primaryDark),
-          ),
-        ),
-      );
+  Widget build(BuildContext context) => GestureDetector(
+    onTap: onTap,
+    child: Container(
+      width: 32, height: 32,
+      alignment: Alignment.center,
+      child: Icon(icon, size: 18, color: AppColors.farmerAccent),
+    ),
+  );
 }
+

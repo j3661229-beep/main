@@ -116,7 +116,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     if (user == null) return;
 
     final isFarmer = user.isFarmer;
-    final isDealer = user.isDealer;
+    // ignore: unused_local_variable
     
     // We append the map link directly to the address text to avoid Prisma migration for now
     final supplierAddress = '${_addressCtrl.text.trim()}${_mapLinkCtrl.text.isNotEmpty ? ' | MAP: ${_mapLinkCtrl.text.trim()}' : ''}';
@@ -175,7 +175,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           child: ListView(
             padding: const EdgeInsets.all(24),
             children: [
-              const Text('Welcome to AgriMart! 🎉', style: AppTextStyles.headingXL),
+              Text('Welcome to AgriMart! 🎉', style: AppTextStyles.headingXL),
               const SizedBox(height: 8),
               Text(
                 isFarmer 
@@ -195,9 +195,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 ),
                 child: Column(
                   children: [
-                    const Text('📍 High-Accuracy Location', style: AppTextStyles.headingSM),
+                    Text('📍 High-Accuracy Location', style: AppTextStyles.headingSM),
                     const SizedBox(height: 4),
-                    const Text('Auto-fill your address using GPS', style: AppTextStyles.bodyXS),
+                    Text('Auto-fill your address using GPS', style: AppTextStyles.bodyXS),
                     const SizedBox(height: 16),
                     SizedBox(
                       width: double.infinity,
@@ -224,7 +224,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               _SetupCard(
                 title: '👤 Personal Identity',
                 children: [
-                  const Text('Your Full Name', style: AppTextStyles.labelLG),
+                  Text('Your Full Name', style: AppTextStyles.labelLG),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _nameCtrl,
@@ -241,7 +241,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 title: isFarmer ? '🌾 Farm Details' : (user.isDealer ? '🤝 Agency Details' : '🏪 Shop Details'),
                 children: [
                   if (isFarmer) ...[
-                    const Text('Village / Town', style: AppTextStyles.labelLG),
+                    Text('Village / Town', style: AppTextStyles.labelLG),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _villageCtrl,
@@ -250,7 +250,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    const Text('District', style: AppTextStyles.labelLG),
+                    Text('District', style: AppTextStyles.labelLG),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _districtCtrl,
@@ -259,7 +259,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    const Text('State', style: AppTextStyles.labelLG),
+                    Text('State', style: AppTextStyles.labelLG),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _stateCtrl,
@@ -268,7 +268,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    const Text('Farm Size (Acres)', style: AppTextStyles.labelLG),
+                    Text('Farm Size (Acres)', style: AppTextStyles.labelLG),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _farmSizeCtrl,
@@ -288,7 +288,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    const Text('District', style: AppTextStyles.labelLG),
+                    Text('District', style: AppTextStyles.labelLG),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _districtCtrl,
@@ -297,7 +297,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    const Text('State', style: AppTextStyles.labelLG),
+                    Text('State', style: AppTextStyles.labelLG),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _stateCtrl,
@@ -316,7 +316,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    const Text('Google Maps Link (Recommended)', style: AppTextStyles.labelLG),
+                    Text('Google Maps Link (Recommended)', style: AppTextStyles.labelLG),
                     const SizedBox(height: 4),
                     const Text('Help farmers navigate directly to your shop.', style: TextStyle(fontSize: 12, color: AppColors.textTertiary)),
                     const SizedBox(height: 8),
@@ -376,3 +376,4 @@ class _SetupCard extends StatelessWidget {
     );
   }
 }
+

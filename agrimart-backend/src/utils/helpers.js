@@ -1,10 +1,7 @@
-const crypto = require('crypto');
-
 /**
  * Calculate distance between two lat/lng points (Haversine formula)
  * Returns distance in km
- */
-const haversineDistance = (lat1, lng1, lat2, lng2) => {
+ */const haversineDistance = (lat1, lng1, lat2, lng2) => {
     const R = 6371;
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLng = ((lng2 - lng1) * Math.PI) / 180;
@@ -33,28 +30,6 @@ const formatPhone = (phone) => {
 };
 
 /**
- * Verify Razorpay HMAC signature
- */
-const verifyRazorpaySignature = (orderId, paymentId, signature) => {
-    const generated = crypto
-        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || 'mock_secret')
-        .update(`${orderId}|${paymentId}`)
-        .digest('hex');
-    return generated === signature;
-};
-
-/**
- * Verify Razorpay webhook signature
- */
-const verifyWebhookSignature = (body, signature) => {
-    const generated = crypto
-        .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET || 'mock_webhook_secret')
-        .update(body)
-        .digest('hex');
-    return generated === signature;
-};
-
-/**
  * Paginate query
  */
 const getPagination = (query) => {
@@ -63,11 +38,6 @@ const getPagination = (query) => {
     const skip = (page - 1) * limit;
     return { page, limit, skip };
 };
-
-/**
- * Convert amount to paise (Razorpay format)
- */
-const toPaise = (amount) => Math.round(amount * 100);
 
 /**
  * Generate order ID prefix
@@ -82,9 +52,6 @@ module.exports = {
     haversineDistance,
     generateOTP,
     formatPhone,
-    verifyRazorpaySignature,
-    verifyWebhookSignature,
     getPagination,
-    toPaise,
     generateOrderId,
 };

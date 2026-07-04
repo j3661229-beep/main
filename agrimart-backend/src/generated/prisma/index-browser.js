@@ -258,8 +258,6 @@ exports.Prisma.OrderScalarFieldEnum = {
   totalAmount: 'totalAmount',
   status: 'status',
   paymentStatus: 'paymentStatus',
-  paymentId: 'paymentId',
-  razorpayOrderId: 'razorpayOrderId',
   deliveryAddress: 'deliveryAddress',
   deliveryLat: 'deliveryLat',
   deliveryLng: 'deliveryLng',
@@ -285,8 +283,6 @@ exports.Prisma.OrderItemScalarFieldEnum = {
 exports.Prisma.PaymentScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
-  razorpayPaymentId: 'razorpayPaymentId',
-  razorpayOrderId: 'razorpayOrderId',
   amount: 'amount',
   status: 'status',
   method: 'method',
@@ -398,6 +394,19 @@ exports.Prisma.TradeBookingScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.MandiNewsScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  content: 'content',
+  source: 'source',
+  imageUrl: 'imageUrl',
+  state: 'state',
+  district: 'district',
+  crop: 'crop',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -489,7 +498,8 @@ exports.Prisma.ModelName = {
   GovernmentScheme: 'GovernmentScheme',
   FCMToken: 'FCMToken',
   DealerCropRate: 'DealerCropRate',
-  TradeBooking: 'TradeBooking'
+  TradeBooking: 'TradeBooking',
+  MandiNews: 'MandiNews'
 };
 
 /**

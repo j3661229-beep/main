@@ -46,7 +46,7 @@ class OrdersScreen extends ConsumerWidget {
                       ? AppColors.success
                       : status == 'CANCELLED'
                           ? AppColors.error
-                          : AppColors.amber;
+                          : AppColors.warning;
                   return GestureDetector(
                     onTap: () => context.push('/farmer/orders/${o['id']}/tracking'),
                     child: Container(
@@ -139,3 +139,4 @@ class OrdersScreen extends ConsumerWidget {
     );
   }
 }
+

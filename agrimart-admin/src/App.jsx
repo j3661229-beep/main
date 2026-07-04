@@ -9,6 +9,7 @@ import Dealers from './pages/Dealers';
 import Products from './pages/Products';
 import Orders from './pages/Orders';
 import MandiPrices from './pages/MandiPrices';
+import MandiNews from './pages/MandiNews';
 import Schemes from './pages/Schemes';
 import Notifications from './pages/Notifications';
 import Analytics from './pages/Analytics';
@@ -38,11 +39,13 @@ export default function App() {
           <Route path="products" element={<Products />} />
           <Route path="orders" element={<Orders />} />
           <Route path="mandi" element={<MandiPrices />} />
+          <Route path="news" element={<MandiNews />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="schemes" element={<Schemes />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings" element={<Settings />} />
         </Route>
+
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

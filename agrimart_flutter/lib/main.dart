@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
-import 'core/theme/app_colors.dart';
 import 'router/app_router.dart';
 
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'firebase_options.dart';
 import 'core/storage/offline_cache.dart';
 import 'core/widgets/error_boundary.dart';
@@ -24,24 +21,12 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Error handling
-  setUpErrorHandling();
-
-  // Pass all uncaught errors from the framework to Crashlytics.
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-
   // 2. Initialize Hive for Caching
   await Hive.initFlutter();
   await Hive.openBox('app_cache');
   await OfflineCache.init();
 
-  // 3. Initialize OneSignal
-  // Note: Using project-specific App ID
-  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-  OneSignal.initialize("35bc4b22-b760-4cbd-a426-0de70bf52d11");
-  OneSignal.Notifications.requestPermission(true);
-
-  // 4. Lock to portrait
+  // 3. Lock to portrait
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -50,7 +35,7 @@ void main() async {
   // Status bar style
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
+    statusBarIconBrightness: Brightness.dark,
   ));
 
   runApp(
@@ -96,3 +81,4 @@ class AgriMartApp extends ConsumerWidget {
     );
   }
 }
+

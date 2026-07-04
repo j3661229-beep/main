@@ -108,6 +108,11 @@ export type DealerCropRate = $Result.DefaultSelection<Prisma.$DealerCropRatePayl
  * 
  */
 export type TradeBooking = $Result.DefaultSelection<Prisma.$TradeBookingPayload>
+/**
+ * Model MandiNews
+ * 
+ */
+export type MandiNews = $Result.DefaultSelection<Prisma.$MandiNewsPayload>
 
 /**
  * Enums
@@ -515,6 +520,16 @@ export class PrismaClient<
     * ```
     */
   get tradeBooking(): Prisma.TradeBookingDelegate<ExtArgs>;
+
+  /**
+   * `prisma.mandiNews`: Exposes CRUD operations for the **MandiNews** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MandiNews
+    * const mandiNews = await prisma.mandiNews.findMany()
+    * ```
+    */
+  get mandiNews(): Prisma.MandiNewsDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -974,7 +989,8 @@ export namespace Prisma {
     GovernmentScheme: 'GovernmentScheme',
     FCMToken: 'FCMToken',
     DealerCropRate: 'DealerCropRate',
-    TradeBooking: 'TradeBooking'
+    TradeBooking: 'TradeBooking',
+    MandiNews: 'MandiNews'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -990,7 +1006,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "session" | "farmer" | "supplier" | "dealer" | "product" | "cart" | "cartItem" | "order" | "orderItem" | "payment" | "review" | "soilReport" | "priceAlert" | "notification" | "governmentScheme" | "fCMToken" | "dealerCropRate" | "tradeBooking"
+      modelProps: "user" | "session" | "farmer" | "supplier" | "dealer" | "product" | "cart" | "cartItem" | "order" | "orderItem" | "payment" | "review" | "soilReport" | "priceAlert" | "notification" | "governmentScheme" | "fCMToken" | "dealerCropRate" | "tradeBooking" | "mandiNews"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2321,6 +2337,76 @@ export namespace Prisma {
           count: {
             args: Prisma.TradeBookingCountArgs<ExtArgs>
             result: $Utils.Optional<TradeBookingCountAggregateOutputType> | number
+          }
+        }
+      }
+      MandiNews: {
+        payload: Prisma.$MandiNewsPayload<ExtArgs>
+        fields: Prisma.MandiNewsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MandiNewsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MandiNewsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MandiNewsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MandiNewsPayload>
+          }
+          findFirst: {
+            args: Prisma.MandiNewsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MandiNewsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MandiNewsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MandiNewsPayload>
+          }
+          findMany: {
+            args: Prisma.MandiNewsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MandiNewsPayload>[]
+          }
+          create: {
+            args: Prisma.MandiNewsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MandiNewsPayload>
+          }
+          createMany: {
+            args: Prisma.MandiNewsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MandiNewsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MandiNewsPayload>[]
+          }
+          delete: {
+            args: Prisma.MandiNewsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MandiNewsPayload>
+          }
+          update: {
+            args: Prisma.MandiNewsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MandiNewsPayload>
+          }
+          deleteMany: {
+            args: Prisma.MandiNewsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MandiNewsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.MandiNewsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MandiNewsPayload>
+          }
+          aggregate: {
+            args: Prisma.MandiNewsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMandiNews>
+          }
+          groupBy: {
+            args: Prisma.MandiNewsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MandiNewsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MandiNewsCountArgs<ExtArgs>
+            result: $Utils.Optional<MandiNewsCountAggregateOutputType> | number
           }
         }
       }
@@ -11676,8 +11762,6 @@ export namespace Prisma {
     totalAmount: number | null
     status: $Enums.OrderStatus | null
     paymentStatus: $Enums.PaymentStatus | null
-    paymentId: string | null
-    razorpayOrderId: string | null
     deliveryAddress: string | null
     deliveryLat: number | null
     deliveryLng: number | null
@@ -11695,8 +11779,6 @@ export namespace Prisma {
     totalAmount: number | null
     status: $Enums.OrderStatus | null
     paymentStatus: $Enums.PaymentStatus | null
-    paymentId: string | null
-    razorpayOrderId: string | null
     deliveryAddress: string | null
     deliveryLat: number | null
     deliveryLng: number | null
@@ -11714,8 +11796,6 @@ export namespace Prisma {
     totalAmount: number
     status: number
     paymentStatus: number
-    paymentId: number
-    razorpayOrderId: number
     deliveryAddress: number
     deliveryLat: number
     deliveryLng: number
@@ -11747,8 +11827,6 @@ export namespace Prisma {
     totalAmount?: true
     status?: true
     paymentStatus?: true
-    paymentId?: true
-    razorpayOrderId?: true
     deliveryAddress?: true
     deliveryLat?: true
     deliveryLng?: true
@@ -11766,8 +11844,6 @@ export namespace Prisma {
     totalAmount?: true
     status?: true
     paymentStatus?: true
-    paymentId?: true
-    razorpayOrderId?: true
     deliveryAddress?: true
     deliveryLat?: true
     deliveryLng?: true
@@ -11785,8 +11861,6 @@ export namespace Prisma {
     totalAmount?: true
     status?: true
     paymentStatus?: true
-    paymentId?: true
-    razorpayOrderId?: true
     deliveryAddress?: true
     deliveryLat?: true
     deliveryLng?: true
@@ -11891,8 +11965,6 @@ export namespace Prisma {
     totalAmount: number
     status: $Enums.OrderStatus
     paymentStatus: $Enums.PaymentStatus
-    paymentId: string | null
-    razorpayOrderId: string | null
     deliveryAddress: string
     deliveryLat: number | null
     deliveryLng: number | null
@@ -11929,8 +12001,6 @@ export namespace Prisma {
     totalAmount?: boolean
     status?: boolean
     paymentStatus?: boolean
-    paymentId?: boolean
-    razorpayOrderId?: boolean
     deliveryAddress?: boolean
     deliveryLat?: boolean
     deliveryLng?: boolean
@@ -11952,8 +12022,6 @@ export namespace Prisma {
     totalAmount?: boolean
     status?: boolean
     paymentStatus?: boolean
-    paymentId?: boolean
-    razorpayOrderId?: boolean
     deliveryAddress?: boolean
     deliveryLat?: boolean
     deliveryLng?: boolean
@@ -11972,8 +12040,6 @@ export namespace Prisma {
     totalAmount?: boolean
     status?: boolean
     paymentStatus?: boolean
-    paymentId?: boolean
-    razorpayOrderId?: boolean
     deliveryAddress?: boolean
     deliveryLat?: boolean
     deliveryLng?: boolean
@@ -12008,8 +12074,6 @@ export namespace Prisma {
       totalAmount: number
       status: $Enums.OrderStatus
       paymentStatus: $Enums.PaymentStatus
-      paymentId: string | null
-      razorpayOrderId: string | null
       deliveryAddress: string
       deliveryLat: number | null
       deliveryLng: number | null
@@ -12420,8 +12484,6 @@ export namespace Prisma {
     readonly totalAmount: FieldRef<"Order", 'Float'>
     readonly status: FieldRef<"Order", 'OrderStatus'>
     readonly paymentStatus: FieldRef<"Order", 'PaymentStatus'>
-    readonly paymentId: FieldRef<"Order", 'String'>
-    readonly razorpayOrderId: FieldRef<"Order", 'String'>
     readonly deliveryAddress: FieldRef<"Order", 'String'>
     readonly deliveryLat: FieldRef<"Order", 'Float'>
     readonly deliveryLng: FieldRef<"Order", 'Float'>
@@ -13861,8 +13923,6 @@ export namespace Prisma {
   export type PaymentMinAggregateOutputType = {
     id: string | null
     orderId: string | null
-    razorpayPaymentId: string | null
-    razorpayOrderId: string | null
     amount: number | null
     status: $Enums.PaymentStatus | null
     method: string | null
@@ -13877,8 +13937,6 @@ export namespace Prisma {
   export type PaymentMaxAggregateOutputType = {
     id: string | null
     orderId: string | null
-    razorpayPaymentId: string | null
-    razorpayOrderId: string | null
     amount: number | null
     status: $Enums.PaymentStatus | null
     method: string | null
@@ -13893,8 +13951,6 @@ export namespace Prisma {
   export type PaymentCountAggregateOutputType = {
     id: number
     orderId: number
-    razorpayPaymentId: number
-    razorpayOrderId: number
     amount: number
     status: number
     method: number
@@ -13921,8 +13977,6 @@ export namespace Prisma {
   export type PaymentMinAggregateInputType = {
     id?: true
     orderId?: true
-    razorpayPaymentId?: true
-    razorpayOrderId?: true
     amount?: true
     status?: true
     method?: true
@@ -13937,8 +13991,6 @@ export namespace Prisma {
   export type PaymentMaxAggregateInputType = {
     id?: true
     orderId?: true
-    razorpayPaymentId?: true
-    razorpayOrderId?: true
     amount?: true
     status?: true
     method?: true
@@ -13953,8 +14005,6 @@ export namespace Prisma {
   export type PaymentCountAggregateInputType = {
     id?: true
     orderId?: true
-    razorpayPaymentId?: true
-    razorpayOrderId?: true
     amount?: true
     status?: true
     method?: true
@@ -14056,8 +14106,6 @@ export namespace Prisma {
   export type PaymentGroupByOutputType = {
     id: string
     orderId: string
-    razorpayPaymentId: string | null
-    razorpayOrderId: string | null
     amount: number
     status: $Enums.PaymentStatus
     method: string | null
@@ -14091,8 +14139,6 @@ export namespace Prisma {
   export type PaymentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     orderId?: boolean
-    razorpayPaymentId?: boolean
-    razorpayOrderId?: boolean
     amount?: boolean
     status?: boolean
     method?: boolean
@@ -14108,8 +14154,6 @@ export namespace Prisma {
   export type PaymentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     orderId?: boolean
-    razorpayPaymentId?: boolean
-    razorpayOrderId?: boolean
     amount?: boolean
     status?: boolean
     method?: boolean
@@ -14125,8 +14169,6 @@ export namespace Prisma {
   export type PaymentSelectScalar = {
     id?: boolean
     orderId?: boolean
-    razorpayPaymentId?: boolean
-    razorpayOrderId?: boolean
     amount?: boolean
     status?: boolean
     method?: boolean
@@ -14153,8 +14195,6 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       orderId: string
-      razorpayPaymentId: string | null
-      razorpayOrderId: string | null
       amount: number
       status: $Enums.PaymentStatus
       method: string | null
@@ -14560,8 +14600,6 @@ export namespace Prisma {
   interface PaymentFieldRefs {
     readonly id: FieldRef<"Payment", 'String'>
     readonly orderId: FieldRef<"Payment", 'String'>
-    readonly razorpayPaymentId: FieldRef<"Payment", 'String'>
-    readonly razorpayOrderId: FieldRef<"Payment", 'String'>
     readonly amount: FieldRef<"Payment", 'Float'>
     readonly status: FieldRef<"Payment", 'PaymentStatus'>
     readonly method: FieldRef<"Payment", 'String'>
@@ -22902,6 +22940,944 @@ export namespace Prisma {
 
 
   /**
+   * Model MandiNews
+   */
+
+  export type AggregateMandiNews = {
+    _count: MandiNewsCountAggregateOutputType | null
+    _min: MandiNewsMinAggregateOutputType | null
+    _max: MandiNewsMaxAggregateOutputType | null
+  }
+
+  export type MandiNewsMinAggregateOutputType = {
+    id: string | null
+    title: string | null
+    content: string | null
+    source: string | null
+    imageUrl: string | null
+    state: string | null
+    district: string | null
+    crop: string | null
+    publishedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type MandiNewsMaxAggregateOutputType = {
+    id: string | null
+    title: string | null
+    content: string | null
+    source: string | null
+    imageUrl: string | null
+    state: string | null
+    district: string | null
+    crop: string | null
+    publishedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type MandiNewsCountAggregateOutputType = {
+    id: number
+    title: number
+    content: number
+    source: number
+    imageUrl: number
+    state: number
+    district: number
+    crop: number
+    publishedAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type MandiNewsMinAggregateInputType = {
+    id?: true
+    title?: true
+    content?: true
+    source?: true
+    imageUrl?: true
+    state?: true
+    district?: true
+    crop?: true
+    publishedAt?: true
+    createdAt?: true
+  }
+
+  export type MandiNewsMaxAggregateInputType = {
+    id?: true
+    title?: true
+    content?: true
+    source?: true
+    imageUrl?: true
+    state?: true
+    district?: true
+    crop?: true
+    publishedAt?: true
+    createdAt?: true
+  }
+
+  export type MandiNewsCountAggregateInputType = {
+    id?: true
+    title?: true
+    content?: true
+    source?: true
+    imageUrl?: true
+    state?: true
+    district?: true
+    crop?: true
+    publishedAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type MandiNewsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MandiNews to aggregate.
+     */
+    where?: MandiNewsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MandiNews to fetch.
+     */
+    orderBy?: MandiNewsOrderByWithRelationInput | MandiNewsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MandiNewsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MandiNews from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MandiNews.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MandiNews
+    **/
+    _count?: true | MandiNewsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MandiNewsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MandiNewsMaxAggregateInputType
+  }
+
+  export type GetMandiNewsAggregateType<T extends MandiNewsAggregateArgs> = {
+        [P in keyof T & keyof AggregateMandiNews]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMandiNews[P]>
+      : GetScalarType<T[P], AggregateMandiNews[P]>
+  }
+
+
+
+
+  export type MandiNewsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MandiNewsWhereInput
+    orderBy?: MandiNewsOrderByWithAggregationInput | MandiNewsOrderByWithAggregationInput[]
+    by: MandiNewsScalarFieldEnum[] | MandiNewsScalarFieldEnum
+    having?: MandiNewsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MandiNewsCountAggregateInputType | true
+    _min?: MandiNewsMinAggregateInputType
+    _max?: MandiNewsMaxAggregateInputType
+  }
+
+  export type MandiNewsGroupByOutputType = {
+    id: string
+    title: string
+    content: string
+    source: string | null
+    imageUrl: string | null
+    state: string | null
+    district: string | null
+    crop: string | null
+    publishedAt: Date
+    createdAt: Date
+    _count: MandiNewsCountAggregateOutputType | null
+    _min: MandiNewsMinAggregateOutputType | null
+    _max: MandiNewsMaxAggregateOutputType | null
+  }
+
+  type GetMandiNewsGroupByPayload<T extends MandiNewsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MandiNewsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MandiNewsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MandiNewsGroupByOutputType[P]>
+            : GetScalarType<T[P], MandiNewsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MandiNewsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    title?: boolean
+    content?: boolean
+    source?: boolean
+    imageUrl?: boolean
+    state?: boolean
+    district?: boolean
+    crop?: boolean
+    publishedAt?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["mandiNews"]>
+
+  export type MandiNewsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    title?: boolean
+    content?: boolean
+    source?: boolean
+    imageUrl?: boolean
+    state?: boolean
+    district?: boolean
+    crop?: boolean
+    publishedAt?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["mandiNews"]>
+
+  export type MandiNewsSelectScalar = {
+    id?: boolean
+    title?: boolean
+    content?: boolean
+    source?: boolean
+    imageUrl?: boolean
+    state?: boolean
+    district?: boolean
+    crop?: boolean
+    publishedAt?: boolean
+    createdAt?: boolean
+  }
+
+
+  export type $MandiNewsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MandiNews"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      title: string
+      content: string
+      source: string | null
+      imageUrl: string | null
+      state: string | null
+      district: string | null
+      crop: string | null
+      publishedAt: Date
+      createdAt: Date
+    }, ExtArgs["result"]["mandiNews"]>
+    composites: {}
+  }
+
+  type MandiNewsGetPayload<S extends boolean | null | undefined | MandiNewsDefaultArgs> = $Result.GetResult<Prisma.$MandiNewsPayload, S>
+
+  type MandiNewsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<MandiNewsFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: MandiNewsCountAggregateInputType | true
+    }
+
+  export interface MandiNewsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MandiNews'], meta: { name: 'MandiNews' } }
+    /**
+     * Find zero or one MandiNews that matches the filter.
+     * @param {MandiNewsFindUniqueArgs} args - Arguments to find a MandiNews
+     * @example
+     * // Get one MandiNews
+     * const mandiNews = await prisma.mandiNews.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MandiNewsFindUniqueArgs>(args: SelectSubset<T, MandiNewsFindUniqueArgs<ExtArgs>>): Prisma__MandiNewsClient<$Result.GetResult<Prisma.$MandiNewsPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one MandiNews that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {MandiNewsFindUniqueOrThrowArgs} args - Arguments to find a MandiNews
+     * @example
+     * // Get one MandiNews
+     * const mandiNews = await prisma.mandiNews.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MandiNewsFindUniqueOrThrowArgs>(args: SelectSubset<T, MandiNewsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MandiNewsClient<$Result.GetResult<Prisma.$MandiNewsPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first MandiNews that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MandiNewsFindFirstArgs} args - Arguments to find a MandiNews
+     * @example
+     * // Get one MandiNews
+     * const mandiNews = await prisma.mandiNews.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MandiNewsFindFirstArgs>(args?: SelectSubset<T, MandiNewsFindFirstArgs<ExtArgs>>): Prisma__MandiNewsClient<$Result.GetResult<Prisma.$MandiNewsPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first MandiNews that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MandiNewsFindFirstOrThrowArgs} args - Arguments to find a MandiNews
+     * @example
+     * // Get one MandiNews
+     * const mandiNews = await prisma.mandiNews.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MandiNewsFindFirstOrThrowArgs>(args?: SelectSubset<T, MandiNewsFindFirstOrThrowArgs<ExtArgs>>): Prisma__MandiNewsClient<$Result.GetResult<Prisma.$MandiNewsPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more MandiNews that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MandiNewsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MandiNews
+     * const mandiNews = await prisma.mandiNews.findMany()
+     * 
+     * // Get first 10 MandiNews
+     * const mandiNews = await prisma.mandiNews.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mandiNewsWithIdOnly = await prisma.mandiNews.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MandiNewsFindManyArgs>(args?: SelectSubset<T, MandiNewsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MandiNewsPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a MandiNews.
+     * @param {MandiNewsCreateArgs} args - Arguments to create a MandiNews.
+     * @example
+     * // Create one MandiNews
+     * const MandiNews = await prisma.mandiNews.create({
+     *   data: {
+     *     // ... data to create a MandiNews
+     *   }
+     * })
+     * 
+     */
+    create<T extends MandiNewsCreateArgs>(args: SelectSubset<T, MandiNewsCreateArgs<ExtArgs>>): Prisma__MandiNewsClient<$Result.GetResult<Prisma.$MandiNewsPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many MandiNews.
+     * @param {MandiNewsCreateManyArgs} args - Arguments to create many MandiNews.
+     * @example
+     * // Create many MandiNews
+     * const mandiNews = await prisma.mandiNews.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MandiNewsCreateManyArgs>(args?: SelectSubset<T, MandiNewsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MandiNews and returns the data saved in the database.
+     * @param {MandiNewsCreateManyAndReturnArgs} args - Arguments to create many MandiNews.
+     * @example
+     * // Create many MandiNews
+     * const mandiNews = await prisma.mandiNews.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MandiNews and only return the `id`
+     * const mandiNewsWithIdOnly = await prisma.mandiNews.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MandiNewsCreateManyAndReturnArgs>(args?: SelectSubset<T, MandiNewsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MandiNewsPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a MandiNews.
+     * @param {MandiNewsDeleteArgs} args - Arguments to delete one MandiNews.
+     * @example
+     * // Delete one MandiNews
+     * const MandiNews = await prisma.mandiNews.delete({
+     *   where: {
+     *     // ... filter to delete one MandiNews
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MandiNewsDeleteArgs>(args: SelectSubset<T, MandiNewsDeleteArgs<ExtArgs>>): Prisma__MandiNewsClient<$Result.GetResult<Prisma.$MandiNewsPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one MandiNews.
+     * @param {MandiNewsUpdateArgs} args - Arguments to update one MandiNews.
+     * @example
+     * // Update one MandiNews
+     * const mandiNews = await prisma.mandiNews.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MandiNewsUpdateArgs>(args: SelectSubset<T, MandiNewsUpdateArgs<ExtArgs>>): Prisma__MandiNewsClient<$Result.GetResult<Prisma.$MandiNewsPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more MandiNews.
+     * @param {MandiNewsDeleteManyArgs} args - Arguments to filter MandiNews to delete.
+     * @example
+     * // Delete a few MandiNews
+     * const { count } = await prisma.mandiNews.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MandiNewsDeleteManyArgs>(args?: SelectSubset<T, MandiNewsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MandiNews.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MandiNewsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MandiNews
+     * const mandiNews = await prisma.mandiNews.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MandiNewsUpdateManyArgs>(args: SelectSubset<T, MandiNewsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one MandiNews.
+     * @param {MandiNewsUpsertArgs} args - Arguments to update or create a MandiNews.
+     * @example
+     * // Update or create a MandiNews
+     * const mandiNews = await prisma.mandiNews.upsert({
+     *   create: {
+     *     // ... data to create a MandiNews
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MandiNews we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MandiNewsUpsertArgs>(args: SelectSubset<T, MandiNewsUpsertArgs<ExtArgs>>): Prisma__MandiNewsClient<$Result.GetResult<Prisma.$MandiNewsPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of MandiNews.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MandiNewsCountArgs} args - Arguments to filter MandiNews to count.
+     * @example
+     * // Count the number of MandiNews
+     * const count = await prisma.mandiNews.count({
+     *   where: {
+     *     // ... the filter for the MandiNews we want to count
+     *   }
+     * })
+    **/
+    count<T extends MandiNewsCountArgs>(
+      args?: Subset<T, MandiNewsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MandiNewsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MandiNews.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MandiNewsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MandiNewsAggregateArgs>(args: Subset<T, MandiNewsAggregateArgs>): Prisma.PrismaPromise<GetMandiNewsAggregateType<T>>
+
+    /**
+     * Group by MandiNews.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MandiNewsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MandiNewsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MandiNewsGroupByArgs['orderBy'] }
+        : { orderBy?: MandiNewsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MandiNewsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMandiNewsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MandiNews model
+   */
+  readonly fields: MandiNewsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MandiNews.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MandiNewsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MandiNews model
+   */ 
+  interface MandiNewsFieldRefs {
+    readonly id: FieldRef<"MandiNews", 'String'>
+    readonly title: FieldRef<"MandiNews", 'String'>
+    readonly content: FieldRef<"MandiNews", 'String'>
+    readonly source: FieldRef<"MandiNews", 'String'>
+    readonly imageUrl: FieldRef<"MandiNews", 'String'>
+    readonly state: FieldRef<"MandiNews", 'String'>
+    readonly district: FieldRef<"MandiNews", 'String'>
+    readonly crop: FieldRef<"MandiNews", 'String'>
+    readonly publishedAt: FieldRef<"MandiNews", 'DateTime'>
+    readonly createdAt: FieldRef<"MandiNews", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MandiNews findUnique
+   */
+  export type MandiNewsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MandiNews
+     */
+    select?: MandiNewsSelect<ExtArgs> | null
+    /**
+     * Filter, which MandiNews to fetch.
+     */
+    where: MandiNewsWhereUniqueInput
+  }
+
+  /**
+   * MandiNews findUniqueOrThrow
+   */
+  export type MandiNewsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MandiNews
+     */
+    select?: MandiNewsSelect<ExtArgs> | null
+    /**
+     * Filter, which MandiNews to fetch.
+     */
+    where: MandiNewsWhereUniqueInput
+  }
+
+  /**
+   * MandiNews findFirst
+   */
+  export type MandiNewsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MandiNews
+     */
+    select?: MandiNewsSelect<ExtArgs> | null
+    /**
+     * Filter, which MandiNews to fetch.
+     */
+    where?: MandiNewsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MandiNews to fetch.
+     */
+    orderBy?: MandiNewsOrderByWithRelationInput | MandiNewsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MandiNews.
+     */
+    cursor?: MandiNewsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MandiNews from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MandiNews.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MandiNews.
+     */
+    distinct?: MandiNewsScalarFieldEnum | MandiNewsScalarFieldEnum[]
+  }
+
+  /**
+   * MandiNews findFirstOrThrow
+   */
+  export type MandiNewsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MandiNews
+     */
+    select?: MandiNewsSelect<ExtArgs> | null
+    /**
+     * Filter, which MandiNews to fetch.
+     */
+    where?: MandiNewsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MandiNews to fetch.
+     */
+    orderBy?: MandiNewsOrderByWithRelationInput | MandiNewsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MandiNews.
+     */
+    cursor?: MandiNewsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MandiNews from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MandiNews.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MandiNews.
+     */
+    distinct?: MandiNewsScalarFieldEnum | MandiNewsScalarFieldEnum[]
+  }
+
+  /**
+   * MandiNews findMany
+   */
+  export type MandiNewsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MandiNews
+     */
+    select?: MandiNewsSelect<ExtArgs> | null
+    /**
+     * Filter, which MandiNews to fetch.
+     */
+    where?: MandiNewsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MandiNews to fetch.
+     */
+    orderBy?: MandiNewsOrderByWithRelationInput | MandiNewsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MandiNews.
+     */
+    cursor?: MandiNewsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MandiNews from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MandiNews.
+     */
+    skip?: number
+    distinct?: MandiNewsScalarFieldEnum | MandiNewsScalarFieldEnum[]
+  }
+
+  /**
+   * MandiNews create
+   */
+  export type MandiNewsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MandiNews
+     */
+    select?: MandiNewsSelect<ExtArgs> | null
+    /**
+     * The data needed to create a MandiNews.
+     */
+    data: XOR<MandiNewsCreateInput, MandiNewsUncheckedCreateInput>
+  }
+
+  /**
+   * MandiNews createMany
+   */
+  export type MandiNewsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MandiNews.
+     */
+    data: MandiNewsCreateManyInput | MandiNewsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MandiNews createManyAndReturn
+   */
+  export type MandiNewsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MandiNews
+     */
+    select?: MandiNewsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many MandiNews.
+     */
+    data: MandiNewsCreateManyInput | MandiNewsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MandiNews update
+   */
+  export type MandiNewsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MandiNews
+     */
+    select?: MandiNewsSelect<ExtArgs> | null
+    /**
+     * The data needed to update a MandiNews.
+     */
+    data: XOR<MandiNewsUpdateInput, MandiNewsUncheckedUpdateInput>
+    /**
+     * Choose, which MandiNews to update.
+     */
+    where: MandiNewsWhereUniqueInput
+  }
+
+  /**
+   * MandiNews updateMany
+   */
+  export type MandiNewsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MandiNews.
+     */
+    data: XOR<MandiNewsUpdateManyMutationInput, MandiNewsUncheckedUpdateManyInput>
+    /**
+     * Filter which MandiNews to update
+     */
+    where?: MandiNewsWhereInput
+  }
+
+  /**
+   * MandiNews upsert
+   */
+  export type MandiNewsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MandiNews
+     */
+    select?: MandiNewsSelect<ExtArgs> | null
+    /**
+     * The filter to search for the MandiNews to update in case it exists.
+     */
+    where: MandiNewsWhereUniqueInput
+    /**
+     * In case the MandiNews found by the `where` argument doesn't exist, create a new MandiNews with this data.
+     */
+    create: XOR<MandiNewsCreateInput, MandiNewsUncheckedCreateInput>
+    /**
+     * In case the MandiNews was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MandiNewsUpdateInput, MandiNewsUncheckedUpdateInput>
+  }
+
+  /**
+   * MandiNews delete
+   */
+  export type MandiNewsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MandiNews
+     */
+    select?: MandiNewsSelect<ExtArgs> | null
+    /**
+     * Filter which MandiNews to delete.
+     */
+    where: MandiNewsWhereUniqueInput
+  }
+
+  /**
+   * MandiNews deleteMany
+   */
+  export type MandiNewsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MandiNews to delete
+     */
+    where?: MandiNewsWhereInput
+  }
+
+  /**
+   * MandiNews without action
+   */
+  export type MandiNewsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MandiNews
+     */
+    select?: MandiNewsSelect<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -23075,8 +24051,6 @@ export namespace Prisma {
     totalAmount: 'totalAmount',
     status: 'status',
     paymentStatus: 'paymentStatus',
-    paymentId: 'paymentId',
-    razorpayOrderId: 'razorpayOrderId',
     deliveryAddress: 'deliveryAddress',
     deliveryLat: 'deliveryLat',
     deliveryLng: 'deliveryLng',
@@ -23108,8 +24082,6 @@ export namespace Prisma {
   export const PaymentScalarFieldEnum: {
     id: 'id',
     orderId: 'orderId',
-    razorpayPaymentId: 'razorpayPaymentId',
-    razorpayOrderId: 'razorpayOrderId',
     amount: 'amount',
     status: 'status',
     method: 'method',
@@ -23246,6 +24218,22 @@ export namespace Prisma {
   };
 
   export type TradeBookingScalarFieldEnum = (typeof TradeBookingScalarFieldEnum)[keyof typeof TradeBookingScalarFieldEnum]
+
+
+  export const MandiNewsScalarFieldEnum: {
+    id: 'id',
+    title: 'title',
+    content: 'content',
+    source: 'source',
+    imageUrl: 'imageUrl',
+    state: 'state',
+    district: 'district',
+    crop: 'crop',
+    publishedAt: 'publishedAt',
+    createdAt: 'createdAt'
+  };
+
+  export type MandiNewsScalarFieldEnum = (typeof MandiNewsScalarFieldEnum)[keyof typeof MandiNewsScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -24294,8 +25282,6 @@ export namespace Prisma {
     totalAmount?: FloatFilter<"Order"> | number
     status?: EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFilter<"Order"> | $Enums.PaymentStatus
-    paymentId?: StringNullableFilter<"Order"> | string | null
-    razorpayOrderId?: StringNullableFilter<"Order"> | string | null
     deliveryAddress?: StringFilter<"Order"> | string
     deliveryLat?: FloatNullableFilter<"Order"> | number | null
     deliveryLng?: FloatNullableFilter<"Order"> | number | null
@@ -24316,8 +25302,6 @@ export namespace Prisma {
     totalAmount?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
-    paymentId?: SortOrderInput | SortOrder
-    razorpayOrderId?: SortOrderInput | SortOrder
     deliveryAddress?: SortOrder
     deliveryLat?: SortOrderInput | SortOrder
     deliveryLng?: SortOrderInput | SortOrder
@@ -24341,8 +25325,6 @@ export namespace Prisma {
     totalAmount?: FloatFilter<"Order"> | number
     status?: EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFilter<"Order"> | $Enums.PaymentStatus
-    paymentId?: StringNullableFilter<"Order"> | string | null
-    razorpayOrderId?: StringNullableFilter<"Order"> | string | null
     deliveryAddress?: StringFilter<"Order"> | string
     deliveryLat?: FloatNullableFilter<"Order"> | number | null
     deliveryLng?: FloatNullableFilter<"Order"> | number | null
@@ -24363,8 +25345,6 @@ export namespace Prisma {
     totalAmount?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
-    paymentId?: SortOrderInput | SortOrder
-    razorpayOrderId?: SortOrderInput | SortOrder
     deliveryAddress?: SortOrder
     deliveryLat?: SortOrderInput | SortOrder
     deliveryLng?: SortOrderInput | SortOrder
@@ -24390,8 +25370,6 @@ export namespace Prisma {
     totalAmount?: FloatWithAggregatesFilter<"Order"> | number
     status?: EnumOrderStatusWithAggregatesFilter<"Order"> | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusWithAggregatesFilter<"Order"> | $Enums.PaymentStatus
-    paymentId?: StringNullableWithAggregatesFilter<"Order"> | string | null
-    razorpayOrderId?: StringNullableWithAggregatesFilter<"Order"> | string | null
     deliveryAddress?: StringWithAggregatesFilter<"Order"> | string
     deliveryLat?: FloatNullableWithAggregatesFilter<"Order"> | number | null
     deliveryLng?: FloatNullableWithAggregatesFilter<"Order"> | number | null
@@ -24490,8 +25468,6 @@ export namespace Prisma {
     NOT?: PaymentWhereInput | PaymentWhereInput[]
     id?: StringFilter<"Payment"> | string
     orderId?: StringFilter<"Payment"> | string
-    razorpayPaymentId?: StringNullableFilter<"Payment"> | string | null
-    razorpayOrderId?: StringNullableFilter<"Payment"> | string | null
     amount?: FloatFilter<"Payment"> | number
     status?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
     method?: StringNullableFilter<"Payment"> | string | null
@@ -24507,8 +25483,6 @@ export namespace Prisma {
   export type PaymentOrderByWithRelationInput = {
     id?: SortOrder
     orderId?: SortOrder
-    razorpayPaymentId?: SortOrderInput | SortOrder
-    razorpayOrderId?: SortOrderInput | SortOrder
     amount?: SortOrder
     status?: SortOrder
     method?: SortOrderInput | SortOrder
@@ -24527,8 +25501,6 @@ export namespace Prisma {
     AND?: PaymentWhereInput | PaymentWhereInput[]
     OR?: PaymentWhereInput[]
     NOT?: PaymentWhereInput | PaymentWhereInput[]
-    razorpayPaymentId?: StringNullableFilter<"Payment"> | string | null
-    razorpayOrderId?: StringNullableFilter<"Payment"> | string | null
     amount?: FloatFilter<"Payment"> | number
     status?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
     method?: StringNullableFilter<"Payment"> | string | null
@@ -24544,8 +25516,6 @@ export namespace Prisma {
   export type PaymentOrderByWithAggregationInput = {
     id?: SortOrder
     orderId?: SortOrder
-    razorpayPaymentId?: SortOrderInput | SortOrder
-    razorpayOrderId?: SortOrderInput | SortOrder
     amount?: SortOrder
     status?: SortOrder
     method?: SortOrderInput | SortOrder
@@ -24568,8 +25538,6 @@ export namespace Prisma {
     NOT?: PaymentScalarWhereWithAggregatesInput | PaymentScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Payment"> | string
     orderId?: StringWithAggregatesFilter<"Payment"> | string
-    razorpayPaymentId?: StringNullableWithAggregatesFilter<"Payment"> | string | null
-    razorpayOrderId?: StringNullableWithAggregatesFilter<"Payment"> | string | null
     amount?: FloatWithAggregatesFilter<"Payment"> | number
     status?: EnumPaymentStatusWithAggregatesFilter<"Payment"> | $Enums.PaymentStatus
     method?: StringNullableWithAggregatesFilter<"Payment"> | string | null
@@ -25213,6 +26181,83 @@ export namespace Prisma {
     notes?: StringNullableWithAggregatesFilter<"TradeBooking"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"TradeBooking"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"TradeBooking"> | Date | string
+  }
+
+  export type MandiNewsWhereInput = {
+    AND?: MandiNewsWhereInput | MandiNewsWhereInput[]
+    OR?: MandiNewsWhereInput[]
+    NOT?: MandiNewsWhereInput | MandiNewsWhereInput[]
+    id?: StringFilter<"MandiNews"> | string
+    title?: StringFilter<"MandiNews"> | string
+    content?: StringFilter<"MandiNews"> | string
+    source?: StringNullableFilter<"MandiNews"> | string | null
+    imageUrl?: StringNullableFilter<"MandiNews"> | string | null
+    state?: StringNullableFilter<"MandiNews"> | string | null
+    district?: StringNullableFilter<"MandiNews"> | string | null
+    crop?: StringNullableFilter<"MandiNews"> | string | null
+    publishedAt?: DateTimeFilter<"MandiNews"> | Date | string
+    createdAt?: DateTimeFilter<"MandiNews"> | Date | string
+  }
+
+  export type MandiNewsOrderByWithRelationInput = {
+    id?: SortOrder
+    title?: SortOrder
+    content?: SortOrder
+    source?: SortOrderInput | SortOrder
+    imageUrl?: SortOrderInput | SortOrder
+    state?: SortOrderInput | SortOrder
+    district?: SortOrderInput | SortOrder
+    crop?: SortOrderInput | SortOrder
+    publishedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MandiNewsWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: MandiNewsWhereInput | MandiNewsWhereInput[]
+    OR?: MandiNewsWhereInput[]
+    NOT?: MandiNewsWhereInput | MandiNewsWhereInput[]
+    title?: StringFilter<"MandiNews"> | string
+    content?: StringFilter<"MandiNews"> | string
+    source?: StringNullableFilter<"MandiNews"> | string | null
+    imageUrl?: StringNullableFilter<"MandiNews"> | string | null
+    state?: StringNullableFilter<"MandiNews"> | string | null
+    district?: StringNullableFilter<"MandiNews"> | string | null
+    crop?: StringNullableFilter<"MandiNews"> | string | null
+    publishedAt?: DateTimeFilter<"MandiNews"> | Date | string
+    createdAt?: DateTimeFilter<"MandiNews"> | Date | string
+  }, "id">
+
+  export type MandiNewsOrderByWithAggregationInput = {
+    id?: SortOrder
+    title?: SortOrder
+    content?: SortOrder
+    source?: SortOrderInput | SortOrder
+    imageUrl?: SortOrderInput | SortOrder
+    state?: SortOrderInput | SortOrder
+    district?: SortOrderInput | SortOrder
+    crop?: SortOrderInput | SortOrder
+    publishedAt?: SortOrder
+    createdAt?: SortOrder
+    _count?: MandiNewsCountOrderByAggregateInput
+    _max?: MandiNewsMaxOrderByAggregateInput
+    _min?: MandiNewsMinOrderByAggregateInput
+  }
+
+  export type MandiNewsScalarWhereWithAggregatesInput = {
+    AND?: MandiNewsScalarWhereWithAggregatesInput | MandiNewsScalarWhereWithAggregatesInput[]
+    OR?: MandiNewsScalarWhereWithAggregatesInput[]
+    NOT?: MandiNewsScalarWhereWithAggregatesInput | MandiNewsScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MandiNews"> | string
+    title?: StringWithAggregatesFilter<"MandiNews"> | string
+    content?: StringWithAggregatesFilter<"MandiNews"> | string
+    source?: StringNullableWithAggregatesFilter<"MandiNews"> | string | null
+    imageUrl?: StringNullableWithAggregatesFilter<"MandiNews"> | string | null
+    state?: StringNullableWithAggregatesFilter<"MandiNews"> | string | null
+    district?: StringNullableWithAggregatesFilter<"MandiNews"> | string | null
+    crop?: StringNullableWithAggregatesFilter<"MandiNews"> | string | null
+    publishedAt?: DateTimeWithAggregatesFilter<"MandiNews"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"MandiNews"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -26194,8 +27239,6 @@ export namespace Prisma {
     totalAmount: number
     status?: $Enums.OrderStatus
     paymentStatus?: $Enums.PaymentStatus
-    paymentId?: string | null
-    razorpayOrderId?: string | null
     deliveryAddress: string
     deliveryLat?: number | null
     deliveryLng?: number | null
@@ -26216,8 +27259,6 @@ export namespace Prisma {
     totalAmount: number
     status?: $Enums.OrderStatus
     paymentStatus?: $Enums.PaymentStatus
-    paymentId?: string | null
-    razorpayOrderId?: string | null
     deliveryAddress: string
     deliveryLat?: number | null
     deliveryLng?: number | null
@@ -26236,8 +27277,6 @@ export namespace Prisma {
     totalAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
-    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: StringFieldUpdateOperationsInput | string
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -26258,8 +27297,6 @@ export namespace Prisma {
     totalAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
-    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: StringFieldUpdateOperationsInput | string
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -26279,8 +27316,6 @@ export namespace Prisma {
     totalAmount: number
     status?: $Enums.OrderStatus
     paymentStatus?: $Enums.PaymentStatus
-    paymentId?: string | null
-    razorpayOrderId?: string | null
     deliveryAddress: string
     deliveryLat?: number | null
     deliveryLng?: number | null
@@ -26297,8 +27332,6 @@ export namespace Prisma {
     totalAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
-    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: StringFieldUpdateOperationsInput | string
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -26316,8 +27349,6 @@ export namespace Prisma {
     totalAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
-    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: StringFieldUpdateOperationsInput | string
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -26409,8 +27440,6 @@ export namespace Prisma {
 
   export type PaymentCreateInput = {
     id?: string
-    razorpayPaymentId?: string | null
-    razorpayOrderId?: string | null
     amount: number
     status?: $Enums.PaymentStatus
     method?: string | null
@@ -26426,8 +27455,6 @@ export namespace Prisma {
   export type PaymentUncheckedCreateInput = {
     id?: string
     orderId: string
-    razorpayPaymentId?: string | null
-    razorpayOrderId?: string | null
     amount: number
     status?: $Enums.PaymentStatus
     method?: string | null
@@ -26441,8 +27468,6 @@ export namespace Prisma {
 
   export type PaymentUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    razorpayPaymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     amount?: FloatFieldUpdateOperationsInput | number
     status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     method?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26458,8 +27483,6 @@ export namespace Prisma {
   export type PaymentUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     orderId?: StringFieldUpdateOperationsInput | string
-    razorpayPaymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     amount?: FloatFieldUpdateOperationsInput | number
     status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     method?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26474,8 +27497,6 @@ export namespace Prisma {
   export type PaymentCreateManyInput = {
     id?: string
     orderId: string
-    razorpayPaymentId?: string | null
-    razorpayOrderId?: string | null
     amount: number
     status?: $Enums.PaymentStatus
     method?: string | null
@@ -26489,8 +27510,6 @@ export namespace Prisma {
 
   export type PaymentUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    razorpayPaymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     amount?: FloatFieldUpdateOperationsInput | number
     status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     method?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26505,8 +27524,6 @@ export namespace Prisma {
   export type PaymentUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     orderId?: StringFieldUpdateOperationsInput | string
-    razorpayPaymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     amount?: FloatFieldUpdateOperationsInput | number
     status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     method?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27208,6 +28225,97 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MandiNewsCreateInput = {
+    id?: string
+    title: string
+    content: string
+    source?: string | null
+    imageUrl?: string | null
+    state?: string | null
+    district?: string | null
+    crop?: string | null
+    publishedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type MandiNewsUncheckedCreateInput = {
+    id?: string
+    title: string
+    content: string
+    source?: string | null
+    imageUrl?: string | null
+    state?: string | null
+    district?: string | null
+    crop?: string | null
+    publishedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type MandiNewsUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    crop?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MandiNewsUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    crop?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MandiNewsCreateManyInput = {
+    id?: string
+    title: string
+    content: string
+    source?: string | null
+    imageUrl?: string | null
+    state?: string | null
+    district?: string | null
+    crop?: string | null
+    publishedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type MandiNewsUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    crop?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MandiNewsUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    crop?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -28108,8 +29216,6 @@ export namespace Prisma {
     totalAmount?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
-    paymentId?: SortOrder
-    razorpayOrderId?: SortOrder
     deliveryAddress?: SortOrder
     deliveryLat?: SortOrder
     deliveryLng?: SortOrder
@@ -28133,8 +29239,6 @@ export namespace Prisma {
     totalAmount?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
-    paymentId?: SortOrder
-    razorpayOrderId?: SortOrder
     deliveryAddress?: SortOrder
     deliveryLat?: SortOrder
     deliveryLng?: SortOrder
@@ -28152,8 +29256,6 @@ export namespace Prisma {
     totalAmount?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
-    paymentId?: SortOrder
-    razorpayOrderId?: SortOrder
     deliveryAddress?: SortOrder
     deliveryLat?: SortOrder
     deliveryLng?: SortOrder
@@ -28247,8 +29349,6 @@ export namespace Prisma {
   export type PaymentCountOrderByAggregateInput = {
     id?: SortOrder
     orderId?: SortOrder
-    razorpayPaymentId?: SortOrder
-    razorpayOrderId?: SortOrder
     amount?: SortOrder
     status?: SortOrder
     method?: SortOrder
@@ -28268,8 +29368,6 @@ export namespace Prisma {
   export type PaymentMaxOrderByAggregateInput = {
     id?: SortOrder
     orderId?: SortOrder
-    razorpayPaymentId?: SortOrder
-    razorpayOrderId?: SortOrder
     amount?: SortOrder
     status?: SortOrder
     method?: SortOrder
@@ -28284,8 +29382,6 @@ export namespace Prisma {
   export type PaymentMinOrderByAggregateInput = {
     id?: SortOrder
     orderId?: SortOrder
-    razorpayPaymentId?: SortOrder
-    razorpayOrderId?: SortOrder
     amount?: SortOrder
     status?: SortOrder
     method?: SortOrder
@@ -28731,6 +29827,45 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumTradeStatusFilter<$PrismaModel>
     _max?: NestedEnumTradeStatusFilter<$PrismaModel>
+  }
+
+  export type MandiNewsCountOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    content?: SortOrder
+    source?: SortOrder
+    imageUrl?: SortOrder
+    state?: SortOrder
+    district?: SortOrder
+    crop?: SortOrder
+    publishedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MandiNewsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    content?: SortOrder
+    source?: SortOrder
+    imageUrl?: SortOrder
+    state?: SortOrder
+    district?: SortOrder
+    crop?: SortOrder
+    publishedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MandiNewsMinOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    content?: SortOrder
+    source?: SortOrder
+    imageUrl?: SortOrder
+    state?: SortOrder
+    district?: SortOrder
+    crop?: SortOrder
+    publishedAt?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type FarmerCreateNestedOneWithoutUserInput = {
@@ -30893,8 +32028,6 @@ export namespace Prisma {
     totalAmount: number
     status?: $Enums.OrderStatus
     paymentStatus?: $Enums.PaymentStatus
-    paymentId?: string | null
-    razorpayOrderId?: string | null
     deliveryAddress: string
     deliveryLat?: number | null
     deliveryLng?: number | null
@@ -30913,8 +32046,6 @@ export namespace Prisma {
     totalAmount: number
     status?: $Enums.OrderStatus
     paymentStatus?: $Enums.PaymentStatus
-    paymentId?: string | null
-    razorpayOrderId?: string | null
     deliveryAddress: string
     deliveryLat?: number | null
     deliveryLng?: number | null
@@ -31135,8 +32266,6 @@ export namespace Prisma {
     totalAmount?: FloatFilter<"Order"> | number
     status?: EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFilter<"Order"> | $Enums.PaymentStatus
-    paymentId?: StringNullableFilter<"Order"> | string | null
-    razorpayOrderId?: StringNullableFilter<"Order"> | string | null
     deliveryAddress?: StringFilter<"Order"> | string
     deliveryLat?: FloatNullableFilter<"Order"> | number | null
     deliveryLng?: FloatNullableFilter<"Order"> | number | null
@@ -32410,8 +33539,6 @@ export namespace Prisma {
 
   export type PaymentCreateWithoutOrderInput = {
     id?: string
-    razorpayPaymentId?: string | null
-    razorpayOrderId?: string | null
     amount: number
     status?: $Enums.PaymentStatus
     method?: string | null
@@ -32425,8 +33552,6 @@ export namespace Prisma {
 
   export type PaymentUncheckedCreateWithoutOrderInput = {
     id?: string
-    razorpayPaymentId?: string | null
-    razorpayOrderId?: string | null
     amount: number
     status?: $Enums.PaymentStatus
     method?: string | null
@@ -32531,8 +33656,6 @@ export namespace Prisma {
 
   export type PaymentUpdateWithoutOrderInput = {
     id?: StringFieldUpdateOperationsInput | string
-    razorpayPaymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     amount?: FloatFieldUpdateOperationsInput | number
     status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     method?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32546,8 +33669,6 @@ export namespace Prisma {
 
   export type PaymentUncheckedUpdateWithoutOrderInput = {
     id?: StringFieldUpdateOperationsInput | string
-    razorpayPaymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     amount?: FloatFieldUpdateOperationsInput | number
     status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     method?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32564,8 +33685,6 @@ export namespace Prisma {
     totalAmount: number
     status?: $Enums.OrderStatus
     paymentStatus?: $Enums.PaymentStatus
-    paymentId?: string | null
-    razorpayOrderId?: string | null
     deliveryAddress: string
     deliveryLat?: number | null
     deliveryLng?: number | null
@@ -32585,8 +33704,6 @@ export namespace Prisma {
     totalAmount: number
     status?: $Enums.OrderStatus
     paymentStatus?: $Enums.PaymentStatus
-    paymentId?: string | null
-    razorpayOrderId?: string | null
     deliveryAddress: string
     deliveryLat?: number | null
     deliveryLng?: number | null
@@ -32755,8 +33872,6 @@ export namespace Prisma {
     totalAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
-    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: StringFieldUpdateOperationsInput | string
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -32776,8 +33891,6 @@ export namespace Prisma {
     totalAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
-    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: StringFieldUpdateOperationsInput | string
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -32948,8 +34061,6 @@ export namespace Prisma {
     totalAmount: number
     status?: $Enums.OrderStatus
     paymentStatus?: $Enums.PaymentStatus
-    paymentId?: string | null
-    razorpayOrderId?: string | null
     deliveryAddress: string
     deliveryLat?: number | null
     deliveryLng?: number | null
@@ -32969,8 +34080,6 @@ export namespace Prisma {
     totalAmount: number
     status?: $Enums.OrderStatus
     paymentStatus?: $Enums.PaymentStatus
-    paymentId?: string | null
-    razorpayOrderId?: string | null
     deliveryAddress: string
     deliveryLat?: number | null
     deliveryLng?: number | null
@@ -33004,8 +34113,6 @@ export namespace Prisma {
     totalAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
-    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: StringFieldUpdateOperationsInput | string
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33025,8 +34132,6 @@ export namespace Prisma {
     totalAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
-    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: StringFieldUpdateOperationsInput | string
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33936,8 +35041,6 @@ export namespace Prisma {
     totalAmount: number
     status?: $Enums.OrderStatus
     paymentStatus?: $Enums.PaymentStatus
-    paymentId?: string | null
-    razorpayOrderId?: string | null
     deliveryAddress: string
     deliveryLat?: number | null
     deliveryLng?: number | null
@@ -33991,8 +35094,6 @@ export namespace Prisma {
     totalAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
-    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: StringFieldUpdateOperationsInput | string
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -34011,8 +35112,6 @@ export namespace Prisma {
     totalAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
-    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: StringFieldUpdateOperationsInput | string
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -34031,8 +35130,6 @@ export namespace Prisma {
     totalAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
-    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
-    razorpayOrderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: StringFieldUpdateOperationsInput | string
     deliveryLat?: NullableFloatFieldUpdateOperationsInput | number | null
     deliveryLng?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -34676,6 +35773,10 @@ export namespace Prisma {
      * @deprecated Use TradeBookingDefaultArgs instead
      */
     export type TradeBookingArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = TradeBookingDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use MandiNewsDefaultArgs instead
+     */
+    export type MandiNewsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = MandiNewsDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

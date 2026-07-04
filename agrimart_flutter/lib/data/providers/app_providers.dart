@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../services/api_service.dart';
 import '../../core/utils/cache_manager.dart';
 import '../../core/storage/offline_cache.dart';
+import 'auth_provider.dart';
 import 'package:geolocator/geolocator.dart';
 
 // ── Search & Trending ─────────────────────────────────────
@@ -197,8 +198,6 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
 
     final index = items.indexWhere((item) => item['id'] == itemId);
     if (index >= 0) {
-      final productId = items[index]['productId'];
-
       // 1. Optimistic Update
       items[index] = {...items[index], 'quantity': quantity};
       current['items'] = items;
@@ -339,6 +338,15 @@ final weatherAdvisoryProvider =
   return ApiService.instance.getWeatherAdvisory(district: district);
 });
 
+// ── Mandi News ──────────────────────────────────────────────
+final mandiNewsProvider = FutureProvider<List>((ref) async {
+  final user = ref.watch(authProvider).user;
+  if (user == null) return [];
+  // Assuming user model has district/state, or fallback
+  final r = await ApiService.instance.getMandiNews(district: user.district);
+  return r['data'] as List? ?? [];
+});
+
 // ── Mandi ─────────────────────────────────────────────────
 final mandiProvider =
     FutureProvider.family<Map, String?>((ref, district) async {
@@ -392,3 +400,17 @@ final dealerBookingsProvider = FutureProvider<List>((ref) async {
   return ApiService.instance.getDealerMyBookings();
 });
 
+// ── Produce Board ─────────────────────────────────────────
+final produceListingsProvider =
+    FutureProvider.family<List, Map<String, String?>>((ref, filters) async {
+  return ApiService.instance.getProduceListings(
+    crop:     filters['crop'],
+    district: filters['district'],
+  );
+});
+
+// ── Dealer Deals ──────────────────────────────────────────
+final dealerDealsProvider =
+    FutureProvider.family<List, String?>((ref, status) async {
+  return ApiService.instance.getDeals(status: status);
+});

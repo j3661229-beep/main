@@ -73,3 +73,4 @@ class AppTranslations {
     return _data[lang]![key] ?? _data['English']![key] ?? key;
   }
 }
+

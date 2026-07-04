@@ -42,7 +42,7 @@ class NotificationsScreen extends ConsumerWidget {
               final isRead = n['isRead'] as bool? ?? false;
               final type = n['type'] as String? ?? 'GENERAL';
               return Container(
-                decoration: BoxDecoration(color: isRead ? AppColors.surface : AppColors.primarySurface.withOpacity(0.4), border: Border(bottom: BorderSide(color: AppColors.border))),
+                decoration: BoxDecoration(color: isRead ? AppColors.surface : AppColors.primarySurface.withValues(alpha: 0.4), border: Border(bottom: BorderSide(color: AppColors.border))),
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: Container(width: 44, height: 44, decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(12)),
@@ -64,3 +64,5 @@ class NotificationsScreen extends ConsumerWidget {
     );
   }
 }
+
+

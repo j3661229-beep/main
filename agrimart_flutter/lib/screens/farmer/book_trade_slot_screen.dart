@@ -317,3 +317,4 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
     );
   }
 }
+
