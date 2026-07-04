@@ -73,14 +73,20 @@ exports.getMyBookings = async (req, res) => {
 
         const { page, limit, skip } = getPagination(req.query);
 
+        const { status } = req.query;
+        const where = {
+            dealerId: dealer.id,
+            ...(status ? { status: status.toUpperCase() } : {}),
+        };
+
         const [bookings, total] = await Promise.all([
             prisma.tradeBooking.findMany({
-                where: { dealerId: dealer.id },
+                where,
                 skip, take: limit,
                 include: { farmer: { include: { user: true } } },
                 orderBy: { slotDate: 'asc' }
             }),
-            prisma.tradeBooking.count({ where: { dealerId: dealer.id } })
+            prisma.tradeBooking.count({ where })
         ]);
         
         paginated(res, bookings, page, limit, total);
@@ -98,8 +104,21 @@ exports.updateBookingStatus = async (req, res) => {
 
         const booking = await prisma.tradeBooking.update({
             where: { id },
-            data: { status }
+            data: { status },
+            include: {
+                farmer: { include: { user: { select: { id: true, name: true } } } },
+            },
         });
+
+        if (booking.farmer?.user?.id) {
+            const { sendNotification } = require('../services/onesignal.service');
+            sendNotification({
+                users: [booking.farmer.user.id],
+                title: `Booking ${status}`,
+                message: `Your ${booking.cropName} delivery slot was ${status.toLowerCase()} by the dealer`,
+                data: { type: 'TRADE_BOOKING', bookingId: booking.id, status },
+            });
+        }
 
         res.json({ booking });
     } catch (error) {

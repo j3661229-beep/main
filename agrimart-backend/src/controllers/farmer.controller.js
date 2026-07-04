@@ -92,4 +92,11 @@ const getSoilReport = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
-module.exports = { getProfile, updateProfile, updateFarmDetails, getDashboard, getOrders, getOrder, createPriceAlert, getPriceAlerts, deletePriceAlert, getSoilReports, getSoilReport };
+const submitFpoInterest = async (req, res, next) => {
+    try {
+        const data = await farmerService.submitFpoInterest(await resolveFarmer(req), req.body);
+        success(res, data, 'FPO interest registered', 201);
+    } catch (err) { next(err); }
+};
+
+module.exports = { getProfile, updateProfile, updateFarmDetails, getDashboard, getOrders, getOrder, createPriceAlert, getPriceAlerts, deletePriceAlert, getSoilReports, getSoilReport, submitFpoInterest };

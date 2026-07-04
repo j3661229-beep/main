@@ -13,10 +13,12 @@ const get = async (key) => {
     }
 };
 
-const set = async (key, value, ttl = 3600) => {
+const set = (key, value, ttl = 3600) => {
     try {
         const payload = typeof value === 'string' ? value : JSON.stringify(value);
-        await redis.setWithExpiry(key, ttl, payload);
+        redis.setWithExpiry(key, ttl, payload).catch(e => {
+            logger.error(`Cache Set Async Error [${key}]: ${e.message}`);
+        });
     } catch (e) {
         logger.error(`Cache Set Error [${key}]: ${e.message}`);
     }

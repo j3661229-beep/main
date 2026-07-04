@@ -21,7 +21,7 @@ const verifyUpiPayment = async (orderId, farmerId, utrNumber) => {
         throw Object.assign(new Error('Payment already processed for this order'), { statusCode: 400 });
     }
 
-    // Save UTR and mark payment confirmed
+    // Save UTR, mark payment confirmed, and deduct stock in one transaction
     await prisma.$transaction([
         prisma.order.update({
             where: { id: orderId },
@@ -37,15 +37,11 @@ const verifyUpiPayment = async (orderId, farmerId, utrNumber) => {
             create: { orderId, amount: order.totalAmount, status: 'SUCCESS', method: 'upi' },
             update: { status: 'SUCCESS', method: 'upi' },
         }),
-    ]);
-
-    // Deduct stock
-    for (const item of order.items) {
-        await prisma.product.update({
+        ...order.items.map((item) => prisma.product.update({
             where: { id: item.productId },
-            data: { stockQuantity: { decrement: item.quantity } }
-        });
-    }
+            data: { stockQuantity: { decrement: item.quantity } },
+        })),
+    ]);
 
     // Notify each supplier to verify UTR in their panel
     const supplierIds = [...new Set(order.items.map(i => i.supplier.userId))];

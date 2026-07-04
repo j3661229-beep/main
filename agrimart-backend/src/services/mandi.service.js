@@ -1,6 +1,9 @@
 const axios = require('axios');
 const cache = require('../utils/cache');
 const redis = require('../config/redis');
+const logger = require('../utils/logger');
+
+const AGMARKNET_DEFAULT_URL = 'https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070';
 
 // Fallback mock mandi data
 const MOCK_PRICES = [
@@ -26,9 +29,16 @@ const getPrices = async ({ district, crop, page = 1, limit = 20 }) => {
     // Try real API if configured
     if (process.env.AGMARKNET_API_KEY) {
         try {
-            const { data } = await axios.get(`${process.env.AGMARKNET_API_URL}/9ef84268-d588-465a-a308-a864a43d0070`, {
-                params: { 'api-key': process.env.AGMARKNET_API_KEY, format: 'json', limit: 50 },
-            });
+            const apiUrl = process.env.AGMARKNET_API_URL || AGMARKNET_DEFAULT_URL;
+            const params = {
+                'api-key': process.env.AGMARKNET_API_KEY,
+                format: 'json',
+                limit: 100,
+            };
+            if (district) params.filters = JSON.stringify({ district });
+            if (crop) params.filters = JSON.stringify({ ...(district ? { district } : {}), commodity: crop });
+
+            const { data } = await axios.get(apiUrl, { params, timeout: 12000 });
             const CROP_EMOJI = { onion: '🧅', tomato: '🍅', soybean: '🫘', maize: '🌽', wheat: '🌾', cotton: '🌿', grapes: '🍇', pomegranate: '🔴', potato: '🥔', rice: '🍚', sugarcane: '🎋', chilli: '🌶️', garlic: '🧄' };
             if (data.records?.length) {
                 const validRecords = data.records.filter(r => r.modal_price && r.modal_price !== '0');
@@ -62,9 +72,11 @@ const getPrices = async ({ district, crop, page = 1, limit = 20 }) => {
 
     const skip = (page - 1) * limit;
     const paginatedPrices = prices.slice(skip, skip + limit);
-    const result = { prices: paginatedPrices, total: prices.length, updatedAt: new Date().toISOString(), source: 'AGMARKNET - data.gov.in' };
-    await redis.setWithExpiry(cacheKey, 1800, JSON.stringify({ prices, total: prices.length, updatedAt: result.updatedAt, source: result.source })); // Cache full for 30 mins
-    await redis.setWithExpiry(`${cacheKey}:stale`, 86400, JSON.stringify({ prices, total: prices.length, updatedAt: result.updatedAt, source: result.source })); // Stale cache for 24 hours
+    const result = { prices: paginatedPrices, total: prices.length, updatedAt: new Date().toISOString(), source: process.env.AGMARKNET_API_KEY ? 'AGMARKNET (data.gov.in)' : 'Demo data (set AGMARKNET_API_KEY)' };
+    try {
+        redis.setWithExpiry(cacheKey, 1800, JSON.stringify({ prices, total: prices.length, updatedAt: result.updatedAt, source: result.source })).catch(() => {});
+        redis.setWithExpiry(`${cacheKey}:stale`, 86400, JSON.stringify({ prices, total: prices.length, updatedAt: result.updatedAt, source: result.source })).catch(() => {});
+    } catch (e) {}
     return result;
 };
 

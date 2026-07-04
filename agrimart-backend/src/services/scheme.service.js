@@ -15,9 +15,42 @@ const getScheme = async (id) => {
 };
 
 const getEligible = async (farmerId) => {
+    if (!farmerId) return [];
     const farmer = await prisma.farmer.findUnique({ where: { id: farmerId } });
-    // All active schemes — in real app, filter by farmer profile
-    return prisma.governmentScheme.findMany({ where: { isActive: true }, take: 10 });
+    if (!farmer) return [];
+
+    const schemes = await prisma.governmentScheme.findMany({
+        where: { isActive: true },
+        orderBy: { createdAt: 'desc' },
+    });
+
+    const district = (farmer.district || '').toLowerCase();
+    const state = (farmer.state || 'maharashtra').toLowerCase();
+    const landSize = farmer.farmSizeAcres || 0;
+    const crops = (farmer.currentCrops || []).map((c) => c.toLowerCase());
+
+    const scoreScheme = (scheme) => {
+        const blob = `${scheme.title} ${scheme.eligibility} ${scheme.description} ${scheme.benefits}`.toLowerCase();
+        let score = 0;
+        if (blob.includes('farmer') || blob.includes('kisan')) score += 2;
+        if (district && blob.includes(district)) score += 3;
+        if (blob.includes(state) || blob.includes('maharashtra')) score += 1;
+        if (landSize > 0 && landSize <= 2 && (blob.includes('small') || blob.includes('marginal'))) score += 2;
+        if (landSize > 2 && landSize <= 5 && blob.includes('small')) score += 1;
+        for (const crop of crops) {
+            const token = crop.split(' ')[0];
+            if (token.length > 2 && blob.includes(token)) score += 2;
+        }
+        if (blob.includes('pm-kisan') || blob.includes('pm kisan')) score += 3;
+        if (blob.includes('pmfby') || blob.includes('crop insurance')) score += 2;
+        return score;
+    };
+
+    return schemes
+        .map((scheme) => ({ ...scheme, matchScore: scoreScheme(scheme) }))
+        .filter((s) => s.matchScore >= 2)
+        .sort((a, b) => b.matchScore - a.matchScore)
+        .slice(0, 15);
 };
 
 const createScheme = async (data) => {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/constants/indian_languages.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
@@ -38,6 +39,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
           ref.read(cartProvider.notifier).load(),
         ]);
       } catch (_) {}
+    } else {
+      // Eager load public APIs so they are ready after login
+      try {
+        ref.read(productsProvider('').future).catchError((_) => <String, dynamic>{});
+        ref.read(mandiNewsProvider.future).catchError((_) => <dynamic>[]);
+        ref.read(schemesProvider.future).catchError((_) => <dynamic>[]);
+      } catch (_) {}
     }
     // Ensure at least 2 seconds of splash visibility
     await Future.delayed(const Duration(seconds: 2));
@@ -46,7 +54,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
 
   Future<void> _navigate() async {
     final prefs = await SharedPreferences.getInstance();
-    final hasChosenLang = (prefs.getString('selected_locale') ?? '').isNotEmpty;
+    final hasChosenLang = prefs.getBool(IndianLanguages.chosenKey) ?? false;
 
     if (!hasChosenLang && mounted) {
       context.go('/auth/language');

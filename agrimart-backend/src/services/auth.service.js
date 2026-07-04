@@ -86,20 +86,20 @@ const verifyOTP = async ({ phone, otp, name, language, role }) => {
         if (user.role === 'FARMER') {
             await prisma.farmer.create({
                 data: {
-                    userId: user.id, village: '', taluka: '', district: 'Maharashtra', pincode: '', farmSizeAcres: 0,
+                    userId: user.id, village: '', taluka: '', district: 'Nashik', pincode: '', farmSizeAcres: 0,
                 },
             });
         } else if (user.role === 'SUPPLIER') {
             await prisma.supplier.create({
                 data: {
-                    userId: user.id, businessName: 'My Store', gstNumber: null, address: '', district: 'Maharashtra', pincode: '',
+                    userId: user.id, businessName: 'My Store', gstNumber: null, address: '', district: 'Nashik', pincode: '',
                     docStatus: 'PENDING',
                 },
             });
         } else if (user.role === 'DEALER') {
             await prisma.dealer.create({
                 data: {
-                    userId: user.id, businessName: 'My Agency', address: '', district: 'Maharashtra', pincode: '',
+                    userId: user.id, businessName: 'My Agency', address: '', district: 'Nashik', pincode: '',
                     docStatus: 'PENDING',
                 },
             });
@@ -242,20 +242,20 @@ const googleSignIn = async ({ email, googleId, name, photoUrl, role }) => {
         if (user.role === 'FARMER') {
             await prisma.farmer.create({
                 data: {
-                    userId: user.id, village: '', taluka: '', district: 'Maharashtra', pincode: '', farmSizeAcres: 0,
+                    userId: user.id, village: '', taluka: '', district: 'Nashik', pincode: '', farmSizeAcres: 0,
                 },
             });
         } else if (user.role === 'SUPPLIER') {
             await prisma.supplier.create({
                 data: {
-                    userId: user.id, businessName: 'My Store', gstNumber: null, address: '', district: 'Maharashtra', pincode: '',
+                    userId: user.id, businessName: 'My Store', gstNumber: null, address: '', district: 'Nashik', pincode: '',
                     docStatus: 'PENDING',
                 },
             });
         } else if (user.role === 'DEALER') {
             await prisma.dealer.create({
                 data: {
-                    userId: user.id, businessName: name, address: '', district: 'Maharashtra', pincode: '',
+                    userId: user.id, businessName: name, address: '', district: 'Nashik', pincode: '',
                     docStatus: 'PENDING',
                 },
             });
@@ -269,6 +269,13 @@ const googleSignIn = async ({ email, googleId, name, photoUrl, role }) => {
                 name: user.name === 'AgriMart User' && name ? name : user.name
             }
         });
+        // Fix legacy profiles that stored state name as district
+        if (user.role === 'FARMER') {
+            const farmer = await prisma.farmer.findUnique({ where: { userId: user.id } });
+            if (farmer && (farmer.district === 'Maharashtra' || farmer.district === farmer.state)) {
+                await prisma.farmer.update({ where: { userId: user.id }, data: { district: 'Nashik' } });
+            }
+        }
     }
 
     // Check pending verification for SUPPLIER/DEALER

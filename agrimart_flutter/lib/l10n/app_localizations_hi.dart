@@ -352,4 +352,201 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get noProductsAvailable => 'कोई उत्पाद उपलब्ध नहीं';
+
+  @override
+  String get tagline => 'किसानों का विश्वसनीय साथी';
+
+  @override
+  String get selectYourRole => 'अपनी भूमिका चुनें';
+
+  @override
+  String get indianAgriMarketplace => 'भारतीय कृषि-टेक मार्केटप्लेस';
+
+  @override
+  String get farmerRole => 'किसान';
+
+  @override
+  String get supplierRole => 'आपूर्तिकर्ता';
+
+  @override
+  String get dealerRole => 'व्यापारी';
+
+  @override
+  String get farmerRoleDesc => 'इनपुट खरीदें, उपज बेचें और AI फसल सलाह पाएं';
+
+  @override
+  String get supplierRoleDesc => 'बीज, खाद और कृषि उत्पाद बेचें';
+
+  @override
+  String get dealerRoleDesc => 'किसानों से उपज खरीदें और मंडी सौदे संभालें';
+
+  @override
+  String get namaste => 'नमस्ते';
+
+  @override
+  String signInAs(String role) {
+    return '$role के रूप में साइन इन करें';
+  }
+
+  @override
+  String get welcomeBack => 'वापसी पर स्वागत है';
+
+  @override
+  String get quickActions => 'त्वरित कार्य';
+
+  @override
+  String get mandiNewsSection => 'मंडी समाचार';
+
+  @override
+  String get localUpdates => 'स्थानीय अपडेट';
+
+  @override
+  String get scanCrop => 'फसल स्कैन करें';
+
+  @override
+  String get aiDiagnosis => 'AI निदान';
+
+  @override
+  String get buyInputs => 'इनपुट खरीदें';
+
+  @override
+  String get seedsAndMore => 'बीज और अन्य';
+
+  @override
+  String get sellProduceAction => 'उपज बेचें';
+
+  @override
+  String get listYourCrop => 'अपनी फसल सूचीबद्ध करें';
+
+  @override
+  String get recentOrders => 'हाल के ऑर्डर';
+
+  @override
+  String get viewAll => 'सभी देखें';
+
+  @override
+  String get noOrdersYet => 'अभी कोई ऑर्डर नहीं';
+
+  @override
+  String get startShoppingInputs => 'कृषि इनपुट खरीदना शुरू करें';
+
+  @override
+  String get browseMarket => 'बाजार देखें';
+
+  @override
+  String get couldNotLoadOrders => 'ऑर्डर लोड नहीं हो सके';
+
+  @override
+  String nearLocation(String location) {
+    return '$location के पास';
+  }
+
+  @override
+  String get noLocalNewsYet => 'अभी स्थानीय समाचार नहीं';
+
+  @override
+  String get tapBrowseNews => 'सभी बाजार अपडेट देखने के लिए टैप करें';
+
+  @override
+  String get diagnose => 'निदान';
+
+  @override
+  String get market => 'बाजार';
+
+  @override
+  String get mobileNumber => 'मोबाइल नंबर';
+
+  @override
+  String get sendOtp => 'OTP भेजें';
+
+  @override
+  String get emailOrPhone => 'ईमेल या फोन';
+
+  @override
+  String get forgotPassword => 'पासवर्ड भूल गए?';
+
+  @override
+  String get dontHaveAccount => 'खाता नहीं है?';
+
+  @override
+  String get signUp => 'साइन अप';
+
+  @override
+  String get enterMobileNumber => 'अपना मोबाइल नंबर दर्ज करें';
+
+  @override
+  String get validTenDigit => 'मान्य 10-अंकीय नंबर दर्ज करें';
+
+  @override
+  String get enterEmailOrPhone => 'ईमेल या फोन दर्ज करें';
+
+  @override
+  String get enterPassword => 'अपना पासवर्ड दर्ज करें';
+
+  @override
+  String get orDivider => 'या';
+
+  @override
+  String get bengali => 'बंगाली';
+
+  @override
+  String get telugu => 'तेलुगु';
+
+  @override
+  String get tamil => 'तमिल';
+
+  @override
+  String get gujarati => 'गुजराती';
+
+  @override
+  String get kannada => 'कन्नड़';
+
+  @override
+  String get malayalam => 'मलयालम';
+
+  @override
+  String get punjabi => 'पंजाबी';
+
+  @override
+  String get odia => 'ओडिया';
+
+  @override
+  String get assamese => 'असमिया';
+
+  @override
+  String get urdu => 'उर्दू';
+
+  @override
+  String get selectLanguageSubtitle => 'ऐप के लिए अपनी पसंदीदा भाषा चुनें';
+
+  @override
+  String get notifications => 'सूचनाएं';
+
+  @override
+  String get couldNotLoadNews => 'समाचार लोड नहीं हो सके';
+
+  @override
+  String get noNewsRightNow => 'अभी कोई समाचार नहीं';
+
+  @override
+  String get newsNotifyLater =>
+      'आपके क्षेत्र में बाजार अपडेट होने पर हम सूचित करेंगे।';
+
+  @override
+  String get localNews => 'स्थानीय समाचार';
+
+  @override
+  String get readFullStory => 'पूरी खबर पढ़ें';
+
+  @override
+  String get readMore => 'और पढ़ें';
+
+  @override
+  String get weatherUnavailable => 'मौसम उपलब्ध नहीं';
+
+  @override
+  String get logIn => 'लॉग इन';
+
+  @override
+  String get getStarted => 'शुरू करें';
 }

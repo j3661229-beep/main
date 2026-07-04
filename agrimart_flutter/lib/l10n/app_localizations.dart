@@ -777,6 +777,390 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No products available'**
   String get noProductsAvailable;
+
+  /// No description provided for @tagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Trusted partner for farmers'**
+  String get tagline;
+
+  /// No description provided for @selectYourRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your role'**
+  String get selectYourRole;
+
+  /// No description provided for @indianAgriMarketplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Indian Agri-Tech Marketplace'**
+  String get indianAgriMarketplace;
+
+  /// No description provided for @farmerRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Farmer'**
+  String get farmerRole;
+
+  /// No description provided for @supplierRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Supplier'**
+  String get supplierRole;
+
+  /// No description provided for @dealerRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Dealer'**
+  String get dealerRole;
+
+  /// No description provided for @farmerRoleDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy inputs, sell produce & get AI crop advice'**
+  String get farmerRoleDesc;
+
+  /// No description provided for @supplierRoleDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell seeds, fertilizers & agricultural products'**
+  String get supplierRoleDesc;
+
+  /// No description provided for @dealerRoleDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy produce from farmers & manage mandi deals'**
+  String get dealerRoleDesc;
+
+  /// No description provided for @namaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Namaste'**
+  String get namaste;
+
+  /// No description provided for @signInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in as {role}'**
+  String signInAs(String role);
+
+  /// No description provided for @welcomeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back'**
+  String get welcomeBack;
+
+  /// No description provided for @quickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get quickActions;
+
+  /// No description provided for @mandiNewsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Mandi News'**
+  String get mandiNewsSection;
+
+  /// No description provided for @localUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Local updates'**
+  String get localUpdates;
+
+  /// No description provided for @scanCrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan a Crop'**
+  String get scanCrop;
+
+  /// No description provided for @aiDiagnosis.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Diagnosis'**
+  String get aiDiagnosis;
+
+  /// No description provided for @buyInputs.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy Inputs'**
+  String get buyInputs;
+
+  /// No description provided for @seedsAndMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Seeds & More'**
+  String get seedsAndMore;
+
+  /// No description provided for @sellProduceAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell Produce'**
+  String get sellProduceAction;
+
+  /// No description provided for @listYourCrop.
+  ///
+  /// In en, this message translates to:
+  /// **'List your crop'**
+  String get listYourCrop;
+
+  /// No description provided for @recentOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Orders'**
+  String get recentOrders;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get viewAll;
+
+  /// No description provided for @noOrdersYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No orders yet'**
+  String get noOrdersYet;
+
+  /// No description provided for @startShoppingInputs.
+  ///
+  /// In en, this message translates to:
+  /// **'Start shopping for farm inputs'**
+  String get startShoppingInputs;
+
+  /// No description provided for @browseMarket.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse Market'**
+  String get browseMarket;
+
+  /// No description provided for @couldNotLoadOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load orders'**
+  String get couldNotLoadOrders;
+
+  /// No description provided for @nearLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Near {location}'**
+  String nearLocation(String location);
+
+  /// No description provided for @noLocalNewsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No local news yet'**
+  String get noLocalNewsYet;
+
+  /// No description provided for @tapBrowseNews.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to browse all market updates'**
+  String get tapBrowseNews;
+
+  /// No description provided for @diagnose.
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnose'**
+  String get diagnose;
+
+  /// No description provided for @market.
+  ///
+  /// In en, this message translates to:
+  /// **'Market'**
+  String get market;
+
+  /// No description provided for @mobileNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile Number'**
+  String get mobileNumber;
+
+  /// No description provided for @sendOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Send OTP'**
+  String get sendOtp;
+
+  /// No description provided for @emailOrPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Email or Phone'**
+  String get emailOrPhone;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// No description provided for @dontHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account?'**
+  String get dontHaveAccount;
+
+  /// No description provided for @signUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get signUp;
+
+  /// No description provided for @enterMobileNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your mobile number'**
+  String get enterMobileNumber;
+
+  /// No description provided for @validTenDigit.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid 10-digit number'**
+  String get validTenDigit;
+
+  /// No description provided for @enterEmailOrPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter email or phone'**
+  String get enterEmailOrPhone;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get enterPassword;
+
+  /// No description provided for @orDivider.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get orDivider;
+
+  /// No description provided for @bengali.
+  ///
+  /// In en, this message translates to:
+  /// **'Bengali'**
+  String get bengali;
+
+  /// No description provided for @telugu.
+  ///
+  /// In en, this message translates to:
+  /// **'Telugu'**
+  String get telugu;
+
+  /// No description provided for @tamil.
+  ///
+  /// In en, this message translates to:
+  /// **'Tamil'**
+  String get tamil;
+
+  /// No description provided for @gujarati.
+  ///
+  /// In en, this message translates to:
+  /// **'Gujarati'**
+  String get gujarati;
+
+  /// No description provided for @kannada.
+  ///
+  /// In en, this message translates to:
+  /// **'Kannada'**
+  String get kannada;
+
+  /// No description provided for @malayalam.
+  ///
+  /// In en, this message translates to:
+  /// **'Malayalam'**
+  String get malayalam;
+
+  /// No description provided for @punjabi.
+  ///
+  /// In en, this message translates to:
+  /// **'Punjabi'**
+  String get punjabi;
+
+  /// No description provided for @odia.
+  ///
+  /// In en, this message translates to:
+  /// **'Odia'**
+  String get odia;
+
+  /// No description provided for @assamese.
+  ///
+  /// In en, this message translates to:
+  /// **'Assamese'**
+  String get assamese;
+
+  /// No description provided for @urdu.
+  ///
+  /// In en, this message translates to:
+  /// **'Urdu'**
+  String get urdu;
+
+  /// No description provided for @selectLanguageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your preferred language for the app'**
+  String get selectLanguageSubtitle;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @couldNotLoadNews.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load news'**
+  String get couldNotLoadNews;
+
+  /// No description provided for @noNewsRightNow.
+  ///
+  /// In en, this message translates to:
+  /// **'No news right now'**
+  String get noNewsRightNow;
+
+  /// No description provided for @newsNotifyLater.
+  ///
+  /// In en, this message translates to:
+  /// **'We will notify you when there are market updates in your area.'**
+  String get newsNotifyLater;
+
+  /// No description provided for @localNews.
+  ///
+  /// In en, this message translates to:
+  /// **'Local News'**
+  String get localNews;
+
+  /// No description provided for @readFullStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Read full story'**
+  String get readFullStory;
+
+  /// No description provided for @readMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Read more'**
+  String get readMore;
+
+  /// No description provided for @weatherUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather unavailable'**
+  String get weatherUnavailable;
+
+  /// No description provided for @logIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Log In'**
+  String get logIn;
+
+  /// No description provided for @getStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
 }
 
 class _AppLocalizationsDelegate

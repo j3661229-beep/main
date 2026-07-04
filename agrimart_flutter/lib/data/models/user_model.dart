@@ -29,7 +29,7 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
     id:           json['id']           ?? '',
-    phone:        json['phone']        ?? '',
+    phone:        json['phone']?.toString() ?? '',
     name:         json['name']         ?? 'AgriMart User',
     email:        json['email']        ?? '',
     role:         json['role']         ?? 'FARMER',
@@ -78,6 +78,16 @@ class UserModel {
       farmer?['district'] as String? ??
       supplier?['district'] as String? ??
       dealer?['district'] as String?;
+
+  /// District for mandi/news — ignores mistaken state names stored as district
+  String get effectiveDistrict {
+    final d = district?.trim();
+    final s = state?.trim();
+    if (d != null && d.isNotEmpty && (s == null || d.toLowerCase() != s.toLowerCase())) {
+      return d;
+    }
+    return 'Nashik';
+  }
 
   String? get state =>
       farmer?['state'] as String? ??

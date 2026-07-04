@@ -51,17 +51,18 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       final orderId = order['id'] as String;
 
       if (_paymentMethod == 'Cash on Delivery') {
-        await ApiService.instance.confirmCashOnDelivery(orderId);
+        // Backend handles COD payment record, stock deduction, and status updates synchronously in createOrder
       } else {
         final utr = _upiCtrl.text.trim();
         if (utr.length < 6) {
-          setState(() { _isProcessing = false; _error = 'Enter UTR/reference after UPI payment'; });
-          return;
+            setState(() { _isProcessing = false; _error = 'Enter UTR/reference after UPI payment'; });
+            return;
         }
         await ApiService.instance.verifyUpiPayment(orderId: orderId, utrNumber: utr);
       }
 
-      await ref.read(cartProvider.notifier).clear();
+      // Clear local cart state instantly without making a redundant API call (backend cleared it)
+      ref.read(cartProvider.notifier).clearLocal();
       HapticFeedback.mediumImpact();
       if (mounted) {
         context.go('/farmer/orders');

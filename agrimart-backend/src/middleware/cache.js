@@ -22,12 +22,12 @@ const cache = (ttlSeconds) => async (req, res, next) => {
 
         // Override res.json to cache the response
         const originalJson = res.json.bind(res)
-        res.json = async (data) => {
+        res.json = (data) => {
             try {
-                await redis.setWithExpiry(key, ttlSeconds, data)
-            } catch (err) {
-                console.error('Redis cache setex error:', err)
-            }
+                redis.setWithExpiry(key, ttlSeconds, data).catch(err => {
+                    console.error('Redis cache setex error:', err)
+                })
+            } catch (err) {}
             return originalJson(data)
         }
 

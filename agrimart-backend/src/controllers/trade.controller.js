@@ -2,6 +2,7 @@ const prisma = require('../config/database');
 const logger = require('../utils/logger');
 const { getPagination } = require('../utils/helpers');
 const { paginated } = require('../utils/apiResponse');
+const { sendNotification } = require('../services/onesignal.service');
 
 // Fetch dealers for a district (and optionally a specific crop)
 exports.getDealerRates = async (req, res) => {
@@ -47,7 +48,7 @@ exports.bookTradeSlot = async (req, res) => {
         // The farmer ID is attached by auth middleware
         const userId = req.user.id;
 
-        const farmer = await prisma.farmer.findUnique({ where: { userId } });
+        const farmer = await prisma.farmer.findUnique({ where: { userId }, include: { user: true } });
         if (!farmer) return res.status(404).json({ success: false, message: 'Farmer profile not found' });
 
         const booking = await prisma.tradeBooking.create({
@@ -59,8 +60,20 @@ exports.bookTradeSlot = async (req, res) => {
                 pricePerQuintal: parseFloat(pricePerQuintal),
                 slotDate: new Date(slotDate),
                 notes
-            }
+            },
+            include: {
+                dealer: { include: { user: { select: { id: true, name: true } } } },
+            },
         });
+
+        if (booking.dealer?.user?.id) {
+            sendNotification({
+                users: [booking.dealer.user.id],
+                title: '🌾 New produce booking',
+                message: `${farmer.user?.name || 'A farmer'} booked ${cropName} — ${approxQuintals} qtl @ ₹${pricePerQuintal}/qtl`,
+                data: { type: 'TRADE_BOOKING', bookingId: booking.id },
+            });
+        }
 
         res.status(201).json({ success: true, data: booking, message: 'Trade slot booked successfully' });
     } catch (error) {

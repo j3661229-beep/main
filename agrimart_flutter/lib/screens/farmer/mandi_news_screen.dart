@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../data/providers/app_providers.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../core/theme/app_colors.dart';
@@ -78,7 +79,20 @@ class _NewsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final link = item['link']?.toString();
+    final isExternal = item['isExternal'] == true;
+    final sourceLabel = isExternal ? (item['source'] ?? 'Google News') : (item['source'] ?? 'AgriMart');
+
+    return GestureDetector(
+      onTap: link != null && link.isNotEmpty
+          ? () async {
+              final uri = Uri.tryParse(link);
+              if (uri != null && await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            }
+          : null,
+      child: Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -134,7 +148,7 @@ class _NewsCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                         ),
-                        child: Text(item['source'] ?? 'General', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primaryDark)),
+                        child: Text(sourceLabel, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primaryDark)),
                       ),
                     Text(_timeAgo(item['publishedAt']), style: AppTextStyles.caption),
                   ],
@@ -151,9 +165,9 @@ class _NewsCard extends StatelessWidget {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    const Text('Read full story', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                    Text(link != null ? 'Read full story' : 'Read more', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
                     const SizedBox(width: 4),
-                    const Icon(Icons.arrow_forward_ios, size: 10, color: AppColors.primary),
+                    Icon(link != null ? Icons.open_in_new : Icons.arrow_forward_ios, size: link != null ? 14 : 10, color: AppColors.primary),
                   ],
                 ),
               ],
@@ -161,6 +175,7 @@ class _NewsCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

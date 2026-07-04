@@ -55,6 +55,8 @@ const tradeRoutes = require('./routes/trade.routes');
 const dealerRoutes = require('./routes/dealer.routes');
 const uploadRoutes = require('./routes/upload.routes');
 const newsRoutes = require('./routes/news.routes');
+const newsService = require('./services/news.service');
+const priceAlertService = require('./services/priceAlert.service');
 
 const app = express();
 
@@ -72,12 +74,16 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-app.use(morgan('combined', { stream: { write: (msg) => logger.info(msg.trim()) } }));
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('dev', { stream: { write: (msg) => logger.info(msg.trim()) } }));
+}
 
-// Global API Rate Limiter (100 reqs per min)
+// Global API Rate Limiter (200 reqs per min per IP)
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 100,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
   message: { error: 'Too many requests, please try again later.' }
 });
 
@@ -114,7 +120,52 @@ if (process.env.RAILWAY_URL || process.env.NODE_ENV === 'production') {
   });
 }
 
+// Sync Google News RSS every 6 hours (stores articles in DB)
+cron.schedule('0 */6 * * *', async () => {
+  try {
+    const result = await newsService.syncGoogleNewsToDb();
+    logger.info(`Google News RSS cron sync — created: ${result.created}, skipped: ${result.skipped}`);
+  } catch (err) {
+    logger.error('Google News RSS cron sync failed', err);
+  }
+});
+
+// Check mandi price alerts every hour
+cron.schedule('0 * * * *', async () => {
+  try {
+    const result = await priceAlertService.checkPriceAlerts();
+    if (result.triggered > 0) {
+      logger.info(`Price alerts triggered: ${result.triggered}`);
+    }
+  } catch (err) {
+    logger.error('Price alert cron failed', err);
+  }
+});
+
+// RSS sync runs on cron only — avoids competing with user traffic after deploy
+
 // API Routes
+// API Routes (v1)
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/farmer', farmerRoutes);
+app.use('/api/v1/supplier', supplierRoutes);
+app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/cart', cartRoutes);
+app.use('/api/v1/orders', orderRoutes);
+app.use('/api/v1/payments', paymentRoutes);
+app.use('/api/v1/ai', aiRoutes);
+app.use('/api/v1/diagnose', aiRoutes);
+app.use('/api/v1/weather', weatherRoutes);
+app.use('/api/v1/mandi', mandiRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/schemes', schemeRoutes);
+app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/trade', tradeRoutes);
+app.use('/api/v1/dealer', dealerRoutes);
+app.use('/api/v1/upload', uploadRoutes);
+app.use('/api/v1/news', newsRoutes);
+
+// Legacy/Alternative mapping without v1 (to avoid breaking admin panel or other clients)
 app.use('/api/auth', authRoutes);
 app.use('/api/farmer', farmerRoutes);
 app.use('/api/supplier', supplierRoutes);
@@ -123,6 +174,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/diagnose', aiRoutes);
 app.use('/api/weather', weatherRoutes);
 app.use('/api/mandi', mandiRoutes);
 app.use('/api/notifications', notificationRoutes);
@@ -132,6 +184,7 @@ app.use('/api/trade', tradeRoutes);
 app.use('/api/dealer', dealerRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/news', newsRoutes);
+
 
 // Error handling
 app.use(notFound);

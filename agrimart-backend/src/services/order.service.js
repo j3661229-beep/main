@@ -1,7 +1,7 @@
 const prisma = require('../config/database');
 const { sendNotification } = require('./onesignal.service');
 
-const createOrder = async (farmerId, { deliveryAddress, deliveryLat, deliveryLng, notes }) => {
+const createOrder = async (farmerId, { deliveryAddress, deliveryLat, deliveryLng, notes, paymentMethod }) => {
     // Get cart
     const cart = await prisma.cart.findUnique({
         where: { farmerId },
@@ -17,6 +17,8 @@ const createOrder = async (farmerId, { deliveryAddress, deliveryLat, deliveryLng
     }
 
     const totalAmount = cart.items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+    const method = paymentMethod || 'cod';
+    const isCod = method === 'cod';
 
     const order = await prisma.$transaction(async (tx) => {
         const newOrder = await tx.order.create({
@@ -27,6 +29,9 @@ const createOrder = async (farmerId, { deliveryAddress, deliveryLat, deliveryLng
                 deliveryLat: deliveryLat ? parseFloat(deliveryLat) : null,
                 deliveryLng: deliveryLng ? parseFloat(deliveryLng) : null,
                 notes,
+                paymentMethod: method,
+                status: isCod ? 'PROCESSING' : 'PENDING',
+                paymentStatus: 'PENDING',
                 items: {
                     create: cart.items.map(item => ({
                         productId: item.productId,
@@ -38,6 +43,21 @@ const createOrder = async (farmerId, { deliveryAddress, deliveryLat, deliveryLng
             },
             include: { items: { include: { product: true, supplier: { include: { user: true } } } } },
         });
+
+        if (isCod) {
+            // Deduct stock immediately
+            for (const item of cart.items) {
+                await tx.product.update({
+                    where: { id: item.productId },
+                    data: { stockQuantity: { decrement: item.quantity } }
+                });
+            }
+            // Create payment record
+            await tx.payment.create({
+                data: { orderId: newOrder.id, amount: totalAmount, status: 'PENDING', method: 'cod' }
+            });
+        }
+
         // Clear cart
         await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
         return newOrder;
@@ -89,18 +109,18 @@ const cancelOrder = async (farmerId, orderId) => {
 const getTracking = async (farmerId, orderId) => {
     const order = await getOrder(farmerId, orderId);
 
-    // We map existing enums to the BOPIS model
+    // Standard Delivery Tracking Map
     const trackingMap = [
         { status: 'PENDING', label: 'Order Placed' },
         { status: 'PROCESSING', label: 'Preparing Order' },
-        { status: 'DISPATCHED', label: 'Ready for Pickup' },
-        { status: 'DELIVERED', label: 'Picked Up' }
+        { status: 'DISPATCHED', label: 'Dispatched' },
+        { status: 'OUT_FOR_DELIVERY', label: 'Out for Delivery' },
+        { status: 'DELIVERED', label: 'Delivered' }
     ];
 
-    // Normalize DB status to one of these 4 if needed (e.g. PAYMENT_CONFIRMED -> PENDING step basically)
+    // Normalize DB status to one of these if needed
     let currentStatus = order.status;
     if (currentStatus === 'PAYMENT_CONFIRMED') currentStatus = 'PENDING';
-    if (currentStatus === 'OUT_FOR_DELIVERY') currentStatus = 'DELIVERED';
 
     let currentIndex = trackingMap.findIndex(s => s.status === currentStatus);
     if (currentIndex === -1) currentIndex = 0; // fallback if cancelled or weird

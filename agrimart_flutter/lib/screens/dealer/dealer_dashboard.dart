@@ -109,6 +109,8 @@ class DealerDashboard extends ConsumerWidget {
                       Expanded(child: _QuickBtn(emoji: '🌾', label: 'Browse Produce', accent: AppColors.dealerAccent, tint: AppColors.dealerTint, onTap: () => context.push('/dealer/produce-board'))),
                       const SizedBox(width: 12),
                       Expanded(child: _QuickBtn(emoji: '🤝', label: 'My Deals', accent: AppColors.farmerAccent, tint: AppColors.farmerTint, onTap: () => context.push('/dealer/my-deals'))),
+                      const SizedBox(width: 12),
+                      Expanded(child: _QuickBtn(emoji: '💹', label: 'My Rates', accent: AppColors.supplierAccent, tint: AppColors.supplierTint, onTap: () => context.push('/dealer/manage-rates'))),
                     ]),
 
                     const SizedBox(height: 24),

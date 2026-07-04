@@ -240,6 +240,12 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
   Future<void> clear() async {
     state = const AsyncValue.data({'items': []});
     await CacheManager.delete('local_cart');
+    try { await ApiService.instance.clearCart(); } catch (_) {}
+  }
+
+  void clearLocal() {
+    state = const AsyncValue.data({'items': []});
+    CacheManager.delete('local_cart');
   }
 
   int get itemCount {
@@ -335,16 +341,29 @@ final weatherProvider = FutureProvider<Map>((ref) async {
 
 final weatherAdvisoryProvider =
     FutureProvider.family<Map, String>((ref, district) async {
-  return ApiService.instance.getWeatherAdvisory(district: district);
+  final weather = await ref.watch(weatherProvider.future);
+  return ApiService.instance.getWeatherAdvisory(
+    lat: (weather['lat'] as num?)?.toDouble(),
+    lng: (weather['lng'] as num?)?.toDouble(),
+    district: district.isNotEmpty ? district : (weather['location']?.toString() ?? 'Nashik'),
+  );
 });
 
 // ── Mandi News ──────────────────────────────────────────────
 final mandiNewsProvider = FutureProvider<List>((ref) async {
   final user = ref.watch(authProvider).user;
   if (user == null) return [];
-  // Assuming user model has district/state, or fallback
-  final r = await ApiService.instance.getMandiNews(district: user.district);
+  final r = await ApiService.instance.getMandiNews(
+    district: user.effectiveDistrict,
+    state: user.state ?? 'Maharashtra',
+  );
   return r['data'] as List? ?? [];
+});
+
+/// Top headlines for the home screen carousel.
+final mandiNewsPreviewProvider = FutureProvider<List>((ref) async {
+  final news = await ref.watch(mandiNewsProvider.future);
+  return news.take(5).toList();
 });
 
 // ── Mandi ─────────────────────────────────────────────────
@@ -366,6 +385,22 @@ final schemesProvider = FutureProvider<List>((ref) async {
 
 final eligibleSchemesProvider = FutureProvider<List>((ref) async {
   return ApiService.instance.getEligibleSchemes();
+});
+
+final priceAlertsProvider = FutureProvider<List>((ref) async {
+  return ApiService.instance.getPriceAlerts();
+});
+
+final cropCalendarProvider = FutureProvider.family<Map, String>((ref, key) async {
+  final i = key.indexOf('|');
+  final district = i >= 0 ? key.substring(0, i) : key;
+  final crops = i >= 0 ? key.substring(i + 1) : null;
+  return ApiService.instance.getCropCalendar(district: district, crops: crops);
+});
+
+final equipmentProductsProvider = FutureProvider<List>((ref) async {
+  final data = await ApiService.instance.getProducts(category: 'EQUIPMENT');
+  return (data['data'] as List?) ?? [];
 });
 
 // ── Notifications ─────────────────────────────────────────

@@ -17,5 +17,6 @@ router.get('/price-alerts', farmerController.getPriceAlerts);
 router.delete('/price-alerts/:id', farmerController.deletePriceAlert);
 router.get('/soil-reports', farmerController.getSoilReports);
 router.get('/soil-reports/:id', farmerController.getSoilReport);
+router.post('/fpo-interest', farmerController.submitFpoInterest);
 
 module.exports = router;

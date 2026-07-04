@@ -1,9 +1,10 @@
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const prisma = require('../config/database');
 const cache = require('../utils/cache');
 const { error } = require('../utils/apiResponse');
 
-const SESSION_CACHE_TTL = 120;  // 2 min
+const SESSION_CACHE_TTL = 300;  // 5 min — cuts DB session lookups on hot paths
 const USER_CACHE_TTL = 300;     // 5 min
 
 /**
@@ -27,8 +28,8 @@ const authenticate = async (req, res, next) => {
             throw err;
         }
 
-        // 1. Check session — try cache first
-        const sessionCacheKey = `session:${token.slice(-16)}`;
+        // 1. Check session — try cache first (full token hash avoids suffix collisions)
+        const sessionCacheKey = `session:${crypto.createHash('sha256').update(token).digest('hex').slice(0, 24)}`;
         let sessionValid = await cache.get(sessionCacheKey);
 
         if (sessionValid === null) {

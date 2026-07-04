@@ -110,7 +110,8 @@ class _CartItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final product = item['product'] as Map? ?? {};
     final name    = product['name'] ?? item['productName'] ?? 'Product';
-    final imageUrl = product['imageUrl'] ?? product['images']?[0];
+    final List? images = product['images'] as List?;
+    final imageUrl = product['imageUrl'] ?? (images != null && images.isNotEmpty ? images[0] : null);
     final price   = (product['price'] as num?) ?? (item['price'] as num?) ?? 0;
     final qty     = (item['quantity'] as num?) ?? 1;
     final itemId  = item['id'] as String? ?? '';

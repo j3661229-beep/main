@@ -70,7 +70,7 @@ class _BookingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dealer = booking['dealer']?['businessName'] ?? booking['dealer']?['user']?['name'] ?? 'Authorized Dealer';
-    final statusColor = booking['status'] == 'ACCEPTED' ? AppColors.success : (booking['status'] == 'CANCELLED' ? AppColors.error : AppColors.amber);
+    final statusColor = booking['status'] == 'ACCEPTED' ? AppColors.success : (booking['status'] == 'CANCELLED' ? AppColors.error : AppColors.warning);
     final slotDate = DateTime.tryParse(booking['slotDate'] ?? '');
 
     return Container(

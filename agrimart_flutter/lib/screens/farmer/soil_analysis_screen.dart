@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:animate_do/animate_do.dart';
 import '../../data/services/api_service.dart';
 import '../../data/providers/auth_provider.dart';
-import '../../data/providers/auth_provider.dart';
 import '../../core/providers/locale_provider.dart';
 import '../../services/voice_service.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
@@ -130,11 +129,11 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(15),
                         child: Image.file(_image!, fit: BoxFit.cover))
-                    : const Column(
+                    : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                            Text('🟫', style: TextStyle(fontSize: 48)),
-                            SizedBox(height: 8),
+                            const Text('🟫', style: TextStyle(fontSize: 48)),
+                            const SizedBox(height: 8),
                             Text('Tap to take soil photo',
                                 style: AppTextStyles.bodySM)
                           ]),
@@ -192,7 +191,7 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
                     children: [
                       Row(
                         children: [
-                          _PremiumBadge('🟫', 'Soil Type', _result!['analysis']?['soilType'] ?? 'N/A', AppColors.amber),
+                          _PremiumBadge('🟫', 'Soil Type', _result!['analysis']?['soilType'] ?? 'N/A', AppColors.warning),
                           const SizedBox(width: 16),
                           _PremiumBadge('⚗️', 'pH Level', '${_result!['analysis']?['phLevel'] ?? 'N/A'}', AppColors.primary),
                         ],

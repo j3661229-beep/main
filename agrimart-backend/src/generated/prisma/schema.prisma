@@ -79,6 +79,7 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([expiresAt])
 }
 
 model Farmer {
@@ -105,6 +106,8 @@ model Farmer {
   priceAlerts   PriceAlert[]
   cart          Cart?
   tradeBookings TradeBooking[]
+
+  @@index([district])
 }
 
 model Supplier {
@@ -217,6 +220,8 @@ model CartItem {
   updatedAt DateTime @updatedAt
   cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product   Product  @relation(fields: [productId], references: [id])
+
+  @@index([cartId, productId])
 }
 
 model Order {
@@ -256,6 +261,11 @@ model OrderItem {
   product    Product     @relation(fields: [productId], references: [id])
   supplier   Supplier    @relation(fields: [supplierId], references: [id])
   review     Review?
+
+  @@index([supplierId])
+  @@index([supplierId, status])
+  @@index([orderId])
+  @@index([productId])
 }
 
 model Payment {
@@ -271,6 +281,8 @@ model Payment {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   order         Order         @relation(fields: [orderId], references: [id])
+
+  @@index([status, createdAt])
 }
 
 model Review {
@@ -283,6 +295,9 @@ model Review {
   createdAt   DateTime  @default(now())
   orderItem   OrderItem @relation(fields: [orderItemId], references: [id])
   product     Product   @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@index([farmerId])
 }
 
 model SoilReport {
@@ -300,6 +315,8 @@ model SoilReport {
   confidence       Float
   createdAt        DateTime @default(now())
   farmer           Farmer   @relation(fields: [farmerId], references: [id])
+
+  @@index([farmerId])
 }
 
 model PriceAlert {
@@ -311,6 +328,8 @@ model PriceAlert {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   farmer      Farmer   @relation(fields: [farmerId], references: [id])
+
+  @@index([farmerId])
 }
 
 model Notification {
@@ -411,4 +430,8 @@ model MandiNews {
   crop        String?
   publishedAt DateTime @default(now())
   createdAt   DateTime @default(now())
+
+  @@index([publishedAt])
+  @@index([district])
+  @@index([state])
 }

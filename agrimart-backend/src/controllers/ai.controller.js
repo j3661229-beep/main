@@ -41,4 +41,11 @@ const cropCalendar = async (req, res, next) => {
     } catch (e) { next(e); }
 };
 
-module.exports = { soilAnalysis, diseaseDetection, cropRecommend, chat, cropCalendar };
+const getDiagnoseHistory = async (req, res, next) => {
+    try {
+        const data = await aiService.getDiagnoseHistory(req.user.farmer?.id, req.query);
+        success(res, data);
+    } catch (e) { next(e); }
+};
+
+module.exports = { soilAnalysis, diseaseDetection, cropRecommend, chat, cropCalendar, getDiagnoseHistory };

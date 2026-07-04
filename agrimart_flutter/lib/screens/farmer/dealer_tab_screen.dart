@@ -136,6 +136,12 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF283593),
+        foregroundColor: Colors.white,
+        title: const Text('Dealer Prices'),
+        elevation: 0,
+      ),
       body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         slivers: [

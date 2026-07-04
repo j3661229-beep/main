@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/constants/indian_languages.dart';
 import '../../core/providers/locale_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/providers/auth_provider.dart';
@@ -48,31 +49,23 @@ class LanguageSelectionScreen extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
-                  children: [
-                    _LanguageCard(
-                      title: l10n.english,
-                      subtitle: 'English',
-                      icon: '🇺🇸',
-                      isSelected: currentLocale.languageCode == 'en',
-                      onTap: () => ref.read(localeProvider.notifier).setLocale(const Locale('en')),
-                    ),
-                    const SizedBox(height: 16),
-                    _LanguageCard(
-                      title: l10n.hindi,
-                      subtitle: 'हिन्दी',
-                      icon: '🇮🇳',
-                      isSelected: currentLocale.languageCode == 'hi',
-                      onTap: () => ref.read(localeProvider.notifier).setLocale(const Locale('hi')),
-                    ),
-                    const SizedBox(height: 16),
-                    _LanguageCard(
-                      title: l10n.marathi,
-                      subtitle: 'मराठी',
-                      icon: '🚩',
-                      isSelected: currentLocale.languageCode == 'mr',
-                      onTap: () => ref.read(localeProvider.notifier).setLocale(const Locale('mr')),
-                    ),
-                  ],
+                  children: IndianLanguages.all.map((lang) {
+                    final isLast = lang == IndianLanguages.all.last;
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
+                      child: _LanguageCard(
+                        title: lang.code == 'en'
+                            ? l10n.english
+                            : lang.code == 'hi'
+                                ? l10n.hindi
+                                : l10n.marathi,
+                        subtitle: lang.nativeName,
+                        icon: lang.code == 'en' ? '🇬🇧' : '🇮🇳',
+                        isSelected: currentLocale.languageCode == lang.code,
+                        onTap: () => ref.read(localeProvider.notifier).setLocale(lang.locale),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
               const Spacer(),
@@ -83,7 +76,9 @@ class LanguageSelectionScreen extends ConsumerWidget {
                   width: double.infinity,
                   height: 60,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await ref.read(localeProvider.notifier).chooseLanguage(currentLocale);
+                      if (!context.mounted) return;
                       final user = ref.read(authProvider).user;
                       if (user != null) {
                         if (user.isFarmer) context.go('/farmer');

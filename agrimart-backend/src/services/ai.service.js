@@ -191,5 +191,23 @@ const cropCalendar = async ({ month, district, crops, language = 'English' }) =>
     return parseJSON(textPayload);
 };
 
-module.exports = { generateWithFallback, soilAnalysis, diseaseDetection, cropRecommend, chat, cropCalendar };
+const getDiagnoseHistory = async (farmerId, { page = 1, limit = 20 }) => {
+    if (!farmerId) throw new Error('Farmer profile required');
+    const skip = (page - 1) * limit;
+    const [history, total] = await Promise.all([
+        prisma.soilReport.findMany({
+            where: { farmerId },
+            skip,
+            take: Number(limit),
+            orderBy: { createdAt: 'desc' }
+        }),
+        prisma.soilReport.count({ where: { farmerId } })
+    ]);
+    return { 
+        data: history, 
+        pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) } 
+    };
+};
+
+module.exports = { generateWithFallback, soilAnalysis, diseaseDetection, cropRecommend, chat, cropCalendar, getDiagnoseHistory };
 

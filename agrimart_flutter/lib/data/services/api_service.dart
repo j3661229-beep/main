@@ -57,6 +57,29 @@ class ApiService {
     return r.data['data'];
   }
 
+  Future<Map> googleSignIn(Map<String, dynamic> data) async {
+    final payload = <String, dynamic>{};
+    data.forEach((key, value) {
+      if (value != null) payload[key] = value;
+    });
+
+    try {
+      final r = await _dio.post('/auth/google', data: payload);
+      final body = r.data;
+      if (body is Map && body['data'] != null) {
+        return Map<String, dynamic>.from(body['data'] as Map);
+      }
+      throw AppException('Login failed: invalid server response');
+    } on DioException catch (e) {
+      final responseData = e.response?.data;
+      if (responseData is Map) {
+        final msg = responseData['message'] ?? responseData['error'];
+        if (msg != null) throw AppException(msg.toString());
+      }
+      rethrow;
+    }
+  }
+
   Future<Map> loginWithPassword({required String emailOrPhone, required String password, required String role}) async {
     final r = await _dio.post('/auth/login', data: {
       'emailOrPhone': emailOrPhone,
@@ -240,17 +263,44 @@ class ApiService {
   // ── AI ────────────────────────────────────────────────────
 
   Future<Map> diagnoseCrop(String imagePath, {String? language}) async {
-    final formData = FormData.fromMap({
-      'image': await MultipartFile.fromFile(imagePath, filename: 'crop.jpg'),
-      if (language != null) 'language': language,
-    });
-    final r = await _dio.post('/diagnose', data: formData, options: Options(contentType: 'multipart/form-data'));
-    return r.data['data'];
+    final data = await detectDisease(imagePath, language: language);
+    return _mapDiseaseResult(data);
+  }
+
+  Map _mapDiseaseResult(Map data) {
+    final analysis = (data['analysis'] as Map?) ?? data;
+    final treatments = analysis['treatments'];
+    var treatmentText = '';
+    if (treatments is List && treatments.isNotEmpty) {
+      treatmentText = treatments.map((t) {
+        if (t is Map) {
+          return '${t['name'] ?? 'Treatment'}: ${t['dosage'] ?? ''} ${t['application'] ?? ''}'.trim();
+        }
+        return t.toString();
+      }).join('\n');
+    } else if (analysis['preventionTips'] is List) {
+      treatmentText = (analysis['preventionTips'] as List).join('\n');
+    }
+    final confidence = analysis['confidence'];
+    num? confidencePct;
+    if (confidence is num) {
+      confidencePct = confidence <= 1 ? (confidence * 100).round() : confidence.round();
+    }
+    return {
+      'crop': analysis['affectedCrop'] ?? 'Unknown',
+      'issue': analysis['diseaseName'] ?? 'Unknown',
+      'disease': analysis['diseaseName'],
+      'confidence': confidencePct ?? confidence,
+      'treatment': treatmentText,
+      'recommendation': treatmentText,
+      'analysis': analysis,
+      'relatedProducts': data['relatedProducts'],
+    };
   }
 
   Future<List> getDiagnoseHistory({int page = 1}) async {
-    final r = await _dio.get('/diagnose/history', queryParameters: {'page': page});
-    return r.data['data'] ?? [];
+    // History endpoint not implemented on backend yet — avoid 404 noise
+    return [];
   }
 
   Future<Map> analyzeSoil(String imagePath, {String? location, String? language}) async {
@@ -286,18 +336,79 @@ class ApiService {
     return r.data['data'];
   }
 
+  Future<Map> getCropCalendar({String? district, String? month, String? crops, String? language}) async {
+    final r = await _dio.get('/ai/crop-calendar', queryParameters: {
+      if (district != null) 'district': district,
+      if (month != null) 'month': month,
+      if (crops != null) 'crops': crops,
+      if (language != null) 'language': language,
+    });
+    return r.data['data'] ?? r.data;
+  }
+
+  // ── Farmer price alerts ───────────────────────────────────
+
+  Future<List> getPriceAlerts() async {
+    final r = await _dio.get('/farmer/price-alerts');
+    return r.data['data'] ?? [];
+  }
+
+  Future<Map> createPriceAlert({required String cropName, required double targetPrice}) async {
+    final r = await _dio.post('/farmer/price-alerts', data: {
+      'cropName': cropName,
+      'targetPrice': targetPrice,
+    });
+    return r.data['data'] ?? r.data;
+  }
+
+  Future<void> deletePriceAlert(String id) async {
+    await _dio.delete('/farmer/price-alerts/$id');
+  }
+
+  Future<Map> submitFpoInterest(Map<String, dynamic> data) async {
+    final r = await _dio.post('/farmer/fpo-interest', data: data);
+    return r.data;
+  }
+
   // ── Advisory ──────────────────────────────────────────────
 
   Future<List> getAdvisory({String? location}) async {
-    final r = await _dio.get('/advisory', queryParameters: {if (location != null) 'location': location});
-    return r.data['data'] ?? [];
+    final r = await _dio.get('/weather/advisory', queryParameters: {if (location != null) 'district': location});
+    final data = r.data['data'];
+    if (data is Map && data['advisories'] is List) return data['advisories'] as List;
+    return data is List ? data : [];
+  }
+
+  Map<String, dynamic> _normalizeWeather(Map raw) {
+    if (raw.containsKey('main')) {
+      final main = raw['main'] as Map?;
+      final w0 = (raw['weather'] as List?)?.isNotEmpty == true ? raw['weather'][0] as Map? : null;
+      final coord = raw['coord'] as Map?;
+      return {
+        ...Map<String, dynamic>.from(raw),
+        'temperature': main?['temp'],
+        'temp': main?['temp'],
+        'humidity': main?['humidity'],
+        'description': w0?['description'] ?? 'Clear',
+        'condition': w0?['main'] ?? 'Clear',
+        'windSpeed': (raw['wind'] as Map?)?['speed'],
+        'wind_speed': (raw['wind'] as Map?)?['speed'],
+        'location': raw['name'] ?? 'Your Location',
+        'city': raw['name'],
+        'lat': coord?['lat'],
+        'lng': coord?['lon'],
+      };
+    }
+    return Map<String, dynamic>.from(raw);
   }
 
   // ── Weather ───────────────────────────────────────────────
 
   Future<Map> getWeather({double? lat, double? lng}) async {
     final r = await _dio.get('/weather/current', queryParameters: {'lat': lat?.toString(), 'lng': lng?.toString()});
-    return r.data['data'];
+    final raw = r.data['data'] ?? r.data;
+    if (raw is Map) return _normalizeWeather(Map<String, dynamic>.from(raw));
+    return {};
   }
 
   Future<Map> getWeatherAdvisory({double? lat, double? lng, String? district}) async {
@@ -332,21 +443,27 @@ class ApiService {
   // ── Produce / Deals (via trade bookings) ──────────────────
 
   Future<List> getProduceListings({String? crop, String? district}) async {
-    final bookings = await getDealerMyBookings();
+    final bookings = await getDealerMyBookings(status: 'PENDING');
     return bookings.where((b) {
       if (crop != null && crop.isNotEmpty && crop != 'All') {
         if ((b['cropName'] ?? '').toString().toLowerCase() != crop.toLowerCase()) return false;
       }
       return true;
-    }).map((b) => {
-      'id': b['id'],
-      'crop': b['cropName'],
-      'quantity': b['approxQuintals'],
-      'expectedPrice': b['pricePerQuintal'],
-      'farmerName': b['farmer']?['user']?['name'] ?? b['farmer']?['name'] ?? 'Farmer',
-      'farmer': b['farmer'],
-      'status': b['status'],
-      'slotDate': b['slotDate'],
+    }).map((b) {
+      final farmer = b['farmer'] as Map?;
+      return {
+        'id': b['id'],
+        'crop': b['cropName'],
+        'quantity': b['approxQuintals'],
+        'expectedPrice': b['pricePerQuintal'],
+        'farmerName': farmer?['user']?['name'] ?? 'Farmer',
+        'village': farmer?['village'] ?? '',
+        'district': farmer?['district'] ?? district ?? '',
+        'farmer': farmer,
+        'status': b['status'],
+        'slotDate': b['slotDate'],
+        'notes': b['notes'],
+      };
     }).toList();
   }
 
@@ -468,8 +585,10 @@ class ApiService {
     return r.data['rate'] ?? r.data['data'] ?? {};
   }
 
-  Future<List> getDealerMyBookings() async {
-    final r = await _dio.get('/dealer/bookings');
+  Future<List> getDealerMyBookings({String? status}) async {
+    final r = await _dio.get('/dealer/bookings', queryParameters: {
+      if (status != null) 'status': status,
+    });
     return r.data['data'] ?? [];
   }
 
@@ -537,17 +656,26 @@ class _AuthInterceptor extends Interceptor {
   final FlutterSecureStorage _storage;
   _AuthInterceptor(this._storage);
 
+  static bool _isPublicAuthPath(String path) {
+    return path.contains('/auth/send-otp') ||
+        path.contains('/auth/verify-otp') ||
+        path.contains('/auth/google') ||
+        path.contains('/auth/refresh-token');
+  }
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    final token = await _storage.read(key: AppConstants.tokenKey);
-    if (token != null) options.headers['Authorization'] = 'Bearer $token';
+    if (!_isPublicAuthPath(options.path)) {
+      final token = await _storage.read(key: AppConstants.tokenKey);
+      if (token != null) options.headers['Authorization'] = 'Bearer $token';
+    }
     handler.next(options);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    if (err.response?.statusCode == 401) {
-      final refreshToken = await _storage.read(key: 'refresh_token');
+    if (err.response?.statusCode == 401 && !_isPublicAuthPath(err.requestOptions.path)) {
+      final refreshToken = await _storage.read(key: AppConstants.refreshTokenKey);
       if (refreshToken != null) {
         try {
           final dio = Dio(BaseOptions(baseUrl: AppConstants.baseUrl));

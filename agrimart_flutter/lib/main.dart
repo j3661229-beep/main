@@ -10,6 +10,7 @@ import 'firebase_options.dart';
 import 'core/storage/offline_cache.dart';
 import 'core/widgets/error_boundary.dart';
 import 'core/providers/locale_provider.dart';
+import 'core/constants/indian_languages.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
 
@@ -66,11 +67,7 @@ class AgriMartApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('hi'),
-        Locale('mr'),
-      ],
+      supportedLocales: IndianLanguages.locales,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         return MediaQuery(

@@ -1,10 +1,15 @@
 class AppConstants {
   AppConstants._();
 
-  // API
-  // Using 172.20.10.2 to allow your physical device to connect to your PC's locally running backend
-  // Alternatively, use 10.0.2.2 for Android Emulator or 127.0.0.1 for iOS simulator.
-  static const String baseUrl = 'http://172.20.10.3:3000/api/v1';
+  // API — backend mounts at /api (not /api/v1)
+  // Override at build time: flutter run --dart-define=API_BASE_URL=http://YOUR_IP:3000/api
+  // Physical device on same Wi‑Fi: use PC LAN IP (ipconfig). USB debugging alternative:
+  //   adb reverse tcp:3000 tcp:3000  then  --dart-define=API_BASE_URL=http://127.0.0.1:3000/api
+  // Android emulator: http://10.0.2.2:3000/api
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://10.133.106.6:3000/api',
+  );
 
   // Storage keys
   static const String tokenKey = 'auth_token';

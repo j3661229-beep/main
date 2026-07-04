@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/shared_widgets.dart';
 import '../../data/providers/auth_provider.dart';
+import '../../l10n/app_localizations.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   final String role;
@@ -23,6 +24,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String _language = 'en';
   bool _obscurePass = true;
   bool _isLoading = false;
+  bool _isGoogleLoading = false;
   String? _error;
 
   bool get _isFarmer => widget.role == 'FARMER';
@@ -82,8 +84,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  Future<void> _googleLogin() async {
+    setState(() { _isGoogleLoading = true; _error = null; });
+    try {
+      await ref.read(authProvider.notifier).signInWithGoogle(widget.role);
+    } catch (e) {
+      if (mounted) {
+        setState(() => _error = e.toString().replaceAll('Exception: ', ''));
+      }
+    } finally {
+      if (mounted) setState(() => _isGoogleLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final authLoading = ref.watch(authProvider).isLoading;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SingleChildScrollView(
@@ -248,6 +265,43 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         isLoading: _isLoading,
                         color: _accent,
                         icon: _isFarmer ? Icons.sms_outlined : Icons.login_rounded,
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          const Expanded(child: Divider(color: AppColors.border)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text('or', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+                          ),
+                          const Expanded(child: Divider(color: AppColors.border)),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: OutlinedButton(
+                          onPressed: (_isLoading || _isGoogleLoading || authLoading) ? null : _googleLogin,
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: AppColors.surface,
+                            side: const BorderSide(color: AppColors.border),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: _isGoogleLoading
+                              ? SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: _accent))
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.g_mobiledata_rounded, color: _accent, size: 28),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      l10n.loginWithGoogle,
+                                      style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                                    ),
+                                  ],
+                                ),
+                        ),
                       ),
                       const SizedBox(height: 20),
                       Row(

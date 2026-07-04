@@ -351,4 +351,203 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noProductsAvailable => 'No products available';
+
+  @override
+  String get tagline => 'Trusted partner for farmers';
+
+  @override
+  String get selectYourRole => 'Select your role';
+
+  @override
+  String get indianAgriMarketplace => 'Indian Agri-Tech Marketplace';
+
+  @override
+  String get farmerRole => 'Farmer';
+
+  @override
+  String get supplierRole => 'Supplier';
+
+  @override
+  String get dealerRole => 'Dealer';
+
+  @override
+  String get farmerRoleDesc => 'Buy inputs, sell produce & get AI crop advice';
+
+  @override
+  String get supplierRoleDesc =>
+      'Sell seeds, fertilizers & agricultural products';
+
+  @override
+  String get dealerRoleDesc => 'Buy produce from farmers & manage mandi deals';
+
+  @override
+  String get namaste => 'Namaste';
+
+  @override
+  String signInAs(String role) {
+    return 'Sign in as $role';
+  }
+
+  @override
+  String get welcomeBack => 'Welcome back';
+
+  @override
+  String get quickActions => 'Quick Actions';
+
+  @override
+  String get mandiNewsSection => 'Mandi News';
+
+  @override
+  String get localUpdates => 'Local updates';
+
+  @override
+  String get scanCrop => 'Scan a Crop';
+
+  @override
+  String get aiDiagnosis => 'AI Diagnosis';
+
+  @override
+  String get buyInputs => 'Buy Inputs';
+
+  @override
+  String get seedsAndMore => 'Seeds & More';
+
+  @override
+  String get sellProduceAction => 'Sell Produce';
+
+  @override
+  String get listYourCrop => 'List your crop';
+
+  @override
+  String get recentOrders => 'Recent Orders';
+
+  @override
+  String get viewAll => 'View all';
+
+  @override
+  String get noOrdersYet => 'No orders yet';
+
+  @override
+  String get startShoppingInputs => 'Start shopping for farm inputs';
+
+  @override
+  String get browseMarket => 'Browse Market';
+
+  @override
+  String get couldNotLoadOrders => 'Could not load orders';
+
+  @override
+  String nearLocation(String location) {
+    return 'Near $location';
+  }
+
+  @override
+  String get noLocalNewsYet => 'No local news yet';
+
+  @override
+  String get tapBrowseNews => 'Tap to browse all market updates';
+
+  @override
+  String get diagnose => 'Diagnose';
+
+  @override
+  String get market => 'Market';
+
+  @override
+  String get mobileNumber => 'Mobile Number';
+
+  @override
+  String get sendOtp => 'Send OTP';
+
+  @override
+  String get emailOrPhone => 'Email or Phone';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get dontHaveAccount => 'Don\'t have an account?';
+
+  @override
+  String get signUp => 'Sign Up';
+
+  @override
+  String get enterMobileNumber => 'Enter your mobile number';
+
+  @override
+  String get validTenDigit => 'Enter a valid 10-digit number';
+
+  @override
+  String get enterEmailOrPhone => 'Enter email or phone';
+
+  @override
+  String get enterPassword => 'Enter your password';
+
+  @override
+  String get orDivider => 'or';
+
+  @override
+  String get bengali => 'Bengali';
+
+  @override
+  String get telugu => 'Telugu';
+
+  @override
+  String get tamil => 'Tamil';
+
+  @override
+  String get gujarati => 'Gujarati';
+
+  @override
+  String get kannada => 'Kannada';
+
+  @override
+  String get malayalam => 'Malayalam';
+
+  @override
+  String get punjabi => 'Punjabi';
+
+  @override
+  String get odia => 'Odia';
+
+  @override
+  String get assamese => 'Assamese';
+
+  @override
+  String get urdu => 'Urdu';
+
+  @override
+  String get selectLanguageSubtitle =>
+      'Choose your preferred language for the app';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get couldNotLoadNews => 'Could not load news';
+
+  @override
+  String get noNewsRightNow => 'No news right now';
+
+  @override
+  String get newsNotifyLater =>
+      'We will notify you when there are market updates in your area.';
+
+  @override
+  String get localNews => 'Local News';
+
+  @override
+  String get readFullStory => 'Read full story';
+
+  @override
+  String get readMore => 'Read more';
+
+  @override
+  String get weatherUnavailable => 'Weather unavailable';
+
+  @override
+  String get logIn => 'Log In';
+
+  @override
+  String get getStarted => 'Get Started';
 }

@@ -11,4 +11,6 @@ router.post('/crop-recommend', authenticate, aiLimiter, aiController.cropRecomme
 router.post('/chat', authenticate, aiLimiter, aiController.chat);
 router.get('/crop-calendar', authenticate, aiLimiter, aiController.cropCalendar);
 
+router.get('/history', authenticate, aiController.getDiagnoseHistory);
+
 module.exports = router;

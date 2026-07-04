@@ -1,6 +1,9 @@
 const prisma = require('../config/database');
 const axios = require('axios');
 const redis = require('../config/redis');
+const cache = require('../utils/cache');
+
+const DASHBOARD_CACHE_TTL = 60;
 
 const getProfile = async (farmerId) => {
     return prisma.farmer.findUnique({ where: { id: farmerId }, include: { user: true } });
@@ -35,6 +38,10 @@ const updateFarmDetails = async (farmerId, data) => {
 };
 
 const getDashboard = async (farmerId) => {
+    const cacheKey = `farmer:dashboard:${farmerId}`;
+    const cached = await cache.get(cacheKey);
+    if (cached) return cached;
+
     const farmer = await prisma.farmer.findUnique({ where: { id: farmerId }, include: { user: true } });
 
     // Weather Promise
@@ -45,10 +52,14 @@ const getDashboard = async (farmerId) => {
         if (cached) return JSON.parse(cached);
         if (process.env.OPENWEATHER_API_KEY) {
             try {
-                const resp = await axios.get(`${process.env.OPENWEATHER_BASE_URL}/weather`, {
+                const base = process.env.OPENWEATHER_BASE_URL || 'https://api.openweathermap.org/data/2.5';
+                const resp = await axios.get(`${base}/weather`, {
                     params: { lat: farmer.latitude, lon: farmer.longitude, appid: process.env.OPENWEATHER_API_KEY, units: 'metric' },
+                    timeout: 10000,
                 });
-                await redis.setWithExpiry(cacheKey, 1800, JSON.stringify(resp.data));
+            try {
+                redis.setWithExpiry(cacheKey, 1800, JSON.stringify(resp.data)).catch(() => {});
+            } catch (e) {}
                 return resp.data;
             } catch (e) { return null; }
         }
@@ -83,7 +94,9 @@ const getDashboard = async (farmerId) => {
         priceAlertsPromise
     ]);
 
-    return { farmer, weather, nearbyProducts, recentOrders, priceAlerts };
+    const result = { farmer, weather, nearbyProducts, recentOrders, priceAlerts };
+    await cache.set(cacheKey, result, DASHBOARD_CACHE_TTL);
+    return result;
 };
 
 const getOrders = async (farmerId, { page, limit, skip }) => {
@@ -132,4 +145,21 @@ const getSoilReport = async (farmerId, reportId) => {
     return report;
 };
 
-module.exports = { getProfile, updateProfile, updateFarmDetails, getDashboard, getOrders, getOrder, createPriceAlert, getPriceAlerts, deletePriceAlert, getSoilReports, getSoilReport };
+const submitFpoInterest = async (farmerId, { cropName, approxQuintals, district, village }) => {
+    const farmer = await prisma.farmer.findUnique({ where: { id: farmerId }, include: { user: true } });
+    if (!farmer) throw Object.assign(new Error('Farmer not found'), { statusCode: 404 });
+
+    await prisma.notification.create({
+        data: {
+            userId: farmer.userId,
+            title: 'FPO bulk interest registered',
+            body: `We'll notify you when FPO pooling opens for ${cropName} in ${district || farmer.district}.`,
+            type: 'FPO_INTEREST',
+            data: { cropName, approxQuintals, district: district || farmer.district, village },
+        },
+    });
+
+    return { cropName, approxQuintals, district: district || farmer.district };
+};
+
+module.exports = { getProfile, updateProfile, updateFarmDetails, getDashboard, getOrders, getOrder, createPriceAlert, getPriceAlerts, deletePriceAlert, getSoilReports, getSoilReport, submitFpoInterest };

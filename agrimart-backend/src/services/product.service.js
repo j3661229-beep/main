@@ -80,7 +80,8 @@ const getProducts = async ({ category, search, sort, district, lat, lng, radius 
 
     // Round location for cache key (1 decimal ≈ 11km precision — good enough)
     const locKey = userLat !== null ? `${userLat.toFixed(1)}_${userLng.toFixed(1)}` : 'noLoc';
-    const cacheKey = `products:v2:${category || 'all'}:${search || ''}:${district || ''}:${sort || 'new'}:${locKey}:${page}:${limit}`;
+    const cacheVer = await getProductCacheVer();
+    const cacheKey = `products:v2:${cacheVer}:${category || 'all'}:${search || ''}:${district || ''}:${sort || 'new'}:${locKey}:${page}:${limit}`;
 
     const cached = await cache.get(cacheKey);
     if (cached) return cached;
@@ -318,11 +319,13 @@ const getRecommended = async (farmerId) => {
 };
 
 const invalidateProductCache = async () => {
-    // Invalidate version key so stale caches refresh on next TTL expiry
     try {
-        await cache.del('products:version');
+        const current = (await cache.get('products:cache_ver')) || 0;
+        await cache.set('products:cache_ver', Number(current) + 1, 86400);
     } catch (e) { /* ignore */ }
 };
+
+const getProductCacheVer = async () => (await cache.get('products:cache_ver')) || 0;
 
 const createProduct = async (supplierId, data) => {
     const product = await prisma.product.create({

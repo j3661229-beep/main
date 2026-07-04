@@ -7,16 +7,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/providers/app_providers.dart';
-import '../../../data/services/api_service.dart';
 import '../../../core/constants/app_constants.dart';
 
 final _selectedCategoryProvider = StateProvider<String?>((ref) => null);
 final _marketTabProvider = StateProvider<int>((ref) => 0);
-
-// Sell produce providers
-final _sellCropProvider = StateProvider<String?>((ref) => null);
-final _sellQtyProvider  = StateProvider<String>((ref) => '');
-final _sellPriceProvider = StateProvider<String>((ref) => '');
 
 class MarketScreen extends ConsumerStatefulWidget {
   final int initialTab;
@@ -150,7 +144,8 @@ class _ProductCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final imageUrl = product['imageUrl'] ?? product['images']?[0];
+    final List? images = product['images'] as List?;
+    final imageUrl = product['imageUrl'] ?? (images != null && images.isNotEmpty ? images[0] : null);
     final name     = product['name'] ?? 'Product';
     final supplier = product['supplier']?['businessName'] ?? 'Supplier';
     final price    = (product['price'] as num?) ?? 0;
@@ -228,174 +223,32 @@ class _ProductCard extends ConsumerWidget {
   }
 }
 
-// ── Sell Tab ──────────────────────────────────────────────
+// ── Sell Tab — dealer rate comparison ─────────────────────
 
-class _SellTab extends ConsumerStatefulWidget {
+class _SellTab extends StatelessWidget {
   const _SellTab();
-  @override
-  ConsumerState<_SellTab> createState() => _SellTabState();
-}
-
-class _SellTabState extends ConsumerState<_SellTab> {
-  final _formKey  = GlobalKey<FormState>();
-  final _qtyCtrl  = TextEditingController();
-  final _priceCtrl = TextEditingController();
-  String? _selectedCrop;
-  bool _isSubmitting = false;
-  bool _submitted = false;
-
-  final _crops = AppConstants.popularCrops.map((c) => c['name']!).toList();
-
-  @override
-  void dispose() { _qtyCtrl.dispose(); _priceCtrl.dispose(); super.dispose(); }
-
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _isSubmitting = true);
-    try {
-      await ApiService.instance.createProduceListing({
-        'crop': _selectedCrop,
-        'quantity': double.tryParse(_qtyCtrl.text),
-        'expectedPrice': double.tryParse(_priceCtrl.text),
-      });
-      setState(() { _isSubmitting = false; _submitted = true; });
-      HapticFeedback.mediumImpact();
-    } catch (e) {
-      setState(() => _isSubmitting = false);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Failed: ${e.toString()}'),
-        backgroundColor: AppColors.danger,
-        behavior: SnackBarBehavior.floating,
-      ));
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    if (_submitted) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('✅', style: TextStyle(fontSize: 64)),
-              const SizedBox(height: 16),
-              Text('Listed!', style: GoogleFonts.spaceGrotesk(fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.success)),
-              const SizedBox(height: 8),
-              Text('Your produce has been listed.\nDealers will contact you soon.', style: GoogleFonts.inter(fontSize: 14, color: AppColors.muted, height: 1.5), textAlign: TextAlign.center),
-              const SizedBox(height: 24),
-              AppButton(label: 'List Another', onTap: () => setState(() => _submitted = false), color: AppColors.farmerAccent, width: 180),
-            ],
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('💰', style: TextStyle(fontSize: 64)),
+          const SizedBox(height: 16),
+          Text('Sell to verified dealers', style: GoogleFonts.spaceGrotesk(fontSize: 20, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          Text(
+            'Compare live buying rates, book a delivery slot, and track bookings.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(fontSize: 14, color: AppColors.muted, height: 1.5),
           ),
-        ),
-      );
-    }
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.border),
-                boxShadow: AppColors.softShadow,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(width: 40, height: 40, decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(12)), child: const Center(child: Text('💰', style: TextStyle(fontSize: 20)))),
-                      const SizedBox(width: 12),
-                      Text('Sell Your Produce', style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink)),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Crop dropdown
-                  Text('Crop *', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.muted)),
-                  const SizedBox(height: 6),
-                  DropdownButtonFormField<String>(
-                    value: _selectedCrop,
-                    hint: Text('Select crop', style: GoogleFonts.inter(color: AppColors.placeholder)),
-                    decoration: InputDecoration(prefixIcon: const Icon(Icons.grass_outlined, color: AppColors.farmerAccent, size: 20)),
-                    items: _crops.map((c) => DropdownMenuItem(value: c, child: Text(c, style: GoogleFonts.inter(fontSize: 14)))).toList(),
-                    onChanged: (v) => setState(() => _selectedCrop = v),
-                    validator: (v) => v == null ? 'Select a crop' : null,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Quantity
-                  Text('Quantity (quintals) *', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.muted)),
-                  const SizedBox(height: 6),
-                  TextFormField(
-                    controller: _qtyCtrl,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-                    decoration: const InputDecoration(hintText: '0.00', prefixIcon: Icon(Icons.scale_outlined, color: AppColors.farmerAccent, size: 20), suffixText: 'qtl'),
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return 'Enter quantity';
-                      if (double.tryParse(v) == null) return 'Enter a valid number';
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Expected price
-                  Text('Expected Price / quintal *', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.muted)),
-                  const SizedBox(height: 6),
-                  TextFormField(
-                    controller: _priceCtrl,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-                    decoration: const InputDecoration(hintText: '0.00', prefixText: '₹ ', suffixText: '/qtl'),
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return 'Enter expected price';
-                      if (double.tryParse(v) == null) return 'Enter a valid price';
-                      return null;
-                    },
-                  ),
-
-                  // Live total
-                  if (_qtyCtrl.text.isNotEmpty && _priceCtrl.text.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(12)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Estimated Value', style: GoogleFonts.inter(fontSize: 13, color: AppColors.dealerAccent, fontWeight: FontWeight.w500)),
-                          Text(
-                            formatRupee(((double.tryParse(_qtyCtrl.text) ?? 0) * (double.tryParse(_priceCtrl.text) ?? 0))),
-                            style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.dealerAccent),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-
-                  const SizedBox(height: 24),
-                  AppButton(
-                    label: 'List Produce',
-                    onTap: _submit,
-                    isLoading: _isSubmitting,
-                    color: AppColors.dealerAccent,
-                    icon: Icons.sell_outlined,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 100),
-          ],
-        ),
+          const SizedBox(height: 28),
+          AppButton(label: 'Compare Dealer Rates', onTap: () => context.push('/farmer/dealer-rates'), color: AppColors.dealerAccent, icon: Icons.store_outlined),
+          const SizedBox(height: 12),
+          AppButton(label: 'My Trade Bookings', onTap: () => context.push('/farmer/trade/bookings'), color: AppColors.farmerAccent, icon: Icons.calendar_month_outlined, isOutlined: true),
+        ],
       ),
     );
   }

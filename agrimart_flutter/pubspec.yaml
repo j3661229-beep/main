@@ -31,6 +31,7 @@ dependencies:
 
   # UI
   google_fonts: ^6.2.1
+  google_sign_in: ^6.2.1
   flutter_svg: ^2.0.10+1
   cached_network_image: ^3.4.1
   shimmer: ^3.0.0
@@ -70,7 +71,6 @@ dependencies:
   # Animations
   animate_do: ^3.3.4
   in_app_review: ^2.0.11
-  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:

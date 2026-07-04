@@ -1,71 +1,183 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_theme.dart';
-import 'package:agrimart/l10n/app_localizations.dart';
+import '../../core/widgets/agri_ui.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/widgets/shared_widgets.dart';
 
 class SchemesScreen extends ConsumerWidget {
   const SchemesScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    final schemes = ref.watch(schemesProvider);
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('🏛️ Govt Schemes'), backgroundColor: AppColors.primary),
-      body: schemes.when(
-        loading: () => const AppShimmerList(),
-        error: (e, _) => AppErrorState(message: 'Could not load government schemes', onRetry: () => ref.invalidate(schemesProvider)),
-        data: (list) => list.isEmpty ? const AppEmptyState(icon: '🏛️', title: 'No Schemes Found', subtitle: 'No applicable agriculture schemes available at this moment.') :
-          ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: list.length,
-            itemBuilder: (ctx, i) {
-              final s = list[i] as Map;
-              return Container(margin: const EdgeInsets.only(bottom: 14), decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: const BorderRadius.vertical(top: Radius.circular(15))),
-                    child: Row(children: [
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: NestedScrollView(
+          headerSliverBuilder: (_, __) => [
+            SliverAppBar(
+              expandedHeight: 130,
+              pinned: true,
+              backgroundColor: AppColors.info,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Container(
+                  decoration: const BoxDecoration(gradient: AppColors.supplierGradient),
+                  padding: const EdgeInsets.fromLTRB(20, 56, 20, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
                       const Text('🏛️', style: TextStyle(fontSize: 28)),
-                      const SizedBox(width: 12),
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(s['title'] ?? '', style: AppTextStyles.headingSM),
-                        Text(s['ministry'] ?? '', style: AppTextStyles.caption.copyWith(color: AppColors.primary)),
-                      ])),
-                    ])),
-                  Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    if (s['benefits'] != null) ...[Text(l10n.benefits, style: AppTextStyles.labelLG), const SizedBox(height: 4), Text(s['benefits'] ?? '', style: AppTextStyles.bodyMD), const SizedBox(height: 10)],
-                    if (s['eligibility'] != null) ...[Text(l10n.eligibility, style: AppTextStyles.labelLG), const SizedBox(height: 4), Text(s['eligibility'] ?? '', style: AppTextStyles.bodyMD.copyWith(color: AppColors.textSecondary)), const SizedBox(height: 10)],
-                    if (s['documents'] is List) ...[
-                      Text(l10n.documentsNeeded, style: AppTextStyles.labelLG),
                       const SizedBox(height: 6),
-                      Wrap(spacing: 6, runSpacing: 4, children: (s['documents'] as List).map((d) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: AppColors.amberSurface, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.amberLight)),
-                        child: Text(d.toString(), style: AppTextStyles.caption.copyWith(color: AppColors.amber)),
-                      )).toList()),
+                      Text('Govt Schemes', style: GoogleFonts.spaceGrotesk(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white)),
+                      const SizedBox(height: 4),
+                      Text('Subsidies, loans & insurance', style: GoogleFonts.inter(fontSize: 13, color: Colors.white70)),
                       const SizedBox(height: 12),
                     ],
-                    if (s['applyUrl'] != null) SizedBox(width: double.infinity,
-                      child: OutlinedButton.icon(
-                        icon: const Icon(Icons.open_in_new, size: 16),
-                        label: Text('${l10n.applyOnline} →'),
-                        onPressed: () async {
-                          final url = Uri.parse(s['applyUrl']);
-                          if (await canLaunchUrl(url)) launchUrl(url, mode: LaunchMode.externalApplication);
-                        },
-                      )),
-                  ])),
-                ]));
-            },
+                  ),
+                ),
+              ),
+              bottom: TabBar(
+                indicatorColor: Colors.white,
+                indicatorWeight: 3,
+                labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 13),
+                unselectedLabelStyle: GoogleFonts.inter(fontSize: 13),
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white60,
+                tabs: const [
+                  Tab(text: 'For You'),
+                  Tab(text: 'All Schemes'),
+                ],
+              ),
+            ),
+          ],
+          body: TabBarView(
+            children: [
+              _SchemeList(provider: eligibleSchemesProvider, emptyTitle: 'No matched schemes', emptySubtitle: 'Complete your farm profile for better matches'),
+              _SchemeList(provider: schemesProvider, emptyTitle: 'No Schemes Found', emptySubtitle: 'Check back later for new government programs'),
+            ],
           ),
+        ),
       ),
     );
   }
 }
 
+class _SchemeList extends ConsumerWidget {
+  final FutureProvider<List> provider;
+  final String emptyTitle;
+  final String emptySubtitle;
+
+  const _SchemeList({
+    required this.provider,
+    required this.emptyTitle,
+    required this.emptySubtitle,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final schemes = ref.watch(provider);
+    return schemes.when(
+      loading: () => const AppShimmerList(),
+      error: (e, _) => AppErrorState(message: 'Could not load schemes', onRetry: () => ref.invalidate(provider)),
+      data: (list) => list.isEmpty
+          ? EmptyState(emoji: '🏛️', title: emptyTitle, subtitle: emptySubtitle)
+          : ListView.builder(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              itemCount: list.length,
+              itemBuilder: (ctx, i) => Padding(
+                padding: EdgeInsets.only(bottom: i < list.length - 1 ? 12 : 0),
+                child: _SchemeCard(scheme: list[i] as Map),
+              ),
+            ),
+    );
+  }
+}
+
+class _SchemeCard extends StatelessWidget {
+  final Map scheme;
+  const _SchemeCard({required this.scheme});
+
+  @override
+  Widget build(BuildContext context) {
+    return AgriCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.infoTint,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(17)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(14)),
+                  child: const Center(child: Text('🏛️', style: TextStyle(fontSize: 24))),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(scheme['title'] ?? '', style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w700)),
+                      Text(scheme['ministry'] ?? '', style: GoogleFonts.inter(fontSize: 12, color: AppColors.info, fontWeight: FontWeight.w500)),
+                      if (scheme['matchScore'] != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: BadgeChip(label: 'Match ${scheme['matchScore']}%', color: AppColors.successTint, textColor: AppColors.success),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (scheme['benefits'] != null) ...[
+                  Text('Benefits', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.muted)),
+                  const SizedBox(height: 4),
+                  Text(scheme['benefits'] ?? '', style: GoogleFonts.inter(fontSize: 13, height: 1.4)),
+                  const SizedBox(height: 12),
+                ],
+                if (scheme['eligibility'] != null) ...[
+                  Text('Eligibility', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.muted)),
+                  const SizedBox(height: 4),
+                  Text(scheme['eligibility'] ?? '', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted, height: 1.4)),
+                  const SizedBox(height: 12),
+                ],
+                if (scheme['applyUrl'] != null)
+                  AppButton(
+                    label: 'Apply Online',
+                    icon: Icons.open_in_new_rounded,
+                    height: 44,
+                    isOutlined: true,
+                    color: AppColors.info,
+                    onTap: () async {
+                      final url = Uri.parse(scheme['applyUrl']);
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

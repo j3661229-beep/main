@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../data/providers/auth_provider.dart';
+import '../core/providers/locale_provider.dart';
 
 // Auth
 import '../screens/auth/splash_screen.dart';
+import '../screens/auth/language_selection_screen.dart';
 import '../screens/auth/role_selection_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/otp_screen.dart';
@@ -23,6 +25,21 @@ import '../screens/farmer/advisory_screen.dart';
 import '../screens/farmer/orders_screen.dart';
 import '../screens/farmer/order_tracking_screen.dart';
 import '../screens/farmer/mandi_news_screen.dart';
+import '../screens/farmer/mandi_prices_screen.dart';
+import '../screens/farmer/schemes_screen.dart';
+import '../screens/farmer/soil_analysis_screen.dart';
+import '../screens/farmer/kisan_ai_screen.dart';
+import '../screens/farmer/crop_advisor_screen.dart';
+import '../screens/farmer/crop_calendar_screen.dart';
+import '../screens/farmer/dealer_tab_screen.dart';
+import '../screens/farmer/trade_booking_screen.dart';
+import '../screens/farmer/farmer_trade_bookings_screen.dart';
+import '../screens/farmer/price_alerts_screen.dart';
+import '../screens/farmer/pmfby_calculator_screen.dart';
+import '../screens/farmer/fpo_bulk_screen.dart';
+import '../screens/farmer/equipment_rental_screen.dart';
+import '../screens/farmer/farm_tools_screen.dart';
+import '../screens/dealer/manage_rates_screen.dart';
 
 // Supplier
 import '../screens/supplier/supplier_home.dart';
@@ -50,6 +67,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       final authState = ref.read(authProvider);
 
       if (state.matchedLocation == '/splash') return null;
+
+      final languageChosen = ref.read(languageChosenProvider);
+      if (!languageChosen && state.matchedLocation != '/auth/language') {
+        return '/auth/language';
+      }
 
       // Not authenticated → send to role selection
       if (!authState.isAuthenticated && authState.user == null) {
@@ -109,6 +131,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       _faded('/splash', const SplashScreen()),
 
       // ── Auth ──────────────────────────────────────────
+      _faded('/auth/language', const LanguageSelectionScreen()),
       _faded('/auth/role', const RoleSelectionScreen()),
 
       GoRoute(
@@ -167,6 +190,31 @@ final routerProvider = Provider<GoRouter>((ref) {
       _faded('/farmer/diagnose',   const CropDoctorScreen()),
       _faded('/farmer/advisory',   const AdvisoryScreen()),
       _faded('/farmer/news',       const MandiNewsScreen()),
+      _faded('/farmer/tools',      const FarmToolsScreen()),
+      _faded('/farmer/mandi-prices', const MandiPricesScreen()),
+      _faded('/farmer/schemes',    const SchemesScreen()),
+      _faded('/farmer/soil',       const SoilAnalysisScreen()),
+      _faded('/farmer/kisan-ai',   const KisanAiScreen()),
+      _faded('/farmer/crop-advisor', const CropAdvisorScreen()),
+      _faded('/farmer/crop-calendar', const CropCalendarScreen()),
+      _faded('/farmer/dealer-rates', const DealerTabScreen()),
+      _faded('/farmer/trade/bookings', const FarmerTradeBookingsScreen()),
+      _faded('/farmer/price-alerts', const PriceAlertsScreen()),
+      _faded('/farmer/pmfby',       const PmfbyCalculatorScreen()),
+      _faded('/farmer/fpo-bulk',   const FpoBulkScreen()),
+      _faded('/farmer/equipment',  const EquipmentRentalScreen()),
+
+      GoRoute(
+        path: '/farmer/trade/book',
+        pageBuilder: (ctx, state) {
+          final extra = state.extra as Map? ?? {};
+          return _fadedPage(TradeBookingScreen(
+            cropName: extra['cropName']?.toString() ?? '',
+            district: extra['district']?.toString() ?? '',
+            dealerId: extra['dealerId']?.toString() ?? '',
+          ));
+        },
+      ),
 
 
       GoRoute(
@@ -185,6 +233,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       _faded('/dealer',             const DealerHome()),
       _faded('/dealer/produce-board', const ProduceBoardScreen()),
       _faded('/dealer/my-deals',    const MyDealsScreen()),
+      _faded('/dealer/manage-rates', const ManageRatesScreen()),
 
       GoRoute(
         path: '/dealer/make-offer',
@@ -226,6 +275,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         previous?.user?.id != next.user?.id) {
       router.refresh();
     }
+  });
+
+  ref.listen(languageChosenProvider, (previous, next) {
+    if (previous != next) router.refresh();
   });
 
   return router;
