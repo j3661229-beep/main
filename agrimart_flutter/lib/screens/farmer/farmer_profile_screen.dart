@@ -33,6 +33,7 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
     _districtCtrl = TextEditingController();
     _landCtrl = TextEditingController();
     _cropsCtrl = TextEditingController();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadFromUser());
   }
 
   @override
@@ -46,14 +47,24 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
 
   void _loadFromUser() {
     final farmer = ref.read(authProvider).user?.farmer as Map?;
-    _villageCtrl.text = farmer?['village']?.toString() ?? '';
-    _districtCtrl.text = farmer?['district']?.toString() ?? ref.read(authProvider).user?.district ?? '';
-    _landCtrl.text = _farmSize(farmer)?.toString() ?? '';
-    _cropsCtrl.text = _cropsList(farmer)?.join(', ') ?? '';
+    if (farmer == null) return;
+    _villageCtrl.text = farmer['village']?.toString() ?? '';
+    _districtCtrl.text = farmer['district']?.toString() ?? ref.read(authProvider).user?.district ?? '';
+    _landCtrl.text = _farmSizeText(farmer);
+    _cropsCtrl.text = _cropsText(farmer);
   }
 
-  String? _farmSize(Map? farmer) =>
-      farmer?['farmSizeAcres'] ?? farmer?['landSize'];
+  String _farmSizeText(Map? farmer) {
+    final v = farmer?['farmSizeAcres'] ?? farmer?['landSize'];
+    if (v == null) return '';
+    return v.toString();
+  }
+
+  String _cropsText(Map? farmer) {
+    final list = _cropsList(farmer);
+    if (list == null || list.isEmpty) return '';
+    return list.map((e) => e.toString()).join(', ');
+  }
 
   List? _cropsList(Map? farmer) =>
       (farmer?['currentCrops'] as List?) ?? (farmer?['primaryCrops'] as List?);
@@ -74,6 +85,7 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
       });
       await ref.read(authProvider.notifier).refreshUser();
       if (mounted) {
+        _loadFromUser();
         setState(() => _editing = false);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.profileUpdated)));
       }
@@ -95,10 +107,16 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
     final phone = user?.phone ?? '';
     final initials = name.isNotEmpty ? name.trim().split(' ').map((w) => w[0]).take(2).join().toUpperCase() : 'F';
     final farmer = user?.farmer as Map?;
+    final farmSize = _farmSizeText(farmer);
+    final crops = _cropsText(farmer);
 
-    if (!_editing && _villageCtrl.text.isEmpty && farmer != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _loadFromUser());
-    }
+    ref.listen(authProvider, (prev, next) {
+      if (!_editing && next.user?.farmer != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && !_editing) _loadFromUser();
+        });
+      }
+    });
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -193,8 +211,8 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                           ] else ...[
                             _InfoRow(label: l10n.villageLabel, value: farmer?['village']?.toString() ?? '-'),
                             _InfoRow(label: l10n.districtLabel, value: farmer?['district']?.toString() ?? (user?.district ?? '-')),
-                            _InfoRow(label: l10n.landSizeLabel, value: '${_farmSize(farmer) ?? '-'} ${l10n.acresUnit}'),
-                            _InfoRow(label: l10n.cropsLabel, value: _cropsList(farmer)?.join(', ') ?? '-'),
+                            _InfoRow(label: l10n.landSizeLabel, value: '${farmSize.isEmpty ? '-' : farmSize} ${l10n.acresUnit}'),
+                            _InfoRow(label: l10n.cropsLabel, value: crops.isEmpty ? '-' : crops),
                             _InfoRow(label: l10n.languageLabel, value: _languageLabel(l10n)),
                           ],
                         ],

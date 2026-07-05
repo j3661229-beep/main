@@ -98,7 +98,9 @@ class WeatherScreen extends ConsumerWidget {
                           if (list is List && list.isNotEmpty)
                             ...list.map((a) {
                               final tip = a is Map
-                                  ? a['tip']?.toString()
+                                  ? (a['body']?.toString().isNotEmpty == true
+                                      ? a['body']?.toString()
+                                      : a['tip']?.toString())
                                   : a.toString();
                               final emoji =
                                   a is Map ? a['emoji']?.toString() : '🌱';

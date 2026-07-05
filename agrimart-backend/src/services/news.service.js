@@ -225,7 +225,7 @@ const getNews = async ({ district, state, limit = 20, page = 1, includeGoogle = 
     let isFallback = dbResult.isFallback;
     let sourceMix = 'database';
 
-    // Live Google RSS only when explicitly requested AND DB has fewer articles than needed
+    // Live Google RSS when DB has fewer articles than needed (default on)
     if (includeGoogle && dbResult.items.length < take) {
         try {
             const googleItems = await fetchLiveGoogleNews({ district, state, take: take * 2 });

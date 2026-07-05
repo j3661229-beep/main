@@ -33,6 +33,7 @@ class _DealerHomeState extends ConsumerState<DealerHome> {
     final r = context.r;
     return Scaffold(
       backgroundColor: AppColors.background,
+      resizeToAvoidBottomInset: false,
       body: IndexedStack(index: _currentIndex, children: _tabs),
       bottomNavigationBar: RoleBottomNav(
         currentIndex: _currentIndex,

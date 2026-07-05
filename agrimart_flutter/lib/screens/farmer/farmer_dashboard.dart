@@ -433,7 +433,11 @@ class _AdvisoryStrip extends ConsumerWidget {
       data: (adv) {
         final list = adv['advisories'] as List?;
         final first = list != null && list.isNotEmpty ? list.first : null;
-        final tip = first is Map ? first['tip']?.toString() : first?.toString();
+        final tip = first is Map
+            ? (first['body']?.toString().isNotEmpty == true
+                ? first['body']?.toString()
+                : first['tip']?.toString())
+            : first?.toString();
         if (tip == null || tip.isEmpty) return const SizedBox.shrink();
 
         return GestureDetector(

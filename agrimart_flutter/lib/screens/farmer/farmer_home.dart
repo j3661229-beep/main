@@ -49,6 +49,7 @@ class _FarmerHomeState extends ConsumerState<FarmerHome> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      resizeToAvoidBottomInset: false,
       body: IndexedStack(
         key: ValueKey('farmer-tabs-${locale.languageCode}'),
         index: _currentIndex,

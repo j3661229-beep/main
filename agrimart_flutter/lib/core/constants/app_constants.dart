@@ -1,17 +1,19 @@
 class AppConstants {
   AppConstants._();
 
-  // API — backend mounts at /api (not /api/v1)
-  // Override at build time: flutter run --dart-define=API_BASE_URL=http://YOUR_IP:3000/api
-  // Physical device on same Wi‑Fi: use PC LAN IP (ipconfig). USB debugging alternative:
-  //   adb reverse tcp:3000 tcp:3000  then  --dart-define=API_BASE_URL=http://127.0.0.1:3000/api
-  // Android emulator: http://10.0.2.2:3000/api
+  // Production — Google Cloud Run (europe-west1)
+  static const String productionApiUrl =
+      'https://agrimart-775670922011.europe-west1.run.app/api';
+
+  // Local dev override:
+  //   flutter run --dart-define=API_BASE_URL=http://YOUR_LAN_IP:3000/api
+  //   Android emulator: http://10.0.2.2:3000/api
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://agrimart-775670922011.europe-west1.run.app/api',
+    defaultValue: productionApiUrl,
   );
 
-  /// Ensures requests always hit `/api/*` even if base URL omits the suffix.
+  /// Normalized base URL — always ends with `/api`.
   static String get apiBaseUrl {
     var url = baseUrl.trim();
     while (url.endsWith('/')) {

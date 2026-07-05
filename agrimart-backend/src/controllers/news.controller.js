@@ -6,13 +6,13 @@ const newsService = require('../services/news.service');
  */
 exports.getNews = async (req, res) => {
     try {
-        const { district, state, limit = 20, page = 1, google = 'false' } = req.query;
+        const { district, state, limit = 20, page = 1, google } = req.query;
         const result = await newsService.getNews({
             district,
             state,
             limit,
             page,
-            includeGoogle: google === 'true',
+            includeGoogle: google !== 'false',
         });
 
         res.status(200).json({

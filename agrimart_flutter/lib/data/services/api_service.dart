@@ -375,11 +375,82 @@ class ApiService {
 
   // ── Advisory ──────────────────────────────────────────────
 
-  Future<List> getAdvisory({String? location}) async {
+  static int _severityColor(String? severity) {
+    switch (severity) {
+      case 'alert':
+        return 0xFFB3402F;
+      case 'warning':
+        return 0xFFD97706;
+      default:
+        return 0xFF3D6B35;
+    }
+  }
+
+  static String _severityType(String? severity) {
+    switch (severity) {
+      case 'alert':
+        return 'weather';
+      case 'warning':
+        return 'irrigation';
+      default:
+        return 'sowing';
+    }
+  }
+
+  static String _severityTitle(String? severity) {
+    switch (severity) {
+      case 'alert':
+        return 'Weather Alert';
+      case 'warning':
+        return 'Action Needed';
+      default:
+        return 'Farm Tip';
+    }
+  }
+
+  Map<String, dynamic> normalizeAdvisoryItem(dynamic raw) {
+    if (raw is! Map) {
+      final text = raw?.toString() ?? '';
+      return {
+        'title': 'Advisory',
+        'body': text,
+        'emoji': '📋',
+        'type': 'advisory',
+        'severity': 'info',
+        'color': 0xFF3D6B35,
+      };
+    }
+    final m = Map<String, dynamic>.from(raw);
+    if (m['title'] != null && m['body'] != null) {
+      return {
+        ...m,
+        'emoji': m['emoji']?.toString() ?? '📋',
+        'color': m['color'] ?? _severityColor(m['severity']?.toString()),
+      };
+    }
+    final severity = m['severity']?.toString() ?? 'info';
+    return {
+      'title': m['title']?.toString() ?? _severityTitle(severity),
+      'body': m['body']?.toString() ?? m['tip']?.toString() ?? '',
+      'emoji': m['emoji']?.toString() ?? '🌾',
+      'type': m['type']?.toString() ?? _severityType(severity),
+      'severity': severity,
+      'color': m['color'] ?? _severityColor(severity),
+    };
+  }
+
+  List<Map<String, dynamic>> _normalizeAdvisoryList(dynamic raw) {
+    if (raw is! List) return [];
+    return raw.map(normalizeAdvisoryItem).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getAdvisory({String? location}) async {
     final r = await _dio.get('/weather/advisory', queryParameters: {if (location != null) 'district': location});
     final data = r.data['data'];
-    if (data is Map && data['advisories'] is List) return data['advisories'] as List;
-    return data is List ? data : [];
+    if (data is Map && data['advisories'] is List) {
+      return _normalizeAdvisoryList(data['advisories']);
+    }
+    return data is List ? _normalizeAdvisoryList(data) : [];
   }
 
   Map<String, dynamic> _normalizeWeather(Map raw) {
@@ -414,16 +485,26 @@ class ApiService {
     return {};
   }
 
-  Future<Map> getWeatherAdvisory({double? lat, double? lng, String? district}) async {
+  Future<Map<String, dynamic>> getWeatherAdvisory({double? lat, double? lng, String? district}) async {
     final r = await _dio.get('/weather/advisory', queryParameters: {'lat': lat?.toString(), 'lng': lng?.toString(), 'district': district});
-    return r.data['data'];
+    final data = r.data['data'];
+    if (data is! Map) return {'advisories': <Map<String, dynamic>>[]};
+    final map = Map<String, dynamic>.from(data);
+    map['advisories'] = _normalizeAdvisoryList(map['advisories']);
+    if (map['weather'] is Map) {
+      map['weather'] = _normalizeWeather(Map<String, dynamic>.from(map['weather'] as Map));
+    }
+    return map;
   }
 
   // ── Farmer Features ───────────────────────────────────────
 
-  Future<Map> getMandiNews({String? district, String? state, int page = 1}) async {
+  Future<Map> getMandiNews({String? district, String? state, int page = 1, bool includeGoogle = true}) async {
     try {
-      final params = <String, dynamic>{'page': page};
+      final params = <String, dynamic>{
+        'page': page,
+        'google': includeGoogle ? 'true' : 'false',
+      };
       if (district != null) params['district'] = district;
       if (state != null) params['state'] = state;
       final r = await _dio.get('/news', queryParameters: params);
