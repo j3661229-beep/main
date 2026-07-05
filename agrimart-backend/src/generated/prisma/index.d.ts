@@ -2875,6 +2875,7 @@ export namespace Prisma {
     email: string | null
     googleId: string | null
     name: string | null
+    passwordHash: string | null
     role: $Enums.UserRole | null
     language: string | null
     profilePhoto: string | null
@@ -2890,6 +2891,7 @@ export namespace Prisma {
     email: string | null
     googleId: string | null
     name: string | null
+    passwordHash: string | null
     role: $Enums.UserRole | null
     language: string | null
     profilePhoto: string | null
@@ -2905,6 +2907,7 @@ export namespace Prisma {
     email: number
     googleId: number
     name: number
+    passwordHash: number
     role: number
     language: number
     profilePhoto: number
@@ -2922,6 +2925,7 @@ export namespace Prisma {
     email?: true
     googleId?: true
     name?: true
+    passwordHash?: true
     role?: true
     language?: true
     profilePhoto?: true
@@ -2937,6 +2941,7 @@ export namespace Prisma {
     email?: true
     googleId?: true
     name?: true
+    passwordHash?: true
     role?: true
     language?: true
     profilePhoto?: true
@@ -2952,6 +2957,7 @@ export namespace Prisma {
     email?: true
     googleId?: true
     name?: true
+    passwordHash?: true
     role?: true
     language?: true
     profilePhoto?: true
@@ -3040,6 +3046,7 @@ export namespace Prisma {
     email: string | null
     googleId: string | null
     name: string
+    passwordHash: string | null
     role: $Enums.UserRole
     language: string
     profilePhoto: string | null
@@ -3072,6 +3079,7 @@ export namespace Prisma {
     email?: boolean
     googleId?: boolean
     name?: boolean
+    passwordHash?: boolean
     role?: boolean
     language?: boolean
     profilePhoto?: boolean
@@ -3093,6 +3101,7 @@ export namespace Prisma {
     email?: boolean
     googleId?: boolean
     name?: boolean
+    passwordHash?: boolean
     role?: boolean
     language?: boolean
     profilePhoto?: boolean
@@ -3108,6 +3117,7 @@ export namespace Prisma {
     email?: boolean
     googleId?: boolean
     name?: boolean
+    passwordHash?: boolean
     role?: boolean
     language?: boolean
     profilePhoto?: boolean
@@ -3142,6 +3152,7 @@ export namespace Prisma {
       email: string | null
       googleId: string | null
       name: string
+      passwordHash: string | null
       role: $Enums.UserRole
       language: string
       profilePhoto: string | null
@@ -3552,6 +3563,7 @@ export namespace Prisma {
     readonly email: FieldRef<"User", 'String'>
     readonly googleId: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
+    readonly passwordHash: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'UserRole'>
     readonly language: FieldRef<"User", 'String'>
     readonly profilePhoto: FieldRef<"User", 'String'>
@@ -23897,6 +23909,7 @@ export namespace Prisma {
     email: 'email',
     googleId: 'googleId',
     name: 'name',
+    passwordHash: 'passwordHash',
     role: 'role',
     language: 'language',
     profilePhoto: 'profilePhoto',
@@ -24448,6 +24461,7 @@ export namespace Prisma {
     email?: StringNullableFilter<"User"> | string | null
     googleId?: StringNullableFilter<"User"> | string | null
     name?: StringFilter<"User"> | string
+    passwordHash?: StringNullableFilter<"User"> | string | null
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     language?: StringFilter<"User"> | string
     profilePhoto?: StringNullableFilter<"User"> | string | null
@@ -24468,6 +24482,7 @@ export namespace Prisma {
     email?: SortOrderInput | SortOrder
     googleId?: SortOrderInput | SortOrder
     name?: SortOrder
+    passwordHash?: SortOrderInput | SortOrder
     role?: SortOrder
     language?: SortOrder
     profilePhoto?: SortOrderInput | SortOrder
@@ -24491,6 +24506,7 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     name?: StringFilter<"User"> | string
+    passwordHash?: StringNullableFilter<"User"> | string | null
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     language?: StringFilter<"User"> | string
     profilePhoto?: StringNullableFilter<"User"> | string | null
@@ -24511,6 +24527,7 @@ export namespace Prisma {
     email?: SortOrderInput | SortOrder
     googleId?: SortOrderInput | SortOrder
     name?: SortOrder
+    passwordHash?: SortOrderInput | SortOrder
     role?: SortOrder
     language?: SortOrder
     profilePhoto?: SortOrderInput | SortOrder
@@ -24532,6 +24549,7 @@ export namespace Prisma {
     email?: StringNullableWithAggregatesFilter<"User"> | string | null
     googleId?: StringNullableWithAggregatesFilter<"User"> | string | null
     name?: StringWithAggregatesFilter<"User"> | string
+    passwordHash?: StringNullableWithAggregatesFilter<"User"> | string | null
     role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
     language?: StringWithAggregatesFilter<"User"> | string
     profilePhoto?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -26266,6 +26284,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -26286,6 +26305,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -26306,6 +26326,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26326,6 +26347,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26346,6 +26368,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -26361,6 +26384,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26376,6 +26400,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28417,6 +28442,7 @@ export namespace Prisma {
     email?: SortOrder
     googleId?: SortOrder
     name?: SortOrder
+    passwordHash?: SortOrder
     role?: SortOrder
     language?: SortOrder
     profilePhoto?: SortOrder
@@ -28432,6 +28458,7 @@ export namespace Prisma {
     email?: SortOrder
     googleId?: SortOrder
     name?: SortOrder
+    passwordHash?: SortOrder
     role?: SortOrder
     language?: SortOrder
     profilePhoto?: SortOrder
@@ -28447,6 +28474,7 @@ export namespace Prisma {
     email?: SortOrder
     googleId?: SortOrder
     name?: SortOrder
+    passwordHash?: SortOrder
     role?: SortOrder
     language?: SortOrder
     profilePhoto?: SortOrder
@@ -31894,6 +31922,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -31913,6 +31942,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -31948,6 +31978,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31967,6 +31998,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31986,6 +32018,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -32005,6 +32038,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -32209,6 +32243,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32228,6 +32263,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32405,6 +32441,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -32424,6 +32461,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -32549,6 +32587,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32568,6 +32607,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32658,6 +32698,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -32677,6 +32718,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -32780,6 +32822,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32799,6 +32842,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -34546,6 +34590,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -34565,6 +34610,7 @@ export namespace Prisma {
     email?: string | null
     googleId?: string | null
     name: string
+    passwordHash?: string | null
     role: $Enums.UserRole
     language?: string
     profilePhoto?: string | null
@@ -34600,6 +34646,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null
@@ -34619,6 +34666,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     language?: StringFieldUpdateOperationsInput | string
     profilePhoto?: NullableStringFieldUpdateOperationsInput | string | null

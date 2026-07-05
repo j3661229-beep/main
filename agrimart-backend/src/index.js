@@ -204,6 +204,9 @@ app.use(errorHandler);
 try {
   app.listen(PORT, '0.0.0.0', () => {
     logger.info(`🌾 AgriMart API running on port ${PORT} — ${process.env.NODE_ENV || 'development'}`);
+    // Warm Vertex AI client on Cloud Run / GCP
+    const { getVertexClient } = require('./config/vertexai');
+    getVertexClient().catch((e) => logger.warn(`Vertex AI warmup skipped: ${e.message}`));
   });
 } catch (error) {
   logger.error('CRITICAL: Server failed to start:', error);

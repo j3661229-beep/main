@@ -4,7 +4,7 @@ const prisma = require('../config/database');
 const { uploadToSupabase } = require('../middleware/upload');
 const logger = require('../utils/logger');
 const cache = require('../utils/cache');
-const { getVertexClient, isVertexConfigured } = require('../config/vertexai');
+const { getVertexClient } = require('../config/vertexai');
 
 const GEMINI_PRIMARY = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const GEMINI_FALLBACK = process.env.GEMINI_FALLBACK_MODEL || 'gemini-2.5-flash-lite';
@@ -46,10 +46,12 @@ const buildContents = (prompt, imageBase64 = null) => {
 };
 
 const generateWithFallback = async (prompt, imageBase64 = null) => {
-    const ai = getVertexClient();
-    if (!ai || !isVertexConfigured()) {
+    const ai = await getVertexClient();
+    if (!ai) {
         throw Object.assign(
-            new Error('Vertex AI is not configured. Set GOOGLE_CLOUD_PROJECT and use ADC (gcloud auth application-default login).'),
+            new Error(
+                'Vertex AI is not configured. On Cloud Run set GOOGLE_CLOUD_PROJECT and grant roles/aiplatform.user to the service account.'
+            ),
             { statusCode: 503 }
         );
     }

@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const prisma = require('../config/database');
 const redis = require('../config/redis');
 const { generateOTP, formatPhone, useStaticOtp, DEV_OTP } = require('../utils/helpers');
@@ -317,4 +318,77 @@ const logout = async (token, userId) => {
     if (userId) await invalidateUserCache(userId);
 };
 
-module.exports = { sendOTP, verifyOTP, googleSignIn, refreshToken, completeOnboarding, logout, invalidateUserCache };
+const findUserByEmailOrPhone = async (emailOrPhone) => {
+    const raw = String(emailOrPhone || '').trim();
+    if (!raw) return null;
+    if (raw.includes('@')) {
+        return prisma.user.findUnique({
+            where: { email: raw.toLowerCase() },
+            include: { farmer: true, supplier: true, dealer: true },
+        });
+    }
+    const formatted = formatPhone(raw);
+    return prisma.user.findFirst({
+        where: { OR: [{ phone: formatted }, { phone: raw }] },
+        include: { farmer: true, supplier: true, dealer: true },
+    });
+};
+
+const assertRoleAccess = async (user) => {
+    if (user.role === 'SUPPLIER') {
+        const supplier = user.supplier || await prisma.supplier.findUnique({ where: { userId: user.id } });
+        if (supplier?.docStatus === 'REJECTED') {
+            throw Object.assign(new Error(`Your verification was rejected: ${supplier.rejectedReason || 'Contact support'}`), { statusCode: 403 });
+        }
+        if (supplier?.docStatus === 'PENDING' && supplier?.govtDocUrl) {
+            return { pendingVerification: true };
+        }
+    } else if (user.role === 'DEALER') {
+        const dealer = user.dealer || await prisma.dealer.findUnique({ where: { userId: user.id } });
+        if (dealer?.docStatus === 'REJECTED') {
+            throw Object.assign(new Error(`Your verification was rejected: ${dealer.rejectedReason || 'Contact support'}`), { statusCode: 403 });
+        }
+        if (dealer?.docStatus === 'PENDING' && dealer?.govtDocUrl) {
+            return { pendingVerification: true };
+        }
+    }
+    return { pendingVerification: false };
+};
+
+const issueAuthSession = async (user, { pendingVerification = false } = {}) => {
+    const { token, refreshToken } = generateTokens(user.id, user.role);
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await prisma.session.create({ data: { userId: user.id, token, expiresAt } });
+
+    const fullUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        include: { farmer: true, supplier: true, dealer: true },
+    });
+    await cacheUser(fullUser);
+    return { user: fullUser, token, refreshToken, pendingVerification };
+};
+
+const loginWithPassword = async ({ emailOrPhone, password, role }) => {
+    if (!emailOrPhone || !password) {
+        throw Object.assign(new Error('Email/phone and password are required'), { statusCode: 400 });
+    }
+
+    const user = await findUserByEmailOrPhone(emailOrPhone);
+    if (!user || !user.passwordHash) {
+        throw Object.assign(new Error('Invalid email/phone or password'), { statusCode: 401 });
+    }
+    if (!user.isActive) {
+        throw Object.assign(new Error('Account is inactive'), { statusCode: 403 });
+    }
+    if (role && user.role !== role) {
+        throw Object.assign(new Error(`This account is registered as a ${user.role}. Cannot login as ${role}.`), { statusCode: 403 });
+    }
+    if (!bcrypt.compareSync(password, user.passwordHash)) {
+        throw Object.assign(new Error('Invalid email/phone or password'), { statusCode: 401 });
+    }
+
+    const access = await assertRoleAccess(user);
+    return issueAuthSession(user, access);
+};
+
+module.exports = { sendOTP, verifyOTP, googleSignIn, refreshToken, completeOnboarding, logout, invalidateUserCache, loginWithPassword };

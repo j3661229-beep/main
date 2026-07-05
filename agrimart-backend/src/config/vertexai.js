@@ -1,35 +1,57 @@
 const { GoogleGenAI } = require('@google/genai');
+const { GoogleAuth } = require('google-auth-library');
 const logger = require('../utils/logger');
 
-const PROJECT_ID =
+let projectId =
     process.env.GOOGLE_CLOUD_PROJECT ||
     process.env.GCP_PROJECT_ID ||
-    process.env.GCLOUD_PROJECT;
+    process.env.GCLOUD_PROJECT ||
+    null;
 
-const LOCATION = process.env.GOOGLE_CLOUD_LOCATION || process.env.GCP_LOCATION || 'asia-south1';
+// Cloud Run service URL uses europe-west1 — match Vertex region
+const LOCATION =
+    process.env.GOOGLE_CLOUD_LOCATION ||
+    process.env.GCP_LOCATION ||
+    (process.env.K_SERVICE ? 'europe-west1' : 'asia-south1');
 
 let client = null;
+let initPromise = null;
 
-const isVertexConfigured = () => Boolean(PROJECT_ID);
-
-const getVertexClient = () => {
-    if (!isVertexConfigured()) return null;
-    if (!client) {
-        client = new GoogleGenAI({
-            enterprise: true,
-            project: PROJECT_ID,
-            location: LOCATION,
-        });
-        logger.info(`Vertex AI client initialized (project=${PROJECT_ID}, location=${LOCATION})`);
+const resolveProjectId = async () => {
+    if (projectId) return projectId;
+    try {
+        const auth = new GoogleAuth({ scopes: ['https://www.googleapis.com/auth/cloud-platform'] });
+        projectId = await auth.getProjectId();
+        if (projectId) {
+            logger.info(`Vertex AI project auto-detected via ADC: ${projectId}`);
+        }
+    } catch (e) {
+        logger.warn(`Vertex AI project auto-detect failed: ${e.message}`);
     }
-    return client;
+    return projectId;
 };
 
-if (!isVertexConfigured()) {
-    logger.warn(
-        'GOOGLE_CLOUD_PROJECT is not set — Vertex AI features will fail. ' +
-        'Set GOOGLE_CLOUD_PROJECT and run: gcloud auth application-default login'
-    );
-}
+const getVertexClient = async () => {
+    if (client) return client;
+    if (!initPromise) {
+        initPromise = (async () => {
+            const pid = await resolveProjectId();
+            if (!pid) {
+                logger.error(
+                    'Vertex AI unavailable: set GOOGLE_CLOUD_PROJECT on Cloud Run, ' +
+                    'or run gcloud auth application-default login locally.'
+                );
+                return null;
+            }
+            client = new GoogleGenAI({ enterprise: true, project: pid, location: LOCATION });
+            logger.info(`Vertex AI client ready (project=${pid}, location=${LOCATION})`);
+            return client;
+        })();
+    }
+    return initPromise;
+};
 
-module.exports = { getVertexClient, isVertexConfigured, PROJECT_ID, LOCATION };
+const isVertexConfigured = () =>
+    Boolean(projectId || process.env.GOOGLE_CLOUD_PROJECT || process.env.K_SERVICE);
+
+module.exports = { getVertexClient, isVertexConfigured, get PROJECT_ID() { return projectId; }, LOCATION };

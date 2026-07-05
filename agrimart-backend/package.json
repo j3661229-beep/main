@@ -13,6 +13,7 @@
     "studio": "node node_modules/prisma/build/index.js studio",
     "seed": "node prisma/seed.js",
     "seed:sarang": "node prisma/seed-sarang.js",
+    "seed:demo": "node prisma/seed-demo-accounts.js",
     "deploy:gcp": "powershell -ExecutionPolicy Bypass -File scripts/deploy-gcp.ps1",
     "test:ai": "node scripts/test-ai-keys.js"
   },

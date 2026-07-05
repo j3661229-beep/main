@@ -57,4 +57,13 @@ const completeOnboarding = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
-module.exports = { sendOTP, verifyOTP, googleSignIn, refreshToken, logout, me, completeOnboarding };
+const login = async (req, res, next) => {
+    try {
+        const { emailOrPhone, password, role } = req.body;
+        if (!emailOrPhone || !password) return error(res, 'Email/phone and password are required');
+        const data = await authService.loginWithPassword({ emailOrPhone, password, role });
+        success(res, data, 'Login successful');
+    } catch (err) { next(err); }
+};
+
+module.exports = { sendOTP, verifyOTP, googleSignIn, refreshToken, logout, me, completeOnboarding, login };
