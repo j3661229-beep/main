@@ -107,6 +107,17 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', alias: true });
 });
 
+// API index — visiting /api in browser (Flutter base URL)
+app.get('/api', (req, res) => {
+  res.json({
+    success: true,
+    message: '🌾 AgriMart API',
+    version: '1.0.0',
+    health: '/api/health',
+    examples: ['/api/schemes', '/api/auth', '/api/ai/chat', '/api/mandi/prices'],
+  });
+});
+
 // Prevent cold starts — ping /health every 5 min in production
 if (process.env.PUBLIC_URL || process.env.RAILWAY_URL || process.env.NODE_ENV === 'production') {
   cron.schedule('*/5 * * * *', async () => {

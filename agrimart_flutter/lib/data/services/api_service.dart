@@ -16,7 +16,7 @@ class ApiService {
 
   late final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: AppConstants.baseUrl,
+      baseUrl: AppConstants.apiBaseUrl,
       connectTimeout: const Duration(milliseconds: AppConstants.connectTimeout),
       receiveTimeout: const Duration(milliseconds: AppConstants.receiveTimeout),
       headers: {
@@ -681,7 +681,7 @@ class _AuthInterceptor extends Interceptor {
       final refreshToken = await _storage.read(key: AppConstants.refreshTokenKey);
       if (refreshToken != null) {
         try {
-          final dio = Dio(BaseOptions(baseUrl: AppConstants.baseUrl));
+          final dio = Dio(BaseOptions(baseUrl: AppConstants.apiBaseUrl));
           final res = await dio.post('/auth/refresh-token', data: {'refreshToken': refreshToken});
           if (res.statusCode == 200 && res.data['data'] != null) {
             final newToken = res.data['data']['token'];

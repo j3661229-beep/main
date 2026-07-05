@@ -8,8 +8,20 @@ class AppConstants {
   // Android emulator: http://10.0.2.2:3000/api
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.59.22.186:3000/api',
+    defaultValue: 'https://agrimart-775670922011.europe-west1.run.app/api',
   );
+
+  /// Ensures requests always hit `/api/*` even if base URL omits the suffix.
+  static String get apiBaseUrl {
+    var url = baseUrl.trim();
+    while (url.endsWith('/')) {
+      url = url.substring(0, url.length - 1);
+    }
+    if (!url.endsWith('/api')) {
+      url = '$url/api';
+    }
+    return url;
+  }
 
   // Storage keys
   static const String tokenKey = 'auth_token';
