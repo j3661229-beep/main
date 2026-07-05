@@ -1,27 +1,27 @@
 require('dotenv').config();
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 const axios = require('axios');
 
+const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT || process.env.GCP_PROJECT_ID;
+const LOCATION = process.env.GOOGLE_CLOUD_LOCATION || process.env.GCP_LOCATION || 'asia-south1';
 const GEMINI_PRIMARY = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const GEMINI_FALLBACK = process.env.GEMINI_FALLBACK_MODEL || 'gemini-2.5-flash-lite';
 const GROQ_MODELS = (process.env.GROQ_CHAT_MODELS || 'llama-3.3-70b-versatile,llama-3.1-8b-instant').split(',').map((m) => m.trim());
 
-async function testGemini() {
-  const key = process.env.GEMINI_API_KEY;
-  if (!key) {
-    console.log('GEMINI: missing key');
+async function testVertex() {
+  if (!PROJECT_ID) {
+    console.log('VERTEX: missing GOOGLE_CLOUD_PROJECT');
     return;
   }
-  console.log('GEMINI key prefix:', key.slice(0, 8), 'length:', key.length);
-  const genAI = new GoogleGenerativeAI(key);
+  console.log('VERTEX project:', PROJECT_ID, 'location:', LOCATION);
+  const ai = new GoogleGenAI({ enterprise: true, project: PROJECT_ID, location: LOCATION });
   for (const model of [GEMINI_PRIMARY, GEMINI_FALLBACK]) {
     try {
-      const m = genAI.getGenerativeModel({ model });
-      const r = await m.generateContent('Reply with exactly: OK');
-      console.log('GEMINI OK', model, '->', r.response.text().trim().slice(0, 80));
+      const r = await ai.models.generateContent({ model, contents: 'Reply with exactly: OK' });
+      console.log('VERTEX OK', model, '->', r.text.trim().slice(0, 80));
       return;
     } catch (e) {
-      console.log('GEMINI FAIL', model, '->', e.message.split('\n')[0]);
+      console.log('VERTEX FAIL', model, '->', e.message.split('\n')[0]);
     }
   }
 }
@@ -51,7 +51,7 @@ async function testGroq() {
 }
 
 (async () => {
-  await testGemini();
+  await testVertex();
   console.log('---');
   await testGroq();
 })();

@@ -13,10 +13,11 @@
     "studio": "node node_modules/prisma/build/index.js studio",
     "seed": "node prisma/seed.js",
     "seed:sarang": "node prisma/seed-sarang.js",
-    "deploy:gcp": "powershell -ExecutionPolicy Bypass -File scripts/deploy-gcp.ps1"
+    "deploy:gcp": "powershell -ExecutionPolicy Bypass -File scripts/deploy-gcp.ps1",
+    "test:ai": "node scripts/test-ai-keys.js"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
+    "@google/genai": "^2.10.0",
     "@prisma/client": "^5.14.0",
     "@supabase/supabase-js": "^2.100.1",
     "@upstash/redis": "^1.37.0",
