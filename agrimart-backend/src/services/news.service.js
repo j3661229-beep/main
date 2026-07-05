@@ -211,38 +211,34 @@ const fetchLiveGoogleNews = async ({ district, state, take }) => {
         .slice(0, take);
 };
 
-const getNews = async ({ district, state, limit = 20, page = 1, includeGoogle = false }) => {
+const getNews = async ({ district, state, limit = 20, page = 1, includeGoogle = true }) => {
     const take = Number(limit);
     const skip = (Number(page) - 1) * take;
-    const cacheKey = `news_feed:${district || 'all'}:${state || 'all'}:${page}:${take}:${includeGoogle}`;
+    const cacheKey = `news_google:${district || 'all'}:${state || 'all'}:${page}:${take}`;
     const cached = await safeRedisGet(cacheKey);
     if (cached) return cached;
 
-    const dbResult = await fetchDbNews({ district, state, take, skip });
+    let items = [];
+    let scope = district ? 'district' : state ? 'state' : 'national';
+    let isFallback = false;
+    let sourceMix = 'google';
 
-    let items = dbResult.items;
-    let scope = dbResult.scope;
-    let isFallback = dbResult.isFallback;
-    let sourceMix = 'database';
-
-    // Live Google RSS when DB has fewer articles than needed (default on)
-    if (includeGoogle && dbResult.items.length < take) {
+    if (includeGoogle) {
         try {
-            const googleItems = await fetchLiveGoogleNews({ district, state, take: take * 2 });
-            items = dedupeByTitle([...dbResult.items, ...googleItems])
-                .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
-                .slice(skip, skip + take);
-
-            if (googleItems.length > 0) {
-                sourceMix = dbResult.items.length > 0 ? 'database+google' : 'google';
-                if (dbResult.items.length === 0) {
-                    scope = district ? 'district' : state ? 'state' : 'national';
-                    isFallback = false;
-                }
-            }
+            const googleItems = await fetchLiveGoogleNews({ district, state, take: take * 3 });
+            items = googleItems.slice(skip, skip + take);
         } catch (err) {
             logger.warn(`Google News RSS fetch failed: ${err.message}`);
         }
+    }
+
+    // Only fall back to DB if Google RSS is unavailable
+    if (items.length === 0) {
+        const dbResult = await fetchDbNews({ district, state, take, skip });
+        items = dbResult.items;
+        scope = dbResult.scope;
+        isFallback = dbResult.isFallback;
+        sourceMix = 'database';
     }
 
     const payload = { items, scope, isFallback, sourceMix };

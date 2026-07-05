@@ -1,7 +1,7 @@
 const newsService = require('../services/news.service');
 
 /**
- * @desc    Get Mandi News (DB + Google News RSS, location-aware)
+ * @desc    Get Mandi News (live Google News RSS, location-aware)
  * @route   GET /api/news
  */
 exports.getNews = async (req, res) => {
