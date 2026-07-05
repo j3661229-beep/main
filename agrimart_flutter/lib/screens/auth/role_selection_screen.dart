@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:agrimart/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/responsive.dart';
 
 class RoleSelectionScreen extends ConsumerStatefulWidget {
   const RoleSelectionScreen({super.key});
@@ -14,38 +16,38 @@ class RoleSelectionScreen extends ConsumerStatefulWidget {
 class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
   String? _hoveredRole;
 
-  final _roles = const [
-    {
-      'role': 'FARMER',
-      'emoji': '🌾',
-      'title': 'Farmer',
-      'titleHi': 'किसान',
-      'subtitle': 'Buy inputs, sell produce\n& get AI crop advice',
-      'accent': AppColors.farmerAccent,
-      'tint': AppColors.farmerTint,
-    },
-    {
-      'role': 'SUPPLIER',
-      'emoji': '🏪',
-      'title': 'Supplier',
-      'titleHi': 'आपूर्तिकर्ता',
-      'subtitle': 'Sell seeds, fertilizers\n& agricultural products',
-      'accent': AppColors.supplierAccent,
-      'tint': AppColors.supplierTint,
-    },
-    {
-      'role': 'DEALER',
-      'emoji': '🤝',
-      'title': 'Dealer',
-      'titleHi': 'व्यापारी',
-      'subtitle': 'Buy produce from farmers\n& manage mandi deals',
-      'accent': AppColors.dealerAccent,
-      'tint': AppColors.dealerTint,
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
+    final l10n = AppLocalizations.of(context)!;
+
+    final roles = [
+      {
+        'role': 'FARMER',
+        'emoji': '🌾',
+        'title': l10n.farmerRole,
+        'subtitle': l10n.farmerRoleDesc,
+        'accent': AppColors.farmerAccent,
+        'tint': AppColors.farmerTint,
+      },
+      {
+        'role': 'SUPPLIER',
+        'emoji': '🏪',
+        'title': l10n.supplierRole,
+        'subtitle': l10n.supplierRoleDesc,
+        'accent': AppColors.supplierAccent,
+        'tint': AppColors.supplierTint,
+      },
+      {
+        'role': 'DEALER',
+        'emoji': '🤝',
+        'title': l10n.dealerRole,
+        'subtitle': l10n.dealerRoleDesc,
+        'accent': AppColors.dealerAccent,
+        'tint': AppColors.dealerTint,
+      },
+    ];
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -54,47 +56,38 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
           child: Column(
             children: [
               const SizedBox(height: 48),
-              // Logo + Brand
               FadeInDown(
                 duration: const Duration(milliseconds: 600),
                 child: Column(
                   children: [
                     Container(
-                      width: 72, height: 72,
+                      width: 72,
+                      height: 72,
                       decoration: BoxDecoration(
                         gradient: AppColors.farmerGradient,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: AppColors.primaryShadow,
                       ),
-                      child: const Center(child: Text('🌱', style: TextStyle(fontSize: 36))),
+                      child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(36)))),
                     ),
                     const SizedBox(height: 16),
-                    Text('AgriMart',
-                        style: GoogleFonts.spaceGrotesk(fontSize: 32, fontWeight: FontWeight.w800, color: AppColors.ink)),
+                    Text('AgriMart', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(32), fontWeight: FontWeight.w800, color: AppColors.ink)),
                     const SizedBox(height: 6),
-                    Text('Indian Agri-Tech Marketplace',
-                        style: GoogleFonts.inter(fontSize: 14, color: AppColors.muted)),
+                    Text(l10n.indianAgriMarketplace, style: GoogleFonts.inter(fontSize: r.sp(14), color: AppColors.muted)),
                   ],
                 ),
               ),
               const SizedBox(height: 48),
               FadeInUp(
                 delay: const Duration(milliseconds: 200),
-                child: Text('Who are you?',
-                    style: GoogleFonts.spaceGrotesk(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.ink)),
-              ),
-              const SizedBox(height: 8),
-              FadeInUp(
-                delay: const Duration(milliseconds: 300),
-                child: Text('Select your role to get started',
-                    style: GoogleFonts.inter(fontSize: 14, color: AppColors.muted)),
+                child: Text(l10n.selectYourRole, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(22), fontWeight: FontWeight.w700, color: AppColors.ink)),
               ),
               const SizedBox(height: 32),
-              ...List.generate(_roles.length, (i) {
-                final r = _roles[i];
-                final accent = r['accent'] as Color;
-                final tint   = r['tint'] as Color;
-                final role   = r['role'] as String;
+              ...List.generate(roles.length, (i) {
+                final roleData = roles[i];
+                final accent = roleData['accent'] as Color;
+                final tint = roleData['tint'] as Color;
+                final role = roleData['role'] as String;
                 return FadeInUp(
                   delay: Duration(milliseconds: 400 + i * 100),
                   child: Padding(
@@ -118,14 +111,14 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
                         ),
                         child: Row(
                           children: [
-                            // Stamp motif
                             CustomPaint(
                               size: const Size(64, 64),
                               painter: _DashedCirclePainter(color: accent),
                               child: Container(
-                                width: 64, height: 64,
+                                width: 64,
+                                height: 64,
                                 decoration: BoxDecoration(color: tint, shape: BoxShape.circle),
-                                child: Center(child: Text(r['emoji'] as String, style: const TextStyle(fontSize: 28))),
+                                child: Center(child: Text(roleData['emoji'] as String, style: TextStyle(fontSize: r.sp(28)))),
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -133,18 +126,9 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Text(r['title'] as String,
-                                          style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.ink)),
-                                      const SizedBox(width: 8),
-                                      Text(r['titleHi'] as String,
-                                          style: GoogleFonts.inter(fontSize: 14, color: AppColors.muted)),
-                                    ],
-                                  ),
+                                  Text(roleData['title'] as String, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700, color: AppColors.ink)),
                                   const SizedBox(height: 4),
-                                  Text(r['subtitle'] as String,
-                                      style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted, height: 1.5)),
+                                  Text(roleData['subtitle'] as String, style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted, height: 1.5)),
                                 ],
                               ),
                             ),
@@ -159,8 +143,7 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
               const SizedBox(height: 40),
               FadeInUp(
                 delay: const Duration(milliseconds: 700),
-                child: Text('🇮🇳  Made for Bharat\'s farmers',
-                    style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted.withValues(alpha: 0.7))),
+                child: Text('🇮🇳  ${l10n.tagline}', style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted.withValues(alpha: 0.7))),
               ),
               const SizedBox(height: 24),
             ],
@@ -186,8 +169,6 @@ class _DashedCirclePainter extends CustomPainter {
       canvas.drawArc(Rect.fromCircle(center: c, radius: r), s, da * 0.55, false, paint);
     }
   }
-  @override bool shouldRepaint(_DashedCirclePainter old) => old.color != color;
+  @override
+  bool shouldRepaint(_DashedCirclePainter old) => old.color != color;
 }
-
-
-

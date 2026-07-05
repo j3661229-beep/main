@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/shared_widgets.dart';
+import '../../core/utils/responsive.dart';
 
 class DealerSlotsScreen extends StatefulWidget {
   const DealerSlotsScreen({super.key});
@@ -62,6 +63,7 @@ class _DealerSlotsScreenState extends State<DealerSlotsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -91,7 +93,7 @@ class _DealerSlotsScreenState extends State<DealerSlotsScreen> {
                     child: const Icon(Icons.event_rounded, color: AppColors.dealerAccent, size: 20),
                   ),
                   const SizedBox(width: 12),
-                  Text('Slot Configuration', style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink)),
+                  Text('Slot Configuration', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(16), fontWeight: FontWeight.w700, color: AppColors.ink)),
                 ]),
                 const SizedBox(height: 20),
 
@@ -130,7 +132,7 @@ class _DealerSlotsScreenState extends State<DealerSlotsScreen> {
                   ])),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('→', style: GoogleFonts.spaceGrotesk(fontSize: 20, color: AppColors.muted)),
+                    child: Text('→', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(20), color: AppColors.muted)),
                   ),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('End Time', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.muted)),

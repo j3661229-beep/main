@@ -8,6 +8,7 @@ import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
 import '../../core/errors/app_exceptions.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
+import '../../core/utils/responsive.dart';
 
 class OrderTrackingScreen extends ConsumerWidget {
   final String orderId;
@@ -15,6 +16,7 @@ class OrderTrackingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final tracking = ref.watch(orderTrackingProvider(orderId));
     final l10n = AppLocalizations.of(context)!;
 
@@ -50,6 +52,7 @@ class _TrackingBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final backendSteps = (data['tracking'] as List? ?? []);
     final order = data['order'] as Map? ?? {};
     final items = order['items'] as List? ?? [];
@@ -108,6 +111,7 @@ class _TrackingBody extends StatelessWidget {
             current: current,
             isLast: isLast,
             timestamp: step['timestamp']?.toString(),
+            l10n: l10n,
           );
         }),
 
@@ -204,6 +208,7 @@ class _StoreLocationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final hasNavigation = supplierLat != null || mapCoords != null || address.isNotEmpty;
 
     return Container(
@@ -235,7 +240,7 @@ class _StoreLocationCard extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Text('🏬', style: TextStyle(fontSize: 28)),
+                  child: Text('🏬', style: TextStyle(fontSize: r.sp(28))),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -254,9 +259,9 @@ class _StoreLocationCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         storeName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: r.sp(18),
                           fontWeight: FontWeight.w900,
                           letterSpacing: -0.5,
                         ),
@@ -295,7 +300,7 @@ class _StoreLocationCard extends StatelessWidget {
           // Navigate Button
           if (hasNavigation)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              padding: EdgeInsets.fromLTRB(r.horizontalPadding, 0, r.horizontalPadding, 16),
               child: Material(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
@@ -319,7 +324,7 @@ class _StoreLocationCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Text('🗺️', style: TextStyle(fontSize: 16)),
+                        Text('🗺️', style: TextStyle(fontSize: r.sp(16))),
                       ],
                     ),
                   ),
@@ -344,6 +349,7 @@ class _ProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -370,7 +376,7 @@ class _ProgressCard extends StatelessWidget {
                   color: AppColors.primarySurface,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Center(child: Text('📦', style: TextStyle(fontSize: 22))),
+                child: Center(child: Text('📦', style: TextStyle(fontSize: 22))),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -389,8 +395,8 @@ class _ProgressCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       '$progressPercent% ${l10n.ready}',
-                      style: const TextStyle(
-                        fontSize: 20,
+                      style: TextStyle(
+                        fontSize: r.sp(20),
                         fontWeight: FontWeight.w900,
                         color: AppColors.primaryDark,
                       ),
@@ -426,17 +432,20 @@ class _TimelineStep extends StatelessWidget {
   final bool current;
   final bool isLast;
   final String? timestamp;
+  final AppLocalizations l10n;
 
   const _TimelineStep({
     required this.label,
     required this.completed,
     required this.current,
     required this.isLast,
+    required this.l10n,
     this.timestamp,
   });
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     Color dotColor = completed
         ? (current ? AppColors.warning : AppColors.primary)
         : AppColors.border;
@@ -529,8 +538,8 @@ class _TimelineStep extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: AppColors.primaryBorder),
                       ),
-                      child: const Text(
-                        '● CURRENT',
+                      child: Text(
+                        '● ${l10n.currentStep}',
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
@@ -572,6 +581,7 @@ class _OrderItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final product = item['product'] as Map? ?? {};
     final name = product['name']?.toString() ?? item['name']?.toString() ?? 'Product';
     final qty = item['quantity']?.toString() ?? '1';
@@ -595,7 +605,7 @@ class _OrderItemRow extends StatelessWidget {
               color: AppColors.primarySurface,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Center(child: Text('🌿', style: TextStyle(fontSize: 22))),
+            child: Center(child: Text('🌿', style: TextStyle(fontSize: 22))),
           ),
           const SizedBox(width: 14),
           Expanded(

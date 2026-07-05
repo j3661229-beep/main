@@ -6,12 +6,14 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/providers/app_providers.dart';
+import '../../core/utils/responsive.dart';
 
 class SupplierDashboard extends ConsumerWidget {
   const SupplierDashboard({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final auth = ref.watch(authProvider);
     final user = auth.user;
     final bizName = (user?.supplier as Map?)?['businessName'] ?? user?.name ?? 'Supplier';
@@ -26,7 +28,7 @@ class SupplierDashboard extends ConsumerWidget {
         child: CustomScrollView(
           slivers: [
             SliverAppBar(
-              expandedHeight: 180,
+              expandedHeight: r.appBarExpandedHeight,
               pinned: true,
               backgroundColor: AppColors.supplierAccent,
               leading: const SizedBox(),
@@ -87,16 +89,17 @@ class SupplierDashboard extends ConsumerWidget {
             ),
 
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
+              child: ResponsiveLayout(
+                applyPadding: false,
+                child: Padding(
+                padding: EdgeInsets.fromLTRB(r.horizontalPadding, r.rs(16), r.horizontalPadding, r.bottomNavInset),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // ── Stat Grid ─────────────────────────────
                     dashboard.when(
                       loading: () => GridView.count(
-                        crossAxisCount: 2, shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: r.gridColumns(compact: 2, medium: 3, expanded: 4), shrinkWrap: true, physics: NeverScrollableScrollPhysics(),
                         mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.5,
                         children: const [
                           ShimmerBox(height: 100, radius: 16),
@@ -107,8 +110,7 @@ class SupplierDashboard extends ConsumerWidget {
                       ),
                       error: (_, __) => _SupplierStatsFallback(),
                       data: (d) => GridView.count(
-                        crossAxisCount: 2, shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: r.gridColumns(compact: 2, medium: 3, expanded: 4), shrinkWrap: true, physics: NeverScrollableScrollPhysics(),
                         mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.5,
                         children: [
                           StatCard(label: 'Orders This Week', value: '${d['ordersThisWeek'] ?? 0}', icon: Icons.shopping_bag_outlined, accent: AppColors.supplierAccent, tint: AppColors.supplierTint),
@@ -122,7 +124,7 @@ class SupplierDashboard extends ConsumerWidget {
                     const SizedBox(height: 24),
 
                     // ── Quick Actions ─────────────────────────
-                    Text('Quick Actions', style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink)),
+                    Text('Quick Actions', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(16), fontWeight: FontWeight.w700, color: AppColors.ink)),
                     const SizedBox(height: 12),
                     Row(
                       children: [
@@ -167,7 +169,7 @@ class SupplierDashboard extends ConsumerWidget {
                                 Padding(
                                   padding: const EdgeInsets.all(14),
                                   child: Row(children: [
-                                    Container(width: 40, height: 40, decoration: BoxDecoration(color: AppColors.supplierTint, borderRadius: BorderRadius.circular(10)), child: const Center(child: Text('🌱', style: TextStyle(fontSize: 20)))),
+                                    Container(width: 40, height: 40, decoration: BoxDecoration(color: AppColors.supplierTint, borderRadius: BorderRadius.circular(10)), child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(20))))),
                                     const SizedBox(width: 12),
                                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                       Text(o['farmerName'] ?? 'Farmer', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500)),
@@ -187,10 +189,11 @@ class SupplierDashboard extends ConsumerWidget {
                         );
                       },
                     ),
-                    const SizedBox(height: 100),
+                    SizedBox(height: r.bottomNavInset),
                   ],
                 ),
               ),
+            ),
             ),
           ],
         ),
@@ -201,9 +204,10 @@ class SupplierDashboard extends ConsumerWidget {
 
 class _SupplierStatsFallback extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => GridView.count(
-    crossAxisCount: 2, shrinkWrap: true,
-    physics: const NeverScrollableScrollPhysics(),
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return GridView.count(
+    crossAxisCount: r.gridColumns(compact: 2, medium: 3, expanded: 4), shrinkWrap: true, physics: NeverScrollableScrollPhysics(),
     mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.5,
     children: const [
       StatCard(label: 'Orders This Week', value: '--', icon: Icons.shopping_bag_outlined, accent: AppColors.supplierAccent, tint: AppColors.supplierTint),
@@ -212,6 +216,7 @@ class _SupplierStatsFallback extends StatelessWidget {
       StatCard(label: 'Pending Orders', value: '--', icon: Icons.pending_outlined, accent: AppColors.warning, tint: AppColors.warningTint),
     ],
   );
+  }
 }
 
 class _QuickBtn extends StatelessWidget {
@@ -221,7 +226,9 @@ class _QuickBtn extends StatelessWidget {
   const _QuickBtn({required this.emoji, required this.label, required this.accent, required this.tint, required this.onTap});
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return GestureDetector(
     onTap: onTap,
     child: Container(
       padding: const EdgeInsets.symmetric(vertical: 18),
@@ -233,12 +240,13 @@ class _QuickBtn extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Container(width: 40, height: 40, decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(12)), child: Center(child: Text(emoji, style: const TextStyle(fontSize: 20)))),
+          Container(width: 40, height: 40, decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(12)), child: Center(child: Text(emoji, style: TextStyle(fontSize: r.sp(20))))),
           const SizedBox(height: 8),
           Text(label, style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.ink)),
         ],
       ),
     ),
-  );
+    );
+  }
 }
 

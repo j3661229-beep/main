@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/responsive.dart';
 
 class DealerBookingsScreen extends StatelessWidget {
   const DealerBookingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -118,14 +120,14 @@ class DealerBookingsScreen extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: () {},
                     style: OutlinedButton.styleFrom(foregroundColor: AppColors.error),
-                    child: const Text('Reject'),
+                    child: Text('Reject'),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {},
-                    child: const Text('Accept'),
+                    child: Text('Accept'),
                   ),
                 ),
               ],
@@ -142,12 +144,15 @@ class _SummaryItem extends StatelessWidget {
   final Color color;
   const _SummaryItem({required this.label, required this.value, required this.color});
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Column(
     children: [
-      Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.bold)),
+      Text(value, style: TextStyle(color: color, fontSize: r.sp(24), fontWeight: FontWeight.bold)),
       Text(label, style: TextStyle(color: color.withValues(alpha: 0.7), fontSize: 12)),
     ],
   );
+  }
 }
 
 class _CropInfoItem extends StatelessWidget {

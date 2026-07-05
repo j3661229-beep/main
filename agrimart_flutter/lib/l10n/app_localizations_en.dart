@@ -550,4 +550,279 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get getStarted => 'Get Started';
+
+  @override
+  String get tools => 'Tools';
+
+  @override
+  String get farmToolkit => 'Farm Toolkit';
+
+  @override
+  String get farmToolkitSubtitle => '11 tools for your farm';
+
+  @override
+  String get farmToolkitBanner =>
+      'Tap any tool — AI crop doctor, govt schemes, insurance & equipment rental.';
+
+  @override
+  String get popularTools => 'Popular Tools';
+
+  @override
+  String get seeAll => 'See all';
+
+  @override
+  String get todaysAdvisory => 'Today\'s Advisory';
+
+  @override
+  String get viewAdvisory => 'View advisory';
+
+  @override
+  String get liveMandiRates => 'Live Mandi Rates';
+
+  @override
+  String get perQuintalShort2 => '/qtl';
+
+  @override
+  String get cropDoctor => 'Crop Doctor';
+
+  @override
+  String get cropDoctorSubtitle => 'AI disease detection';
+
+  @override
+  String get takeCropPhoto => 'Take a photo of your crop';
+
+  @override
+  String get aiIdentifyDisease =>
+      'AI will identify disease & suggest treatment';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get analyzeCrop => 'Analyze Crop';
+
+  @override
+  String get analyzingCrop => 'Analyzing crop...';
+
+  @override
+  String get aiWorking => 'AI is analyzing your crop';
+
+  @override
+  String get analysisResult => 'Analysis Result';
+
+  @override
+  String get detectedIssue => 'Detected Issue';
+
+  @override
+  String get confidence => 'Confidence';
+
+  @override
+  String get scanHistory => 'Scan History';
+
+  @override
+  String get noScansYet => 'No scans yet';
+
+  @override
+  String get scanHistorySubtitle => 'Scan a crop to see history here';
+
+  @override
+  String get browseProducts => 'Browse market';
+
+  @override
+  String get sellTabTitle => 'Sell to verified dealers';
+
+  @override
+  String get sellTabSubtitle =>
+      'Compare live buying rates, book a delivery slot, and track bookings.';
+
+  @override
+  String get compareDealerRates => 'Compare Dealer Rates';
+
+  @override
+  String get myTradeBookings => 'My Trade Bookings';
+
+  @override
+  String bestRateToday(String district) {
+    return 'Best rate today in $district';
+  }
+
+  @override
+  String get bookSlot => 'Book slot';
+
+  @override
+  String get editFarmProfile => 'Edit farm profile';
+
+  @override
+  String get saveChanges => 'Save changes';
+
+  @override
+  String get villageLabel => 'Village';
+
+  @override
+  String get districtLabel => 'District';
+
+  @override
+  String get landSizeLabel => 'Land size (acres)';
+
+  @override
+  String get cropsLabel => 'Crops (comma separated)';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get helpSupport => 'Help & Support';
+
+  @override
+  String get logOutConfirmTitle => 'Log out?';
+
+  @override
+  String get logOutConfirmMessage => 'You will be logged out of AgriMart.';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get searchTools => 'Search tools...';
+
+  @override
+  String get favoriteTools => 'Favorites';
+
+  @override
+  String get recentTools => 'Recently used';
+
+  @override
+  String get noToolsMatch => 'No tools match your search';
+
+  @override
+  String get offlineTitle => 'You are offline';
+
+  @override
+  String get offlineSubtitle =>
+      'Some features need internet. Cached data may be shown.';
+
+  @override
+  String get kisanPromptSpray => 'When should I spray onion?';
+
+  @override
+  String get kisanPromptPmfby => 'PMFBY insurance for tomato?';
+
+  @override
+  String get kisanPromptMandi => 'Best mandi rate for grapes?';
+
+  @override
+  String get orderStepPlaced => 'Order placed';
+
+  @override
+  String get orderStepConfirmed => 'Confirmed';
+
+  @override
+  String get orderStepShipped => 'Shipped';
+
+  @override
+  String get orderStepDelivered => 'Delivered';
+
+  @override
+  String get proceedToPay => 'Proceed to Pay';
+
+  @override
+  String get cartEmpty => 'Cart is empty';
+
+  @override
+  String get cartEmptySubtitle => 'Add items from the market to continue';
+
+  @override
+  String get myCart => 'My Cart';
+
+  @override
+  String get subtotal => 'Subtotal';
+
+  @override
+  String get delivery => 'Delivery';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get free => 'FREE';
+
+  @override
+  String get addedToCart => 'Added to cart';
+
+  @override
+  String get categoryMarketIntel => 'Market Intel';
+
+  @override
+  String get categoryAiAdvisory => 'AI & Advisory';
+
+  @override
+  String get categorySchemesFinance => 'Schemes & Finance';
+
+  @override
+  String get categoryTradeRent => 'Trade & Rent';
+
+  @override
+  String toolsCount(int count) {
+    return '$count TOOLS';
+  }
+
+  @override
+  String get farmToolkitCardSubtitle => 'Prices, AI, schemes, insurance & more';
+
+  @override
+  String get pullToRefresh => 'Pull down to refresh';
+
+  @override
+  String get analysisFailed => 'Analysis failed. Please try again.';
+
+  @override
+  String get cropLabel => 'Crop';
+
+  @override
+  String get localBadge => 'Local';
+
+  @override
+  String get priceAlerts => 'Price Alerts';
+
+  @override
+  String get aiPowered => 'AI Powered';
+
+  @override
+  String get changeLanguage => 'Change language';
+
+  @override
+  String get profileUpdated => 'Profile updated';
+
+  @override
+  String get buyInputsTab => 'Buy Inputs';
+
+  @override
+  String get sellProduceTab => 'Sell Produce';
+
+  @override
+  String get noRatesAvailable => 'No rates available';
+
+  @override
+  String get tapForPriceAlerts => 'Set price alerts';
+
+  @override
+  String get logOut => 'Log Out';
+
+  @override
+  String get languageLabel => 'Language';
+
+  @override
+  String get currentStep => 'CURRENT';
+
+  @override
+  String get treatmentRecommendation => 'Treatment Recommendation';
+
+  @override
+  String get noAdvisoryToday => 'No advisory available today.';
+
+  @override
+  String get acresUnit => 'acres';
 }

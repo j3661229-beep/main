@@ -6,6 +6,7 @@ import 'package:geocoding/geocoding.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/responsive.dart';
 
 class ProfileSetupScreen extends ConsumerStatefulWidget {
   const ProfileSetupScreen({super.key});
@@ -156,6 +157,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final auth = ref.watch(authProvider);
     final user = auth.user;
     if (user == null) return const Scaffold();
@@ -339,7 +341,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 ),
                 child: auth.isLoading
                   ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
-                  : const Text('Complete Setup ✨', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  : Text('Complete Setup ✨', style: TextStyle(fontSize: r.sp(18), fontWeight: FontWeight.bold)),
               ),
               const SizedBox(height: 32),
             ],
@@ -357,6 +359,7 @@ class _SetupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(

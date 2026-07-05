@@ -1,6 +1,7 @@
 // Legacy PhoneScreen — redirected to the unified LoginScreen
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/utils/responsive.dart';
 
 class PhoneScreen extends StatelessWidget {
   final String role;
@@ -8,6 +9,7 @@ class PhoneScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     // Immediately redirect to the new login flow
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.go('/auth/login?role=$role');

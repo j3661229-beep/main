@@ -4,12 +4,14 @@ import 'package:go_router/go_router.dart';
 import '../../core/widgets/agri_ui.dart';
 import '../../core/widgets/shared_widgets.dart';
 import '../../data/providers/app_providers.dart';
+import '../../core/utils/responsive.dart';
 
 class EquipmentRentalScreen extends ConsumerWidget {
   const EquipmentRentalScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final products = ref.watch(equipmentProductsProvider);
 
     return AgriScreen(
@@ -35,7 +37,7 @@ class EquipmentRentalScreen extends ConsumerWidget {
             );
           }
           return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+            padding: EdgeInsets.fromLTRB(r.horizontalPadding, 20, r.horizontalPadding, 32),
             child: Column(
               children: List.generate(list.length, (i) {
                 final p = list[i] as Map;

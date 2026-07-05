@@ -5,19 +5,21 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/providers/app_providers.dart';
+import '../../core/utils/responsive.dart';
 
 class MyOrdersScreen extends ConsumerWidget {
   const MyOrdersScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final orders = ref.watch(ordersProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        title: Text('My Orders', style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700)),
+        title: Text('My Orders', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700)),
         leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
       ),
       body: RefreshIndicator(
@@ -64,6 +66,7 @@ class _OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final status       = order['status'] ?? 'Pending';
     final productName  = order['productName'] ?? order['items']?[0]?['product']?['name'] ?? 'Product';
     final supplierName = order['supplierName'] ?? order['items']?[0]?['supplier']?['businessName'] ?? 'Supplier';
@@ -86,7 +89,7 @@ class _OrderCard extends StatelessWidget {
             Container(
               width: 52, height: 52,
               decoration: BoxDecoration(color: AppColors.farmerTint, borderRadius: BorderRadius.circular(14)),
-              child: const Center(child: Text('📦', style: TextStyle(fontSize: 26))),
+              child: Center(child: Text('📦', style: TextStyle(fontSize: r.sp(26)))),
             ),
             const SizedBox(width: 14),
             Expanded(

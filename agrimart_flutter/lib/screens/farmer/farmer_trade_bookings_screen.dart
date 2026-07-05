@@ -4,12 +4,14 @@ import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import 'package:intl/intl.dart';
+import '../../core/utils/responsive.dart';
 
 class FarmerTradeBookingsScreen extends ConsumerWidget {
   const FarmerTradeBookingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final bookings = ref.watch(farmerTradeBookingsProvider);
 
     return Scaffold(
@@ -38,7 +40,7 @@ class FarmerTradeBookingsScreen extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: AppColors.softShadow),
-                        child: const Text('📅', style: TextStyle(fontSize: 64)),
+                        child: Text('📅', style: TextStyle(fontSize: 64)),
                       ),
                       const SizedBox(height: 24),
                       Text('No Booked Slots yet', style: AppTextStyles.headingLG),
@@ -69,6 +71,7 @@ class _BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final dealer = booking['dealer']?['businessName'] ?? booking['dealer']?['user']?['name'] ?? 'Authorized Dealer';
     final statusColor = booking['status'] == 'ACCEPTED' ? AppColors.success : (booking['status'] == 'CANCELLED' ? AppColors.error : AppColors.warning);
     final slotDate = DateTime.tryParse(booking['slotDate'] ?? '');
@@ -90,7 +93,7 @@ class _BookingCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(12)),
-                child: const Text('🌾', style: TextStyle(fontSize: 24)),
+                child: Text('🌾', style: TextStyle(fontSize: r.sp(24))),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -129,6 +132,7 @@ class _DetailCol extends StatelessWidget {
   const _DetailCol({required this.label, required this.value});
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -147,6 +151,7 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -159,7 +164,7 @@ class _ErrorState extends StatelessWidget {
             const SizedBox(height: 8),
             Text(message, style: AppTextStyles.bodySM, textAlign: TextAlign.center),
             const SizedBox(height: 24),
-            ElevatedButton(onPressed: onRetry, child: const Text('Try Again')),
+            ElevatedButton(onPressed: onRetry, child: Text('Try Again')),
           ],
         ),
       ),

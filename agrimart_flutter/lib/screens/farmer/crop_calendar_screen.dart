@@ -6,12 +6,14 @@ import '../../core/widgets/agri_ui.dart';
 import '../../core/widgets/shared_widgets.dart';
 import '../../data/providers/app_providers.dart';
 import '../../data/providers/auth_provider.dart';
+import '../../core/utils/responsive.dart';
 
 class CropCalendarScreen extends ConsumerWidget {
   const CropCalendarScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final district = ref.watch(authProvider).user?.effectiveDistrict ?? 'Nashik';
     final crops = ref.watch(authProvider).user?.farmer?['currentCrops'];
     final cropStr = crops is List ? crops.join(', ') : 'Onion, Tomato, Soybean';
@@ -32,7 +34,7 @@ class CropCalendarScreen extends ConsumerWidget {
             return const EmptyState(emoji: '📅', title: 'No activities', subtitle: 'Try again later');
           }
           return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+            padding: EdgeInsets.fromLTRB(r.horizontalPadding, 20, r.horizontalPadding, 32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -59,7 +61,7 @@ class CropCalendarScreen extends ConsumerWidget {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(14)),
-                            child: Center(child: Text(item['emoji'] ?? '🌱', style: const TextStyle(fontSize: 24))),
+                            child: Center(child: Text(item['emoji'] ?? '🌱', style: TextStyle(fontSize: r.sp(24)))),
                           ),
                           const SizedBox(width: 14),
                           Expanded(

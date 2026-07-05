@@ -366,6 +366,15 @@ final mandiNewsPreviewProvider = FutureProvider<List>((ref) async {
   return news.take(5).toList();
 });
 
+/// Top mandi price rows for home ticker (no dedicated mandi prices screen).
+final mandiTickerProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final user = ref.watch(authProvider).user;
+  final district = user?.effectiveDistrict ?? 'Nashik';
+  final data = await ref.watch(mandiProvider(district).future);
+  final prices = (data['prices'] as List?) ?? [];
+  return prices.take(5).map((p) => Map<String, dynamic>.from(p as Map)).toList();
+});
+
 // ── Mandi ─────────────────────────────────────────────────
 final mandiProvider =
     FutureProvider.family<Map, String?>((ref, district) async {
@@ -429,6 +438,13 @@ final dealerDashboardProvider = FutureProvider<Map>((ref) async {
 
 final dealerRatesProvider = FutureProvider<List>((ref) async {
   return ApiService.instance.getDealerMyRates();
+});
+
+/// Dealer buying rates for farmers (Sell tab hero).
+final farmerDealerRatesProvider =
+    FutureProvider.family<List, String>((ref, district) async {
+  if (district.isEmpty) return [];
+  return ApiService.instance.getDealerRates(district: district);
 });
 
 final dealerBookingsProvider = FutureProvider<List>((ref) async {

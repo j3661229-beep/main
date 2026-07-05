@@ -5,6 +5,7 @@ import '../../core/widgets/agri_ui.dart';
 import 'dealer_dashboard.dart';
 import 'produce_board_screen.dart';
 import 'dealer_profile_screen.dart';
+import '../../core/utils/responsive.dart';
 
 class DealerHome extends ConsumerStatefulWidget {
   const DealerHome({super.key});
@@ -29,6 +30,7 @@ class _DealerHomeState extends ConsumerState<DealerHome> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: IndexedStack(index: _currentIndex, children: _tabs),

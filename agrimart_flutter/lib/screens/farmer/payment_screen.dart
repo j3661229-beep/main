@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/providers/app_providers.dart';
 import '../../../data/services/api_service.dart';
+import '../../core/utils/responsive.dart';
 
 class PaymentScreen extends ConsumerStatefulWidget {
   const PaymentScreen({super.key});
@@ -80,13 +81,14 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final cartAsync = ref.watch(cartProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        title: Text('Payment', style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700)),
+        title: Text('Payment', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700)),
         leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
       ),
       body: cartAsync.when(
@@ -131,7 +133,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Total Amount', style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink)),
+                          Text('Total Amount', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(16), fontWeight: FontWeight.w700, color: AppColors.ink)),
                           Text(formatRupee(total), style: GoogleFonts.spaceGrotesk(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.farmerAccent)),
                         ],
                       ),
@@ -180,7 +182,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                                       color: _paymentMethod == m ? AppColors.farmerTint : AppColors.background,
                                       borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: Center(child: Text(emojis[i], style: const TextStyle(fontSize: 20))),
+                                    child: Center(child: Text(emojis[i], style: TextStyle(fontSize: r.sp(20)))),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(child: Text(m, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.ink))),

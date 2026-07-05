@@ -5,12 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/providers/auth_provider.dart';
+import '../../core/utils/responsive.dart';
 
 class SupplierProfileScreen extends ConsumerWidget {
   const SupplierProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final user = ref.watch(authProvider).user;
     final supplier = user?.supplier as Map? ?? {};
     final bizName = supplier['businessName'] ?? user?.name ?? 'Supplier';
@@ -27,7 +29,7 @@ class SupplierProfileScreen extends ConsumerWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 200,
+            expandedHeight: r.heroHeaderHeight,
             pinned: true,
             backgroundColor: AppColors.supplierAccent,
             leading: const SizedBox(),
@@ -41,10 +43,10 @@ class SupplierProfileScreen extends ConsumerWidget {
                       Container(
                         width: 80, height: 80,
                         decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)),
-                        child: Center(child: Text(initials, style: GoogleFonts.spaceGrotesk(fontSize: 28, fontWeight: FontWeight.w700, color: Colors.white))),
+                        child: Center(child: Text(initials, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(28), fontWeight: FontWeight.w700, color: Colors.white))),
                       ),
                       const SizedBox(height: 10),
-                      Text(bizName, style: GoogleFonts.spaceGrotesk(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white)),
+                      Text(bizName, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(20), fontWeight: FontWeight.w700, color: Colors.white)),
                       const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -62,8 +64,10 @@ class SupplierProfileScreen extends ConsumerWidget {
           ),
 
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
+            child: ResponsiveLayout(
+              applyPadding: false,
+              child: Padding(
+              padding: EdgeInsets.fromLTRB(r.horizontalPadding, r.rs(16), r.horizontalPadding, r.bottomNavInset),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -99,9 +103,10 @@ class SupplierProfileScreen extends ConsumerWidget {
                       _SettingsTile(icon: Icons.logout_rounded, color: AppColors.danger, label: 'Log Out', textColor: AppColors.danger, onTap: () => _confirmLogout(context, ref)),
                     ]),
                   ),
-                  const SizedBox(height: 80),
+                  SizedBox(height: r.bottomNavInset),
                 ],
               ),
+            ),
             ),
           ),
         ],
@@ -130,22 +135,28 @@ class _Card extends StatelessWidget {
   final Widget child;
   const _Card({required this.child});
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.border), boxShadow: AppColors.softShadow),
     child: child,
   );
+  }
 }
 
 class _CardHeader extends StatelessWidget {
   final String emoji, title;
   const _CardHeader({required this.emoji, required this.title});
   @override
-  Widget build(BuildContext context) => Row(children: [
-    Container(width: 36, height: 36, decoration: BoxDecoration(color: AppColors.supplierTint, borderRadius: BorderRadius.circular(10)), child: Center(child: Text(emoji, style: const TextStyle(fontSize: 18)))),
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Row(children: [
+    Container(width: 36, height: 36, decoration: BoxDecoration(color: AppColors.supplierTint, borderRadius: BorderRadius.circular(10)), child: Center(child: Text(emoji, style: TextStyle(fontSize: r.sp(18))))),
     const SizedBox(width: 12),
     Text(title, style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.ink)),
   ]);
+  }
 }
 
 class _InfoRow extends StatelessWidget {
@@ -165,11 +176,14 @@ class _SettingsTile extends StatelessWidget {
   final IconData icon; final Color color; final String label; final VoidCallback onTap; final Color? textColor;
   const _SettingsTile({required this.icon, required this.color, required this.label, required this.onTap, this.textColor});
   @override
-  Widget build(BuildContext context) => ListTile(
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return ListTile(
     onTap: onTap,
     leading: Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)), child: Icon(icon, color: color, size: 20)),
     title: Text(label, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: textColor ?? AppColors.ink)),
     trailing: textColor != null ? null : const Icon(Icons.chevron_right_rounded, color: AppColors.muted, size: 20),
   );
+  }
 }
 

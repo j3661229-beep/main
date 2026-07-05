@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
+import '../utils/responsive.dart';
 
 // ── AppButton ─────────────────────────────────────────────
 class AppButton extends StatelessWidget {
@@ -34,24 +35,27 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final bg = color ?? AppColors.farmerAccent;
     final fg = textColor ?? Colors.white;
+    final btnHeight = height == 52 ? r.rs(52) : height;
+    final btnRadius = radius == 14 ? r.rs(14) : radius;
 
     return SizedBox(
       width: width ?? double.infinity,
-      height: height,
+      height: btnHeight,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: (isLoading || onTap == null) ? null : onTap,
-            borderRadius: BorderRadius.circular(radius),
+            borderRadius: BorderRadius.circular(btnRadius),
             child: Ink(
               decoration: BoxDecoration(
                 color: isOutlined ? Colors.transparent : (onTap == null ? AppColors.border : bg),
                 border: isOutlined ? Border.all(color: bg, width: 1.5) : null,
-                borderRadius: BorderRadius.circular(radius),
+                borderRadius: BorderRadius.circular(btnRadius),
                 boxShadow: isOutlined || onTap == null
                     ? null
                     : [BoxShadow(color: bg.withValues(alpha: 0.25), blurRadius: 12, offset: const Offset(0, 6))],
@@ -77,7 +81,7 @@ class AppButton extends StatelessWidget {
                           Text(
                             label,
                             style: GoogleFonts.spaceGrotesk(
-                              fontSize: 15,
+                              fontSize: r.sp(15),
                               fontWeight: FontWeight.w600,
                               color: isOutlined ? bg : fg,
                               letterSpacing: 0.1,
@@ -209,11 +213,12 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(r.rs(16)),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(r.rs(16)),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
         boxShadow: AppColors.softShadow,
       ),
@@ -221,17 +226,17 @@ class StatCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 36, height: 36,
-            decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, color: accent, size: 20),
+            width: r.rs(36), height: r.rs(36),
+            decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(r.rs(10))),
+            child: Icon(icon, color: accent, size: r.rs(20)),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: r.rs(12)),
           Text(
             value,
-            style: GoogleFonts.spaceGrotesk(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.ink),
+            style: GoogleFonts.spaceGrotesk(fontSize: r.sp(22), fontWeight: FontWeight.w700, color: AppColors.ink),
           ),
-          const SizedBox(height: 2),
-          Text(label, style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+          SizedBox(height: r.rs(2)),
+          Text(label, style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
           if (subtitle != null) ...[
             const SizedBox(height: 4),
             Text(subtitle!, style: GoogleFonts.inter(fontSize: 11, color: AppColors.success, fontWeight: FontWeight.w500)),
@@ -387,28 +392,29 @@ class FilterChipRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: r.horizontalPadding),
       child: Row(
         children: options.map((opt) {
           final isSelected = opt == selected;
           return Padding(
-            padding: const EdgeInsets.only(right: 8),
+            padding: EdgeInsets.only(right: r.rs(8)),
             child: GestureDetector(
               onTap: () => onSelect(opt),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rs(8)),
                 decoration: BoxDecoration(
                   color: isSelected ? accent : AppColors.surface,
                   border: Border.all(color: isSelected ? accent : AppColors.border),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(r.rs(20)),
                 ),
                 child: Text(
                   opt,
                   style: GoogleFonts.inter(
-                    fontSize: 13,
+                    fontSize: r.sp(13),
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                     color: isSelected ? Colors.white : AppColors.ink,
                   ),
@@ -487,20 +493,21 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(40),
+        padding: EdgeInsets.all(r.rs(40)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 56)),
-            const SizedBox(height: 16),
-            Text(title, style: GoogleFonts.spaceGrotesk(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.ink), textAlign: TextAlign.center),
-            const SizedBox(height: 8),
-            Text(subtitle, style: GoogleFonts.inter(fontSize: 14, color: AppColors.muted), textAlign: TextAlign.center),
+            Text(emoji, style: TextStyle(fontSize: r.sp(56))),
+            SizedBox(height: r.rs(16)),
+            Text(title, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(20), fontWeight: FontWeight.w700, color: AppColors.ink), textAlign: TextAlign.center),
+            SizedBox(height: r.rs(8)),
+            Text(subtitle, style: GoogleFonts.inter(fontSize: r.sp(14), color: AppColors.muted), textAlign: TextAlign.center),
             if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: 24),
-              AppButton(label: actionLabel!, onTap: onAction, width: 180, height: 46),
+              SizedBox(height: r.rs(24)),
+              AppButton(label: actionLabel!, onTap: onAction, width: r.rs(180), height: r.rs(46)),
             ],
           ],
         ),
@@ -519,16 +526,17 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+      padding: EdgeInsets.fromLTRB(r.horizontalPadding, r.rs(20), r.horizontalPadding, r.rs(12)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink)),
+          Text(title, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(16), fontWeight: FontWeight.w700, color: AppColors.ink)),
           if (actionLabel != null)
             GestureDetector(
               onTap: onAction,
-              child: Text(actionLabel!, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.farmerAccent)),
+              child: Text(actionLabel!, style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w500, color: AppColors.farmerAccent)),
             ),
         ],
       ),

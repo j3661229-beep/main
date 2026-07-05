@@ -14,8 +14,13 @@
 /**
  * Generate a 6-digit OTP
  */
+const DEV_OTP = '123456';
+
+/** When true, OTP is always 123456 and rate limits are relaxed. Set STATIC_OTP=false in production. */
+const useStaticOtp = () => process.env.STATIC_OTP !== 'false';
+
 const generateOTP = () => {
-    if (process.env.NODE_ENV === 'development') return '123456';
+    if (useStaticOtp()) return DEV_OTP;
     return String(Math.floor(100000 + Math.random() * 900000));
 };
 
@@ -51,6 +56,8 @@ const generateOrderId = () => {
 module.exports = {
     haversineDistance,
     generateOTP,
+    useStaticOtp,
+    DEV_OTP,
     formatPhone,
     getPagination,
     generateOrderId,

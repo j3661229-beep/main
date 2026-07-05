@@ -6,12 +6,27 @@ const { uploadToSupabase } = require('../middleware/upload');
 const logger = require('../utils/logger');
 const cache = require('../utils/cache');
 
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Initialize Gemini (Google AI Studio key — usually starts with AIza... or AQ...)
+const genAI = process.env.GEMINI_API_KEY
+    ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+    : null;
 
-// Primary model from env (allows Railway override without redeploy)
-const GEMINI_PRIMARY   = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
-const GEMINI_FALLBACK  = 'gemini-1.5-flash-latest';
+// Use stable models — 2.5 is often overloaded on free tier
+const GEMINI_PRIMARY  = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const GEMINI_FALLBACK = process.env.GEMINI_FALLBACK_MODEL || 'gemini-1.5-flash';
+
+// Groq chat models (llama3-*-8192 was decommissioned — use current IDs)
+const GROQ_CHAT_MODELS = (process.env.GROQ_CHAT_MODELS || 'llama-3.3-70b-versatile,llama-3.1-8b-instant')
+    .split(',')
+    .map((m) => m.trim())
+    .filter(Boolean);
+
+if (!process.env.GEMINI_API_KEY) {
+    logger.warn('GEMINI_API_KEY is not set — crop/soil AI features will fail.');
+}
+if (!process.env.GROQ_API_KEY) {
+    logger.warn('GROQ_API_KEY is not set — Kisan AI chat will fall back to Gemini only.');
+}
 
 const SYSTEM_KISAN = `You are Kisan AI, an expert agricultural assistant for Indian farmers. Detect the user language (Marathi/Hindi/English) and ALWAYS reply in the SAME language. Help with: crop advice, disease identification, mandi prices, government schemes, fertilizer usage, weather-based tips. Use simple words farmers understand. Be practical and specific. Avoid complex jargon. Format answers with clear steps when giving instructions. Mention local mandi names when relevant.`;
 
@@ -28,23 +43,29 @@ const parseJSON = (text) => {
 };
 
 const generateWithFallback = async (prompt, imageBase64 = null) => {
+    if (!genAI || !process.env.GEMINI_API_KEY) {
+        throw Object.assign(new Error('GEMINI_API_KEY is not configured on the server.'), { statusCode: 503 });
+    }
+
     let lastError;
 
-    const modelsToTry = [GEMINI_PRIMARY, GEMINI_FALLBACK];
+    const modelsToTry = [GEMINI_PRIMARY, GEMINI_FALLBACK].filter((v, i, a) => a.indexOf(v) === i);
 
-    const contents = imageBase64 ? [prompt, { inlineData: { data: imageBase64, mimeType: "image/jpeg" } }] : prompt;
+    const contents = imageBase64 ? [prompt, { inlineData: { data: imageBase64, mimeType: 'image/jpeg' } }] : prompt;
 
     for (const modelName of modelsToTry) {
         try {
             const model = genAI.getGenerativeModel({ model: modelName });
             const result = await model.generateContent(contents);
+            logger.info(`Gemini generation succeeded with model: ${modelName}`);
             return result.response.text();
         } catch (e) {
-            logger.warn(`Model [${modelName}] failed generation: ${e.message}`);
+            const detail = e.message || String(e);
+            logger.warn(`Model [${modelName}] failed generation: ${detail}`);
             lastError = e;
         }
     }
-    throw lastError || new Error("All Gemini fallback models failed during generation.");
+    throw lastError || new Error('All Gemini fallback models failed during generation.');
 };
 
 const soilAnalysis = async (farmerId, imageBuffer, originalName, { location = '', language = 'English' } = {}) => {
@@ -122,9 +143,54 @@ const cropRecommend = async (farmerId, { location, soilType, season, farmSize, l
     return result;
 };
 
-const chat = async (userId, { message, history = [], language = 'English' }) => {
-    let lastError;
+const chatWithGroq = async (messages) => {
+    const GROQ_API_KEY = process.env.GROQ_API_KEY?.replace(/^["']|["']$/g, '');
+    if (!GROQ_API_KEY) return null;
 
+    let lastError;
+    for (const modelName of GROQ_CHAT_MODELS) {
+        try {
+            const response = await axios.post(
+                'https://api.groq.com/openai/v1/chat/completions',
+                { model: modelName, messages, temperature: 0.7 },
+                {
+                    headers: {
+                        Authorization: `Bearer ${GROQ_API_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    timeout: 45000,
+                }
+            );
+
+            logger.info(`AI Chat successfully used Groq model: ${modelName}`);
+            return {
+                reply: response.data.choices[0].message.content,
+                tokensUsed: response.data.usage?.total_tokens,
+                source: 'groq',
+            };
+        } catch (e) {
+            const errStr = e.response?.data ? JSON.stringify(e.response.data) : e.message;
+            logger.warn(`Model [${modelName}] failed in Groq Chat: ${errStr}`);
+            lastError = e;
+        }
+    }
+    if (lastError) logger.warn('Groq chat failed for all models; trying Gemini fallback.');
+    return null;
+};
+
+const chatWithGemini = async (personaInstruction, message, history = []) => {
+    const transcript = history
+        .filter((msg) => msg.role !== 'system')
+        .slice(-8)
+        .map((msg) => `${msg.role === 'assistant' || msg.role === 'model' ? 'Assistant' : 'Farmer'}: ${msg.content}`)
+        .join('\n');
+
+    const prompt = `${personaInstruction}\n\nConversation:\n${transcript}\nFarmer: ${message}\nAssistant:`;
+    const reply = await generateWithFallback(prompt);
+    return { reply, source: 'gemini' };
+};
+
+const chat = async (userId, { message, history = [], language = 'English' }) => {
     // Fetch user context for hyper-personalized responses
     const farmer = await prisma.farmer.findUnique({ where: { userId }, include: { user: true } });
     const farmerContext = farmer ? `
@@ -140,47 +206,22 @@ const chat = async (userId, { message, history = [], language = 'English' }) => 
     const personaInstruction = `${SYSTEM_KISAN}\n${farmerContext}\nRespond in ${language}. Keep sentences short and clear for voice playback.`;
 
     const groqHistory = history
-        .filter(msg => msg.role !== 'system')
-        .map(msg => ({
-            role: (msg.role === 'model' || msg.role === 'assistant') ? 'assistant' : 'user',
-            content: msg.content
+        .filter((msg) => msg.role !== 'system')
+        .map((msg) => ({
+            role: msg.role === 'model' || msg.role === 'assistant' ? 'assistant' : 'user',
+            content: msg.content,
         }));
 
     const messages = [
         { role: 'system', content: personaInstruction },
         ...groqHistory,
-        { role: 'user', content: message }
+        { role: 'user', content: message },
     ];
 
-    const modelsToTry = ['llama3-70b-8192', 'llama3-8b-8192'];
-    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    const groqResult = await chatWithGroq(messages);
+    if (groqResult) return groqResult;
 
-    if (!GROQ_API_KEY) {
-        throw new Error("GROQ_API_KEY is not defined in environment variables.");
-    }
-
-    for (const modelName of modelsToTry) {
-        try {
-            const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
-                model: modelName,
-                messages: messages,
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${GROQ_API_KEY}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            logger.info(`AI Chat successfully used Groq model: ${modelName}`);
-            return { reply: response.data.choices[0].message.content, tokensUsed: response.data.usage?.total_tokens, source: 'groq' };
-        } catch (e) {
-            const errStr = e.response?.data ? JSON.stringify(e.response.data) : e.message;
-            logger.warn(`Model [${modelName}] failed in Groq Chat: ${errStr}`);
-            lastError = e;
-        }
-    }
-
-    throw lastError || new Error("AI Chat unavailable. All Groq fallback models failed.");
+    return chatWithGemini(personaInstruction, message, history);
 };
 
 const cropCalendar = async ({ month, district, crops, language = 'English' }) => {

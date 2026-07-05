@@ -4,17 +4,19 @@ import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_fallback.dart';
+import '../../core/utils/responsive.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final notifications = ref.watch(notificationsProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('🔔 Notifications'), backgroundColor: AppColors.primary, actions: [
-        TextButton(onPressed: () {}, child: const Text('Mark All Read', style: TextStyle(color: Colors.white70, fontSize: 13))),
+        TextButton(onPressed: () {}, child: Text('Mark All Read', style: TextStyle(color: Colors.white70, fontSize: 13))),
       ]),
       body: notifications.when(
         loading: () => const Center(child: CircularProgressIndicator()),

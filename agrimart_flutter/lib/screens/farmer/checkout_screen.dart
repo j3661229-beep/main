@@ -9,6 +9,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_snackbar.dart';
+import '../../core/utils/responsive.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
@@ -86,6 +87,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final cart = ref.watch(cartProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -115,7 +117,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           return Column(children: [
             Expanded(
               child: ListView(padding: const EdgeInsets.all(20), children: [
-                const Text('Store Pickup Time', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                Text('Store Pickup Time', style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
                 const SizedBox(height: 12),
                 Container(
                   decoration: BoxDecoration(
@@ -140,7 +142,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                const Text('Payment Method', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                Text('Payment Method', style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -177,7 +179,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
-              const Text('Pay via UPI', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Pay via UPI', style: TextStyle(fontSize: context.r.sp(18), fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Text('Pay ₹${total.toStringAsFixed(0)} to the supplier UPI ID below, then enter your UTR number.',
                   style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
@@ -248,7 +250,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Order Summary', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+        Text('Order Summary', style: TextStyle(fontSize: context.r.sp(16), fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(16),
@@ -302,7 +304,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             onPressed: _placing ? null : onTap,
             child: _placing
                 ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                : Text(label, style: TextStyle(fontSize: context.r.sp(16), fontWeight: FontWeight.bold)),
           ),
         ),
       ),

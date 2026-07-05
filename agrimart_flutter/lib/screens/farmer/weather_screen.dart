@@ -6,12 +6,14 @@ import '../../core/theme/app_theme.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/utils/responsive.dart';
 
 class WeatherScreen extends ConsumerWidget {
   const WeatherScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final weather = ref.watch(weatherProvider);
     final district = weather.when(
       data: (d) => d['name'] as String? ?? 'Maharashtra',
@@ -49,7 +51,7 @@ class WeatherScreen extends ConsumerWidget {
                           color: Colors.white)),
                   Text('${data['weather']?[0]?['description'] ?? ''}',
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: r.sp(16),
                           color: Colors.white.withValues(alpha: 0.85))),
                   Text(data['name'] ?? 'Current Location',
                       style: TextStyle(
@@ -107,7 +109,7 @@ class WeatherScreen extends ConsumerWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(emoji ?? '🌱',
-                                          style: const TextStyle(fontSize: 18)),
+                                          style: TextStyle(fontSize: r.sp(18))),
                                       const SizedBox(width: 8),
                                       Expanded(
                                           child: Text(tip ?? '',
@@ -157,18 +159,21 @@ class _WeatherStat extends StatelessWidget {
   final String emoji, label, value;
   const _WeatherStat(this.emoji, this.label, this.value);
   @override
-  Widget build(BuildContext context) => Column(children: [
-        Text(emoji, style: const TextStyle(fontSize: 20)),
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Column(children: [
+        Text(emoji, style: TextStyle(fontSize: r.sp(20))),
         const SizedBox(height: 4),
         Text(value,
-            style: const TextStyle(
-                fontSize: 16,
+            style: TextStyle(
+                fontSize: r.sp(16),
                 fontWeight: FontWeight.w700,
                 color: Colors.white)),
         Text(label,
             style: TextStyle(
                 fontSize: 11, color: Colors.white.withValues(alpha: 0.65))),
       ]);
+  }
 }
 
 class _TempCard extends StatelessWidget {
@@ -176,13 +181,16 @@ class _TempCard extends StatelessWidget {
   final Color color;
   const _TempCard(this.emoji, this.label, this.value, this.color);
   @override
-  Widget build(BuildContext context) => Column(children: [
-        Text(emoji, style: const TextStyle(fontSize: 24)),
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Column(children: [
+        Text(emoji, style: TextStyle(fontSize: r.sp(24))),
         const SizedBox(height: 4),
         Text(value,
             style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.w800, color: color)),
+                fontSize: r.sp(20), fontWeight: FontWeight.w800, color: color)),
         Text(label, style: AppTextStyles.caption),
       ]);
+  }
 }
 

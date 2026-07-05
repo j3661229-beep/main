@@ -6,12 +6,14 @@ import '../../core/providers/locale_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/providers/auth_provider.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
+import '../../core/utils/responsive.dart';
 
 class LanguageSelectionScreen extends ConsumerWidget {
   const LanguageSelectionScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeProvider);
 
@@ -30,8 +32,8 @@ class LanguageSelectionScreen extends ConsumerWidget {
               const SizedBox(height: 24),
               Text(
                 l10n.selectLanguage,
-                style: const TextStyle(
-                  fontSize: 28,
+                style: TextStyle(
+                  fontSize: r.sp(28),
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
                 ),
@@ -40,7 +42,7 @@ class LanguageSelectionScreen extends ConsumerWidget {
               Text(
                 l10n.chooseLanguage,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: r.sp(16),
                   color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
@@ -77,7 +79,8 @@ class LanguageSelectionScreen extends ConsumerWidget {
                   height: 60,
                   child: ElevatedButton(
                     onPressed: () async {
-                      await ref.read(localeProvider.notifier).chooseLanguage(currentLocale);
+                      final selected = ref.read(localeProvider);
+                      await ref.read(localeProvider.notifier).chooseLanguage(selected);
                       if (!context.mounted) return;
                       final user = ref.read(authProvider).user;
                       if (user != null) {
@@ -96,7 +99,7 @@ class LanguageSelectionScreen extends ConsumerWidget {
                     ),
                     child: Text(
                       l10n.continueBtn,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: r.sp(18), fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -126,6 +129,7 @@ class _LanguageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -149,7 +153,7 @@ class _LanguageCard extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: r.sp(18),
                     fontWeight: FontWeight.bold,
                     color: isSelected ? AppColors.primary : Colors.white,
                   ),

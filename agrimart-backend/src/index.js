@@ -107,11 +107,11 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', alias: true });
 });
 
-// Prevent Railway Cold Starts (Ping self every 5 mins)
-if (process.env.RAILWAY_URL || process.env.NODE_ENV === 'production') {
+// Prevent cold starts — ping /health every 5 min in production
+if (process.env.PUBLIC_URL || process.env.RAILWAY_URL || process.env.NODE_ENV === 'production') {
   cron.schedule('*/5 * * * *', async () => {
     try {
-      const url = process.env.RAILWAY_URL || `http://localhost:${PORT}`;
+      const url = process.env.PUBLIC_URL || process.env.RAILWAY_URL || `http://localhost:${PORT}`;
       await fetch(`${url}/health`);
       logger.info('Keep-alive ping sent to /health');
     } catch (err) {

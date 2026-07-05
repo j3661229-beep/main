@@ -12,7 +12,8 @@
     "generate": "npx prisma generate",
     "studio": "node node_modules/prisma/build/index.js studio",
     "seed": "node prisma/seed.js",
-    "seed:sarang": "node prisma/seed-sarang.js"
+    "seed:sarang": "node prisma/seed-sarang.js",
+    "deploy:gcp": "powershell -ExecutionPolicy Bypass -File scripts/deploy-gcp.ps1"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

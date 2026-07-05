@@ -7,6 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/shared_widgets.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../l10n/app_localizations.dart';
+import '../../core/utils/responsive.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   final String role;
@@ -99,6 +100,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final l10n = AppLocalizations.of(context)!;
     final authLoading = ref.watch(authProvider).isLoading;
     return Scaffold(
@@ -136,7 +138,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 16),
                   Text(
                     _isFarmer ? 'Namaste 🙏' : 'Welcome back',
-                    style: GoogleFonts.spaceGrotesk(fontSize: 28, fontWeight: FontWeight.w700, color: Colors.white),
+                    style: GoogleFonts.spaceGrotesk(fontSize: r.sp(28), fontWeight: FontWeight.w700, color: Colors.white),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -333,6 +335,7 @@ class _LangChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final isSel = code == selected;
     return GestureDetector(
       onTap: () => onTap(code),

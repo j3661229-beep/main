@@ -10,6 +10,7 @@ import '../../services/voice_service.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/responsive.dart';
 
 class KisanAiScreen extends ConsumerStatefulWidget {
   const KisanAiScreen({super.key});
@@ -53,11 +54,10 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
     await prefs.setString('kisan_chat_history', jsonEncode(_messages));
   }
 
-  final _suggestions = [
-    'माझ्या कांद्याची पाने पिवळ्या होत आहेत, काय करू?',
-    'सोयाबीनसाठी कोणते खत वापरावे?',
-    'What fertilizer is best for onion crop?',
-    'मला आंबा बागेसाठी सल्ला द्या',
+  List<String> _prompts(AppLocalizations l10n) => [
+    l10n.kisanPromptSpray,
+    l10n.kisanPromptPmfby,
+    l10n.kisanPromptMandi,
   ];
 
   Future<void> _send(String msg) async {
@@ -150,6 +150,7 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
@@ -159,8 +160,8 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
           const SizedBox(width: 8),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(l10n.kisanAi,
-                style: const TextStyle(
-                    fontSize: 16,
+                style: TextStyle(
+                    fontSize: r.sp(16),
                     fontWeight: FontWeight.w700,
                     color: Colors.white)),
             const Text('मराठी | हिंदी | English',
@@ -194,7 +195,7 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
             const SizedBox(height: 24),
             Text('Quick Questions:', style: AppTextStyles.headingSM),
             const SizedBox(height: 12),
-            ..._suggestions.map((s) => GestureDetector(
+            ..._prompts(l10n).map((s) => GestureDetector(
                   onTap: () => _send(s),
                   child: Container(
                       margin: const EdgeInsets.only(bottom: 8),
@@ -246,7 +247,7 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
                                  gradient: const LinearGradient(colors: [AppColors.primary, AppColors.primaryDark]),
                                  boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 6)]
                                ),
-                               child: const Text('🤖', style: TextStyle(fontSize: 14)),
+                               child: Text('🤖', style: TextStyle(fontSize: 14)),
                              ),
                              const SizedBox(height: 6),
                              IconButton(

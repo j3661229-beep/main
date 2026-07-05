@@ -7,6 +7,7 @@ import '../../data/providers/auth_provider.dart';
 import '../../data/services/api_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/responsive.dart';
 
 class DocUploadScreen extends ConsumerStatefulWidget {
   const DocUploadScreen({super.key});
@@ -49,7 +50,7 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
               leading: Container(
                   width: 44, height: 44,
                   decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(12)),
-                  child: const Center(child: Text('📷', style: TextStyle(fontSize: 22)))),
+                  child: Center(child: Text('📷', style: TextStyle(fontSize: 22)))),
               title: Text('Take a Photo', style: AppTextStyles.headingMD),
               subtitle: const Text('Use your camera'),
               onTap: () => Navigator.pop(context, ImageSource.camera),
@@ -58,7 +59,7 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
               leading: Container(
                   width: 44, height: 44,
                   decoration: BoxDecoration(color: const Color(0xFFE3F2FD), borderRadius: BorderRadius.circular(12)),
-                  child: const Center(child: Text('🖼️', style: TextStyle(fontSize: 22)))),
+                  child: Center(child: Text('🖼️', style: TextStyle(fontSize: 22)))),
               title: Text('Choose from Gallery', style: AppTextStyles.headingMD),
               subtitle: const Text('Pick an existing image'),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
@@ -107,6 +108,7 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final auth = ref.watch(authProvider);
     final role = auth.user?.role ?? 'SUPPLIER';
 
@@ -135,7 +137,7 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
                     const SizedBox(width: 12),
                     Text(
                       role == 'DEALER' ? '🤝 Dealer Verification' : '🏪 Supplier Verification',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
+                      style: TextStyle(fontSize: r.sp(18), fontWeight: FontWeight.w700, color: Colors.white),
                     ),
                   ],
                 ),
@@ -271,7 +273,7 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
                                           color: AppColors.success.withValues(alpha: 0.9),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
-                                        child: const Text('✓ Selected', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                                        child: Text('✓ Selected', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
                                       ),
                                     ),
                                   ],
@@ -286,7 +288,7 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
                                         color: AppColors.primarySurface,
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                      child: const Center(child: Text('📤', style: TextStyle(fontSize: 28))),
+                                      child: Center(child: Text('📤', style: TextStyle(fontSize: r.sp(28)))),
                                     ),
                                     const SizedBox(height: 12),
                                     const Text('Tap to upload document', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
@@ -313,12 +315,12 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
                             shadowColor: AppColors.primary.withValues(alpha: 0.3),
                           ),
                           child: _isUploading
-                              ? const Row(
+                              ? Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5)),
                                     SizedBox(width: 12),
-                                    Text('Uploading...', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                    Text('Uploading...', style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.bold)),
                                   ],
                                 )
                               : const Text('Submit for Verification 🛡️', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
@@ -329,7 +331,7 @@ class _DocUploadScreenState extends ConsumerState<DocUploadScreen> {
                       Center(
                         child: TextButton(
                           onPressed: () => ref.read(authProvider.notifier).logout(),
-                          child: const Text('Sign out & login later', style: TextStyle(color: AppColors.textTertiary)),
+                          child: Text('Sign out & login later', style: TextStyle(color: AppColors.textTertiary)),
                         ),
                       ),
                       const SizedBox(height: 16),

@@ -11,6 +11,7 @@ import 'package:agrimart/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/utils/responsive.dart';
 
 class DiseaseDetectionScreen extends ConsumerStatefulWidget {
   const DiseaseDetectionScreen({super.key});
@@ -55,6 +56,7 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
@@ -71,7 +73,7 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                     border: Border.all(
                         color: AppColors.error.withValues(alpha: 0.3))),
                 child: Row(children: [
-                  Text('🔬', style: TextStyle(fontSize: 28)),
+                  Text('🔬', style: TextStyle(fontSize: r.sp(28))),
                   SizedBox(width: 12),
                   Expanded(
                       child: Column(
@@ -92,16 +94,16 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                           child:
                               Column(mainAxisSize: MainAxisSize.min, children: [
                         ListTile(
-                            leading: const Text('📷',
-                                style: TextStyle(fontSize: 24)),
+                            leading: Text('📷',
+                                style: TextStyle(fontSize: r.sp(24))),
                             title: const Text('Camera'),
                             onTap: () {
                               Navigator.pop(context);
                               _pickImage(ImageSource.camera);
                             }),
                         ListTile(
-                            leading: const Text('🖼️',
-                                style: TextStyle(fontSize: 24)),
+                            leading: Text('🖼️',
+                                style: TextStyle(fontSize: r.sp(24))),
                             title: const Text('Gallery'),
                             onTap: () {
                               Navigator.pop(context);
@@ -123,7 +125,7 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(15),
                           child: Image.file(_image!, fit: BoxFit.cover))
-                      : const Column(
+                      : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                               Text('🌿', style: TextStyle(fontSize: 48)),
@@ -144,7 +146,7 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
               const SizedBox(height: 12),
               const AppShimmer(width: 200, height: 16),
               const SizedBox(height: 24),
-              const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 SizedBox(
                     width: 16,
                     height: 16,
@@ -177,7 +179,7 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(color: Colors.red.shade100, shape: BoxShape.circle),
-                            child: const Text('🦠', style: TextStyle(fontSize: 32)),
+                            child: Text('🦠', style: TextStyle(fontSize: 32)),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -233,10 +235,10 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
-                                    child: const Text('💊', style: TextStyle(fontSize: 16)),
+                                    child: Text('💊', style: TextStyle(fontSize: r.sp(16))),
                                   ),
                                   const SizedBox(width: 12),
-                                  const Text('Treatment Plan', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+                                  Text('Treatment Plan', style: TextStyle(color: Colors.white, fontSize: r.sp(18), fontWeight: FontWeight.w800, letterSpacing: -0.5)),
                                 ],
                               ),
                               IconButton(
@@ -264,13 +266,13 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  const Text('🧪', style: TextStyle(fontSize: 24)),
+                                  Text('🧪', style: TextStyle(fontSize: r.sp(24))),
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(t['name'], style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                        Text(t['name'], style: TextStyle(color: Colors.white, fontSize: r.sp(16), fontWeight: FontWeight.bold)),
                                         const SizedBox(height: 4),
                                         Text('${t['dosage']} • ${t['application']}', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12)),
                                       ]
@@ -295,6 +297,7 @@ class _DiseaseDetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     if (content.isEmpty) return const SizedBox.shrink();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,7 +305,7 @@ class _DiseaseDetailRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
-          child: Text(emoji, style: const TextStyle(fontSize: 16)),
+          child: Text(emoji, style: TextStyle(fontSize: r.sp(16))),
         ),
         const SizedBox(width: 16),
         Expanded(

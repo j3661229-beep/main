@@ -6,6 +6,7 @@ import '../../core/constants/indian_languages.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/responsive.dart';
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
   @override
@@ -81,6 +82,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(gradient: AppColors.heroGradient),
@@ -99,7 +101,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [BoxShadow(color: AppColors.farmerAccent.withValues(alpha: 0.4), blurRadius: 24, spreadRadius: 4)],
                     ),
-                    child: const Center(child: Text('🌾', style: TextStyle(fontSize: 52))),
+                    child: Center(child: Text('🌾', style: TextStyle(fontSize: 52))),
                   ),
                   const SizedBox(height: 24),
                   const Text('AgriMart', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.5)),

@@ -7,6 +7,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
 import '../../core/widgets/mandi_chart.dart';
+import '../../core/utils/responsive.dart';
 
 final mandiHistoryProvider = FutureProvider.family<Map, String>((ref, crop) async {
   return ApiService.instance.getCropHistory(crop);
@@ -25,6 +26,7 @@ class _MandiChartScreenState extends ConsumerState<MandiChartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final cropName = widget.cropData['crop'] as String? ?? 'Crop';
     final historyAsync = ref.watch(mandiHistoryProvider(cropName));
 
@@ -32,7 +34,7 @@ class _MandiChartScreenState extends ConsumerState<MandiChartScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text('${widget.cropData['emoji']} $cropName', 
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: -0.5)),
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: r.sp(18), letterSpacing: -0.5)),
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
@@ -99,7 +101,7 @@ class _MandiChartScreenState extends ConsumerState<MandiChartScreen> {
                         Text(
                           '${change.abs().toStringAsFixed(2)}% ($_selectedRange)',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: r.sp(18),
                             fontWeight: FontWeight.w700,
                             color: trendColor,
                             letterSpacing: -0.5,

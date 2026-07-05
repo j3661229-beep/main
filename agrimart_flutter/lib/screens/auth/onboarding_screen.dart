@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/responsive.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -21,6 +22,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Scaffold(
       body: Stack(children: [
         PageView.builder(
@@ -38,7 +40,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Text(p['emoji'] as String, style: const TextStyle(fontSize: 100)),
                   const SizedBox(height: 40),
-                  Text(p['title'] as String, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.5)),
+                  Text(p['title'] as String, style: TextStyle(fontSize: r.sp(28), fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.5)),
                   const SizedBox(height: 4),
                   Text(p['subtitle'] as String, style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w500)),
                   const SizedBox(height: 20),

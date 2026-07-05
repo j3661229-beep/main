@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/services/api_service.dart';
+import '../../core/utils/responsive.dart';
 
 class AdvancePaymentScreen extends ConsumerStatefulWidget {
   final Map dealContext;
@@ -57,13 +58,14 @@ class _AdvancePaymentScreenState extends ConsumerState<AdvancePaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     if (_success) return _SuccessView(onDone: () => context.go('/dealer'));
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        title: Text('Advance Payment', style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700)),
+        title: Text('Advance Payment', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700)),
         leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
       ),
       body: SingleChildScrollView(
@@ -96,7 +98,7 @@ class _AdvancePaymentScreenState extends ConsumerState<AdvancePaymentScreen> {
                   Container(
                     width: 60, height: 60,
                     decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(16)),
-                    child: const Center(child: Text('💰', style: TextStyle(fontSize: 30))),
+                    child: Center(child: Text('💰', style: TextStyle(fontSize: 30))),
                   ),
                 ],
               ),
@@ -125,7 +127,7 @@ class _AdvancePaymentScreenState extends ConsumerState<AdvancePaymentScreen> {
                     decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(14)),
                     child: Row(
                       children: [
-                        Container(width: 44, height: 44, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)), child: const Center(child: Text('📱', style: TextStyle(fontSize: 22)))),
+                        Container(width: 44, height: 44, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)), child: Center(child: Text('📱', style: TextStyle(fontSize: 22)))),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -171,11 +173,11 @@ class _AdvancePaymentScreenState extends ConsumerState<AdvancePaymentScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text('▪▪▪▪▪▪▪', style: TextStyle(fontSize: 18, letterSpacing: 4)),
-                              const Text('▪     ▪', style: TextStyle(fontSize: 18, letterSpacing: 6)),
-                              const Text('▪ ▪▪▪ ▪', style: TextStyle(fontSize: 18, letterSpacing: 4)),
-                              const Text('▪     ▪', style: TextStyle(fontSize: 18, letterSpacing: 6)),
-                              const Text('▪▪▪▪▪▪▪', style: TextStyle(fontSize: 18, letterSpacing: 4)),
+                              Text('▪▪▪▪▪▪▪', style: TextStyle(fontSize: r.sp(18), letterSpacing: 4)),
+                              Text('▪     ▪', style: TextStyle(fontSize: r.sp(18), letterSpacing: 6)),
+                              Text('▪ ▪▪▪ ▪', style: TextStyle(fontSize: r.sp(18), letterSpacing: 4)),
+                              Text('▪     ▪', style: TextStyle(fontSize: r.sp(18), letterSpacing: 6)),
+                              Text('▪▪▪▪▪▪▪', style: TextStyle(fontSize: r.sp(18), letterSpacing: 4)),
                               const SizedBox(height: 8),
                               Text('QR Code', style: GoogleFonts.inter(fontSize: 11, color: AppColors.muted)),
                             ],
@@ -258,7 +260,9 @@ class _SuccessView extends StatelessWidget {
   const _SuccessView({required this.onDone});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Scaffold(
     backgroundColor: AppColors.background,
     body: Center(
       child: Padding(
@@ -269,10 +273,10 @@ class _SuccessView extends StatelessWidget {
             Container(
               width: 100, height: 100,
               decoration: BoxDecoration(color: AppColors.successTint, shape: BoxShape.circle),
-              child: const Center(child: Text('✅', style: TextStyle(fontSize: 52))),
+              child: Center(child: Text('✅', style: TextStyle(fontSize: r.sp(52)))),
             ),
             const SizedBox(height: 24),
-            Text('Deal Sent!', style: GoogleFonts.spaceGrotesk(fontSize: 28, fontWeight: FontWeight.w800, color: AppColors.success)),
+            Text('Deal Sent!', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(28), fontWeight: FontWeight.w800, color: AppColors.success)),
             const SizedBox(height: 8),
             Text('Your offer has been sent to the farmer.\nAdvance payment recorded.', style: GoogleFonts.inter(fontSize: 14, color: AppColors.muted, height: 1.6), textAlign: TextAlign.center),
             const SizedBox(height: 32),
@@ -281,6 +285,7 @@ class _SuccessView extends StatelessWidget {
         ),
       ),
     ),
-  );
+    );
+  }
 }
 

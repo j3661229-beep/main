@@ -549,4 +549,277 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get getStarted => 'शुरू करें';
+
+  @override
+  String get tools => 'टूल्स';
+
+  @override
+  String get farmToolkit => 'फार्म टूलकिट';
+
+  @override
+  String get farmToolkitSubtitle => 'आपके खेत के 11 टूल';
+
+  @override
+  String get farmToolkitBanner =>
+      'कोई भी टूल टैप करें — AI, योजनाएं, बीमा और उपकरण।';
+
+  @override
+  String get popularTools => 'लोकप्रिय टूल';
+
+  @override
+  String get seeAll => 'सभी देखें';
+
+  @override
+  String get todaysAdvisory => 'आज की सलाह';
+
+  @override
+  String get viewAdvisory => 'सलाह देखें';
+
+  @override
+  String get liveMandiRates => 'लाइव मंडी भाव';
+
+  @override
+  String get perQuintalShort2 => '/क्विंटल';
+
+  @override
+  String get cropDoctor => 'फसल डॉक्टर';
+
+  @override
+  String get cropDoctorSubtitle => 'AI रोग पहचान';
+
+  @override
+  String get takeCropPhoto => 'अपनी फसल की फोटो लें';
+
+  @override
+  String get aiIdentifyDisease => 'AI रोग पहचानेगा और उपचार बताएगा';
+
+  @override
+  String get camera => 'कैमरा';
+
+  @override
+  String get gallery => 'गैलरी';
+
+  @override
+  String get analyzeCrop => 'फसल जांचें';
+
+  @override
+  String get analyzingCrop => 'फसल की जांच हो रही है...';
+
+  @override
+  String get aiWorking => 'AI आपकी फसल का विश्लेषण कर रहा है';
+
+  @override
+  String get analysisResult => 'विश्लेषण परिणाम';
+
+  @override
+  String get detectedIssue => 'पहचानी गई समस्या';
+
+  @override
+  String get confidence => 'विश्वास';
+
+  @override
+  String get scanHistory => 'स्कैन इतिहास';
+
+  @override
+  String get noScansYet => 'अभी कोई स्कैन नहीं';
+
+  @override
+  String get scanHistorySubtitle => 'इतिहास देखने के लिए फसल स्कैन करें';
+
+  @override
+  String get browseProducts => 'बाजार देखें';
+
+  @override
+  String get sellTabTitle => 'सत्यापित व्यापारियों को बेचें';
+
+  @override
+  String get sellTabSubtitle =>
+      'लाइव दर तुलना करें, स्लॉट बुक करें और ट्रैक करें।';
+
+  @override
+  String get compareDealerRates => 'व्यापारी दर तुलना';
+
+  @override
+  String get myTradeBookings => 'मेरी बुकिंग';
+
+  @override
+  String bestRateToday(String district) {
+    return '$district में आज की सर्वोत्तम दर';
+  }
+
+  @override
+  String get bookSlot => 'स्लॉट बुक करें';
+
+  @override
+  String get editFarmProfile => 'खेत प्रोफाइल संपादित करें';
+
+  @override
+  String get saveChanges => 'सहेजें';
+
+  @override
+  String get villageLabel => 'गांव';
+
+  @override
+  String get districtLabel => 'जिला';
+
+  @override
+  String get landSizeLabel => 'जमीन (एकड़)';
+
+  @override
+  String get cropsLabel => 'फसलें (अल्पविराम से)';
+
+  @override
+  String get settings => 'सेटिंग्स';
+
+  @override
+  String get helpSupport => 'मदद और सहायता';
+
+  @override
+  String get logOutConfirmTitle => 'लॉग आउट?';
+
+  @override
+  String get logOutConfirmMessage => 'आप AgriMart से लॉग आउट हो जाएंगे।';
+
+  @override
+  String get cancel => 'रद्द करें';
+
+  @override
+  String get searchTools => 'टूल खोजें...';
+
+  @override
+  String get favoriteTools => 'पसंदीदा';
+
+  @override
+  String get recentTools => 'हाल ही में उपयोग';
+
+  @override
+  String get noToolsMatch => 'कोई टूल नहीं मिला';
+
+  @override
+  String get offlineTitle => 'आप ऑफलाइन हैं';
+
+  @override
+  String get offlineSubtitle => 'कुछ सुविधाओं के लिए इंटरनेट चाहिए।';
+
+  @override
+  String get kisanPromptSpray => 'प्याज पर छिड़काव कब करूं?';
+
+  @override
+  String get kisanPromptPmfby => 'टमाटर के लिए PMFBY बीमा?';
+
+  @override
+  String get kisanPromptMandi => 'अंगूर का सर्वोत्तम मंडी भाव?';
+
+  @override
+  String get orderStepPlaced => 'ऑर्डर दिया';
+
+  @override
+  String get orderStepConfirmed => 'पुष्टि';
+
+  @override
+  String get orderStepShipped => 'भेजा गया';
+
+  @override
+  String get orderStepDelivered => 'डिलीवर';
+
+  @override
+  String get proceedToPay => 'भुगतान करें';
+
+  @override
+  String get cartEmpty => 'कार्ट खाली है';
+
+  @override
+  String get cartEmptySubtitle => 'बाजार से सामान जोड़ें';
+
+  @override
+  String get myCart => 'मेरी कार्ट';
+
+  @override
+  String get subtotal => 'उप-योग';
+
+  @override
+  String get delivery => 'डिलीवरी';
+
+  @override
+  String get total => 'कुल';
+
+  @override
+  String get free => 'मुफ्त';
+
+  @override
+  String get addedToCart => 'कार्ट में जोड़ा';
+
+  @override
+  String get categoryMarketIntel => 'बाजार जानकारी';
+
+  @override
+  String get categoryAiAdvisory => 'AI और सलाह';
+
+  @override
+  String get categorySchemesFinance => 'योजनाएं और वित्त';
+
+  @override
+  String get categoryTradeRent => 'व्यापार और किराया';
+
+  @override
+  String toolsCount(int count) {
+    return '$count टूल';
+  }
+
+  @override
+  String get farmToolkitCardSubtitle => 'भाव, AI, योजनाएं, बीमा और अधिक';
+
+  @override
+  String get pullToRefresh => 'रीफ्रेश के लिए नीचे खींचें';
+
+  @override
+  String get analysisFailed => 'विश्लेषण विफल। पुनः प्रयास करें।';
+
+  @override
+  String get cropLabel => 'फसल';
+
+  @override
+  String get localBadge => 'स्थानीय';
+
+  @override
+  String get priceAlerts => 'मूल्य अलर्ट';
+
+  @override
+  String get aiPowered => 'AI संचालित';
+
+  @override
+  String get changeLanguage => 'भाषा बदलें';
+
+  @override
+  String get profileUpdated => 'प्रोफाइल अपडेट';
+
+  @override
+  String get buyInputsTab => 'इनपुट खरीदें';
+
+  @override
+  String get sellProduceTab => 'फसल बेचें';
+
+  @override
+  String get noRatesAvailable => 'कोई दर उपलब्ध नहीं';
+
+  @override
+  String get tapForPriceAlerts => 'मूल्य अलर्ट सेट करें';
+
+  @override
+  String get logOut => 'लॉग आउट';
+
+  @override
+  String get languageLabel => 'भाषा';
+
+  @override
+  String get currentStep => 'वर्तमान';
+
+  @override
+  String get treatmentRecommendation => 'उपचार सिफारिश';
+
+  @override
+  String get noAdvisoryToday => 'आज कोई सलाह उपलब्ध नहीं।';
+
+  @override
+  String get acresUnit => 'एकड़';
 }

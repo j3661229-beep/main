@@ -9,6 +9,9 @@ class ApiService {
   static ApiService get instance => _instance ??= ApiService._();
   ApiService._();
 
+  /// Temporarily stores signup data between SignupScreen and OtpScreen
+  Map<String, dynamic>? pendingSignupData;
+
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   late final Dio _dio = Dio(

@@ -6,7 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/shared_widgets.dart';
 import '../../data/services/api_service.dart';
+import '../../data/providers/auth_provider.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/utils/responsive.dart';
 
 /// Unified signup screen — adapts form based on [role]
 class SignupScreen extends ConsumerStatefulWidget {
@@ -69,45 +71,46 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() { _isLoading = true; _error = null; });
     try {
+      final phoneString = '+91${_phoneCtrl.text.trim()}';
+      
       switch (widget.role) {
         case 'FARMER':
-          await ApiService.instance.registerFarmer({
+          ApiService.instance.pendingSignupData = {
             'name': _nameCtrl.text.trim(),
-            'phone': '+91${_phoneCtrl.text.trim()}',
             'village': _villageCtrl.text.trim(),
             'district': _selectedDistrict,
             'landSize': double.tryParse(_landCtrl.text),
             'primaryCrops': _selectedCrops.toList(),
-          });
-          if (mounted) {
-            context.push('/auth/otp?phone=${Uri.encodeComponent('+91${_phoneCtrl.text.trim()}')}&role=FARMER&language=en');
-          }
+          };
           break;
         case 'SUPPLIER':
-          await ApiService.instance.registerSupplier({
+          ApiService.instance.pendingSignupData = {
             'businessName': _bizCtrl.text.trim(),
             'ownerName': _nameCtrl.text.trim(),
-            'phone': _phoneCtrl.text.trim(),
             'email': _emailCtrl.text.trim(),
             'gstin': _gstinCtrl.text.trim().toUpperCase(),
             'city': _cityCtrl.text.trim(),
             'district': _selectedDistrict,
             'categories': _selectedCategories.toList(),
-          });
-          if (mounted) context.go('/auth/pending');
+          };
           break;
         case 'DEALER':
-          await ApiService.instance.registerDealer({
+          ApiService.instance.pendingSignupData = {
             'businessName': _bizCtrl.text.trim(),
             'ownerName': _nameCtrl.text.trim(),
-            'phone': _phoneCtrl.text.trim(),
             'email': _emailCtrl.text.trim(),
             'mandiLicense': _licenseCtrl.text.trim(),
             'apmcYard': _apmcCtrl.text.trim(),
             'commodities': _selectedCommodities.toList(),
-          });
-          if (mounted) context.go('/auth/pending');
+          };
           break;
+      }
+      
+      // Send OTP to start the flow
+      await ref.read(authProvider.notifier).sendOTP(phone: phoneString, role: widget.role);
+      
+      if (mounted) {
+        context.push('/auth/otp?phone=${Uri.encodeComponent(phoneString)}&role=${widget.role}&language=en');
       }
     } catch (e) {
       setState(() { _error = e.toString().replaceAll('Exception: ', ''); });
@@ -118,6 +121,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SingleChildScrollView(
@@ -138,7 +142,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   const SizedBox(height: 20),
                   Text(_emoji, style: const TextStyle(fontSize: 40)),
                   const SizedBox(height: 8),
-                  Text('Create Account', style: GoogleFonts.spaceGrotesk(fontSize: 26, fontWeight: FontWeight.w700, color: Colors.white)),
+                  Text('Create Account', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(26), fontWeight: FontWeight.w700, color: Colors.white)),
                   Text('Register as $_roleLabel', style: GoogleFonts.inter(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
                 ],
               ),

@@ -9,6 +9,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/utils/responsive.dart';
 
 // Provider for dealer crop rates — district only, all crops
 final dealerRatesProvider = FutureProvider.family<List, String>((ref, district) async {
@@ -132,6 +133,7 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final rates = ref.watch(dealerRatesProvider(_effectiveDistrict));
 
     return Scaffold(
@@ -171,7 +173,7 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
                           color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Text('🏪', style: TextStyle(fontSize: 26)),
+                        child: Text('🏪', style: TextStyle(fontSize: r.sp(26))),
                       ),
                       const SizedBox(width: 14),
                       const Expanded(
@@ -340,6 +342,7 @@ class _CropRateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final bestRateObj = rates.reduce((a, b) => (a['pricePerQuintal'] as num).toDouble() > (b['pricePerQuintal'] as num).toDouble() ? a : b);
     final bestRate = (bestRateObj['pricePerQuintal'] as num).toDouble();
     final bestDealerId = bestRateObj['dealerId'] as String? ?? '';
@@ -364,13 +367,13 @@ class _CropRateCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Text(_cropEmoji(cropName), style: const TextStyle(fontSize: 28)),
+                Text(_cropEmoji(cropName), style: TextStyle(fontSize: r.sp(28))),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(cropName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                      Text(cropName, style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
                       Text('${rates.length} dealer${rates.length > 1 ? 's' : ''} buying'),
                     ],
                   ),
@@ -378,7 +381,7 @@ class _CropRateCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('₹${bestRate.toStringAsFixed(0)}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.primary)),
+                    Text('₹${bestRate.toStringAsFixed(0)}', style: TextStyle(fontSize: r.sp(20), fontWeight: FontWeight.w900, color: AppColors.primary)),
                     const Text('best/quintal', style: TextStyle(fontSize: 10, color: AppColors.textTertiary, fontWeight: FontWeight.w600)),
                   ],
                 ),
@@ -396,7 +399,7 @@ class _CropRateCard extends StatelessWidget {
             final isBest = price == bestRate;
 
             return Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              padding: EdgeInsets.fromLTRB(r.horizontalPadding, 12, r.horizontalPadding, 0),
               child: Row(
                 children: [
                   Container(
@@ -405,7 +408,7 @@ class _CropRateCard extends StatelessWidget {
                       color: isBest ? AppColors.primarySurface : AppColors.surface,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Center(child: Text('🤝', style: TextStyle(fontSize: 20))),
+                    child: Center(child: Text('🤝', style: TextStyle(fontSize: r.sp(20)))),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -420,7 +423,7 @@ class _CropRateCard extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(8)),
-                                child: const Text('BEST', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800)),
+                                child: Text('BEST', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800)),
                               ),
                             ],
                           ],
@@ -446,7 +449,7 @@ class _CropRateCard extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () => onBookSlot(bestDealerId, bestRate),
-                icon: const Text('📅', style: TextStyle(fontSize: 16)),
+                icon: Text('📅', style: TextStyle(fontSize: r.sp(16))),
                 label: const Text('Book Delivery Slot', style: TextStyle(fontWeight: FontWeight.w700)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
@@ -466,6 +469,7 @@ class _CropRateCard extends StatelessWidget {
 class _RateShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Container(
       height: 120,
       margin: const EdgeInsets.only(bottom: 12),

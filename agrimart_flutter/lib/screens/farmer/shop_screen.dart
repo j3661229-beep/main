@@ -17,6 +17,7 @@ import '../../core/widgets/app_snackbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../core/utils/responsive.dart';
 
 class ShopScreen extends ConsumerStatefulWidget {
   const ShopScreen({super.key});
@@ -197,6 +198,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final q = Uri(queryParameters: {
       if (_category.isNotEmpty) 'category': _category,
       if (_search.isNotEmpty) 'search': _search,
@@ -439,7 +441,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                       '$_effectiveLat,$_effectiveLng',
                                     ),
                                   ),
-                                  child: const Text('Retry'),
+                                  child: Text('Retry'),
                                 ),
                               ],
                             ),
@@ -467,7 +469,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                 // Products Grid
                 SliverPadding(
                   padding:
-                      EdgeInsets.fromLTRB(16, 0, 16, totalItems > 0 ? 180 : 100),
+                      EdgeInsets.fromLTRB(16, 0, 16, totalItems > 0 ? r.bottomNavInset + r.rs(80) : r.bottomNavInset),
                   sliver: products.when(
                     loading: () =>
                         const SliverToBoxAdapter(child: AppShimmerGrid()),
@@ -486,13 +488,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                 subtitle: l10n.clearFiltersSubtitle));
                       }
                       return SliverGrid(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.75, // Better space utilization
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                        ),
+                        gridDelegate: r.productGridDelegate(),
                         delegate: SliverChildBuilderDelegate(
                           (ctx, i) {
                             final p = list[i] as Map;
@@ -583,9 +579,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600)),
                               Text('₹${totalPrice.toStringAsFixed(0)}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 16,
+                                      fontSize: r.sp(16),
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: 0.5)),
                             ],
@@ -593,9 +589,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           Row(
                             children: [
                               Text(l10n.viewCart,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 16,
+                                      fontSize: r.sp(16),
                                       fontWeight: FontWeight.bold)),
                               SizedBox(width: 8),
                               Icon(Icons.arrow_forward_ios,
@@ -659,6 +655,7 @@ class _ProductCardSwiggy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final l10n = AppLocalizations.of(context)!;
     return FadeInUp(
       child: Container(
@@ -772,7 +769,7 @@ class _ProductCardSwiggy extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('₹${product['price']}',
-                        style: AppTextStyles.priceSmall.copyWith(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
+                        style: AppTextStyles.priceSmall.copyWith(fontSize: r.sp(16), fontWeight: FontWeight.w900, letterSpacing: -0.5)),
 
                     // ADD BUTTON / QTY SELECTOR
                     if (cartQty == 0)
@@ -854,6 +851,7 @@ class _CategoryGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return GestureDetector(
         onTap: onTap,
         child: Column(
@@ -907,6 +905,7 @@ class _PromoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Container(
       width: 280,
       margin: const EdgeInsets.only(right: 16),
@@ -940,9 +939,9 @@ class _PromoBanner extends StatelessWidget {
                         letterSpacing: 1.2)),
                 const SizedBox(height: 4),
                 Text(subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: r.sp(18),
                         fontWeight: FontWeight.bold,
                         height: 1.15)),
               ],
@@ -961,6 +960,7 @@ class _NearbySupplierCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final products = supplier['products'] as List? ?? [];
     final l10n = AppLocalizations.of(context)!;
 
@@ -1014,7 +1014,7 @@ class _NearbySupplierCard extends StatelessWidget {
                           )
                         ],
                       ),
-                      child: const Center(child: Text('🏬', style: TextStyle(fontSize: 20))),
+                      child: Center(child: Text('🏬', style: TextStyle(fontSize: r.sp(20)))),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -1043,7 +1043,7 @@ class _NearbySupplierCard extends StatelessWidget {
               
               // Featured Products
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                padding: EdgeInsets.fromLTRB(r.horizontalPadding, 0, r.horizontalPadding, 16),
                 child: products.isNotEmpty
                     ? Wrap(
                         spacing: 8,
@@ -1119,6 +1119,7 @@ class _SortChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: Material(
@@ -1184,6 +1185,7 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final r = context.r;
     final progress = shrinkOffset / maxExtent;
     final l10n = AppLocalizations.of(context)!;
 
@@ -1243,10 +1245,10 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
                               children: [
                                 Text(
                                   isCustomLocation ? l10n.browsing : l10n.pickupLocation,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w800,
-                                      fontSize: 16)
+                                      fontSize: r.sp(16))
                                 ),
                                 const Icon(Icons.keyboard_arrow_down,
                                     color: Colors.white, size: 20),
@@ -1284,7 +1286,7 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
                   Expanded(
                     child: FadeIn(
                       duration: const Duration(milliseconds: 300),
-                      child: const Center(
+                      child: Center(
                         child: Text(
                           '', // Placeholder for potential tagline
                           style: TextStyle(color: Colors.white, fontSize: 13),
@@ -1389,6 +1391,7 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
       decoration: const BoxDecoration(
@@ -1476,7 +1479,7 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
                       border: Border.all(color: isSelected ? AppColors.primary : AppColors.border.withValues(alpha: 0.5)),
                     ),
                     child: Row(children: [
-                      Text('📌', style: const TextStyle(fontSize: 18)),
+                      Text('📌', style: TextStyle(fontSize: r.sp(18))),
                       const SizedBox(width: 12),
                       Expanded(child: Text(d['name'] as String, style: AppTextStyles.headingSM.copyWith(color: isSelected ? AppColors.primary : AppColors.textPrimary))),
                       if (isSelected) const Icon(Icons.check_circle, color: AppColors.primary, size: 20),

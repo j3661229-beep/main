@@ -32,16 +32,6 @@ const kFarmToolCategories = [
 
 const kFarmTools = [
   FarmToolItem(
-    emoji: '📊',
-    label: 'Mandi Prices',
-    subtitle: 'Live APMC rates',
-    route: '/farmer/mandi-prices',
-    category: 'Market Intel',
-    accent: AppColors.farmerAccent,
-    tint: AppColors.farmerTint,
-    featured: true,
-  ),
-  FarmToolItem(
     emoji: '🔔',
     label: 'Price Alerts',
     subtitle: 'Target notifications',

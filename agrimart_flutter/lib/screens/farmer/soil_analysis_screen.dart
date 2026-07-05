@@ -11,6 +11,7 @@ import 'package:agrimart/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/utils/responsive.dart';
 
 class SoilAnalysisScreen extends ConsumerStatefulWidget {
   const SoilAnalysisScreen({super.key});
@@ -57,6 +58,7 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
@@ -73,7 +75,7 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: AppColors.primaryBorder)),
                 child: Row(children: [
-                  const Text('🤖', style: TextStyle(fontSize: 28)),
+                  Text('🤖', style: TextStyle(fontSize: r.sp(28))),
                   const SizedBox(width: 12),
                   Expanded(
                       child: Column(
@@ -97,16 +99,16 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
                           child:
                               Column(mainAxisSize: MainAxisSize.min, children: [
                         ListTile(
-                            leading: const Text('📷',
-                                style: TextStyle(fontSize: 24)),
+                            leading: Text('📷',
+                                style: TextStyle(fontSize: r.sp(24))),
                             title: const Text('Take Photo'),
                             onTap: () {
                               Navigator.pop(context);
                               _pickImage(ImageSource.camera);
                             }),
                         ListTile(
-                            leading: const Text('🖼️',
-                                style: TextStyle(fontSize: 24)),
+                            leading: Text('🖼️',
+                                style: TextStyle(fontSize: r.sp(24))),
                             title: const Text('Choose from Gallery'),
                             onTap: () {
                               Navigator.pop(context);
@@ -231,10 +233,10 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
-                                    child: const Text('✨', style: TextStyle(fontSize: 16)),
+                                    child: Text('✨', style: TextStyle(fontSize: r.sp(16))),
                                   ),
                                   const SizedBox(width: 12),
-                                  const Text('AI Advisory', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+                                  Text('AI Advisory', style: TextStyle(color: Colors.white, fontSize: r.sp(18), fontWeight: FontWeight.w800, letterSpacing: -0.5)),
                                 ],
                               ),
                               IconButton(
@@ -283,6 +285,7 @@ class _PremiumBadge extends StatelessWidget {
   const _PremiumBadge(this.emoji, this.label, this.value, this.color);
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -295,7 +298,7 @@ class _PremiumBadge extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
-              Text(emoji, style: const TextStyle(fontSize: 20)),
+              Text(emoji, style: TextStyle(fontSize: r.sp(20))),
               const SizedBox(width: 8),
               Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textTertiary)),
             ]),
@@ -315,6 +318,7 @@ class _NPKMeter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     double progress = 0.5;
     final v = value.toLowerCase();
     if (v.contains('high')) progress = 0.9;
@@ -331,7 +335,7 @@ class _NPKMeter extends StatelessWidget {
             children: [
               Row(
                 children: [
-                   Text(emoji, style: const TextStyle(fontSize: 16)),
+                   Text(emoji, style: TextStyle(fontSize: r.sp(16))),
                    const SizedBox(width: 8),
                    Text(label, style: AppTextStyles.bodyMD.copyWith(fontWeight: FontWeight.w800, color: AppColors.textSecondary)),
                 ]

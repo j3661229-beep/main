@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/providers/app_providers.dart';
+import '../../core/utils/responsive.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
   final String productId;
@@ -13,6 +14,7 @@ class ProductDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final productAsync = ref.watch(productDetailProvider(productId));
 
     return Scaffold(
@@ -52,9 +54,9 @@ class ProductDetailScreen extends ConsumerWidget {
                 flexibleSpace: FlexibleSpaceBar(
                   background: imageUrl != null
                       ? CachedNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover,
-                          placeholder: (_, __) => Container(color: AppColors.farmerTint, child: const Center(child: Text('🌱', style: TextStyle(fontSize: 80)))),
-                          errorWidget: (_, __, ___) => Container(color: AppColors.farmerTint, child: const Center(child: Text('🌱', style: TextStyle(fontSize: 80)))))
-                      : Container(color: AppColors.farmerTint, child: const Center(child: Text('🌱', style: TextStyle(fontSize: 80)))),
+                          placeholder: (_, __) => Container(color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: 80)))),
+                          errorWidget: (_, __, ___) => Container(color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: 80)))))
+                      : Container(color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: 80)))),
                 ),
               ),
 
@@ -86,7 +88,7 @@ class ProductDetailScreen extends ConsumerWidget {
                           const SizedBox(height: 6),
                           Row(
                             children: [
-                              Text(formatRupee(price), style: GoogleFonts.spaceGrotesk(fontSize: 28, fontWeight: FontWeight.w800, color: AppColors.farmerAccent)),
+                              Text(formatRupee(price), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(28), fontWeight: FontWeight.w800, color: AppColors.farmerAccent)),
                               const SizedBox(width: 6),
                               Text('/ $unit', style: GoogleFonts.inter(fontSize: 14, color: AppColors.muted)),
                             ],
@@ -113,7 +115,7 @@ class ProductDetailScreen extends ConsumerWidget {
 
                     // ── Add to Cart ───────────────────────
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                      padding: EdgeInsets.fromLTRB(r.horizontalPadding, 0, r.horizontalPadding, 24),
                       child: Column(
                         children: [
                           AppButton(
@@ -162,7 +164,9 @@ class _InfoPill extends StatelessWidget {
   final Color? color;
   const _InfoPill({required this.label, required this.value, this.color});
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
       color: AppColors.background,
@@ -178,5 +182,6 @@ class _InfoPill extends StatelessWidget {
       ),
     ),
   );
+  }
 }
 

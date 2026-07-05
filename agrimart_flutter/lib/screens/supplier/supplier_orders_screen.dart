@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/providers/app_providers.dart';
 import '../../../data/services/api_service.dart';
+import '../../core/utils/responsive.dart';
 
 final _supplierOrderStatusProvider = StateProvider<String?>((ref) => null);
 
@@ -14,6 +15,7 @@ class SupplierOrdersScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final status = ref.watch(_supplierOrderStatusProvider);
     final orders = ref.watch(supplierOrdersProvider(status));
     final statuses = ['All', 'PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'];
@@ -22,7 +24,7 @@ class SupplierOrdersScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        title: Text('Orders', style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700)),
+        title: Text('Orders', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700)),
         leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
       ),
       body: Column(
@@ -107,6 +109,7 @@ class _SupplierOrderCardState extends ConsumerState<_SupplierOrderCard> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final o = widget.order;
     final farmerName  = o['farmerName']  ?? o['farmer']?['name']  ?? 'Farmer';
     final productName = o['productName'] ?? o['product']?['name'] ?? 'Product';
@@ -130,7 +133,7 @@ class _SupplierOrderCardState extends ConsumerState<_SupplierOrderCard> {
               Container(
                 width: 44, height: 44,
                 decoration: BoxDecoration(color: AppColors.supplierTint, borderRadius: BorderRadius.circular(12)),
-                child: const Center(child: Text('🌾', style: TextStyle(fontSize: 22))),
+                child: Center(child: Text('🌾', style: TextStyle(fontSize: 22))),
               ),
               const SizedBox(width: 12),
               Expanded(

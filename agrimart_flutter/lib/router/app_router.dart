@@ -25,7 +25,6 @@ import '../screens/farmer/advisory_screen.dart';
 import '../screens/farmer/orders_screen.dart';
 import '../screens/farmer/order_tracking_screen.dart';
 import '../screens/farmer/mandi_news_screen.dart';
-import '../screens/farmer/mandi_prices_screen.dart';
 import '../screens/farmer/schemes_screen.dart';
 import '../screens/farmer/soil_analysis_screen.dart';
 import '../screens/farmer/kisan_ai_screen.dart';
@@ -191,7 +190,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       _faded('/farmer/advisory',   const AdvisoryScreen()),
       _faded('/farmer/news',       const MandiNewsScreen()),
       _faded('/farmer/tools',      const FarmToolsScreen()),
-      _faded('/farmer/mandi-prices', const MandiPricesScreen()),
       _faded('/farmer/schemes',    const SchemesScreen()),
       _faded('/farmer/soil',       const SoilAnalysisScreen()),
       _faded('/farmer/kisan-ai',   const KisanAiScreen()),

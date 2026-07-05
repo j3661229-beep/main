@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const prisma = require('../config/database');
 const redis = require('../config/redis');
-const { generateOTP, formatPhone } = require('../utils/helpers');
+const { generateOTP, formatPhone, useStaticOtp, DEV_OTP } = require('../utils/helpers');
 const logger = require('../utils/logger');
 
 let twilioClient;
@@ -34,7 +34,7 @@ const generateTokens = (userId, role) => {
 
 const sendOTP = async (phone, role) => {
     const formatted = formatPhone(phone);
-    const otp = '123456'; // Static OTP for testing — replace with generateOTP() in production
+    const otp = generateOTP();
     const otpKey = `otp:${formatted}`;
     const roleKey = `otp_role:${formatted}`;
 
@@ -42,7 +42,13 @@ const sendOTP = async (phone, role) => {
     await redis.setWithExpiry(roleKey, 600, role);
 
     await sendWhatsAppOTP(formatted, otp);
-    return { phone: formatted };
+
+    const result = { phone: formatted };
+    if (useStaticOtp()) {
+        result.otp = DEV_OTP;
+        logger.warn(`[STATIC OTP] Use OTP ${DEV_OTP} for ${formatted}`);
+    }
+    return result;
 };
 
 // Cache user profile in Redis
@@ -68,10 +74,11 @@ const verifyOTP = async ({ phone, otp, name, language, role }) => {
     const rolesKey = `otp_role:${formatted}`;
 
     const storedOTP = await redis.get(otpKey);
-    if (!storedOTP || storedOTP !== otp) {
+    const staticOk = useStaticOtp() && otp === DEV_OTP;
+    if (!staticOk && (!storedOTP || storedOTP !== otp)) {
         throw Object.assign(new Error('Invalid or expired OTP'), { statusCode: 400 });
     }
-    await redis.del(otpKey, rolesKey);
+    if (storedOTP) await redis.del(otpKey, rolesKey);
 
     // Find or create user
     let user = await prisma.user.findUnique({ where: { phone: formatted } });

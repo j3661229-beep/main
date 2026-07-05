@@ -8,6 +8,7 @@ import '../../core/widgets/agri_ui.dart';
 import '../../core/widgets/shared_widgets.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../data/services/api_service.dart';
+import '../../core/utils/responsive.dart';
 
 class FpoBulkScreen extends ConsumerStatefulWidget {
   const FpoBulkScreen({super.key});
@@ -43,6 +44,7 @@ class _FpoBulkScreenState extends ConsumerState<FpoBulkScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     if (_submitted) {
       return AgriScreen(
         title: 'FPO Bulk Sell',
@@ -82,7 +84,7 @@ class _FpoBulkScreenState extends ConsumerState<FpoBulkScreen> {
       accent: AppColors.dealerAccent,
       gradient: AppColors.dealerGradient,
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+        padding: EdgeInsets.fromLTRB(r.horizontalPadding, 20, r.horizontalPadding, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

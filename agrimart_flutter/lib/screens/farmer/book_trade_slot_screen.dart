@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/services/api_service.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
+import '../../core/utils/responsive.dart';
 
 class BookTradeSlotScreen extends StatefulWidget {
   final String cropName;
@@ -111,7 +112,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                   child: const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 48),
                 ),
                 const SizedBox(height: 24),
-                Text(l10n.bookingConfirmed, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                Text(l10n.bookingConfirmed, style: TextStyle(fontSize: ctx.r.sp(20), fontWeight: FontWeight.w800)),
                 const SizedBox(height: 12),
                 Text('${l10n.deliverySlotConfirmed} ${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}.', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary, height: 1.4)),
                 const SizedBox(height: 24),
@@ -141,11 +142,12 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('${l10n.sellPrefix} ${widget.cropName}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: Text('${l10n.sellPrefix} ${widget.cropName}', style: TextStyle(fontWeight: FontWeight.w800, fontSize: r.sp(18))),
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
@@ -159,7 +161,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                     children: [
                       const Icon(Icons.storefront_outlined, size: 64, color: AppColors.textTertiary),
                       const SizedBox(height: 16),
-                      Text(l10n.noDealersFound(widget.cropName, widget.district), style: const TextStyle(color: AppColors.textSecondary, fontSize: 16), textAlign: TextAlign.center),
+                      Text(l10n.noDealersFound(widget.cropName, widget.district), style: TextStyle(color: AppColors.textSecondary, fontSize: r.sp(16)), textAlign: TextAlign.center),
                     ],
                   ),
                 )
@@ -204,7 +206,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(sName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.textPrimary)),
+                                        Text(sName, style: TextStyle(fontWeight: FontWeight.w800, fontSize: r.sp(16), color: AppColors.textPrimary)),
                                         const SizedBox(height: 4),
                                         Row(
                                           children: [
@@ -219,7 +221,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Text('₹$rate', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.primaryDark)),
+                                      Text('₹$rate', style: TextStyle(fontWeight: FontWeight.w900, fontSize: r.sp(18), color: AppColors.primaryDark)),
                                       Text(l10n.perQuintalShort, style: const TextStyle(fontSize: 10, color: AppColors.textTertiary, fontWeight: FontWeight.bold)),
                                     ],
                                   )
@@ -309,7 +311,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
               ),
               child: _isSubmitting 
                 ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
-                : Text(l10n.confirmBookingSlot, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                : Text(l10n.confirmBookingSlot, style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.w800, letterSpacing: 0.5)),
             )
           )
         )

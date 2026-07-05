@@ -9,6 +9,7 @@ import '../../core/constants/app_constants.dart';
 import '../../data/providers/app_providers.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../data/services/api_service.dart';
+import '../../core/utils/responsive.dart';
 
 class PriceAlertsScreen extends ConsumerStatefulWidget {
   const PriceAlertsScreen({super.key});
@@ -60,6 +61,7 @@ class _PriceAlertsScreenState extends ConsumerState<PriceAlertsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final alerts = ref.watch(priceAlertsProvider);
     final district = ref.watch(authProvider).user?.effectiveDistrict ?? 'Nashik';
 
@@ -69,7 +71,7 @@ class _PriceAlertsScreenState extends ConsumerState<PriceAlertsScreen> {
       emoji: '🔔',
       onRefresh: () async => ref.invalidate(priceAlertsProvider),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+        padding: EdgeInsets.fromLTRB(r.horizontalPadding, 20, r.horizontalPadding, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

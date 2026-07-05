@@ -1161,6 +1161,540 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Get Started'**
   String get getStarted;
+
+  /// No description provided for @tools.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools'**
+  String get tools;
+
+  /// No description provided for @farmToolkit.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm Toolkit'**
+  String get farmToolkit;
+
+  /// No description provided for @farmToolkitSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'11 tools for your farm'**
+  String get farmToolkitSubtitle;
+
+  /// No description provided for @farmToolkitBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap any tool — AI crop doctor, govt schemes, insurance & equipment rental.'**
+  String get farmToolkitBanner;
+
+  /// No description provided for @popularTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular Tools'**
+  String get popularTools;
+
+  /// No description provided for @seeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAll;
+
+  /// No description provided for @todaysAdvisory.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Advisory'**
+  String get todaysAdvisory;
+
+  /// No description provided for @viewAdvisory.
+  ///
+  /// In en, this message translates to:
+  /// **'View advisory'**
+  String get viewAdvisory;
+
+  /// No description provided for @liveMandiRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Mandi Rates'**
+  String get liveMandiRates;
+
+  /// No description provided for @perQuintalShort2.
+  ///
+  /// In en, this message translates to:
+  /// **'/qtl'**
+  String get perQuintalShort2;
+
+  /// No description provided for @cropDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop Doctor'**
+  String get cropDoctor;
+
+  /// No description provided for @cropDoctorSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI disease detection'**
+  String get cropDoctorSubtitle;
+
+  /// No description provided for @takeCropPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo of your crop'**
+  String get takeCropPhoto;
+
+  /// No description provided for @aiIdentifyDisease.
+  ///
+  /// In en, this message translates to:
+  /// **'AI will identify disease & suggest treatment'**
+  String get aiIdentifyDisease;
+
+  /// No description provided for @camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// No description provided for @gallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// No description provided for @analyzeCrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze Crop'**
+  String get analyzeCrop;
+
+  /// No description provided for @analyzingCrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing crop...'**
+  String get analyzingCrop;
+
+  /// No description provided for @aiWorking.
+  ///
+  /// In en, this message translates to:
+  /// **'AI is analyzing your crop'**
+  String get aiWorking;
+
+  /// No description provided for @analysisResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis Result'**
+  String get analysisResult;
+
+  /// No description provided for @detectedIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Detected Issue'**
+  String get detectedIssue;
+
+  /// No description provided for @confidence.
+  ///
+  /// In en, this message translates to:
+  /// **'Confidence'**
+  String get confidence;
+
+  /// No description provided for @scanHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan History'**
+  String get scanHistory;
+
+  /// No description provided for @noScansYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No scans yet'**
+  String get noScansYet;
+
+  /// No description provided for @scanHistorySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan a crop to see history here'**
+  String get scanHistorySubtitle;
+
+  /// No description provided for @browseProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse market'**
+  String get browseProducts;
+
+  /// No description provided for @sellTabTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell to verified dealers'**
+  String get sellTabTitle;
+
+  /// No description provided for @sellTabSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare live buying rates, book a delivery slot, and track bookings.'**
+  String get sellTabSubtitle;
+
+  /// No description provided for @compareDealerRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare Dealer Rates'**
+  String get compareDealerRates;
+
+  /// No description provided for @myTradeBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'My Trade Bookings'**
+  String get myTradeBookings;
+
+  /// No description provided for @bestRateToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Best rate today in {district}'**
+  String bestRateToday(String district);
+
+  /// No description provided for @bookSlot.
+  ///
+  /// In en, this message translates to:
+  /// **'Book slot'**
+  String get bookSlot;
+
+  /// No description provided for @editFarmProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit farm profile'**
+  String get editFarmProfile;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get saveChanges;
+
+  /// No description provided for @villageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Village'**
+  String get villageLabel;
+
+  /// No description provided for @districtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'District'**
+  String get districtLabel;
+
+  /// No description provided for @landSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Land size (acres)'**
+  String get landSizeLabel;
+
+  /// No description provided for @cropsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Crops (comma separated)'**
+  String get cropsLabel;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @helpSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & Support'**
+  String get helpSupport;
+
+  /// No description provided for @logOutConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out?'**
+  String get logOutConfirmTitle;
+
+  /// No description provided for @logOutConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You will be logged out of AgriMart.'**
+  String get logOutConfirmMessage;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @searchTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Search tools...'**
+  String get searchTools;
+
+  /// No description provided for @favoriteTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favoriteTools;
+
+  /// No description provided for @recentTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently used'**
+  String get recentTools;
+
+  /// No description provided for @noToolsMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No tools match your search'**
+  String get noToolsMatch;
+
+  /// No description provided for @offlineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You are offline'**
+  String get offlineTitle;
+
+  /// No description provided for @offlineSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Some features need internet. Cached data may be shown.'**
+  String get offlineSubtitle;
+
+  /// No description provided for @kisanPromptSpray.
+  ///
+  /// In en, this message translates to:
+  /// **'When should I spray onion?'**
+  String get kisanPromptSpray;
+
+  /// No description provided for @kisanPromptPmfby.
+  ///
+  /// In en, this message translates to:
+  /// **'PMFBY insurance for tomato?'**
+  String get kisanPromptPmfby;
+
+  /// No description provided for @kisanPromptMandi.
+  ///
+  /// In en, this message translates to:
+  /// **'Best mandi rate for grapes?'**
+  String get kisanPromptMandi;
+
+  /// No description provided for @orderStepPlaced.
+  ///
+  /// In en, this message translates to:
+  /// **'Order placed'**
+  String get orderStepPlaced;
+
+  /// No description provided for @orderStepConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get orderStepConfirmed;
+
+  /// No description provided for @orderStepShipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipped'**
+  String get orderStepShipped;
+
+  /// No description provided for @orderStepDelivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered'**
+  String get orderStepDelivered;
+
+  /// No description provided for @proceedToPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Proceed to Pay'**
+  String get proceedToPay;
+
+  /// No description provided for @cartEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Cart is empty'**
+  String get cartEmpty;
+
+  /// No description provided for @cartEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add items from the market to continue'**
+  String get cartEmptySubtitle;
+
+  /// No description provided for @myCart.
+  ///
+  /// In en, this message translates to:
+  /// **'My Cart'**
+  String get myCart;
+
+  /// No description provided for @subtotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtotal'**
+  String get subtotal;
+
+  /// No description provided for @delivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery'**
+  String get delivery;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// No description provided for @free.
+  ///
+  /// In en, this message translates to:
+  /// **'FREE'**
+  String get free;
+
+  /// No description provided for @addedToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to cart'**
+  String get addedToCart;
+
+  /// No description provided for @categoryMarketIntel.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Intel'**
+  String get categoryMarketIntel;
+
+  /// No description provided for @categoryAiAdvisory.
+  ///
+  /// In en, this message translates to:
+  /// **'AI & Advisory'**
+  String get categoryAiAdvisory;
+
+  /// No description provided for @categorySchemesFinance.
+  ///
+  /// In en, this message translates to:
+  /// **'Schemes & Finance'**
+  String get categorySchemesFinance;
+
+  /// No description provided for @categoryTradeRent.
+  ///
+  /// In en, this message translates to:
+  /// **'Trade & Rent'**
+  String get categoryTradeRent;
+
+  /// No description provided for @toolsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} TOOLS'**
+  String toolsCount(int count);
+
+  /// No description provided for @farmToolkitCardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Prices, AI, schemes, insurance & more'**
+  String get farmToolkitCardSubtitle;
+
+  /// No description provided for @pullToRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull down to refresh'**
+  String get pullToRefresh;
+
+  /// No description provided for @analysisFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis failed. Please try again.'**
+  String get analysisFailed;
+
+  /// No description provided for @cropLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop'**
+  String get cropLabel;
+
+  /// No description provided for @localBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Local'**
+  String get localBadge;
+
+  /// No description provided for @priceAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Price Alerts'**
+  String get priceAlerts;
+
+  /// No description provided for @aiPowered.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Powered'**
+  String get aiPowered;
+
+  /// No description provided for @changeLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Change language'**
+  String get changeLanguage;
+
+  /// No description provided for @profileUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated'**
+  String get profileUpdated;
+
+  /// No description provided for @buyInputsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy Inputs'**
+  String get buyInputsTab;
+
+  /// No description provided for @sellProduceTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell Produce'**
+  String get sellProduceTab;
+
+  /// No description provided for @noRatesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No rates available'**
+  String get noRatesAvailable;
+
+  /// No description provided for @tapForPriceAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Set price alerts'**
+  String get tapForPriceAlerts;
+
+  /// No description provided for @logOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Out'**
+  String get logOut;
+
+  /// No description provided for @languageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get languageLabel;
+
+  /// No description provided for @currentStep.
+  ///
+  /// In en, this message translates to:
+  /// **'CURRENT'**
+  String get currentStep;
+
+  /// No description provided for @treatmentRecommendation.
+  ///
+  /// In en, this message translates to:
+  /// **'Treatment Recommendation'**
+  String get treatmentRecommendation;
+
+  /// No description provided for @noAdvisoryToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No advisory available today.'**
+  String get noAdvisoryToday;
+
+  /// No description provided for @acresUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'acres'**
+  String get acresUnit;
 }
 
 class _AppLocalizationsDelegate

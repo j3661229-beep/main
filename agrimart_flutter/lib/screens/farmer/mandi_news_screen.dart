@@ -8,12 +8,14 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/utils/responsive.dart';
 
 class MandiNewsScreen extends ConsumerWidget {
   const MandiNewsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final newsAsync = ref.watch(mandiNewsProvider);
     final user = ref.watch(authProvider).user;
 
@@ -79,6 +81,7 @@ class _NewsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final link = item['link']?.toString();
     final isExternal = item['isExternal'] == true;
     final sourceLabel = isExternal ? (item['source'] ?? 'Google News') : (item['source'] ?? 'AgriMart');

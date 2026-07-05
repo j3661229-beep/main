@@ -126,6 +126,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await _storage.write(key: AppConstants.userKey, value: jsonEncode(data['user']));
       
       state = AuthState(user: user, isAuthenticated: true);
+
+      // Complete onboarding if there's pending signup data
+      if (_api.pendingSignupData != null) {
+        try {
+          final onboardData = Map<String, dynamic>.from(_api.pendingSignupData!);
+          onboardData['role'] = role ?? user.role;
+          await completeOnboarding(onboardData);
+          _api.pendingSignupData = null;
+          return state.user ?? user;
+        } catch (e) {
+          // Ignore onboarding errors to not break login flow
+        }
+      }
+      
       return user;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: _parseError(e));
@@ -186,6 +200,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(isLoading: false, error: _parseError(e));
       rethrow;
     }
+  }
+
+  Future<void> refreshUser() async {
+    try {
+      final res = await _api.getMe();
+      if (res['success'] == true && res['data'] != null) {
+        final freshUserJson = res['data']['user'] ?? res['data'];
+        final user = UserModel.fromJson(freshUserJson);
+        await _storage.write(key: AppConstants.userKey, value: jsonEncode(freshUserJson));
+        state = AuthState(user: user, isAuthenticated: true);
+      }
+    } catch (_) {}
   }
 
   Future<void> logout() async {

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/services/api_service.dart';
+import '../../core/utils/responsive.dart';
 
 final _myDealsProvider = FutureProvider<List>((ref) async {
   return ApiService.instance.getDeals();
@@ -15,13 +16,14 @@ class MyDealsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final deals = ref.watch(_myDealsProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        title: Text('My Deals', style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700)),
+        title: Text('My Deals', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700)),
         leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
       ),
       body: RefreshIndicator(
@@ -78,6 +80,7 @@ class _DealCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final crop       = deal['crop']        ?? deal['listing']?['crop'] ?? 'Crop';
     final farmer     = deal['farmerName']  ?? deal['listing']?['farmerName'] ?? deal['listing']?['farmer']?['name'] ?? 'Farmer';
     final qty        = (deal['quantity']   ?? deal['listing']?['quantity'] as num?) ?? 0;
@@ -102,14 +105,14 @@ class _DealCard extends StatelessWidget {
               Container(
                 width: 50, height: 50,
                 decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(14)),
-                child: const Center(child: Text('🌾', style: TextStyle(fontSize: 26))),
+                child: Center(child: Text('🌾', style: TextStyle(fontSize: r.sp(26)))),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(crop, style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink)),
+                    Text(crop, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(16), fontWeight: FontWeight.w700, color: AppColors.ink)),
                     Row(children: [
                       const Icon(Icons.person_outline, size: 13, color: AppColors.muted),
                       const SizedBox(width: 3),

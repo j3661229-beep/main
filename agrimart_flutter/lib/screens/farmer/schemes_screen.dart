@@ -8,12 +8,14 @@ import '../../core/widgets/agri_ui.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
 import '../../core/widgets/shared_widgets.dart';
+import '../../core/utils/responsive.dart';
 
 class SchemesScreen extends ConsumerWidget {
   const SchemesScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -32,9 +34,9 @@ class SchemesScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      const Text('🏛️', style: TextStyle(fontSize: 28)),
+                      Text('🏛️', style: TextStyle(fontSize: r.sp(28))),
                       const SizedBox(height: 6),
-                      Text('Govt Schemes', style: GoogleFonts.spaceGrotesk(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white)),
+                      Text('Govt Schemes', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(24), fontWeight: FontWeight.w800, color: Colors.white)),
                       const SizedBox(height: 4),
                       Text('Subsidies, loans & insurance', style: GoogleFonts.inter(fontSize: 13, color: Colors.white70)),
                       const SizedBox(height: 12),
@@ -81,6 +83,7 @@ class _SchemeList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final schemes = ref.watch(provider);
     return schemes.when(
       loading: () => const AppShimmerList(),
@@ -88,7 +91,7 @@ class _SchemeList extends ConsumerWidget {
       data: (list) => list.isEmpty
           ? EmptyState(emoji: '🏛️', title: emptyTitle, subtitle: emptySubtitle)
           : ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              padding: EdgeInsets.fromLTRB(r.horizontalPadding, 16, r.horizontalPadding, 32),
               itemCount: list.length,
               itemBuilder: (ctx, i) => Padding(
                 padding: EdgeInsets.only(bottom: i < list.length - 1 ? 12 : 0),
@@ -105,6 +108,7 @@ class _SchemeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return AgriCard(
       padding: EdgeInsets.zero,
       child: Column(
@@ -122,7 +126,7 @@ class _SchemeCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(14)),
-                  child: const Center(child: Text('🏛️', style: TextStyle(fontSize: 24))),
+                  child: Center(child: Text('🏛️', style: TextStyle(fontSize: r.sp(24)))),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

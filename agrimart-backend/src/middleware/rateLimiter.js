@@ -1,5 +1,5 @@
 const rateLimit = require('express-rate-limit');
-const redis = require('../config/redis');
+const { useStaticOtp } = require('../utils/helpers');
 
 const createLimiter = (windowMs, max, message) =>
     rateLimit({
@@ -8,7 +8,7 @@ const createLimiter = (windowMs, max, message) =>
         message: { success: false, message },
         standardHeaders: true,
         legacyHeaders: false,
-        skip: () => process.env.NODE_ENV === 'test',
+        skip: () => process.env.NODE_ENV === 'test' || useStaticOtp(),
     });
 
 // OTP: 5 requests per 10 minutes

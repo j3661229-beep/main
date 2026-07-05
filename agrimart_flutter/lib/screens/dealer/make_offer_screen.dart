@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
+import '../../core/utils/responsive.dart';
 
 class MakeOfferScreen extends ConsumerStatefulWidget {
   final Map listing;
@@ -51,6 +52,7 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final l = widget.listing;
     final crop       = l['crop'] ?? 'Crop';
     final farmerName = l['farmerName'] ?? l['farmer']?['name'] ?? 'Farmer';
@@ -60,7 +62,7 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        title: Text('Make Offer', style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700)),
+        title: Text('Make Offer', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700)),
         leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
       ),
       body: SingleChildScrollView(
@@ -84,7 +86,7 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
                   children: [
                     Text('Produce Summary', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.8))),
                     const SizedBox(height: 6),
-                    Text(crop, style: GoogleFonts.spaceGrotesk(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
+                    Text(crop, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(26), fontWeight: FontWeight.w800, color: Colors.white)),
                     const SizedBox(height: 12),
                     Row(children: [
                       _SummaryChip(label: 'Farmer', value: farmerName),
@@ -115,7 +117,7 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Your Offer', style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink)),
+                    Text('Your Offer', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(16), fontWeight: FontWeight.w700, color: AppColors.ink)),
                     const SizedBox(height: 16),
 
                     Text('Offer Price / quintal *', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.muted)),
@@ -124,10 +126,10 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
                       controller: _offerCtrl,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-                      style: GoogleFonts.spaceGrotesk(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.dealerAccent),
+                      style: GoogleFonts.spaceGrotesk(fontSize: r.sp(20), fontWeight: FontWeight.w700, color: AppColors.dealerAccent),
                       decoration: InputDecoration(
                         prefixText: '₹ ',
-                        prefixStyle: GoogleFonts.spaceGrotesk(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.dealerAccent),
+                        prefixStyle: GoogleFonts.spaceGrotesk(fontSize: r.sp(20), fontWeight: FontWeight.w700, color: AppColors.dealerAccent),
                         suffixText: '/qtl',
                         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.dealerAccent, width: 2)),
                       ),
@@ -182,7 +184,7 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
                             Text('${formatRupee(_offerPrice)}/qtl × ${_quantity.toInt()} qtl', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
                           ],
                         ),
-                        Text(formatRupee(_total), style: GoogleFonts.spaceGrotesk(fontSize: 24, fontWeight: FontWeight.w800, color: AppColors.dealerAccent)),
+                        Text(formatRupee(_total), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(24), fontWeight: FontWeight.w800, color: AppColors.dealerAccent)),
                       ],
                     ),
                   ],

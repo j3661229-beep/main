@@ -6,12 +6,14 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_fallback.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/utils/responsive.dart';
 
 class OrdersScreen extends ConsumerWidget {
   const OrdersScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final orders = ref.watch(ordersProvider);
 
     return Scaffold(
@@ -66,8 +68,8 @@ class OrdersScreen extends ConsumerWidget {
                               decoration: BoxDecoration(
                                   color: AppColors.primarySurface,
                                   borderRadius: BorderRadius.circular(16)),
-                              child: const Center(
-                                  child: Text('📦', style: TextStyle(fontSize: 28)))),
+                              child: Center(
+                                  child: Text('📦', style: TextStyle(fontSize: r.sp(28))))),
                           const SizedBox(width: 16),
                           Expanded(
                             child: Column(
@@ -99,7 +101,7 @@ class OrdersScreen extends ConsumerWidget {
                                           const Text('TOTAL AMOUNT', style: TextStyle(fontSize: 9, color: AppColors.textTertiary, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
                                           const SizedBox(height: 2),
                                           Text('₹${o['totalAmount']}',
-                                              style: AppTextStyles.priceSmall.copyWith(fontSize: 18, fontWeight: FontWeight.w900)),
+                                              style: AppTextStyles.priceSmall.copyWith(fontSize: r.sp(18), fontWeight: FontWeight.w900)),
                                         ]),
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.end,

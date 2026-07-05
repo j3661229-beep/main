@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/services/api_service.dart';
 import 'package:intl/intl.dart';
+import '../../core/utils/responsive.dart';
 
 class TradeBookingScreen extends ConsumerStatefulWidget {
   final String cropName;
@@ -90,6 +91,7 @@ class _TradeBookingScreenState extends ConsumerState<TradeBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -187,7 +189,7 @@ class _TradeBookingScreenState extends ConsumerState<TradeBookingScreen> {
                 onPressed: _loading ? null : _submitBooking,
                 child: _loading 
                   ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
-                  : const Text('Confirm Booking', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  : Text('Confirm Booking', style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -202,6 +204,7 @@ class _DetailRow extends StatelessWidget {
   const _DetailRow({required this.label, required this.value});
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

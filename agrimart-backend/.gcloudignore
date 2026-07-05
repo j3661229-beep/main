@@ -1,0 +1,15 @@
+node_modules/
+npm-debug.log
+.env
+.env.*
+!.env.example
+.git/
+.gitignore
+crash.log
+railway.json
+README.md
+*.md
+.vscode/
+coverage/
+test/
+scripts/test-ai-keys.js

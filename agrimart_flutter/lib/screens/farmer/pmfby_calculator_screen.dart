@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/agri_ui.dart';
 import '../../core/widgets/shared_widgets.dart';
+import '../../core/utils/responsive.dart';
 
 class PmfbyCalculatorScreen extends StatefulWidget {
   const PmfbyCalculatorScreen({super.key});
@@ -38,6 +39,7 @@ class _PmfbyCalculatorScreenState extends State<PmfbyCalculatorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return AgriScreen(
       title: 'PMFBY Calculator',
       subtitle: 'Crop insurance premium',
@@ -49,7 +51,7 @@ class _PmfbyCalculatorScreenState extends State<PmfbyCalculatorScreen> {
       ),
       accent: AppColors.dealerAccent,
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+        padding: EdgeInsets.fromLTRB(r.horizontalPadding, 20, r.horizontalPadding, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

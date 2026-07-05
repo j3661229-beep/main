@@ -3,16 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/providers/locale_provider.dart';
+import '../../core/widgets/language_picker_sheet.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/utils/responsive.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final auth = ref.watch(authProvider);
     final user = auth.user;
     final locale = ref.watch(localeProvider);
@@ -85,7 +88,7 @@ class ProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 32),
                 _sectionHeader(l10n.accountManagement.toUpperCase()),
                 _buildItem(Icons.language, l10n.appLanguage, langName, () {
-                  _showLanguagePicker(context, ref, locale);
+                  showLanguagePickerSheet(context, ref);
                 }),
                 _buildItem(Icons.location_on_outlined, 'My Farm Address',
                     'Manage saved locations', () {
@@ -143,8 +146,8 @@ class ProfileScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(16)),
                     ),
                     label: Text(l10n.logout,
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
+                        style: TextStyle(
+                            fontSize: r.sp(16), fontWeight: FontWeight.bold)),
                   ),
                 ),
                 const SizedBox(height: 64),
@@ -153,41 +156,7 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  void _showLanguagePicker(BuildContext context, WidgetRef ref, Locale currentLocale) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Select Language / भाषा निवडा', style: AppTextStyles.headingLG),
-              const SizedBox(height: 16),
-              ...[
-                {'name': 'English', 'code': 'en'},
-                {'name': 'मराठी (Marathi)', 'code': 'mr'},
-                {'name': 'हिंदी (Hindi)', 'code': 'hi'}
-              ].map((l) {
-                final isSelected = currentLocale.languageCode == l['code'];
-                return ListTile(
-                  title: Text(l['name']!, style: isSelected ? AppTextStyles.headingMD.copyWith(color: AppColors.primary) : AppTextStyles.bodyLG),
-                  trailing: isSelected ? const Icon(Icons.check_circle, color: AppColors.primary) : null,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  tileColor: isSelected ? AppColors.primarySurface : null,
-                  onTap: () {
-                    ref.read(localeProvider.notifier).setLocale(Locale(l['code']!));
-                    Navigator.pop(ctx);
-                  },
-                );
-              }),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+
 
   void _showStubSheet(BuildContext context, String title, String body) {
     showModalBottomSheet(
@@ -208,7 +177,7 @@ class ProfileScreen extends ConsumerWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Got it'),
+                  child: Text('Got it'),
                 ),
               ),
             ],

@@ -17,31 +17,33 @@ import 'package:agrimart/l10n/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // 2. Initialize Hive for Caching
   await Hive.initFlutter();
   await Hive.openBox('app_cache');
   await OfflineCache.init();
 
-  // 3. Lock to portrait
+  final bootstrap = await loadLocaleBootstrap();
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // Status bar style
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.dark,
   ));
 
   runApp(
-    const ProviderScope(
-      child: ErrorBoundary(
+    ProviderScope(
+      overrides: [
+        localeProvider.overrideWith((ref) => LocaleNotifier(ref, initialLocale: bootstrap.locale)),
+        languageChosenProvider.overrideWith((ref) => LanguageChosenNotifier(initial: bootstrap.languageChosen)),
+      ],
+      child: const ErrorBoundary(
         child: AgriMartApp(),
       ),
     ),
@@ -61,6 +63,15 @@ class AgriMartApp extends ConsumerWidget {
       theme: AppTheme.light,
       routerConfig: router,
       locale: locale,
+      localeResolutionCallback: (deviceLocale, supportedLocales) {
+        if (IndianLanguages.isSupported(locale.languageCode)) {
+          return locale;
+        }
+        if (deviceLocale != null && IndianLanguages.isSupported(deviceLocale.languageCode)) {
+          return Locale(deviceLocale.languageCode);
+        }
+        return supportedLocales.first;
+      },
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -70,12 +81,15 @@ class AgriMartApp extends ConsumerWidget {
       supportedLocales: IndianLanguages.locales,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
-          child: child!,
+        return Localizations.override(
+          context: context,
+          locale: locale,
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
+            child: child!,
+          ),
         );
       },
     );
   }
 }
-

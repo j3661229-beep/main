@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/shared_widgets.dart';
 import '../../data/providers/auth_provider.dart';
+import '../../core/utils/responsive.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
   final String phone;
@@ -19,8 +20,8 @@ class OtpScreen extends ConsumerStatefulWidget {
 }
 
 class _OtpScreenState extends ConsumerState<OtpScreen> {
-  final List<TextEditingController> _ctrls = List.generate(4, (_) => TextEditingController());
-  final List<FocusNode> _nodes = List.generate(4, (_) => FocusNode());
+  final List<TextEditingController> _ctrls = List.generate(6, (_) => TextEditingController());
+  final List<FocusNode> _nodes = List.generate(6, (_) => FocusNode());
   bool _isLoading = false;
   String? _error;
   int _resendSeconds = 30;
@@ -54,17 +55,17 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   String get _otp => _ctrls.map((c) => c.text).join();
 
   void _onChanged(int index, String val) {
-    if (val.length == 1 && index < 3) {
+    if (val.length == 1 && index < 5) {
       _nodes[index + 1].requestFocus();
     } else if (val.isEmpty && index > 0) {
       _nodes[index - 1].requestFocus();
     }
-    if (_otp.length == 4) _verify();
+    if (_otp.length == 6) _verify();
   }
 
   Future<void> _verify() async {
-    if (_otp.length < 4) {
-      setState(() => _error = 'Enter the 4-digit OTP');
+    if (_otp.length < 6) {
+      setState(() => _error = 'Enter the 6-digit OTP');
       return;
     }
     setState(() { _isLoading = true; _error = null; });
@@ -98,6 +99,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
@@ -122,7 +124,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 const Text('📱', style: TextStyle(fontSize: 40)),
                 const SizedBox(height: 12),
                 Text('Verify your number',
-                    style: GoogleFonts.spaceGrotesk(fontSize: 26, fontWeight: FontWeight.w700, color: Colors.white)),
+                    style: GoogleFonts.spaceGrotesk(fontSize: r.sp(26), fontWeight: FontWeight.w700, color: Colors.white)),
                 const SizedBox(height: 4),
                 Text('OTP sent to ${widget.phone}',
                     style: GoogleFonts.inter(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
@@ -145,15 +147,15 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                   ),
                   child: Column(
                     children: [
-                      Text('Enter OTP', style: GoogleFonts.spaceGrotesk(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.ink)),
+                      Text('Enter OTP', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(20), fontWeight: FontWeight.w700, color: AppColors.ink)),
                       const SizedBox(height: 8),
-                      Text('4-digit code sent via SMS', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
+                      Text('6-digit code sent via SMS', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
                       const SizedBox(height: 32),
 
                       // OTP boxes
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(4, (i) => _OtpBox(
+                        children: List.generate(6, (i) => _OtpBox(
                           controller: _ctrls[i],
                           focusNode: _nodes[i],
                           onChanged: (v) => _onChanged(i, v),
@@ -218,8 +220,9 @@ class _OtpBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Container(
-      width: 64, height: 64,
+      width: 48, height: 56,
       decoration: BoxDecoration(
         border: Border.all(
           color: hasError ? AppColors.danger : (focusNode.hasFocus ? AppColors.farmerAccent : AppColors.border),
@@ -234,7 +237,7 @@ class _OtpBox extends StatelessWidget {
         textAlign: TextAlign.center,
         keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(1)],
-        style: GoogleFonts.spaceGrotesk(fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.ink),
+        style: GoogleFonts.spaceGrotesk(fontSize: r.sp(24), fontWeight: FontWeight.w700, color: AppColors.ink),
         decoration: const InputDecoration(border: InputBorder.none, counterText: ''),
         onChanged: onChanged,
       ),

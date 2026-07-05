@@ -8,7 +8,7 @@ class AppConstants {
   // Android emulator: http://10.0.2.2:3000/api
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.133.106.6:3000/api',
+    defaultValue: 'http://10.59.22.186:3000/api',
   );
 
   // Storage keys

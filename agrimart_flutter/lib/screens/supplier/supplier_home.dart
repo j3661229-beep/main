@@ -7,6 +7,7 @@ import '../../core/widgets/agri_ui.dart';
 import 'supplier_dashboard.dart';
 import 'supplier_orders_screen.dart';
 import 'supplier_profile_screen.dart';
+import '../../core/utils/responsive.dart';
 
 class SupplierHome extends ConsumerStatefulWidget {
   const SupplierHome({super.key});
@@ -31,6 +32,7 @@ class _SupplierHomeState extends ConsumerState<SupplierHome> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: IndexedStack(index: _currentIndex, children: _tabs),

@@ -3,31 +3,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:agrimart/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/providers/app_providers.dart';
+import '../../core/utils/responsive.dart';
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
+    final l10n = AppLocalizations.of(context)!;
     final cartAsync = ref.watch(cartProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        title: Text('My Cart', style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700)),
+        title: Text(l10n.myCart, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700)),
         leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
       ),
       body: cartAsync.when(
         loading: () => const Center(child: CircularProgressIndicator(color: AppColors.farmerAccent)),
-        error: (e, _) => EmptyState(emoji: '⚠️', title: 'Could not load cart', subtitle: e.toString()),
+        error: (e, _) => EmptyState(emoji: '⚠️', title: l10n.couldNotLoadOrders, subtitle: e.toString()),
         data: (cart) {
           final items = (cart['items'] as List?) ?? [];
           if (items.isEmpty) {
-            return const EmptyState(emoji: '🛒', title: 'Cart is empty', subtitle: 'Add items from the market to continue');
+            return EmptyState(emoji: '🛒', title: l10n.cartEmpty, subtitle: l10n.cartEmptySubtitle);
           }
 
           // Calculate total
@@ -49,43 +53,45 @@ class CartScreen extends ConsumerWidget {
                 ),
               ),
 
-              // ── Summary + Checkout ─────────────────────────
+              // Sticky checkout bar
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.fromLTRB(r.rs(20), r.rs(16), r.rs(20), r.rs(12)),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(r.rs(24))),
                   boxShadow: AppColors.deepShadow,
+                  border: Border(top: BorderSide(color: AppColors.border.withValues(alpha: 0.6))),
                 ),
                 child: SafeArea(
+                  top: false,
                   child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Subtotal (${items.length} items)', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
+                          Text('${l10n.subtotal} (${items.length})', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
                           Text(formatRupee(total), style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink)),
                         ],
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: r.rs(6)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Delivery', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
-                          Text(total >= 500 ? 'FREE' : formatRupee(50), style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.success)),
+                          Text(l10n.delivery, style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
+                          Text(total >= 500 ? l10n.free : formatRupee(50), style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.success)),
                         ],
                       ),
-                      const Divider(height: 20, color: AppColors.border),
+                      Divider(height: r.rs(20), color: AppColors.border),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Total', style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink)),
-                          Text(formatRupee(total >= 500 ? total : total + 50), style: GoogleFonts.spaceGrotesk(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.farmerAccent)),
+                          Text(l10n.total, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(16), fontWeight: FontWeight.w700, color: AppColors.ink)),
+                          Text(formatRupee(total >= 500 ? total : total + 50), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(20), fontWeight: FontWeight.w800, color: AppColors.farmerAccent)),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: r.rs(16)),
                       AppButton(
-                        label: 'Proceed to Pay',
+                        label: l10n.proceedToPay,
                         onTap: () => context.push('/farmer/payment'),
                         color: AppColors.farmerAccent,
                         icon: Icons.payment_outlined,
@@ -108,6 +114,7 @@ class _CartItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final product = item['product'] as Map? ?? {};
     final name    = product['name'] ?? item['productName'] ?? 'Product';
     final List? images = product['images'] as List?;
@@ -132,8 +139,8 @@ class _CartItem extends ConsumerWidget {
               borderRadius: BorderRadius.circular(12),
               child: imageUrl != null
                   ? CachedNetworkImage(imageUrl: imageUrl, width: 70, height: 70, fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) => Container(width: 70, height: 70, color: AppColors.farmerTint, child: const Center(child: Text('🌱', style: TextStyle(fontSize: 28)))))
-                  : Container(width: 70, height: 70, color: AppColors.farmerTint, child: const Center(child: Text('🌱', style: TextStyle(fontSize: 28)))),
+                      errorWidget: (_, __, ___) => Container(width: 70, height: 70, color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(28))))))
+                  : Container(width: 70, height: 70, color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(28))))),
             ),
             const SizedBox(width: 12),
             // Details

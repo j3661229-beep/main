@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/services/api_service.dart';
+import '../../core/utils/responsive.dart';
 
 final _advisoryProvider = FutureProvider.family<List, String>((ref, location) async {
   return ApiService.instance.getAdvisory(location: location.isEmpty ? null : location);
@@ -16,6 +17,7 @@ class AdvisoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final user = ref.watch(authProvider).user;
     final location = user?.district ?? '';
     final advisory = ref.watch(_advisoryProvider(location));
@@ -24,7 +26,7 @@ class AdvisoryScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        title: Text('Advisory', style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700)),
+        title: Text('Advisory', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700)),
         leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
       ),
       body: RefreshIndicator(
@@ -76,6 +78,7 @@ class _AdvisoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final color = Color(tip['color'] as int? ?? 0xFF3D6B35);
     final tint  = color.withValues(alpha: 0.1);
 

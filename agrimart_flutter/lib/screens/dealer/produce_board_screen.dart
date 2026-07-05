@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/services/api_service.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../core/utils/responsive.dart';
 
 final _produceBoardCropProvider  = StateProvider<String?>((ref) => null);
 final _produceListingsProvider   = FutureProvider.family<List, String?>((ref, crop) async {
@@ -17,6 +18,7 @@ class ProduceBoardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final selectedCrop = ref.watch(_produceBoardCropProvider);
     final listings     = ref.watch(_produceListingsProvider(selectedCrop));
     final crops        = ['All', ...AppConstants.popularCrops.map((c) => c['name']!)];
@@ -25,7 +27,7 @@ class ProduceBoardScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        title: Text('Produce Board', style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700)),
+        title: Text('Produce Board', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700)),
         leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
       ),
       body: Column(
@@ -74,6 +76,7 @@ class _ProduceListing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final crop         = listing['crop'] ?? 'Crop';
     final quantity     = listing['quantity'] ?? 0;
     final farmerName   = listing['farmerName'] ?? listing['farmer']?['name'] ?? 'Farmer';
@@ -104,7 +107,7 @@ class _ProduceListing extends StatelessWidget {
               Container(
                 width: 52, height: 52,
                 decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(14)),
-                child: Center(child: Text(cropEmoji, style: const TextStyle(fontSize: 28))),
+                child: Center(child: Text(cropEmoji, style: TextStyle(fontSize: r.sp(28)))),
               ),
               const SizedBox(width: 14),
               Expanded(

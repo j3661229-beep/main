@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/providers/app_providers.dart';
 import '../../data/services/api_service.dart';
+import '../../core/utils/responsive.dart';
 
 class ManageRatesScreen extends ConsumerStatefulWidget {
   const ManageRatesScreen({super.key});
@@ -45,6 +46,7 @@ class _ManageRatesScreenState extends ConsumerState<ManageRatesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final rates = ref.watch(dealerRatesProvider);
 
     return Scaffold(

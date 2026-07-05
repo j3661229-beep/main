@@ -8,6 +8,7 @@ import 'package:agrimart/l10n/app_localizations.dart';
 import '../../services/voice_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/responsive.dart';
 
 class CropAdvisorScreen extends ConsumerStatefulWidget {
   const CropAdvisorScreen({super.key});
@@ -58,6 +59,7 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -86,7 +88,7 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                                   Text(l10n.cropAdvisor,
                                     style: TextStyle(
                                         color: Colors.white,
-                                        fontSize: 20,
+                                        fontSize: r.sp(20),
                                         fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 4),
                                 Text(
@@ -129,8 +131,8 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                                   child: CircularProgressIndicator(
                                       color: Colors.white, strokeWidth: 3))
                               : Text(l10n.getAiRecommendations,
-                                  style: const TextStyle(
-                                      fontSize: 16,
+                                  style: TextStyle(
+                                      fontSize: r.sp(16),
                                       fontWeight: FontWeight.bold)),
                         )),
                     const SizedBox(height: 40),
@@ -275,7 +277,7 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('💡', style: TextStyle(fontSize: 16)),
+                              Text('💡', style: TextStyle(fontSize: context.r.sp(16))),
                               const SizedBox(width: 8),
                               Expanded(child: Text(crop['reason'] ?? '', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4, fontWeight: FontWeight.w500))),
                             ]

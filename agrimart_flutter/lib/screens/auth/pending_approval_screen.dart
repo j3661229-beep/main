@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/responsive.dart';
 
 class PendingApprovalScreen extends ConsumerWidget {
   const PendingApprovalScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final auth = ref.watch(authProvider);
     final role = auth.user?.role ?? 'SUPPLIER';
     final isDealer = role == 'DEALER';
@@ -65,7 +67,7 @@ class PendingApprovalScreen extends ConsumerWidget {
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 2),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Text('⏳', style: TextStyle(fontSize: 48)),
                             ),
                           ),
@@ -114,8 +116,8 @@ class PendingApprovalScreen extends ConsumerWidget {
                       Text(
                         isDealer ? 'Dealer Account\nUnder Review' : 'Supplier Account\nUnder Review',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 28,
+                        style: TextStyle(
+                          fontSize: r.sp(28),
                           fontWeight: FontWeight.w900,
                           color: AppColors.textPrimary,
                           letterSpacing: -0.5,
@@ -177,7 +179,7 @@ class PendingApprovalScreen extends ConsumerWidget {
                                 color: AppColors.primary.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Center(child: Text('📱', style: TextStyle(fontSize: 20))),
+                              child: Center(child: Text('📱', style: TextStyle(fontSize: r.sp(20)))),
                             ),
                             const SizedBox(width: 12),
                             const Expanded(
@@ -202,7 +204,7 @@ class PendingApprovalScreen extends ConsumerWidget {
                             side: const BorderSide(color: AppColors.error),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
-                          child: const Text('Sign Out', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                          child: Text('Sign Out', style: TextStyle(fontWeight: FontWeight.w700, fontSize: r.sp(16))),
                         ),
                       ),
 
@@ -226,6 +228,7 @@ class _StepTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -237,7 +240,7 @@ class _StepTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(icon, style: const TextStyle(fontSize: 24)),
+          Text(icon, style: TextStyle(fontSize: r.sp(24))),
           const SizedBox(width: 14),
           Expanded(
             child: Column(

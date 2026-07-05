@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/responsive.dart';
 
 class DealerWorkingDaysScreen extends StatefulWidget {
   const DealerWorkingDaysScreen({super.key});
@@ -44,6 +45,7 @@ class _DealerWorkingDaysScreenState extends State<DealerWorkingDaysScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final openDays = _schedule.where((s) => s.isOpen).length;
 
     return Scaffold(
@@ -64,7 +66,7 @@ class _DealerWorkingDaysScreenState extends State<DealerWorkingDaysScreen> {
               ),
               const SizedBox(width: 16),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text('Your Weekly Schedule', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+                Text('Your Weekly Schedule', style: TextStyle(color: Colors.white, fontSize: r.sp(18), fontWeight: FontWeight.w800)),
                 const SizedBox(height: 4),
                 Text('$openDays days open • ${7 - openDays} days off', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13, fontWeight: FontWeight.w500)),
               ])),
@@ -182,7 +184,7 @@ class _DealerWorkingDaysScreenState extends State<DealerWorkingDaysScreen> {
             child: ElevatedButton.icon(
               onPressed: _saveSchedule,
               icon: const Icon(Icons.save),
-              label: const Text('Save Schedule', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              label: Text('Save Schedule', style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.bold)),
             ),
           ),
           const SizedBox(height: 40),
