@@ -97,6 +97,20 @@ const getAdvisory = async ({ lat, lng, district }) => {
         const textPayload = await generateWithFallback(prompt);
         const match = textPayload.match(/\[[\s\S]*\]/);
         advisories = JSON.parse(match ? match[0] : textPayload);
+        if (!Array.isArray(advisories)) throw new Error('Not an array');
+        advisories = advisories.map((item, i) => {
+            const tip = item.tip || item.body || item.title || '';
+            const parts = tip.split(/[.!?]/).map((s) => s.trim()).filter(Boolean);
+            const title = item.title || (parts[0] ? parts[0].substring(0, 60) : `Tip ${i + 1}`);
+            return {
+                tip,
+                title,
+                body: item.body || tip,
+                severity: item.severity || 'info',
+                emoji: item.emoji || '🌾',
+                type: item.type || item.severity || 'advisory',
+            };
+        });
     } catch {
         advisories = [
             { tip: 'Check local mandi prices before harvesting', severity: 'info', emoji: '📊' },

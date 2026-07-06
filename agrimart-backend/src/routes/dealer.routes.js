@@ -1,21 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const dealerController = require('../controllers/dealer.controller');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, requireDealer, requireVerifiedDealer } = require('../middleware/auth');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
-router.use(authenticate);
+router.use(authenticate, requireDealer, apiLimiter);
 
-// Middleware to ensure role is DEALER
-const isDealer = (req, res, next) => {
-    if (req.user.role !== 'DEALER') {
-        return res.status(403).json({ message: 'Access denied. Dealer role required.' });
-    }
-    next();
-};
+router.get('/profile', dealerController.getProfile);
+router.put('/profile', dealerController.updateProfile);
+router.get('/dashboard', dealerController.getDashboard);
 
-router.get('/rates', isDealer, dealerController.getMyRates);
-router.post('/rates', isDealer, dealerController.updateRate);
-router.get('/bookings', isDealer, dealerController.getMyBookings);
-router.patch('/bookings/:id', isDealer, dealerController.updateBookingStatus);
+router.get('/rates', dealerController.getMyRates);
+router.post('/rates', requireVerifiedDealer, dealerController.updateRate);
+router.delete('/rates/:id', requireVerifiedDealer, dealerController.deleteRate);
+
+router.get('/bookings', dealerController.getMyBookings);
+router.get('/bookings/:id', dealerController.getBooking);
+router.patch('/bookings/:id', requireVerifiedDealer, dealerController.updateBookingStatus);
 
 module.exports = router;

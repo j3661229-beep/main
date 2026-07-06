@@ -6197,6 +6197,7 @@ export namespace Prisma {
     totalRatings: number | null
     bankAccountNo: string | null
     ifscCode: string | null
+    upiId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6223,6 +6224,7 @@ export namespace Prisma {
     totalRatings: number | null
     bankAccountNo: string | null
     ifscCode: string | null
+    upiId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6249,6 +6251,7 @@ export namespace Prisma {
     totalRatings: number
     bankAccountNo: number
     ifscCode: number
+    upiId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -6291,6 +6294,7 @@ export namespace Prisma {
     totalRatings?: true
     bankAccountNo?: true
     ifscCode?: true
+    upiId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6317,6 +6321,7 @@ export namespace Prisma {
     totalRatings?: true
     bankAccountNo?: true
     ifscCode?: true
+    upiId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6343,6 +6348,7 @@ export namespace Prisma {
     totalRatings?: true
     bankAccountNo?: true
     ifscCode?: true
+    upiId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -6456,6 +6462,7 @@ export namespace Prisma {
     totalRatings: number
     bankAccountNo: string | null
     ifscCode: string | null
+    upiId: string | null
     createdAt: Date
     updatedAt: Date
     _count: SupplierCountAggregateOutputType | null
@@ -6501,6 +6508,7 @@ export namespace Prisma {
     totalRatings?: boolean
     bankAccountNo?: boolean
     ifscCode?: boolean
+    upiId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -6531,6 +6539,7 @@ export namespace Prisma {
     totalRatings?: boolean
     bankAccountNo?: boolean
     ifscCode?: boolean
+    upiId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -6558,6 +6567,7 @@ export namespace Prisma {
     totalRatings?: boolean
     bankAccountNo?: boolean
     ifscCode?: boolean
+    upiId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
@@ -6601,6 +6611,7 @@ export namespace Prisma {
       totalRatings: number
       bankAccountNo: string | null
       ifscCode: string | null
+      upiId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["supplier"]>
@@ -7020,6 +7031,7 @@ export namespace Prisma {
     readonly totalRatings: FieldRef<"Supplier", 'Int'>
     readonly bankAccountNo: FieldRef<"Supplier", 'String'>
     readonly ifscCode: FieldRef<"Supplier", 'String'>
+    readonly upiId: FieldRef<"Supplier", 'String'>
     readonly createdAt: FieldRef<"Supplier", 'DateTime'>
     readonly updatedAt: FieldRef<"Supplier", 'DateTime'>
   }
@@ -23978,6 +23990,7 @@ export namespace Prisma {
     totalRatings: 'totalRatings',
     bankAccountNo: 'bankAccountNo',
     ifscCode: 'ifscCode',
+    upiId: 'upiId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -24771,6 +24784,7 @@ export namespace Prisma {
     totalRatings?: IntFilter<"Supplier"> | number
     bankAccountNo?: StringNullableFilter<"Supplier"> | string | null
     ifscCode?: StringNullableFilter<"Supplier"> | string | null
+    upiId?: StringNullableFilter<"Supplier"> | string | null
     createdAt?: DateTimeFilter<"Supplier"> | Date | string
     updatedAt?: DateTimeFilter<"Supplier"> | Date | string
     user?: XOR<UserRelationFilter, UserWhereInput>
@@ -24800,6 +24814,7 @@ export namespace Prisma {
     totalRatings?: SortOrder
     bankAccountNo?: SortOrderInput | SortOrder
     ifscCode?: SortOrderInput | SortOrder
+    upiId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -24832,6 +24847,7 @@ export namespace Prisma {
     totalRatings?: IntFilter<"Supplier"> | number
     bankAccountNo?: StringNullableFilter<"Supplier"> | string | null
     ifscCode?: StringNullableFilter<"Supplier"> | string | null
+    upiId?: StringNullableFilter<"Supplier"> | string | null
     createdAt?: DateTimeFilter<"Supplier"> | Date | string
     updatedAt?: DateTimeFilter<"Supplier"> | Date | string
     user?: XOR<UserRelationFilter, UserWhereInput>
@@ -24861,6 +24877,7 @@ export namespace Prisma {
     totalRatings?: SortOrder
     bankAccountNo?: SortOrderInput | SortOrder
     ifscCode?: SortOrderInput | SortOrder
+    upiId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: SupplierCountOrderByAggregateInput
@@ -24895,6 +24912,7 @@ export namespace Prisma {
     totalRatings?: IntWithAggregatesFilter<"Supplier"> | number
     bankAccountNo?: StringNullableWithAggregatesFilter<"Supplier"> | string | null
     ifscCode?: StringNullableWithAggregatesFilter<"Supplier"> | string | null
+    upiId?: StringNullableWithAggregatesFilter<"Supplier"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Supplier"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Supplier"> | Date | string
   }
@@ -26645,6 +26663,7 @@ export namespace Prisma {
     totalRatings?: number
     bankAccountNo?: string | null
     ifscCode?: string | null
+    upiId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSupplierInput
@@ -26674,6 +26693,7 @@ export namespace Prisma {
     totalRatings?: number
     bankAccountNo?: string | null
     ifscCode?: string | null
+    upiId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     products?: ProductUncheckedCreateNestedManyWithoutSupplierInput
@@ -26701,6 +26721,7 @@ export namespace Prisma {
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
     ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
+    upiId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSupplierNestedInput
@@ -26730,6 +26751,7 @@ export namespace Prisma {
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
     ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
+    upiId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUncheckedUpdateManyWithoutSupplierNestedInput
@@ -26758,6 +26780,7 @@ export namespace Prisma {
     totalRatings?: number
     bankAccountNo?: string | null
     ifscCode?: string | null
+    upiId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -26783,6 +26806,7 @@ export namespace Prisma {
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
     ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
+    upiId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26809,6 +26833,7 @@ export namespace Prisma {
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
     ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
+    upiId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -28829,6 +28854,7 @@ export namespace Prisma {
     totalRatings?: SortOrder
     bankAccountNo?: SortOrder
     ifscCode?: SortOrder
+    upiId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -28862,6 +28888,7 @@ export namespace Prisma {
     totalRatings?: SortOrder
     bankAccountNo?: SortOrder
     ifscCode?: SortOrder
+    upiId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -28888,6 +28915,7 @@ export namespace Prisma {
     totalRatings?: SortOrder
     bankAccountNo?: SortOrder
     ifscCode?: SortOrder
+    upiId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -31531,6 +31559,7 @@ export namespace Prisma {
     totalRatings?: number
     bankAccountNo?: string | null
     ifscCode?: string | null
+    upiId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     products?: ProductCreateNestedManyWithoutSupplierInput
@@ -31558,6 +31587,7 @@ export namespace Prisma {
     totalRatings?: number
     bankAccountNo?: string | null
     ifscCode?: string | null
+    upiId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     products?: ProductUncheckedCreateNestedManyWithoutSupplierInput
@@ -31767,6 +31797,7 @@ export namespace Prisma {
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
     ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
+    upiId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUpdateManyWithoutSupplierNestedInput
@@ -31794,6 +31825,7 @@ export namespace Prisma {
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
     ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
+    upiId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUncheckedUpdateManyWithoutSupplierNestedInput
@@ -32924,6 +32956,7 @@ export namespace Prisma {
     totalRatings?: number
     bankAccountNo?: string | null
     ifscCode?: string | null
+    upiId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSupplierInput
@@ -32952,6 +32985,7 @@ export namespace Prisma {
     totalRatings?: number
     bankAccountNo?: string | null
     ifscCode?: string | null
+    upiId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutSupplierInput
@@ -33080,6 +33114,7 @@ export namespace Prisma {
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
     ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
+    upiId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSupplierNestedInput
@@ -33108,6 +33143,7 @@ export namespace Prisma {
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
     ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
+    upiId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orderItems?: OrderItemUncheckedUpdateManyWithoutSupplierNestedInput
@@ -33839,6 +33875,7 @@ export namespace Prisma {
     totalRatings?: number
     bankAccountNo?: string | null
     ifscCode?: string | null
+    upiId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSupplierInput
@@ -33867,6 +33904,7 @@ export namespace Prisma {
     totalRatings?: number
     bankAccountNo?: string | null
     ifscCode?: string | null
+    upiId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     products?: ProductUncheckedCreateNestedManyWithoutSupplierInput
@@ -34038,6 +34076,7 @@ export namespace Prisma {
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
     ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
+    upiId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSupplierNestedInput
@@ -34066,6 +34105,7 @@ export namespace Prisma {
     totalRatings?: IntFieldUpdateOperationsInput | number
     bankAccountNo?: NullableStringFieldUpdateOperationsInput | string | null
     ifscCode?: NullableStringFieldUpdateOperationsInput | string | null
+    upiId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUncheckedUpdateManyWithoutSupplierNestedInput

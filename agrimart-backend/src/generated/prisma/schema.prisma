@@ -133,6 +133,7 @@ model Supplier {
   totalRatings   Int            @default(0)
   bankAccountNo  String?
   ifscCode       String?
+  upiId          String?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)

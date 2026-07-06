@@ -40,6 +40,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       if (user != null) {
         _nameCtrl.text = user.name;
       }
+      _getCurrentLocation();
     });
   }
 

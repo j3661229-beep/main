@@ -3,7 +3,11 @@ const { success, created, paginated } = require('../utils/apiResponse');
 const { getPagination } = require('../utils/helpers');
 
 const createOrder = async (req, res, next) => {
-    try { created(res, await orderService.createOrder(req.user.farmer.id, req.body)); } catch (e) { next(e); }
+    try {
+        const farmerId = req.user?.farmer?.id;
+        if (!farmerId) return error(res, 'Farmer profile required. Please complete profile setup.', 403);
+        created(res, await orderService.createOrder(farmerId, req.body));
+    } catch (e) { next(e); }
 };
 const getOrders = async (req, res, next) => {
     try {

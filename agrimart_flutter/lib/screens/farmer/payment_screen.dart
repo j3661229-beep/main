@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
+import '../../../data/providers/auth_provider.dart';
 import '../../../data/providers/app_providers.dart';
 import '../../../data/services/api_service.dart';
 import '../../core/utils/responsive.dart';
@@ -23,6 +24,27 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   String? _error;
 
   final _methods = ['UPI', 'Cash on Delivery'];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _prefillAddress());
+  }
+
+  void _prefillAddress() {
+    final user = ref.read(authProvider).user;
+    final farmer = user?.farmer as Map?;
+    if (farmer == null) return;
+    final parts = [
+      farmer['village'],
+      farmer['taluka'],
+      farmer['district'],
+      farmer['pincode'],
+    ].where((p) => p != null && p.toString().trim().isNotEmpty).join(', ');
+    if (parts.isNotEmpty && _addrCtrl.text.isEmpty) {
+      _addrCtrl.text = parts;
+    }
+  }
 
   @override
   void dispose() { _upiCtrl.dispose(); _addrCtrl.dispose(); super.dispose(); }
@@ -45,24 +67,36 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     }
     setState(() { _isProcessing = true; _error = null; });
     try {
+      await ref.read(cartProvider.notifier).syncWithServer();
+      final cart = ref.read(cartProvider).valueOrNull;
+      final items = (cart?['items'] as List?) ?? [];
+      if (items.isEmpty) {
+        setState(() {
+          _isProcessing = false;
+          _error = 'Your cart is empty. Add products before checkout.';
+        });
+        return;
+      }
+
+      final isCod = _paymentMethod == 'Cash on Delivery';
       final order = await ApiService.instance.createOrder(
         deliveryAddress: _addrCtrl.text.trim(),
-        paymentMethod: _paymentMethod == 'Cash on Delivery' ? 'cod' : 'upi',
+        paymentMethod: isCod ? 'cod' : 'upi',
       );
-      final orderId = order['id'] as String;
+      final orderId = (order['id'] ?? order['orderId'])?.toString();
+      if (orderId == null || orderId.isEmpty) {
+        throw Exception('Order was not created. Please try again.');
+      }
 
-      if (_paymentMethod == 'Cash on Delivery') {
-        // Backend handles COD payment record, stock deduction, and status updates synchronously in createOrder
-      } else {
+      if (!isCod) {
         final utr = _upiCtrl.text.trim();
         if (utr.length < 6) {
-            setState(() { _isProcessing = false; _error = 'Enter UTR/reference after UPI payment'; });
-            return;
+          setState(() { _isProcessing = false; _error = 'Enter UTR/reference after UPI payment'; });
+          return;
         }
         await ApiService.instance.verifyUpiPayment(orderId: orderId, utrNumber: utr);
       }
 
-      // Clear local cart state instantly without making a redundant API call (backend cleared it)
       ref.read(cartProvider.notifier).clearLocal();
       HapticFeedback.mediumImpact();
       if (mounted) {

@@ -96,4 +96,39 @@ const requireDealer = (req, res, next) => {
     next();
 };
 
-module.exports = { authenticate, requireFarmer, requireSupplier, requireDealer };
+/**
+ * Require supplier/dealer document verification for business actions.
+ * Allows profile read and dashboard; blocks mutations until approved.
+ */
+const requireVerifiedSupplier = (req, res, next) => {
+    const supplier = req.user?.supplier;
+    if (!supplier) return error(res, 'Supplier profile not found', 404);
+    if (supplier.docStatus === 'REJECTED') {
+        return error(res, 'Your account was rejected. Contact support.', 403);
+    }
+    if (supplier.docStatus !== 'APPROVED' && !supplier.isVerified) {
+        return error(res, 'Account pending verification. Upload documents and wait for admin approval.', 403);
+    }
+    next();
+};
+
+const requireVerifiedDealer = (req, res, next) => {
+    const dealer = req.user?.dealer;
+    if (!dealer) return error(res, 'Dealer profile not found', 404);
+    if (dealer.docStatus === 'REJECTED') {
+        return error(res, 'Your account was rejected. Contact support.', 403);
+    }
+    if (dealer.docStatus !== 'APPROVED' && !dealer.isVerified) {
+        return error(res, 'Account pending verification. Upload documents and wait for admin approval.', 403);
+    }
+    next();
+};
+
+module.exports = {
+    authenticate,
+    requireFarmer,
+    requireSupplier,
+    requireDealer,
+    requireVerifiedSupplier,
+    requireVerifiedDealer,
+};

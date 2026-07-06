@@ -16,6 +16,7 @@ exports.getDealerRates = async (req, res) => {
         const whereClause = {
             district: { equals: district, mode: 'insensitive' },
             isActive: true,
+            dealer: { isVerified: true, docStatus: 'APPROVED' },
             ...(crop ? { cropName: { equals: crop, mode: 'insensitive' } } : {}),
         };
 
@@ -51,10 +52,18 @@ exports.bookTradeSlot = async (req, res) => {
         const farmer = await prisma.farmer.findUnique({ where: { userId }, include: { user: true } });
         if (!farmer) return res.status(404).json({ success: false, message: 'Farmer profile not found' });
 
+        const dealer = await prisma.dealer.findFirst({
+            where: { id: dealerId, isVerified: true, docStatus: 'APPROVED' },
+            include: { user: { select: { id: true, name: true } } },
+        });
+        if (!dealer) {
+            return res.status(400).json({ success: false, message: 'Dealer not found or not verified' });
+        }
+
         const booking = await prisma.tradeBooking.create({
             data: {
                 farmerId: farmer.id,
-                dealerId,
+                dealerId: dealer.id,
                 cropName,
                 approxQuintals: parseFloat(approxQuintals),
                 pricePerQuintal: parseFloat(pricePerQuintal),

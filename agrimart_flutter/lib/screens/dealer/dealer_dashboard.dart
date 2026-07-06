@@ -142,8 +142,8 @@ class DealerDashboard extends ConsumerWidget {
                                   Container(width: 40, height: 40, decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(10)), child: Center(child: Text('🌾', style: TextStyle(fontSize: r.sp(20))))),
                                   const SizedBox(width: 12),
                                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                    Text(b['farmerName'] ?? b['crop'] ?? 'Deal', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500)),
-                                    Text(b['crop'] ?? b['slotDate'] ?? '', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+                                    Text(b['farmerName'] ?? b['cropName'] ?? b['crop'] ?? 'Deal', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500)),
+                                    Text(b['cropName'] ?? b['crop'] ?? b['slotDate'] ?? '', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
                                   ])),
                                   BadgeChip.status(b['status'] ?? 'Pending'),
                                 ]),

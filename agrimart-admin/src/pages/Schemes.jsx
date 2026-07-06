@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { createScheme, updateScheme, deleteScheme } from '../lib/api';
+import { getSchemes, createScheme, updateScheme, deleteScheme } from '../lib/api';
 import toast from 'react-hot-toast';
 
 const EMPTY = { title: '', ministry: '', description: '', benefits: '', eligibility: '', documents: '', applyUrl: '', deadline: '' };
@@ -13,9 +13,7 @@ export default function Schemes() {
     const [actionLoading, setActionLoading] = useState(null); // 'delete-{id}'
 
     useEffect(() => {
-        // public endpoint — no admin auth needed
-        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/schemes`)
-            .then(r => r.json())
+        getSchemes()
             .then(r => setSchemes(r.data || []))
             .catch(() => toast.error('Failed to load schemes'))
             .finally(() => setLoading(false));

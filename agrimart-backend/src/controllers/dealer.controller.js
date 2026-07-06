@@ -1,128 +1,81 @@
-const prisma = require('../config/database');
-const logger = require('../utils/logger');
+const dealerService = require('../services/dealer.service');
+const { success, paginated } = require('../utils/apiResponse');
 const { getPagination } = require('../utils/helpers');
-const { paginated } = require('../utils/apiResponse');
+const prisma = require('../config/database');
 
-// Get all rates for the logged-in dealer
-exports.getMyRates = async (req, res) => {
-    try {
-        const dealer = await prisma.dealer.findUnique({ where: { userId: req.user.id } });
-        if (!dealer) return res.status(404).json({ message: 'Dealer profile not found' });
-
-        const { page, limit, skip } = getPagination(req.query);
-
-        const [rates, total] = await Promise.all([
-            prisma.dealerCropRate.findMany({
-                where: { dealerId: dealer.id },
-                skip, take: limit,
-                orderBy: { updatedAt: 'desc' }
-            }),
-            prisma.dealerCropRate.count({ where: { dealerId: dealer.id } })
-        ]);
-        
-        paginated(res, rates, page, limit, total);
-    } catch (error) {
-        logger.error('Error in getMyRates:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
+const resolveDealer = async (req) => {
+    const directId = req.user?.dealer?.id;
+    if (directId) return directId;
+    const d = await prisma.dealer.findUnique({ where: { userId: req.user.id } });
+    if (!d) throw Object.assign(new Error('Dealer profile not found. Please complete onboarding.'), { statusCode: 404 });
+    return d.id;
 };
 
-// Add or update a crop rate
-exports.updateRate = async (req, res) => {
-    try {
-        const { cropName, pricePerQuintal, district, state, isActive } = req.body;
-        const dealer = await prisma.dealer.findUnique({ where: { userId: req.user.id } });
-
-        if (!dealer) return res.status(404).json({ message: 'Dealer profile not found' });
-
-        const rate = await prisma.dealerCropRate.upsert({
-            where: {
-                dealerId_cropName_district: {
-                    dealerId: dealer.id,
-                    cropName,
-                    district: district || dealer.district
-                }
-            },
-            update: {
-                pricePerQuintal: parseFloat(pricePerQuintal),
-                isActive: isActive !== undefined ? isActive : true,
-                state: state || dealer.state
-            },
-            create: {
-                dealerId: dealer.id,
-                cropName,
-                pricePerQuintal: parseFloat(pricePerQuintal),
-                district: district || dealer.district,
-                state: state || dealer.state,
-                isActive: isActive !== undefined ? isActive : true
-            }
-        });
-
-        res.json({ rate });
-    } catch (error) {
-        logger.error('Error in updateRate:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
+const getProfile = async (req, res, next) => {
+    try { success(res, await dealerService.getProfile(await resolveDealer(req))); } catch (e) { next(e); }
 };
 
-// Get bookings for the dealer
-exports.getMyBookings = async (req, res) => {
-    try {
-        const dealer = await prisma.dealer.findUnique({ where: { userId: req.user.id } });
-        if (!dealer) return res.status(404).json({ message: 'Dealer profile not found' });
-
-        const { page, limit, skip } = getPagination(req.query);
-
-        const { status } = req.query;
-        const where = {
-            dealerId: dealer.id,
-            ...(status ? { status: status.toUpperCase() } : {}),
-        };
-
-        const [bookings, total] = await Promise.all([
-            prisma.tradeBooking.findMany({
-                where,
-                skip, take: limit,
-                include: { farmer: { include: { user: true } } },
-                orderBy: { slotDate: 'asc' }
-            }),
-            prisma.tradeBooking.count({ where })
-        ]);
-        
-        paginated(res, bookings, page, limit, total);
-    } catch (error) {
-        logger.error('Error in getMyBookings:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
+const updateProfile = async (req, res, next) => {
+    try { success(res, await dealerService.updateProfile(await resolveDealer(req), req.body), 'Profile updated'); } catch (e) { next(e); }
 };
 
-// Update booking status
-exports.updateBookingStatus = async (req, res) => {
+const getDashboard = async (req, res, next) => {
+    try { success(res, await dealerService.getDashboard(await resolveDealer(req))); } catch (e) { next(e); }
+};
+
+const getMyRates = async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const { status } = req.body;
+        const pag = getPagination(req.query);
+        const { rates, total } = await dealerService.getRates(await resolveDealer(req), pag);
+        paginated(res, rates, pag.page, pag.limit, total);
+    } catch (e) { next(e); }
+};
 
-        const booking = await prisma.tradeBooking.update({
-            where: { id },
-            data: { status },
-            include: {
-                farmer: { include: { user: { select: { id: true, name: true } } } },
-            },
-        });
+const updateRate = async (req, res, next) => {
+    try {
+        const rate = await dealerService.upsertRate(await resolveDealer(req), req.body);
+        success(res, { rate }, 'Rate saved');
+    } catch (e) { next(e); }
+};
 
-        if (booking.farmer?.user?.id) {
-            const { sendNotification } = require('../services/onesignal.service');
-            sendNotification({
-                users: [booking.farmer.user.id],
-                title: `Booking ${status}`,
-                message: `Your ${booking.cropName} delivery slot was ${status.toLowerCase()} by the dealer`,
-                data: { type: 'TRADE_BOOKING', bookingId: booking.id, status },
-            });
-        }
+const deleteRate = async (req, res, next) => {
+    try {
+        success(res, await dealerService.deactivateRate(await resolveDealer(req), req.params.id), 'Rate deactivated');
+    } catch (e) { next(e); }
+};
 
-        res.json({ booking });
-    } catch (error) {
-        logger.error('Error in updateBookingStatus:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
+const getMyBookings = async (req, res, next) => {
+    try {
+        const pag = getPagination(req.query);
+        const { bookings, total } = await dealerService.getBookings(await resolveDealer(req), pag, req.query);
+        paginated(res, bookings, pag.page, pag.limit, total);
+    } catch (e) { next(e); }
+};
+
+const getBooking = async (req, res, next) => {
+    try { success(res, await dealerService.getBooking(await resolveDealer(req), req.params.id)); } catch (e) { next(e); }
+};
+
+const updateBookingStatus = async (req, res, next) => {
+    try {
+        const booking = await dealerService.updateBookingStatus(
+            await resolveDealer(req),
+            req.params.id,
+            req.body.status,
+            req.body,
+        );
+        success(res, { booking }, 'Booking updated');
+    } catch (e) { next(e); }
+};
+
+module.exports = {
+    getProfile,
+    updateProfile,
+    getDashboard,
+    getMyRates,
+    updateRate,
+    deleteRate,
+    getMyBookings,
+    getBooking,
+    updateBookingStatus,
 };

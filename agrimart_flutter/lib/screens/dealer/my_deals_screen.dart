@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
+import '../../../data/providers/app_providers.dart';
 import '../../../data/services/api_service.dart';
 import '../../core/utils/responsive.dart';
 
@@ -64,13 +65,14 @@ class MyDealsScreen extends ConsumerWidget {
   }
 }
 
-class _DealCard extends StatelessWidget {
+class _DealCard extends ConsumerWidget {
   final Map deal;
   const _DealCard({required this.deal});
 
   String _displayStatus(String? s) {
     switch (s?.toUpperCase()) {
       case 'PENDING':   return 'Awaiting Reply';
+      case 'ACCEPTED':
       case 'CONFIRMED': return 'Confirmed';
       case 'COMPLETED': return 'Completed';
       case 'CANCELLED': return 'Cancelled';
@@ -79,7 +81,7 @@ class _DealCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final r = context.r;
     final crop       = deal['crop']        ?? deal['listing']?['crop'] ?? 'Crop';
     final farmer     = deal['farmerName']  ?? deal['listing']?['farmerName'] ?? deal['listing']?['farmer']?['name'] ?? 'Farmer';
@@ -157,6 +159,28 @@ class _DealCard extends StatelessWidget {
               const SizedBox(width: 6),
               Text('Pickup: ${_formatDate(pickupDate)}', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
             ]),
+          ],
+          if (status.toString().toUpperCase() == 'ACCEPTED') ...[
+            const SizedBox(height: 14),
+            AppButton(
+              label: 'Mark Completed',
+              color: AppColors.dealerAccent,
+              height: 40,
+              icon: Icons.check_rounded,
+              onTap: () async {
+                try {
+                  await ApiService.instance.updateDealStatus(deal['id'].toString(), 'COMPLETED');
+                  ref.invalidate(_myDealsProvider);
+                  ref.invalidate(dealerDashboardProvider);
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.error),
+                    );
+                  }
+                }
+              },
+            ),
           ],
         ],
       ),

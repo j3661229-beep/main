@@ -237,6 +237,34 @@ class CartNotifier extends StateNotifier<AsyncValue<Map>> {
     }
   }
 
+  Future<void> syncWithServer() async {
+    final serverCart = await ApiService.instance.getCart();
+    final serverItems = (serverCart['items'] as List?) ?? [];
+    if (serverItems.isNotEmpty) {
+      state = AsyncValue.data(serverCart);
+      await _saveLocal();
+      return;
+    }
+
+    final localItems = (state.valueOrNull?['items'] as List?) ?? [];
+    if (localItems.isEmpty) {
+      state = AsyncValue.data(serverCart);
+      return;
+    }
+
+    for (final item in localItems) {
+      final productId = item['productId'] ?? item['product']?['id'];
+      final qty = (item['quantity'] as num?)?.toInt() ?? 1;
+      if (productId != null) {
+        await ApiService.instance.addToCart(productId: productId.toString(), quantity: qty);
+      }
+    }
+
+    final refreshed = await ApiService.instance.getCart();
+    state = AsyncValue.data(refreshed);
+    await _saveLocal();
+  }
+
   Future<void> clear() async {
     state = const AsyncValue.data({'items': []});
     await CacheManager.delete('local_cart');

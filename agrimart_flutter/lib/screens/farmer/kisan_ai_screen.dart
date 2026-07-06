@@ -141,13 +141,27 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
     }
   }
 
+  @override
+  void dispose() {
+    VoiceService.instance.stop();
+    VoiceService.instance.stopListening();
+    _ctrl.dispose();
+    _scrollCtrl.dispose();
+    super.dispose();
+  }
+
   void _scrollToBottom() {
     Future.delayed(const Duration(milliseconds: 100), () {
-      if (_scrollCtrl.hasClients)
-        _scrollCtrl.animateTo(_scrollCtrl.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+      if (_scrollCtrl.hasClients) {
+        _scrollCtrl.animateTo(
+          _scrollCtrl.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     final r = context.r;
@@ -169,6 +183,18 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
           ]),
         ]),
         actions: [
+          if (_currentlySpeakingId != null || VoiceService.instance.isSpeaking)
+            IconButton(
+              icon: const Icon(Icons.stop_circle_rounded, color: Colors.white),
+              tooltip: 'Stop voice',
+              onPressed: _stopSpeak,
+            ),
+          if (_isListening)
+            IconButton(
+              icon: const Icon(Icons.mic_off_rounded, color: Colors.white),
+              tooltip: 'Stop listening',
+              onPressed: _toggleListen,
+            ),
           if (_messages.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.delete_outline, color: Colors.white),
@@ -331,21 +357,24 @@ class _KisanAiScreenState extends ConsumerState<KisanAiScreen> {
                       color: _isListening ? AppColors.error : AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12)),
                   child: Icon(
-                    _isListening ? Icons.mic_rounded : Icons.mic_none_rounded,
+                    _isListening ? Icons.stop_rounded : Icons.mic_none_rounded,
                     color: _isListening ? Colors.white : AppColors.primary, 
                     size: 20
                   )),
             ),
             GestureDetector(
-              onTap: () => _send(_ctrl.text),
+              onTap: _isListening ? _toggleListen : () => _send(_ctrl.text),
               child: Container(
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: _isListening ? AppColors.error : AppColors.primary,
                       borderRadius: BorderRadius.circular(12)),
-                  child: const Icon(Icons.send_rounded,
-                      color: Colors.white, size: 20)),
+                  child: Icon(
+                    _isListening ? Icons.stop_rounded : Icons.send_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  )),
             ),
           ])),
         ),

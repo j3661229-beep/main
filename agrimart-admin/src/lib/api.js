@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://main-production-070d.up.railway.app/api';
+const PROD_URL = 'https://agrimart-775670922011.europe-west1.run.app/api';
+const BASE_URL = import.meta.env.VITE_API_URL || PROD_URL;
 
 const api = axios.create({
     baseURL: BASE_URL,
-    timeout: 15000,
+    timeout: 20000,
     headers: { 'Content-Type': 'application/json' },
 });
 
@@ -20,7 +21,6 @@ api.interceptors.response.use(
         if (err.response?.status === 401) {
             localStorage.removeItem('admin_token');
             localStorage.removeItem('admin_user');
-            // PrivateRoute will handle redirect to /login
             if (!window.location.pathname.includes('/login')) {
                 window.location.href = '/login';
             }
@@ -50,7 +50,6 @@ export const getPendingDealers = () => api.get('/admin/dealers/pending');
 export const getAllDealers = (params) => api.get('/admin/dealers', { params });
 export const verifyDealer = (id, data) => api.post(`/admin/dealers/${id}/verify`, data);
 
-
 /* Products */
 export const getProducts = (params) => api.get('/admin/products', { params });
 export const approveProduct = (id) => api.patch(`/admin/products/${id}/approve`);
@@ -60,6 +59,7 @@ export const rejectProduct = (id) => api.patch(`/admin/products/${id}/reject`);
 export const getOrders = (params) => api.get('/admin/orders', { params });
 
 /* Schemes */
+export const getSchemes = () => api.get('/schemes');
 export const createScheme = (data) => api.post('/admin/schemes', data);
 export const updateScheme = (id, data) => api.put(`/admin/schemes/${id}`, data);
 export const deleteScheme = (id) => api.delete(`/admin/schemes/${id}`);
@@ -69,5 +69,9 @@ export const broadcastNotification = (data) => api.post('/admin/notifications/br
 
 /* Mandi */
 export const getMandiPrices = (params) => api.get('/mandi/prices', { params });
+
+/* News */
+export const getNews = (params) => api.get('/news', { params });
+export const createNews = (data) => api.post('/news', data);
 
 export default api;

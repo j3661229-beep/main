@@ -76,17 +76,26 @@ const generateWithFallback = async (prompt, imageBase64 = null) => {
 };
 
 const soilAnalysis = async (farmerId, imageBuffer, originalName, { location = '', language = 'English' } = {}) => {
-    const imageUrl = await uploadToSupabase(imageBuffer, originalName || 'soil.jpg', 'soil');
+    let imageUrl = null;
+    try {
+        imageUrl = await uploadToSupabase(imageBuffer, originalName || 'soil.jpg', 'soil');
+    } catch (uploadErr) {
+        logger.warn(`Soil image upload skipped: ${uploadErr.message}`);
+        imageUrl = `data:image/jpeg;base64,${imageBuffer.toString('base64').slice(0, 32)}...`;
+    }
 
-    const prompt = `Analyse this Indian farm soil image. ${location ? `Location: ${location}. ` : ''} Respond in ${language}. Return ONLY valid JSON with these keys: soilType (string), phLevel (number), nitrogenLevel, phosphorusLevel, potassiumLevel, organicMatter, recommendedCrops (array), treatmentAdvice (string - keep sentences short for voice synthesis), confidence (number)`;
+    const prompt = `Analyse this Indian farm soil image. ${location ? `Location: ${location}. ` : ''}Respond in ${language}. Return ONLY valid JSON with these keys: soilType (string), phLevel (number), nitrogenLevel, phosphorusLevel, potassiumLevel, organicMatter, recommendedCrops (array), treatmentAdvice (string - keep sentences short for voice synthesis), confidence (number)`;
 
     const textPayload = await generateWithFallback(prompt, imageBuffer.toString('base64'));
     const analysis = parseJSON(textPayload);
+    if (analysis.error) {
+        throw Object.assign(new Error('AI could not analyse the soil image. Please try a clearer photo.'), { statusCode: 502 });
+    }
 
     const report = await prisma.soilReport.create({
         data: {
             farmerId,
-            imageUrl,
+            imageUrl: imageUrl || '',
             soilType: analysis.soilType || 'Unknown',
             phLevel: parseFloat(analysis.phLevel) || 7,
             nitrogenLevel: analysis.nitrogenLevel || 'medium',
@@ -115,6 +124,9 @@ const diseaseDetection = async (imageBuffer, originalName, { language = 'English
 
     const textPayload = await generateWithFallback(prompt, imageBuffer.toString('base64'));
     const analysis = parseJSON(textPayload);
+    if (analysis.error) {
+        throw Object.assign(new Error('AI could not identify the crop disease. Please try a clearer photo.'), { statusCode: 502 });
+    }
 
     const relatedProducts = await prisma.product.findMany({
         where: { isActive: true, isApproved: true, category: 'PESTICIDE' },
@@ -126,8 +138,8 @@ const diseaseDetection = async (imageBuffer, originalName, { language = 'English
 };
 
 const cropRecommend = async (farmerId, { location, soilType, season, farmSize, language = 'English' }) => {
-    const farmer = await prisma.farmer.findUnique({ where: { id: farmerId } });
-    const context = `Location: ${location || farmer?.district}, Soil: ${soilType || farmer?.soilType || 'mixed'}, Season: ${season || 'Kharif'}, Farm size: ${farmSize || farmer?.farmSizeAcres || 2} acres`;
+    const farmer = farmerId ? await prisma.farmer.findUnique({ where: { id: farmerId } }) : null;
+    const context = `Location: ${location || farmer?.district || 'Maharashtra'}, Soil: ${soilType || farmer?.soilType || 'mixed'}, Season: ${season || 'Kharif'}, Farm size: ${farmSize || farmer?.farmSizeAcres || 2} acres`;
 
     const cacheKey = `crop_rec:${context.replace(/\s+/g, '_')}_${language}`;
     const cached = await cache.get(cacheKey);
@@ -139,8 +151,11 @@ const cropRecommend = async (farmerId, { location, soilType, season, farmSize, l
     Each object must have these keys: crop, emoji, matchPercent (number), reason (short for voice), expectedYield, marketDemand.`;
 
     const textPayload = await generateWithFallback(prompt);
-    logger.info(`Crop Recommend Raw Payload: ${textPayload}`);
+    logger.info(`Crop Recommend Raw Payload: ${textPayload.substring(0, 200)}`);
     const parsed = parseJSON(textPayload);
+    if (parsed.error) {
+        throw Object.assign(new Error('AI crop recommendation failed. Please try again.'), { statusCode: 502 });
+    }
     const result = { context, crops: Array.isArray(parsed) ? parsed : parsed.crops || [] };
 
     await cache.set(cacheKey, result, 86400);

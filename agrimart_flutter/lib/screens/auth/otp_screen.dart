@@ -20,8 +20,8 @@ class OtpScreen extends ConsumerStatefulWidget {
 }
 
 class _OtpScreenState extends ConsumerState<OtpScreen> {
-  final List<TextEditingController> _ctrls = List.generate(6, (_) => TextEditingController());
-  final List<FocusNode> _nodes = List.generate(6, (_) => FocusNode());
+  final _otpCtrl = TextEditingController();
+  final _focusNode = FocusNode();
   bool _isLoading = false;
   String? _error;
   int _resendSeconds = 30;
@@ -31,10 +31,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   void initState() {
     super.initState();
     _startTimer();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _nodes[0].requestFocus());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
   }
 
   void _startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_resendSeconds > 0) {
         setState(() => _resendSeconds--);
@@ -46,25 +47,15 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
   @override
   void dispose() {
-    for (final c in _ctrls) c.dispose();
-    for (final n in _nodes) n.dispose();
+    _otpCtrl.dispose();
+    _focusNode.dispose();
     _timer?.cancel();
     super.dispose();
   }
 
-  String get _otp => _ctrls.map((c) => c.text).join();
-
-  void _onChanged(int index, String val) {
-    if (val.length == 1 && index < 5) {
-      _nodes[index + 1].requestFocus();
-    } else if (val.isEmpty && index > 0) {
-      _nodes[index - 1].requestFocus();
-    }
-    if (_otp.length == 6) _verify();
-  }
-
   Future<void> _verify() async {
-    if (_otp.length < 6) {
+    final otp = _otpCtrl.text.trim();
+    if (otp.length < 6) {
       setState(() => _error = 'Enter the 6-digit OTP');
       return;
     }
@@ -72,14 +63,13 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     try {
       await ref.read(authProvider.notifier).verifyOTP(
         phone: widget.phone,
-        otp: _otp,
+        otp: otp,
         role: widget.role,
         language: widget.language,
       );
-      // Router will handle redirect based on auth state
     } catch (e) {
-      for (final c in _ctrls) c.clear();
-      _nodes[0].requestFocus();
+      _otpCtrl.clear();
+      _focusNode.requestFocus();
       setState(() {
         _isLoading = false;
         _error = e.toString().replaceAll('Exception: ', '');
@@ -97,14 +87,29 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     }
   }
 
+  void _onOtpChanged(String value) {
+    final cleaned = value.replaceAll(RegExp(r'\D'), '');
+    final digits = cleaned.length > 6 ? cleaned.substring(0, 6) : cleaned;
+    if (digits != _otpCtrl.text) {
+      _otpCtrl.value = TextEditingValue(
+        text: digits,
+        selection: TextSelection.collapsed(offset: digits.length),
+      );
+    }
+    if (_error != null) setState(() => _error = null);
+    setState(() {});
+    if (digits.length == 6) _verify();
+  }
+
   @override
   Widget build(BuildContext context) {
     final r = context.r;
+    final otp = _otpCtrl.text;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
         children: [
-          // Header
           Container(
             width: double.infinity,
             padding: EdgeInsets.fromLTRB(24, MediaQuery.of(context).padding.top + 24, 24, 32),
@@ -131,8 +136,6 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               ],
             ),
           ),
-
-          // Card
           Expanded(
             child: SingleChildScrollView(
               child: Transform.translate(
@@ -152,15 +155,52 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       Text('6-digit code sent via SMS', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
                       const SizedBox(height: 32),
 
-                      // OTP boxes
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(6, (i) => _OtpBox(
-                          controller: _ctrls[i],
-                          focusNode: _nodes[i],
-                          onChanged: (v) => _onChanged(i, v),
-                          hasError: _error != null,
-                        )),
+                      // Hidden input + visual boxes
+                      Stack(
+                        children: [
+                          Opacity(
+                            opacity: 0.01,
+                            child: TextField(
+                              controller: _otpCtrl,
+                              focusNode: _focusNode,
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.done,
+                              autofillHints: const [AutofillHints.oneTimeCode],
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(6)],
+                              onChanged: _onOtpChanged,
+                              onSubmitted: (_) => _verify(),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _focusNode.requestFocus(),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: List.generate(6, (i) {
+                                final char = i < otp.length ? otp[i] : '';
+                                final isActive = i == otp.length || (otp.length == 6 && i == 5);
+                                return Container(
+                                  width: 48,
+                                  height: 56,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: _error != null
+                                          ? AppColors.danger
+                                          : (isActive ? AppColors.farmerAccent : AppColors.border),
+                                      width: isActive ? 2 : 1.5,
+                                    ),
+                                    borderRadius: BorderRadius.circular(14),
+                                    color: AppColors.surface,
+                                  ),
+                                  child: Text(
+                                    char,
+                                    style: GoogleFonts.spaceGrotesk(fontSize: r.sp(24), fontWeight: FontWeight.w700, color: AppColors.ink),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ),
+                        ],
                       ),
 
                       if (_error != null) ...[
@@ -187,8 +227,6 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         icon: Icons.verified_outlined,
                       ),
                       const SizedBox(height: 20),
-
-                      // Resend
                       if (_resendSeconds > 0)
                         Text('Resend OTP in ${_resendSeconds}s',
                             style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted))
@@ -209,39 +247,3 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     );
   }
 }
-
-class _OtpBox extends StatelessWidget {
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final void Function(String) onChanged;
-  final bool hasError;
-
-  const _OtpBox({required this.controller, required this.focusNode, required this.onChanged, required this.hasError});
-
-  @override
-  Widget build(BuildContext context) {
-    final r = context.r;
-    return Container(
-      width: 48, height: 56,
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: hasError ? AppColors.danger : (focusNode.hasFocus ? AppColors.farmerAccent : AppColors.border),
-          width: focusNode.hasFocus ? 2 : 1.5,
-        ),
-        borderRadius: BorderRadius.circular(14),
-        color: AppColors.surface,
-      ),
-      child: TextField(
-        controller: controller,
-        focusNode: focusNode,
-        textAlign: TextAlign.center,
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(1)],
-        style: GoogleFonts.spaceGrotesk(fontSize: r.sp(24), fontWeight: FontWeight.w700, color: AppColors.ink),
-        decoration: const InputDecoration(border: InputBorder.none, counterText: ''),
-        onChanged: onChanged,
-      ),
-    );
-  }
-}
-

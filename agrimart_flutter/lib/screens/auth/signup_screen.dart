@@ -8,6 +8,7 @@ import '../../core/widgets/shared_widgets.dart';
 import '../../data/services/api_service.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/utils/location_helper.dart';
 import '../../core/utils/responsive.dart';
 
 /// Unified signup screen — adapts form based on [role]
@@ -37,6 +38,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   Set<String> _selectedCategories = {};
   Set<String> _selectedCommodities = {};
   bool _isLoading = false;
+  bool _isLocating = false;
   String? _error;
 
   Color get _accent   => AppColors.accentFor(widget.role);
@@ -66,6 +68,35 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   }
 
   bool _validateGstin(String v) => RegExp(r'^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}$').hasMatch(v);
+
+  Future<void> _useMyLocation() async {
+    setState(() => _isLocating = true);
+    try {
+      final loc = await LocationHelper.getCurrent();
+      if (loc == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location unavailable. Enter manually.'), backgroundColor: AppColors.warning),
+          );
+        }
+        return;
+      }
+      setState(() {
+        if (widget.role == 'FARMER') {
+          if (loc.village.isNotEmpty) _villageCtrl.text = loc.village;
+          if (loc.district.isNotEmpty) _selectedDistrict = loc.district;
+        } else if (widget.role == 'SUPPLIER') {
+          if (loc.village.isNotEmpty) _cityCtrl.text = loc.village;
+          if (loc.district.isNotEmpty) _selectedDistrict = loc.district;
+        } else if (widget.role == 'DEALER') {
+          if (loc.village.isNotEmpty) _apmcCtrl.text = loc.village;
+          if (loc.district.isNotEmpty) _selectedDistrict = loc.district;
+        }
+      });
+    } finally {
+      if (mounted) setState(() => _isLocating = false);
+    }
+  }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -203,7 +234,18 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
                       // District dropdown
                       const SizedBox(height: 14),
-                      _Label('District${widget.role != 'FARMER' ? '' : ' *'}'),
+                      Row(
+                        children: [
+                          Expanded(child: _Label('District${widget.role != 'FARMER' ? '' : ' *'}')),
+                          TextButton.icon(
+                            onPressed: _isLocating ? null : _useMyLocation,
+                            icon: _isLocating
+                                ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                                : Icon(Icons.my_location_rounded, size: 16, color: _accent),
+                            label: Text('Use my location', style: GoogleFonts.inter(fontSize: 12, color: _accent)),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
                         value: _selectedDistrict,

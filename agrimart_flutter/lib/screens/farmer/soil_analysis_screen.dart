@@ -43,8 +43,22 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
       final language = locale.languageCode == 'hi' ? 'Hindi' : locale.languageCode == 'mr' ? 'Marathi' : 'English';
       final location = "${user?.farmer?['village'] ?? ''}, ${user?.farmer?['district'] ?? ''}";
       final res = await ApiService.instance.analyzeSoil(_image!.path, location: location, language: language);
+      final analysis = res['analysis'] as Map? ?? {};
+      final report = res['report'] as Map? ?? {};
       setState(() {
-        _result = res;
+        _result = {
+          ...res,
+          'analysis': {
+            ...analysis,
+            'soilType': analysis['soilType'] ?? report['soilType'],
+            'phLevel': analysis['phLevel'] ?? report['phLevel'],
+            'nitrogenLevel': analysis['nitrogenLevel'] ?? report['nitrogenLevel'],
+            'phosphorusLevel': analysis['phosphorusLevel'] ?? report['phosphorusLevel'],
+            'potassiumLevel': analysis['potassiumLevel'] ?? report['potassiumLevel'],
+            'treatmentAdvice': analysis['treatmentAdvice'] ?? report['treatmentAdvice'],
+            'recommendedCrops': analysis['recommendedCrops'] ?? report['recommendedCrops'],
+          },
+        };
         _analyzing = false;
       });
     } catch (e) {

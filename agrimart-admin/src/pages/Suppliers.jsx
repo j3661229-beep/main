@@ -3,7 +3,7 @@ import { getPendingSuppliers, getAllSuppliers, verifySupplier } from '../lib/api
 import toast from 'react-hot-toast';
 
 const STATUS_MAP = {
-    VERIFIED: <span className="badge badge-success">Verified</span>,
+    APPROVED: <span className="badge badge-success">Approved</span>,
     PENDING: <span className="badge badge-warning">Pending</span>,
     REJECTED: <span className="badge badge-danger">Rejected</span>,
 };
@@ -119,28 +119,31 @@ export default function Suppliers() {
                                         <td style={{ fontFamily: 'monospace', fontSize: 13 }}>{s.user?.phone}</td>
                                         <td className="text-sm">{s.gstNumber || '—'}</td>
                                         <td className="text-secondary text-sm">{s.district}, {s.pincode}</td>
-                                        {tab === 'all' && <td>{STATUS_MAP[s.verificationStatus] || <span className="badge badge-gray">Unknown</span>}</td>}
+                                        {tab === 'all' && <td>{STATUS_MAP[s.docStatus] || <span className="badge badge-gray">Unknown</span>}</td>}
                                         <td className="text-secondary text-sm">{new Date(s.createdAt).toLocaleDateString('en-IN')}</td>
                                         <td>
                                             <div className="flex-center gap-8">
-                                                {s.verificationStatus !== 'VERIFIED' && (
-                                                    <button
-                                                        className="btn btn-sm btn-success"
-                                                        disabled={actionLoading === `approve-${s.id}`}
-                                                        onClick={() => handleVerify(s.id, 'approve')}
-                                                    >
-                                                        {actionLoading === `approve-${s.id}` ? <><span className="btn-spinner" /> Approving…</> : '✅ Approve'}
-                                                    </button>
+                                                {s.docStatus === 'PENDING' && (
+                                                    <>
+                                                        <button
+                                                            className="btn btn-sm btn-success"
+                                                            disabled={actionLoading === `approve-${s.id}`}
+                                                            onClick={() => handleVerify(s.id, 'approve')}
+                                                        >
+                                                            {actionLoading === `approve-${s.id}` ? <><span className="btn-spinner" /> Approving…</> : '✅ Approve'}
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-sm btn-danger"
+                                                            disabled={!!actionLoading}
+                                                            onClick={() => setSelected(s)}
+                                                        >❌ Reject</button>
+                                                    </>
                                                 )}
-                                                {s.verificationStatus !== 'REJECTED' && (
-                                                    <button
-                                                        className="btn btn-sm btn-danger"
-                                                        disabled={!!actionLoading}
-                                                        onClick={() => setSelected(s)}
-                                                    >❌ Reject</button>
+                                                {s.docStatus === 'APPROVED' && (
+                                                    <span className="text-xs text-secondary">✅ Verified</span>
                                                 )}
-                                                {s.verificationStatus === 'VERIFIED' && s.verificationStatus !== 'REJECTED' && (
-                                                    <span className="text-xs text-secondary">Verified</span>
+                                                {s.docStatus === 'REJECTED' && (
+                                                    <span className="text-xs" style={{ color: 'var(--red-600)' }}>❌ Rejected</span>
                                                 )}
                                             </div>
                                         </td>

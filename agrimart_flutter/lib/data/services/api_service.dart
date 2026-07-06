@@ -302,7 +302,10 @@ class ApiService {
   }
 
   Future<List> getDiagnoseHistory({int page = 1}) async {
-    // History endpoint not implemented on backend yet — avoid 404 noise
+    final r = await _dio.get('/ai/history', queryParameters: {'page': page});
+    final data = r.data['data'];
+    if (data is Map && data['data'] is List) return data['data'];
+    if (data is List) return data;
     return [];
   }
 
@@ -564,16 +567,35 @@ class ApiService {
 
   Future<List> getDeals({String? status, int page = 1}) async {
     final bookings = await getDealerMyBookings();
+    final mapped = bookings.map(_mapBookingToDeal).toList();
     if (status != null && status.isNotEmpty) {
-      return bookings.where((b) => (b['status'] ?? '').toString().toUpperCase() == status.toUpperCase()).toList();
+      return mapped.where((b) => (b['status'] ?? '').toString().toUpperCase() == status.toUpperCase()).toList();
     }
-    return bookings;
+    return mapped;
+  }
+
+  Map<String, dynamic> _mapBookingToDeal(dynamic b) {
+    final booking = b as Map;
+    final farmer = booking['farmer'] as Map?;
+    return {
+      ...booking,
+      'crop': booking['cropName'] ?? booking['crop'],
+      'quantity': booking['approxQuintals'] ?? booking['quantity'],
+      'offerPrice': booking['pricePerQuintal'] ?? booking['offerPrice'],
+      'farmerName': booking['farmerName'] ?? farmer?['user']?['name'] ?? 'Farmer',
+      'pickupDate': booking['slotDate'] ?? booking['pickupDate'],
+      'listing': booking,
+    };
   }
 
   Future<Map> createDeal(Map<String, dynamic> data) async {
     final bookingId = data['bookingId'] ?? data['listingId'];
     if (bookingId != null) {
-      return updateDealerBookingStatus(bookingId.toString(), 'ACCEPTED');
+      final body = <String, dynamic>{'status': 'ACCEPTED'};
+      if (data['offerPrice'] != null) body['offerPrice'] = data['offerPrice'];
+      if (data['notes'] != null) body['notes'] = data['notes'];
+      final r = await _dio.patch('/dealer/bookings/$bookingId', data: body);
+      return r.data['booking'] ?? r.data['data'] ?? {};
     }
     return bookTradeSlot(data);
   }
@@ -600,8 +622,8 @@ class ApiService {
   }
 
   Future<Map> updateOrderStatus(String itemId, String status) async {
-    final r = await _dio.patch('/orders/$itemId', data: {'status': status});
-    return r.data['data'];
+    final r = await _dio.put('/supplier/orders/$itemId/status', data: {'status': status});
+    return r.data['data'] ?? r.data;
   }
 
   Future<Map> createProduct(Map<String, dynamic> data) async {
@@ -634,6 +656,21 @@ class ApiService {
     return r.data['data'];
   }
 
+  Future<Map> updateSupplierProfile(Map<String, dynamic> data) async {
+    final r = await _dio.put('/supplier/profile', data: data);
+    return r.data['data'] ?? r.data;
+  }
+
+  Future<Map> updateDealerProfile(Map<String, dynamic> data) async {
+    final r = await _dio.put('/dealer/profile', data: data);
+    return r.data['data'] ?? r.data;
+  }
+
+  Future<Map> deleteDealerRate(String id) async {
+    final r = await _dio.delete('/dealer/rates/$id');
+    return r.data['data'] ?? r.data;
+  }
+
   // ── Dealer ────────────────────────────────────────────────
 
   Future<Map> getDealerStats() async {
@@ -642,21 +679,8 @@ class ApiService {
   }
 
   Future<Map> getDealerDashboard() async {
-    final rates    = await getDealerMyRates();
-    final bookings = await getDealerMyBookings();
-    final pending  = (bookings as List).where((b) => b['status'] == 'PENDING').length;
-    final today    = bookings.where((b) {
-      final d = DateTime.tryParse(b['slotDate'] ?? '');
-      return d != null && d.day == DateTime.now().day && d.month == DateTime.now().month;
-    }).length;
-    return {
-      'activeRates': (rates as List).where((r) => r['isActive'] == true).length,
-      'pendingBookings': pending,
-      'todaySlots': today,
-      'totalBookings': bookings.length,
-      'rates': rates,
-      'bookings': bookings,
-    };
+    final r = await _dio.get('/dealer/dashboard');
+    return r.data['data'] ?? r.data;
   }
 
   Future<List> getDealerMyRates() async {

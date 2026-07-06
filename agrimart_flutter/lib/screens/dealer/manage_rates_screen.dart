@@ -28,6 +28,7 @@ class _ManageRatesScreenState extends ConsumerState<ManageRatesScreen> {
       _cropCtrl.clear();
       _priceCtrl.clear();
       ref.invalidate(dealerRatesProvider);
+      ref.invalidate(dealerDashboardProvider);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Rate updated successfully!'), backgroundColor: AppColors.success),
@@ -96,7 +97,29 @@ class _ManageRatesScreenState extends ConsumerState<ManageRatesScreen> {
                     contentPadding: EdgeInsets.zero,
                     title: Text(rate['cropName'] ?? '', style: const TextStyle(fontWeight: FontWeight.w700)),
                     subtitle: Text('${rate['district'] ?? ''} • ${rate['isActive'] == false ? 'Inactive' : 'Active'}'),
-                    trailing: Text('₹${rate['pricePerQuintal']}/qtl', style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.primary)),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('₹${rate['pricePerQuintal']}/qtl', style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.primary)),
+                        if (rate['isActive'] != false)
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
+                            onPressed: () async {
+                              try {
+                                await ApiService.instance.deleteDealerRate(rate['id'].toString());
+                                ref.invalidate(dealerRatesProvider);
+                                ref.invalidate(dealerDashboardProvider);
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.error),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                      ],
+                    ),
                   );
                 }).toList(),
               );

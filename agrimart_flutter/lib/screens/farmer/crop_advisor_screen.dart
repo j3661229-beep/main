@@ -8,6 +8,7 @@ import 'package:agrimart/l10n/app_localizations.dart';
 import '../../services/voice_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/location_helper.dart';
 import '../../core/utils/responsive.dart';
 
 class CropAdvisorScreen extends ConsumerStatefulWidget {
@@ -18,12 +19,43 @@ class CropAdvisorScreen extends ConsumerStatefulWidget {
 }
 
 class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
-  late final _locCtrl = TextEditingController(text: ref.read(authProvider).user?.farmer?['district'] ?? 'Nashik');
+  late final _locCtrl = TextEditingController();
   final _soilCtrl = TextEditingController(text: 'Black Cotton Soil');
   final _seasonCtrl = TextEditingController(text: 'Kharif');
   final _sizeCtrl = TextEditingController(text: '2');
   bool _loading = false;
+  bool _locating = false;
   List _recommendations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    final user = ref.read(authProvider).user;
+    final farmer = user?.farmer as Map?;
+    _locCtrl.text = farmer?['district']?.toString() ?? farmer?['village']?.toString() ?? '';
+    if (farmer?['soilType'] != null) _soilCtrl.text = farmer!['soilType'].toString();
+    if (farmer?['farmSizeAcres'] != null) _sizeCtrl.text = farmer!['farmSizeAcres'].toString();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _fetchLocation(silent: true));
+  }
+
+  Future<void> _fetchLocation({bool silent = false}) async {
+    setState(() => _locating = true);
+    try {
+      final loc = await LocationHelper.getCurrent();
+      if (loc != null && mounted) {
+        setState(() {
+          if (loc.district.isNotEmpty) _locCtrl.text = loc.district;
+          else if (loc.village.isNotEmpty) _locCtrl.text = loc.village;
+        });
+      } else if (!silent && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not detect location. Enter manually.'), backgroundColor: AppColors.warning),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _locating = false);
+    }
+  }
 
   Future<void> _analyze() async {
     setState(() => _loading = true);
@@ -38,6 +70,11 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
         'language': langName,
       });
       setState(() => _recommendations = res['crops'] ?? []);
+      if (_recommendations.isEmpty && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No crop recommendations returned. Try again.'), backgroundColor: AppColors.warning),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -103,7 +140,14 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                     Text(l10n.farmDetails, style: AppTextStyles.headingMD),
                     const SizedBox(height: 16),
                     _buildField(
-                        '${l10n.location} / District', _locCtrl, 'e.g. Pune, Nashik'),
+                        '${l10n.location} / District', _locCtrl, 'e.g. Pune, Nashik',
+                        suffix: IconButton(
+                          icon: _locating
+                              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                              : const Icon(Icons.my_location_rounded, color: AppColors.primary),
+                          onPressed: _locating ? null : () => _fetchLocation(),
+                          tooltip: 'Use my location',
+                        )),
                     const SizedBox(height: 14),
                     _buildField(
                         l10n.soilType, _soilCtrl, 'e.g. Black, Red, Sandy'),
@@ -142,7 +186,7 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
   }
 
   Widget _buildField(String label, TextEditingController ctrl, String hint,
-      {bool isNum = false}) {
+      {bool isNum = false, Widget? suffix}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -163,6 +207,7 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: const BorderSide(color: AppColors.border)),
+            suffixIcon: suffix,
           ),
         ),
       ],

@@ -188,6 +188,7 @@ exports.Prisma.SupplierScalarFieldEnum = {
   totalRatings: 'totalRatings',
   bankAccountNo: 'bankAccountNo',
   ifscCode: 'ifscCode',
+  upiId: 'upiId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

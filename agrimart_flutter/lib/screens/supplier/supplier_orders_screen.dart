@@ -18,7 +18,7 @@ class SupplierOrdersScreen extends ConsumerWidget {
     final r = context.r;
     final status = ref.watch(_supplierOrderStatusProvider);
     final orders = ref.watch(supplierOrdersProvider(status));
-    final statuses = ['All', 'PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'];
+    const statuses = ['All', 'PENDING', 'PROCESSING', 'DISPATCHED', 'DELIVERED'];
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -29,7 +29,6 @@ class SupplierOrdersScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // Status filter
           const SizedBox(height: 8),
           FilterChipRow(
             options: statuses,
@@ -38,7 +37,6 @@ class SupplierOrdersScreen extends ConsumerWidget {
             accent: AppColors.supplierAccent,
           ),
           const SizedBox(height: 12),
-
           Expanded(
             child: RefreshIndicator(
               color: AppColors.supplierAccent,
@@ -58,11 +56,13 @@ class SupplierOrdersScreen extends ConsumerWidget {
                   onAction: () => ref.invalidate(supplierOrdersProvider),
                 ),
                 data: (list) {
-                  if (list.isEmpty) return const EmptyState(
-                    emoji: '📦',
-                    title: 'No orders found',
-                    subtitle: 'Orders will appear here when farmers purchase your products',
-                  );
+                  if (list.isEmpty) {
+                    return const EmptyState(
+                      emoji: '📦',
+                      title: 'No orders found',
+                      subtitle: 'Orders will appear here when farmers purchase your products',
+                    );
+                  }
                   return ListView.separated(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: list.length,
@@ -93,36 +93,96 @@ class _SupplierOrderCardState extends ConsumerState<_SupplierOrderCard> {
   @override
   void initState() {
     super.initState();
-    _status = widget.order['status'] ?? 'PENDING';
+    _status = (widget.order['status'] ?? 'PENDING').toString();
   }
 
-  Future<void> _confirmOrder() async {
+  String get _farmerName {
+    final o = widget.order;
+    return o['farmerName']
+        ?? o['order']?['farmer']?['user']?['name']
+        ?? o['farmer']?['name']
+        ?? 'Farmer';
+  }
+
+  String get _productName {
+    final o = widget.order;
+    return o['productName'] ?? o['product']?['name'] ?? 'Product';
+  }
+
+  num get _amount {
+    final o = widget.order;
+    return (o['totalAmount'] ?? o['amount'] ?? ((o['price'] as num?) ?? 0) * ((o['quantity'] as num?) ?? 1)) as num;
+  }
+
+  Future<void> _updateStatus(String nextStatus, String successLabel) async {
     setState(() => _isUpdating = true);
     try {
-      await ApiService.instance.updateOrderStatus(widget.order['id'], 'CONFIRMED');
-      setState(() { _status = 'CONFIRMED'; _isUpdating = false; });
+      await ApiService.instance.updateOrderStatus(widget.order['id'].toString(), nextStatus);
+      if (mounted) {
+        setState(() {
+          _status = nextStatus;
+          _isUpdating = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(successLabel), backgroundColor: AppColors.success),
+        );
+      }
       ref.invalidate(supplierOrdersProvider);
+      ref.invalidate(supplierDashboardProvider);
     } catch (e) {
-      setState(() => _isUpdating = false);
+      if (mounted) {
+        setState(() => _isUpdating = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
+        );
+      }
+    }
+  }
+
+  String? get _nextAction {
+    switch (_status.toUpperCase()) {
+      case 'PENDING':
+      case 'PAYMENT_CONFIRMED':
+        return 'PROCESSING';
+      case 'PROCESSING':
+        return 'DISPATCHED';
+      case 'DISPATCHED':
+      case 'OUT_FOR_DELIVERY':
+        return 'DELIVERED';
+      default:
+        return null;
+    }
+  }
+
+  String get _actionLabel {
+    switch (_nextAction) {
+      case 'PROCESSING':
+        return 'Confirm & Process';
+      case 'DISPATCHED':
+        return 'Mark Dispatched';
+      case 'DELIVERED':
+        return 'Mark Delivered';
+      default:
+        return 'Update';
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final r = context.r;
     final o = widget.order;
-    final farmerName  = o['farmerName']  ?? o['farmer']?['name']  ?? 'Farmer';
-    final productName = o['productName'] ?? o['product']?['name'] ?? 'Product';
-    final qty         = o['quantity'] ?? o['qty'] ?? '-';
-    final amount      = (o['totalAmount'] ?? o['amount'] as num?) ?? 0;
-    final orderId     = o['id'] ?? '';
+    final qty = o['quantity'] ?? o['qty'] ?? '-';
+    final orderId = o['id']?.toString() ?? '';
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _status == 'PENDING' ? AppColors.supplierAccent.withValues(alpha: 0.4) : AppColors.border.withValues(alpha: 0.6)),
+        border: Border.all(
+          color: _status == 'PENDING'
+              ? AppColors.supplierAccent.withValues(alpha: 0.4)
+              : AppColors.border.withValues(alpha: 0.6),
+        ),
         boxShadow: AppColors.softShadow,
       ),
       child: Column(
@@ -131,17 +191,18 @@ class _SupplierOrderCardState extends ConsumerState<_SupplierOrderCard> {
           Row(
             children: [
               Container(
-                width: 44, height: 44,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(color: AppColors.supplierTint, borderRadius: BorderRadius.circular(12)),
-                child: Center(child: Text('🌾', style: TextStyle(fontSize: 22))),
+                child: const Center(child: Text('🌾', style: TextStyle(fontSize: 22))),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(farmerName, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink)),
-                    Text(productName, style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+                    Text(_farmerName, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink)),
+                    Text(_productName, style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
                   ],
                 ),
               ),
@@ -153,15 +214,15 @@ class _SupplierOrderCardState extends ConsumerState<_SupplierOrderCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _InfoChip(label: 'Qty', value: '$qty units'),
-              _InfoChip(label: 'Amount', value: formatRupee(amount)),
+              _InfoChip(label: 'Amount', value: formatRupee(_amount)),
               _InfoChip(label: 'Order #', value: orderId.length > 8 ? orderId.substring(0, 8) : orderId),
             ],
           ),
-          if (_status == 'PENDING') ...[
+          if (_nextAction != null) ...[
             const SizedBox(height: 14),
             AppButton(
-              label: 'Confirm Order',
-              onTap: _confirmOrder,
+              label: _actionLabel,
+              onTap: () => _updateStatus(_nextAction!, 'Order updated to $_nextAction'),
               isLoading: _isUpdating,
               color: AppColors.supplierAccent,
               height: 42,
@@ -186,4 +247,3 @@ class _InfoChip extends StatelessWidget {
     ],
   );
 }
-
