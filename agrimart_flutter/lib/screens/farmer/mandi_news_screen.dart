@@ -91,10 +91,10 @@ class _NewsCard extends StatelessWidget {
   void _openDetails(BuildContext context) async {
     final link = item['link']?.toString();
     if (link != null && link.isNotEmpty) {
-      final uri = Uri.tryParse(link);
-      if (uri != null && await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
-      }
+      context.push('/webview', extra: {
+        'url': link,
+        'title': item['title'] ?? 'News Article',
+      });
       return;
     }
 

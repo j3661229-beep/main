@@ -54,6 +54,7 @@ import '../screens/dealer/my_deals_screen.dart';
 
 // Shared
 import '../screens/shared/notifications_screen.dart';
+import '../screens/shared/webview_screen.dart';
 
 // Legacy auth screens still referenced
 import '../screens/auth/profile_setup_screen.dart';
@@ -251,6 +252,17 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // ── Shared ────────────────────────────────────────
       _faded('/notifications', const NotificationsScreen()),
+
+      GoRoute(
+        path: '/webview',
+        pageBuilder: (ctx, state) {
+          final extra = state.extra as Map? ?? {};
+          return _fadedPage(WebViewScreen(
+            url: extra['url']?.toString() ?? 'https://google.com',
+            title: extra['title']?.toString() ?? 'Article',
+          ));
+        },
+      ),
 
       // ── Legacy / Fallback ─────────────────────────────
       GoRoute(
