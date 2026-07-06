@@ -25,6 +25,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _phoneCtrl   = TextEditingController();
   final _emailCtrl   = TextEditingController();
   final _passCtrl    = TextEditingController();
+  final _confirmPassCtrl = TextEditingController();
   final _bizCtrl     = TextEditingController();
   final _gstinCtrl   = TextEditingController();
   final _cityCtrl    = TextEditingController();
@@ -39,6 +40,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   Set<String> _selectedCommodities = {};
   bool _isLoading = false;
   bool _isLocating = false;
+  bool _obscurePass = true;
+  bool _obscureConfirmPass = true;
   String? _error;
 
   Color get _accent   => AppColors.accentFor(widget.role);
@@ -63,7 +66,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   @override
   void dispose() {
-    for (final c in [_nameCtrl, _phoneCtrl, _emailCtrl, _passCtrl, _bizCtrl, _gstinCtrl, _cityCtrl, _licenseCtrl, _apmcCtrl, _villageCtrl, _landCtrl]) c.dispose();
+    for (final c in [_nameCtrl, _phoneCtrl, _emailCtrl, _passCtrl, _confirmPassCtrl, _bizCtrl, _gstinCtrl, _cityCtrl, _licenseCtrl, _apmcCtrl, _villageCtrl, _landCtrl]) c.dispose();
     super.dispose();
   }
 
@@ -103,46 +106,39 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     setState(() { _isLoading = true; _error = null; });
     try {
       final phoneString = '+91${_phoneCtrl.text.trim()}';
-      
-      switch (widget.role) {
-        case 'FARMER':
-          ApiService.instance.pendingSignupData = {
-            'name': _nameCtrl.text.trim(),
-            'village': _villageCtrl.text.trim(),
-            'district': _selectedDistrict,
-            'landSize': double.tryParse(_landCtrl.text),
-            'primaryCrops': _selectedCrops.toList(),
-          };
-          break;
-        case 'SUPPLIER':
-          ApiService.instance.pendingSignupData = {
-            'businessName': _bizCtrl.text.trim(),
-            'ownerName': _nameCtrl.text.trim(),
-            'email': _emailCtrl.text.trim(),
-            'gstin': _gstinCtrl.text.trim().toUpperCase(),
-            'city': _cityCtrl.text.trim(),
-            'district': _selectedDistrict,
-            'categories': _selectedCategories.toList(),
-          };
-          break;
-        case 'DEALER':
-          ApiService.instance.pendingSignupData = {
-            'businessName': _bizCtrl.text.trim(),
-            'ownerName': _nameCtrl.text.trim(),
-            'email': _emailCtrl.text.trim(),
-            'mandiLicense': _licenseCtrl.text.trim(),
-            'apmcYard': _apmcCtrl.text.trim(),
-            'commodities': _selectedCommodities.toList(),
-          };
-          break;
+
+      if (widget.role == 'FARMER') {
+        ApiService.instance.pendingSignupData = {
+          'name': _nameCtrl.text.trim(),
+          'village': _villageCtrl.text.trim(),
+          'district': _selectedDistrict,
+          'landSize': double.tryParse(_landCtrl.text),
+          'primaryCrops': _selectedCrops.toList(),
+        };
+        await ref.read(authProvider.notifier).sendOTP(phone: phoneString, role: widget.role);
+        if (mounted) {
+          context.push('/auth/otp?phone=${Uri.encodeComponent(phoneString)}&role=${widget.role}&language=en');
+        }
+        return;
       }
-      
-      // Send OTP to start the flow
-      await ref.read(authProvider.notifier).sendOTP(phone: phoneString, role: widget.role);
-      
-      if (mounted) {
-        context.push('/auth/otp?phone=${Uri.encodeComponent(phoneString)}&role=${widget.role}&language=en');
-      }
+
+      await ref.read(authProvider.notifier).registerWithPassword({
+        'email': _emailCtrl.text.trim(),
+        'password': _passCtrl.text,
+        'phone': phoneString,
+        'role': widget.role,
+        'businessName': _bizCtrl.text.trim(),
+        'ownerName': _nameCtrl.text.trim(),
+        'district': _selectedDistrict,
+        if (widget.role == 'SUPPLIER') ...{
+          'gstin': _gstinCtrl.text.trim().toUpperCase(),
+          'city': _cityCtrl.text.trim(),
+        },
+        if (widget.role == 'DEALER') ...{
+          'mandiLicense': _licenseCtrl.text.trim(),
+          'apmcYard': _apmcCtrl.text.trim(),
+        },
+      });
     } catch (e) {
       setState(() { _error = e.toString().replaceAll('Exception: ', ''); });
     } finally {
@@ -204,7 +200,21 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       _buildPhoneField(),
                       if (widget.role != 'FARMER') ...[
                         const SizedBox(height: 14),
-                        _buildField('Email *', _emailCtrl, 'you@example.com', Icons.email_outlined, type: TextInputType.emailAddress),
+                        _buildField('Email *', _emailCtrl, 'you@example.com', Icons.email_outlined, type: TextInputType.emailAddress,
+                          validator: (v) {
+                            if (v == null || v.trim().isEmpty) return 'Enter your email';
+                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v.trim())) return 'Enter a valid email';
+                            return null;
+                          }),
+                        const SizedBox(height: 14),
+                        _buildPasswordField('Password *', _passCtrl, _obscurePass, () => setState(() => _obscurePass = !_obscurePass)),
+                        const SizedBox(height: 14),
+                        _buildPasswordField('Confirm Password *', _confirmPassCtrl, _obscureConfirmPass, () => setState(() => _obscureConfirmPass = !_obscureConfirmPass),
+                          validator: (v) {
+                            if (v == null || v.isEmpty) return 'Confirm your password';
+                            if (v != _passCtrl.text) return 'Passwords do not match';
+                            return null;
+                          }),
                       ],
                       if (widget.role == 'SUPPLIER') ...[
                         const SizedBox(height: 14),
@@ -295,6 +305,32 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       ),
     );
   }
+
+  Widget _buildPasswordField(String label, TextEditingController ctrl, bool obscure, VoidCallback onToggle, {String? Function(String?)? validator}) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _Label(label),
+      const SizedBox(height: 6),
+      TextFormField(
+        controller: ctrl,
+        obscureText: obscure,
+        decoration: InputDecoration(
+          hintText: '••••••••',
+          prefixIcon: Icon(Icons.lock_outline_rounded, color: _accent, size: 20),
+          suffixIcon: IconButton(
+            onPressed: onToggle,
+            icon: Icon(obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: AppColors.muted, size: 20),
+          ),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _accent, width: 2)),
+        ),
+        validator: validator ?? (v) {
+          if (v == null || v.isEmpty) return 'Enter a password';
+          if (v.length < 6) return 'Password must be at least 6 characters';
+          return null;
+        },
+      ),
+    ],
+  );
 
   Widget _buildField(String label, TextEditingController ctrl, String hint, IconData icon, {
     TextInputType type = TextInputType.text,

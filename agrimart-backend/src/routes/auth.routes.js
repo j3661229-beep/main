@@ -8,6 +8,7 @@ const authController = require('../controllers/auth.controller');
 router.post('/send-otp', otpLimiter, authController.sendOTP);
 router.post('/verify-otp', otpLimiter, authController.verifyOTP);
 router.post('/login', apiLimiter, authController.login);
+router.post('/register', apiLimiter, authController.register);
 router.post('/google', apiLimiter, authController.googleSignIn);
 router.post('/refresh-token', apiLimiter, authController.refreshToken);
 router.post('/logout', authenticate, authController.logout);

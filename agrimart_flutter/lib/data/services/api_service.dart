@@ -92,6 +92,11 @@ class ApiService {
     return r.data['data'];
   }
 
+  Future<Map> registerWithPassword(Map<String, dynamic> data) async {
+    final r = await _dio.post('/auth/register', data: data);
+    return r.data['data'];
+  }
+
   Future<Map> registerFarmer(Map<String, dynamic> data) async {
     final r = await _dio.post('/farmers/register', data: data);
     return r.data['data'];

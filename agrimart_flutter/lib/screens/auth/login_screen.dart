@@ -205,18 +205,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           },
                         ),
                       ] else ...[
-                        // Email/Phone
-                        Text('Email or Phone', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.muted)),
+                        // Email
+                        Text('Email', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.muted)),
                         const SizedBox(height: 6),
                         TextFormField(
                           controller: _emailCtrl,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             hintText: 'business@example.com',
-                            prefixIcon: Icon(Icons.person_outline_rounded, color: _accent, size: 20),
+                            prefixIcon: Icon(Icons.email_outlined, color: _accent, size: 20),
                             focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _accent, width: 2)),
                           ),
-                          validator: (v) => (v == null || v.isEmpty) ? 'Enter email or phone' : null,
+                          validator: (v) {
+                            if (v == null || v.trim().isEmpty) return 'Enter your email';
+                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v.trim())) return 'Enter a valid email';
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 16),
                         // Password

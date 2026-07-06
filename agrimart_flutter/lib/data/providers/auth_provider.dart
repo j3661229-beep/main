@@ -65,6 +65,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<UserModel> registerWithPassword(Map<String, dynamic> data) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final res = await _api.registerWithPassword(data);
+      final token = res['token'] as String;
+      final user = UserModel.fromJson(res['user']);
+      await _storage.write(key: AppConstants.tokenKey, value: token);
+      await _storage.write(key: AppConstants.refreshTokenKey, value: res['refreshToken'] ?? '');
+      await _storage.write(key: AppConstants.userKey, value: jsonEncode(res['user']));
+      state = AuthState(user: user, isAuthenticated: true);
+      return user;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: _parseError(e));
+      rethrow;
+    }
+  }
+
   Future<UserModel> loginWithPassword({
     required String emailOrPhone,
     required String password,

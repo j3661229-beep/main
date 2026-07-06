@@ -1,4 +1,5 @@
 require('dotenv').config();
+const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('../src/generated/prisma');
 const prisma = new PrismaClient();
 
@@ -8,12 +9,27 @@ const daysFromNow = (n) => {
     return d;
 };
 
-async function upsertUser({ phone, email, name, role, language, isVerified = true }) {
+async function upsertUser({ phone, email, name, role, language, isVerified = true, password }) {
     const where = phone ? { phone } : { email };
+    const passwordHash = password ? bcrypt.hashSync(password, 10) : undefined;
     return prisma.user.upsert({
         where,
-        update: { name, isVerified },
-        create: { phone, email, name, role, language, isVerified, isActive: true },
+        update: {
+            name,
+            isVerified,
+            ...(email ? { email } : {}),
+            ...(passwordHash ? { passwordHash } : {}),
+        },
+        create: {
+            phone,
+            email,
+            name,
+            role,
+            language,
+            isVerified,
+            isActive: true,
+            ...(passwordHash ? { passwordHash } : {}),
+        },
     });
 }
 
@@ -132,7 +148,8 @@ async function main() {
     // ── Suppliers ───────────────────────────────────────────
     const supplierDefs = [
         {
-            phone: '+918765432109', name: 'Suresh Agri Supplies', businessName: 'Suresh Agri Supplies',
+            phone: '+918765432109', email: 'supplier@agrimart.in', password: 'Supplier@123',
+            name: 'Suresh Agri Supplies', businessName: 'Suresh Agri Supplies',
             gst: '27AAAAA0000A1Z5', address: '12, Agri Market, Nashik-Pune Road',
             district: 'Nashik', pincode: '422001', lat: 19.99, lng: 73.79,
             rating: 4.6, totalRatings: 128,
@@ -147,7 +164,10 @@ async function main() {
 
     const suppliers = [];
     for (const s of supplierDefs) {
-        const user = await upsertUser({ phone: s.phone, name: s.name, role: 'SUPPLIER', language: 'hindi' });
+        const user = await upsertUser({
+            phone: s.phone, email: s.email, password: s.password,
+            name: s.name, role: 'SUPPLIER', language: 'hindi',
+        });
         const supplier = await prisma.supplier.upsert({
             where: { userId: user.id },
             update: { isVerified: true, docStatus: 'APPROVED' },
@@ -173,7 +193,8 @@ async function main() {
     // ── Dealers ─────────────────────────────────────────────
     const dealerDefs = [
         {
-            phone: '+917654321098', name: 'Kisan Trading Co.', businessName: 'Kisan Trading Co.',
+            phone: '+917654321098', email: 'dealer@agrimart.in', password: 'Dealer@123',
+            name: 'Kisan Trading Co.', businessName: 'Kisan Trading Co.',
             address: 'Lasalgaon APMC Market, Nashik', district: 'Nashik', pincode: '422306',
             lat: 20.14, lng: 74.22, rating: 4.8, totalRatings: 342,
         },
@@ -186,7 +207,10 @@ async function main() {
 
     const dealers = [];
     for (const d of dealerDefs) {
-        const user = await upsertUser({ phone: d.phone, name: d.name, role: 'DEALER', language: 'english' });
+        const user = await upsertUser({
+            phone: d.phone, email: d.email, password: d.password,
+            name: d.name, role: 'DEALER', language: 'english',
+        });
         const dealer = await prisma.dealer.upsert({
             where: { userId: user.id },
             update: { isVerified: true, docStatus: 'APPROVED' },
@@ -483,9 +507,10 @@ async function main() {
     console.log('\nTest accounts (OTP: 123456):');
     console.log('  Farmer:   +919876543210  (Ramesh Patil)');
     console.log('  Farmer:   +919123456789  (Sunil Kadam)');
-    console.log('  Supplier: +918765432109  (Suresh Agri Supplies)');
-    console.log('  Dealer:   +917654321098  (Kisan Trading Co.)');
     console.log('  Admin:    +919999999999');
+    console.log('\nSupplier / Dealer (email + password):');
+    console.log('  Supplier: supplier@agrimart.in  /  Supplier@123');
+    console.log('  Dealer:   dealer@agrimart.in    /  Dealer@123');
 }
 
 main()

@@ -66,4 +66,14 @@ const login = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
-module.exports = { sendOTP, verifyOTP, googleSignIn, refreshToken, logout, me, completeOnboarding, login };
+const register = async (req, res, next) => {
+    try {
+        const { email, password, role } = req.body;
+        if (!email || !password) return error(res, 'Email and password are required');
+        if (!role) return error(res, 'Role is required');
+        const data = await authService.registerWithPassword(req.body);
+        success(res, data, 'Registration successful', 201);
+    } catch (err) { next(err); }
+};
+
+module.exports = { sendOTP, verifyOTP, googleSignIn, refreshToken, logout, me, completeOnboarding, login, register };

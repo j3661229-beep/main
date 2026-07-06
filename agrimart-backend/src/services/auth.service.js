@@ -391,4 +391,84 @@ const loginWithPassword = async ({ emailOrPhone, password, role }) => {
     return issueAuthSession(user, access);
 };
 
-module.exports = { sendOTP, verifyOTP, googleSignIn, refreshToken, completeOnboarding, logout, invalidateUserCache, loginWithPassword };
+const registerWithPassword = async ({
+    email, password, phone, name, role,
+    businessName, ownerName, gstin, city, district,
+    mandiLicense, apmcYard,
+}) => {
+    if (!['SUPPLIER', 'DEALER'].includes(role)) {
+        throw Object.assign(new Error('Email/password registration is only for Supplier and Dealer'), { statusCode: 400 });
+    }
+    if (!email || !password) {
+        throw Object.assign(new Error('Email and password are required'), { statusCode: 400 });
+    }
+    if (password.length < 6) {
+        throw Object.assign(new Error('Password must be at least 6 characters'), { statusCode: 400 });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const formattedPhone = phone ? formatPhone(phone) : null;
+    const displayName = ownerName || name || businessName || 'AgriMart User';
+
+    const existing = await prisma.user.findFirst({
+        where: {
+            OR: [
+                { email: normalizedEmail },
+                ...(formattedPhone ? [{ phone: formattedPhone }] : []),
+            ],
+        },
+    });
+    if (existing) {
+        throw Object.assign(new Error('An account with this email or phone already exists'), { statusCode: 409 });
+    }
+
+    const passwordHash = bcrypt.hashSync(password, 10);
+    const user = await prisma.user.create({
+        data: {
+            email: normalizedEmail,
+            phone: formattedPhone,
+            name: displayName,
+            role,
+            language: 'english',
+            passwordHash,
+            isVerified: false,
+            isActive: true,
+        },
+    });
+
+    if (role === 'SUPPLIER') {
+        await prisma.supplier.create({
+            data: {
+                userId: user.id,
+                businessName: businessName || displayName,
+                gstNumber: gstin || null,
+                address: city || '',
+                district: district || 'Nashik',
+                pincode: '',
+                docStatus: 'PENDING',
+            },
+        });
+    } else {
+        await prisma.dealer.create({
+            data: {
+                userId: user.id,
+                businessName: businessName || displayName,
+                address: apmcYard || '',
+                district: district || 'Nashik',
+                pincode: '',
+                docStatus: 'PENDING',
+            },
+        });
+    }
+
+    const fullUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        include: { farmer: true, supplier: true, dealer: true },
+    });
+    return issueAuthSession(fullUser, { pendingVerification: false });
+};
+
+module.exports = {
+    sendOTP, verifyOTP, googleSignIn, refreshToken, completeOnboarding, logout,
+    invalidateUserCache, loginWithPassword, registerWithPassword,
+};
