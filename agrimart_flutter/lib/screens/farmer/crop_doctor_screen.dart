@@ -7,6 +7,7 @@ import 'package:agrimart/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../core/widgets/offline_banner.dart';
+import '../../../core/errors/app_exceptions.dart';
 import '../../../data/services/api_service.dart';
 import '../../core/utils/responsive.dart';
 
@@ -43,7 +44,7 @@ class _CropDoctorScreenState extends ConsumerState<CropDoctorScreen> {
       setState(() { _result = res; _isAnalyzing = false; });
       ref.invalidate(_diagnoseHistoryProvider);
     } catch (e) {
-      setState(() { _error = l10n.analysisFailed; _isAnalyzing = false; });
+      setState(() { _error = extractUserFacingError(e); _isAnalyzing = false; });
     }
   }
 

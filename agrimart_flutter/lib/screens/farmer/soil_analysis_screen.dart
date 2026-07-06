@@ -11,6 +11,7 @@ import 'package:agrimart/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_shimmer.dart';
+import '../../core/errors/app_exceptions.dart';
 import '../../core/utils/responsive.dart';
 
 class SoilAnalysisScreen extends ConsumerStatefulWidget {
@@ -65,7 +66,7 @@ class _SoilAnalysisScreenState extends ConsumerState<SoilAnalysisScreen> {
       setState(() => _analyzing = false);
       if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Analysis failed: $e'),
+            content: Text(extractUserFacingError(e)),
             backgroundColor: AppColors.error));
     }
   }

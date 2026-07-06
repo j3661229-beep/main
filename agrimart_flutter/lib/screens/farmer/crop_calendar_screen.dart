@@ -6,6 +6,8 @@ import '../../core/widgets/agri_ui.dart';
 import '../../core/widgets/shared_widgets.dart';
 import '../../data/providers/app_providers.dart';
 import '../../data/providers/auth_provider.dart';
+import '../../core/widgets/app_fallback.dart';
+import '../../core/errors/app_exceptions.dart';
 import '../../core/utils/responsive.dart';
 
 class CropCalendarScreen extends ConsumerWidget {
@@ -27,7 +29,13 @@ class CropCalendarScreen extends ConsumerWidget {
       onRefresh: () async => ref.invalidate(cropCalendarProvider(key)),
       body: calendar.when(
         loading: () => const Padding(padding: EdgeInsets.all(40), child: Center(child: CircularProgressIndicator())),
-        error: (e, _) => Padding(padding: const EdgeInsets.all(24), child: Center(child: Text('Could not load: $e'))),
+        error: (e, _) => Padding(
+          padding: const EdgeInsets.all(24),
+          child: AppErrorState(
+            message: extractUserFacingError(e),
+            onRetry: () => ref.invalidate(cropCalendarProvider(key)),
+          ),
+        ),
         data: (data) {
           final activities = (data['activities'] as List?) ?? [];
           if (activities.isEmpty) {

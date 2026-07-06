@@ -9,6 +9,7 @@ import '../../services/voice_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/location_helper.dart';
+import '../../core/errors/app_exceptions.dart';
 import '../../core/utils/responsive.dart';
 
 class CropAdvisorScreen extends ConsumerStatefulWidget {
@@ -78,7 +79,7 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('AI Error: $e'), backgroundColor: AppColors.error));
+            content: Text(extractUserFacingError(e)), backgroundColor: AppColors.error));
       }
     } finally {
       setState(() => _loading = false);

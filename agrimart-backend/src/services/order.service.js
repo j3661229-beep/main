@@ -2,78 +2,75 @@ const prisma = require('../config/database');
 const { sendNotification } = require('./onesignal.service');
 
 const createOrder = async (farmerId, { deliveryAddress, deliveryLat, deliveryLng, notes, paymentMethod }) => {
-    // Get cart
     const cart = await prisma.cart.findUnique({
         where: { farmerId },
         include: { items: { include: { product: { include: { supplier: true } } } } },
     });
     if (!cart || cart.items.length === 0) throw Object.assign(new Error('Cart is empty'), { statusCode: 400 });
 
-    // Validate stock
     for (const item of cart.items) {
+        if (!item.product.isActive) {
+            throw Object.assign(new Error(`${item.product.name} is no longer available`), { statusCode: 400 });
+        }
         if (item.product.stockQuantity < item.quantity) {
             throw Object.assign(new Error(`Insufficient stock for ${item.product.name}`), { statusCode: 400 });
         }
     }
 
     const totalAmount = cart.items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-    const method = paymentMethod || 'cod';
+    const method = (paymentMethod || 'cod').toLowerCase();
     const isCod = method === 'cod';
 
-    const order = await prisma.$transaction(async (tx) => {
-        const newOrder = await tx.order.create({
-            data: {
-                farmerId,
-                totalAmount,
-                deliveryAddress,
-                deliveryLat: deliveryLat ? parseFloat(deliveryLat) : null,
-                deliveryLng: deliveryLng ? parseFloat(deliveryLng) : null,
-                notes,
-                paymentMethod: method,
-                status: isCod ? 'PROCESSING' : 'PENDING',
-                paymentStatus: 'PENDING',
-                items: {
-                    create: cart.items.map(item => ({
-                        productId: item.productId,
-                        supplierId: item.product.supplierId,
-                        quantity: item.quantity,
-                        price: item.product.price * item.quantity,
-                    })),
-                },
+    // Use sequential writes — interactive $transaction fails on Supabase PgBouncer pooler
+    const newOrder = await prisma.order.create({
+        data: {
+            farmerId,
+            totalAmount,
+            deliveryAddress,
+            deliveryLat: deliveryLat ? parseFloat(deliveryLat) : null,
+            deliveryLng: deliveryLng ? parseFloat(deliveryLng) : null,
+            notes,
+            paymentMethod: method,
+            status: isCod ? 'PROCESSING' : 'PENDING',
+            paymentStatus: 'PENDING',
+            items: {
+                create: cart.items.map((item) => ({
+                    productId: item.productId,
+                    supplierId: item.product.supplierId,
+                    quantity: item.quantity,
+                    price: item.product.price * item.quantity,
+                })),
             },
-            include: { items: { include: { product: true, supplier: { include: { user: true } } } } },
-        });
+        },
+        include: { items: { include: { product: true, supplier: { include: { user: true } } } } },
+    });
 
-        if (isCod) {
-            // Deduct stock immediately
-            for (const item of cart.items) {
-                await tx.product.update({
-                    where: { id: item.productId },
-                    data: { stockQuantity: { decrement: item.quantity } }
-                });
-            }
-            // Create payment record
-            await tx.payment.create({
-                data: { orderId: newOrder.id, amount: totalAmount, status: 'PENDING', method: 'cod' }
+    if (isCod) {
+        for (const item of cart.items) {
+            await prisma.product.update({
+                where: { id: item.productId },
+                data: { stockQuantity: { decrement: item.quantity } },
             });
         }
-
-        // Clear cart
-        await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
-        return newOrder;
-    });
-
-    // Notify Suppliers (Don't await)
-    order.items.forEach(item => {
-        sendNotification({
-            users: [item.supplier.user.id],
-            title: 'New Order Received! 📦',
-            message: `You have a new order for ${item.product.name} from a farmer.`,
-            data: { orderId: order.id, type: 'ORDER' }
+        await prisma.payment.create({
+            data: { orderId: newOrder.id, amount: totalAmount, status: 'PENDING', method: 'cod' },
         });
+    }
+
+    await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
+
+    newOrder.items.forEach((item) => {
+        if (item.supplier?.user?.id) {
+            sendNotification({
+                users: [item.supplier.user.id],
+                title: 'New Order Received! 📦',
+                message: `You have a new order for ${item.product.name} from a farmer.`,
+                data: { orderId: newOrder.id, type: 'ORDER' },
+            });
+        }
     });
 
-    return order;
+    return newOrder;
 };
 
 const getOrders = async (farmerId, { page, limit, skip }) => {
@@ -109,21 +106,19 @@ const cancelOrder = async (farmerId, orderId) => {
 const getTracking = async (farmerId, orderId) => {
     const order = await getOrder(farmerId, orderId);
 
-    // Standard Delivery Tracking Map
     const trackingMap = [
         { status: 'PENDING', label: 'Order Placed' },
         { status: 'PROCESSING', label: 'Preparing Order' },
         { status: 'DISPATCHED', label: 'Dispatched' },
         { status: 'OUT_FOR_DELIVERY', label: 'Out for Delivery' },
-        { status: 'DELIVERED', label: 'Delivered' }
+        { status: 'DELIVERED', label: 'Delivered' },
     ];
 
-    // Normalize DB status to one of these if needed
     let currentStatus = order.status;
     if (currentStatus === 'PAYMENT_CONFIRMED') currentStatus = 'PENDING';
 
-    let currentIndex = trackingMap.findIndex(s => s.status === currentStatus);
-    if (currentIndex === -1) currentIndex = 0; // fallback if cancelled or weird
+    let currentIndex = trackingMap.findIndex((s) => s.status === currentStatus);
+    if (currentIndex === -1) currentIndex = 0;
 
     return {
         order,

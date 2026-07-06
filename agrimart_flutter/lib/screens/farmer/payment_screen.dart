@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/shared_widgets.dart';
+import '../../../core/errors/app_exceptions.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/providers/app_providers.dart';
 import '../../../data/services/api_service.dart';
@@ -109,7 +110,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
         ));
       }
     } catch (e) {
-      setState(() { _isProcessing = false; _error = e.toString().replaceAll('Exception: ', ''); });
+      setState(() { _isProcessing = false; _error = extractUserFacingError(e); });
     }
   }
 

@@ -9,6 +9,40 @@ const { getVertexClient } = require('../config/vertexai');
 const GEMINI_PRIMARY = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const GEMINI_FALLBACK = process.env.GEMINI_FALLBACK_MODEL || 'gemini-2.5-flash-lite';
 
+/** Models verified to work on Vertex AI (europe-west1 / asia-south1). */
+const KNOWN_GOOD_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+
+/** Block invalid env overrides (e.g. gemini-2.0-flash-lite returns 404). */
+const BLOCKED_MODEL_PATTERNS = [/gemini-2\.0-flash-lite/i, /gemini-2\.0-flash$/i];
+
+const resolveVertexModels = () => {
+    const fromEnv = [GEMINI_PRIMARY, GEMINI_FALLBACK]
+        .filter(Boolean)
+        .map((m) => m.trim())
+        .filter((m) => !BLOCKED_MODEL_PATTERNS.some((re) => re.test(m)));
+    return [...new Set([...fromEnv, ...KNOWN_GOOD_MODELS])];
+};
+
+const friendlyAiError = (err) => {
+    const msg = err?.message || String(err);
+    if (msg.includes('NOT_FOUND') || msg.includes('not found') || msg.includes('404')) {
+        return Object.assign(
+            new Error('AI service is temporarily unavailable. Please try again in a minute.'),
+            { statusCode: 503 }
+        );
+    }
+    if (msg.includes('not configured') || msg.includes('Vertex AI')) {
+        return Object.assign(
+            new Error('AI service is not configured on the server. Contact support.'),
+            { statusCode: 503 }
+        );
+    }
+    return Object.assign(
+        new Error('AI analysis failed. Please try again with a clearer photo.'),
+        { statusCode: 502 }
+    );
+};
+
 const GROQ_CHAT_MODELS = (process.env.GROQ_CHAT_MODELS || 'llama-3.3-70b-versatile,llama-3.1-8b-instant')
     .split(',')
     .map((m) => m.trim())
@@ -57,13 +91,14 @@ const generateWithFallback = async (prompt, imageBase64 = null) => {
     }
 
     let lastError;
-    const modelsToTry = [GEMINI_PRIMARY, GEMINI_FALLBACK].filter((v, i, a) => a.indexOf(v) === i);
+    const modelsToTry = resolveVertexModels();
     const contents = buildContents(prompt, imageBase64);
 
     for (const modelName of modelsToTry) {
         try {
             const response = await ai.models.generateContent({ model: modelName, contents });
             const text = response.text;
+            if (!text?.trim()) throw new Error('Empty AI response');
             logger.info(`Vertex AI generation succeeded with model: ${modelName}`);
             return text;
         } catch (e) {
@@ -72,7 +107,7 @@ const generateWithFallback = async (prompt, imageBase64 = null) => {
             lastError = e;
         }
     }
-    throw lastError || new Error('All Vertex AI fallback models failed during generation.');
+    throw friendlyAiError(lastError);
 };
 
 const soilAnalysis = async (farmerId, imageBuffer, originalName, { location = '', language = 'English' } = {}) => {
