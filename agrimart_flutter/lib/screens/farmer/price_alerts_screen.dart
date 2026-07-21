@@ -81,9 +81,9 @@ class _PriceAlertsScreenState extends ConsumerState<PriceAlertsScreen> {
               tint: AppColors.warningTint,
               icon: Icons.notifications_active_outlined,
             ),
-            const SizedBox(height: 24),
-            Text('New alert', style: GoogleFonts.spaceGrotesk(fontSize: 17, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 12),
+            SizedBox(height: r.rh(24)),
+            Text('New alert', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(17), fontWeight: FontWeight.w700)),
+            SizedBox(height: r.rh(12)),
             AgriCard(
               child: Column(
                 children: [
@@ -98,7 +98,7 @@ class _PriceAlertsScreenState extends ConsumerState<PriceAlertsScreen> {
                         .toList(),
                     onChanged: (v) => _cropCtrl.text = v ?? '',
                   ),
-                  const Divider(height: 1),
+                  Divider(height: r.rh(1)),
                   TextField(
                     controller: _priceCtrl,
                     keyboardType: TextInputType.number,
@@ -112,7 +112,7 @@ class _PriceAlertsScreenState extends ConsumerState<PriceAlertsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: r.rh(16)),
             AppButton(
               label: 'Set Alert',
               onTap: _createAlert,
@@ -120,11 +120,11 @@ class _PriceAlertsScreenState extends ConsumerState<PriceAlertsScreen> {
               color: AppColors.farmerAccent,
               icon: Icons.notifications_active_outlined,
             ),
-            const SizedBox(height: 28),
-            Text('Your alerts', style: GoogleFonts.spaceGrotesk(fontSize: 17, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 12),
+            SizedBox(height: r.rh(28)),
+            Text('Your alerts', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(17), fontWeight: FontWeight.w700)),
+            SizedBox(height: r.rh(12)),
             alerts.when(
-              loading: () => const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator())),
+              loading: () => Center(child: Padding(padding: EdgeInsets.all(r.rs(24)), child: CircularProgressIndicator())),
               error: (e, _) => Text('Could not load alerts: $e'),
               data: (list) {
                 if (list.isEmpty) {
@@ -139,7 +139,7 @@ class _PriceAlertsScreenState extends ConsumerState<PriceAlertsScreen> {
                     final map = a as Map;
                     final active = map['isActive'] != false;
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
+                      padding: EdgeInsets.only(bottom: r.rh(10)),
                       child: AgriListTile(
                         emoji: active ? '🎯' : '✅',
                         title: map['cropName'] ?? '',

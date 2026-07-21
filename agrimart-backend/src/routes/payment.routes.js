@@ -7,6 +7,7 @@ const paymentController = require('../controllers/payment.controller');
 router.post('/verify-upi', authenticate, requireFarmer, apiLimiter, paymentController.verifyUpi);
 router.post('/cod', authenticate, requireFarmer, apiLimiter, paymentController.confirmCashOnDelivery);
 router.get('/:orderId/upi-details', authenticate, requireFarmer, apiLimiter, paymentController.getUpiDetails);
+// Any authenticated user can request payment details; controller enforces order ownership
 router.get('/:orderId', authenticate, apiLimiter, paymentController.getPayment);
 
 module.exports = router;

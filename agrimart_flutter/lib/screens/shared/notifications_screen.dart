@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/widgets/app_fallback.dart';
+import '../../core/widgets/agri_ui.dart';
+import '../../core/widgets/shared_widgets.dart';
 import '../../core/utils/responsive.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
+
+  static const _typeEmoji = {
+    'ORDER': '📦',
+    'WEATHER': '☀️',
+    'PRICE_ALERT': '📈',
+    'SCHEME': '🏛️',
+    'ADVISORY': '🌾',
+    'GENERAL': '📢',
+  };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -15,56 +25,85 @@ class NotificationsScreen extends ConsumerWidget {
     final notifications = ref.watch(notificationsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('🔔 Notifications'), backgroundColor: AppColors.primary, actions: [
-        TextButton(onPressed: () {}, child: Text('Mark All Read', style: TextStyle(color: Colors.white70, fontSize: 13))),
-      ]),
-      body: notifications.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => AppErrorState(
-          message: e.toString(),
-          onRetry: () => ref.refresh(notificationsProvider),
-        ),
-        data: (data) {
-          final list = data['data'] as List? ?? [];
-          if (list.isEmpty) {
-            return const AppEmptyState(
-              icon: '🔔',
-              title: 'No notifications yet',
-              subtitle: 'You\'ll be notified about orders, prices & weather',
-            );
-          }
-
-          final typeEmoji = {'ORDER': '📦', 'WEATHER': '☀️', 'PRICE_ALERT': '📈', 'SCHEME': '🏛️', 'ADVISORY': '🌾', 'GENERAL': '📢'};
-
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: list.length,
-            itemBuilder: (ctx, i) {
-              final n = list[i] as Map;
-              final isRead = n['isRead'] as bool? ?? false;
-              final type = n['type'] as String? ?? 'GENERAL';
-              return Container(
-                decoration: BoxDecoration(color: isRead ? AppColors.surface : AppColors.primarySurface.withValues(alpha: 0.4), border: Border(bottom: BorderSide(color: AppColors.border))),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  leading: Container(width: 44, height: 44, decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(12)),
-                    child: Center(child: Text(typeEmoji[type] ?? '📢', style: const TextStyle(fontSize: 22)))),
-                  title: Text(n['title'] ?? '', style: AppTextStyles.headingSM.copyWith(fontWeight: isRead ? FontWeight.w500 : FontWeight.w700)),
-                  subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const SizedBox(height: 2),
-                    Text(n['body'] ?? '', style: AppTextStyles.bodySM, maxLines: 2, overflow: TextOverflow.ellipsis),
-                    const SizedBox(height: 4),
-                    Text(n['createdAt']?.toString().split('T').first ?? '', style: AppTextStyles.caption),
-                  ]),
-                  trailing: !isRead ? Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle)) : null,
+      backgroundColor: AppColors.background,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: r.rs(120),
+            pinned: true,
+            backgroundColor: AppColors.farmerAccent,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: r.rs(24)),
+              onPressed: () => Navigator.of(context).maybePop(),
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: const BoxDecoration(gradient: AppColors.farmerGradient),
+                padding: EdgeInsets.fromLTRB(r.horizontalPadding, r.safePadding.top + r.rs(48), r.horizontalPadding, r.rs(16)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('🔔', style: TextStyle(fontSize: r.sp(28))),
+                    SizedBox(height: r.rs(6)),
+                    Text(
+                      'Notifications',
+                      style: GoogleFonts.spaceGrotesk(fontSize: r.sp(24), fontWeight: FontWeight.w800, color: Colors.white),
+                    ),
+                  ],
                 ),
-              );
-            },
-          );
-        },
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: notifications.when(
+              loading: () => Padding(
+                padding: EdgeInsets.all(r.horizontalPadding),
+                child: Column(children: List.generate(4, (_) => Padding(
+                  padding: EdgeInsets.only(bottom: r.rs(12)),
+                  child: ShimmerBox(height: r.rs(90), radius: 18),
+                ))),
+              ),
+              error: (e, _) => EmptyState(
+                emoji: '⚠️',
+                title: 'Could not load',
+                subtitle: e.toString(),
+                actionLabel: 'Retry',
+                onAction: () => ref.invalidate(notificationsProvider),
+              ),
+              data: (data) {
+                final list = data['data'] as List? ?? [];
+                if (list.isEmpty) {
+                  return EmptyState(
+                    emoji: '🔔',
+                    title: 'No notifications yet',
+                    subtitle: 'You\'ll be notified about orders, prices & weather alerts',
+                  );
+                }
+                return Padding(
+                  padding: EdgeInsets.fromLTRB(r.horizontalPadding, r.rs(16), r.horizontalPadding, r.rs(32)),
+                  child: Column(
+                    children: list.map<Widget>((n) {
+                      final map = n as Map;
+                      final type = map['type'] as String? ?? 'GENERAL';
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: r.rs(10)),
+                        child: FarmerNotificationTile(
+                          emoji: _typeEmoji[type] ?? '📢',
+                          title: map['title']?.toString() ?? '',
+                          body: map['body']?.toString() ?? '',
+                          date: map['createdAt']?.toString().split('T').first ?? '',
+                          isRead: map['isRead'] as bool? ?? false,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 }
-
-

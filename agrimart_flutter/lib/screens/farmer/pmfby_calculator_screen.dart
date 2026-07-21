@@ -61,7 +61,7 @@ class _PmfbyCalculatorScreenState extends State<PmfbyCalculatorScreen> {
               tint: AppColors.dealerTint,
               icon: Icons.shield_outlined,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: r.rh(20)),
             AgriCard(
               child: Column(
                 children: [
@@ -71,21 +71,21 @@ class _PmfbyCalculatorScreenState extends State<PmfbyCalculatorScreen> {
                     items: _crops.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                     onChanged: (v) => setState(() => _crop = v ?? _crop),
                   ),
-                  const Divider(height: 1),
+                  Divider(height: r.rh(1)),
                   DropdownButtonFormField<String>(
                     value: _season,
                     decoration: const InputDecoration(labelText: 'Season', border: InputBorder.none),
                     items: _seasons.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
                     onChanged: (v) => setState(() => _season = v ?? _season),
                   ),
-                  const Divider(height: 1),
+                  Divider(height: r.rh(1)),
                   TextField(
                     controller: _areaCtrl,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
                     decoration: const InputDecoration(labelText: 'Insured area (hectares)', border: InputBorder.none),
                   ),
-                  const Divider(height: 1),
+                  Divider(height: r.rh(1)),
                   TextField(
                     controller: _sumInsuredCtrl,
                     keyboardType: TextInputType.number,
@@ -94,29 +94,29 @@ class _PmfbyCalculatorScreenState extends State<PmfbyCalculatorScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: r.rh(20)),
             AppButton(label: 'Calculate Premium', onTap: _calculate, color: AppColors.dealerAccent),
             if (_premium != null) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: r.rh(24)),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(r.rs(24)),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [AppColors.dealerTint, AppColors.dealerTint.withValues(alpha: 0.4)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(r.rs(20)),
                   border: Border.all(color: AppColors.dealerAccent.withValues(alpha: 0.2)),
                 ),
                 child: Column(
                   children: [
                     Text('Estimated farmer premium', style: GoogleFonts.inter(color: AppColors.muted)),
-                    const SizedBox(height: 8),
-                    Text('₹${_premium!.toStringAsFixed(0)}', style: GoogleFonts.spaceGrotesk(fontSize: 36, fontWeight: FontWeight.w800, color: AppColors.dealerAccent)),
-                    const SizedBox(height: 12),
-                    Text('Apply on pmfby.gov.in • Keep field photos for claims', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted), textAlign: TextAlign.center),
+                    SizedBox(height: r.rh(8)),
+                    Text('₹${_premium!.toStringAsFixed(0)}', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(36), fontWeight: FontWeight.w800, color: AppColors.dealerAccent)),
+                    SizedBox(height: r.rh(12)),
+                    Text('Apply on pmfby.gov.in • Keep field photos for claims', style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted), textAlign: TextAlign.center),
                   ],
                 ),
               ),

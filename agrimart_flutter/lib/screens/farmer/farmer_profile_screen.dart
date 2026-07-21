@@ -135,8 +135,8 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: 80,
-                        height: 80,
+                        width: r.rs(80),
+                        height: r.rh(80),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
@@ -146,9 +146,9 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                           child: Text(initials, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(28), fontWeight: FontWeight.w700, color: Colors.white)),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: r.rh(12)),
                       Text(name, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(20), fontWeight: FontWeight.w700, color: Colors.white)),
-                      if (phone.isNotEmpty) Text(phone, style: GoogleFonts.inter(fontSize: 13, color: Colors.white.withValues(alpha: 0.8))),
+                      if (phone.isNotEmpty) Text(phone, style: GoogleFonts.inter(fontSize: r.sp(13), color: Colors.white.withValues(alpha: 0.8))),
                     ],
                   ),
                 ),
@@ -164,10 +164,10 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: EdgeInsets.all(r.rs(20)),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(r.rs(20)),
                         border: Border.all(color: AppColors.border),
                         boxShadow: AppColors.softShadow,
                       ),
@@ -177,14 +177,14 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                           Row(
                             children: [
                               Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(color: AppColors.farmerTint, borderRadius: BorderRadius.circular(10)),
+                                width: r.rs(36),
+                                height: r.rh(36),
+                                decoration: BoxDecoration(color: AppColors.farmerTint, borderRadius: BorderRadius.circular(r.rs(10))),
                                 child: Center(child: Text('🌾', style: TextStyle(fontSize: r.sp(18)))),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: r.rs(12)),
                               Expanded(
-                                child: Text(l10n.farmDetails, style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.ink)),
+                                child: Text(l10n.farmDetails, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(15), fontWeight: FontWeight.w700, color: AppColors.ink)),
                               ),
                               TextButton(
                                 onPressed: () {
@@ -195,13 +195,13 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: r.rh(16)),
                           if (_editing) ...[
                             _EditField(label: l10n.villageLabel, controller: _villageCtrl),
                             _EditField(label: l10n.districtLabel, controller: _districtCtrl),
                             _EditField(label: l10n.landSizeLabel, controller: _landCtrl, keyboard: TextInputType.number),
                             _EditField(label: l10n.cropsLabel, controller: _cropsCtrl),
-                            const SizedBox(height: 12),
+                            SizedBox(height: r.rh(12)),
                             AppButton(
                               label: l10n.saveChanges,
                               onTap: _saving ? null : () => _saveProfile(l10n),
@@ -218,13 +218,13 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Text(l10n.settings, style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.ink)),
-                    const SizedBox(height: 10),
+                    SizedBox(height: r.rh(20)),
+                    Text(l10n.settings, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(15), fontWeight: FontWeight.w700, color: AppColors.ink)),
+                    SizedBox(height: r.rh(10)),
                     Container(
                       decoration: BoxDecoration(
                         color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(r.rs(16)),
                         border: Border.all(color: AppColors.border),
                         boxShadow: AppColors.softShadow,
                       ),
@@ -237,11 +237,11 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                             trailing: _languageLabel(l10n),
                             onTap: () => showLanguagePickerSheet(context, ref),
                           ),
-                          const Divider(height: 1, color: AppColors.border),
+                          Divider(height: r.rh(1), color: AppColors.border),
                           _SettingsTile(icon: Icons.notifications_outlined, color: AppColors.supplierAccent, label: l10n.notifications, onTap: () => context.push('/notifications')),
-                          const Divider(height: 1, color: AppColors.border),
+                          Divider(height: r.rh(1), color: AppColors.border),
                           _SettingsTile(icon: Icons.help_outline_rounded, color: AppColors.dealerAccent, label: l10n.helpSupport, onTap: () => _showHelpSheet(context, l10n)),
-                          const Divider(height: 1, color: AppColors.border),
+                          Divider(height: r.rh(1), color: AppColors.border),
                           _SettingsTile(
                             icon: Icons.logout_rounded,
                             color: AppColors.danger,
@@ -252,8 +252,8 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 32),
-                    Center(child: Text('AgriMart v1.0.0', style: GoogleFonts.inter(fontSize: 12, color: AppColors.placeholder))),
+                    SizedBox(height: r.rh(32)),
+                    Center(child: Text('AgriMart v1.0.0', style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.placeholder))),
                     SizedBox(height: r.bottomNavInset),
                   ],
                 ),
@@ -266,22 +266,23 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
   }
 
   void _showHelpSheet(BuildContext context, AppLocalizations l10n) {
+    final r = context.r;
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(r.rs(24)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('💬 ${l10n.helpSupport}', style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 12),
+            Text('💬 ${l10n.helpSupport}', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700)),
+            SizedBox(height: r.rh(12)),
             Text(
               'Kisan Helpline: 1800-120-120\nEmail: support@agrimart.in',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 14, height: 1.5, color: AppColors.muted),
+              style: GoogleFonts.inter(fontSize: r.sp(14), height: 1.5, color: AppColors.muted),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: r.rh(20)),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -296,10 +297,11 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
   }
 
   Future<void> _confirmLogout(BuildContext context, WidgetRef ref, AppLocalizations l10n) async {
+    final r = context.r;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(r.rs(20))),
         title: Text(l10n.logOutConfirmTitle, style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700)),
         content: Text(l10n.logOutConfirmMessage, style: GoogleFonts.inter()),
         actions: [
@@ -323,8 +325,9 @@ class _EditField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: r.rh(12)),
       child: TextField(
         controller: controller,
         keyboardType: keyboard,
@@ -332,7 +335,7 @@ class _EditField extends StatelessWidget {
           labelText: label,
           filled: true,
           fillColor: AppColors.background,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(r.rs(12)), borderSide: BorderSide(color: AppColors.border)),
         ),
       ),
     );
@@ -343,16 +346,19 @@ class _InfoRow extends StatelessWidget {
   final String label, value;
   const _InfoRow({required this.label, required this.value});
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Padding(
+    padding: EdgeInsets.symmetric(vertical: r.rh(6)),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
-        Flexible(child: Text(value, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.ink), textAlign: TextAlign.right)),
+        Text(label, style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.muted)),
+        Flexible(child: Text(value, style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w500, color: AppColors.ink), textAlign: TextAlign.right)),
       ],
     ),
   );
+  }
 }
 
 class _SettingsTile extends StatelessWidget {
@@ -366,18 +372,19 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return ListTile(
       onTap: onTap,
       leading: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-        child: Icon(icon, color: color, size: 20),
+        width: r.rs(36),
+        height: r.rh(36),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(r.rs(10))),
+        child: Icon(icon, color: color, size: r.sp(20)),
       ),
-      title: Text(label, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: textColor ?? AppColors.ink)),
+      title: Text(label, style: GoogleFonts.inter(fontSize: r.sp(14), fontWeight: FontWeight.w500, color: textColor ?? AppColors.ink)),
       trailing: trailing != null
-          ? Text(trailing!, style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted))
-          : (textColor != null ? null : const Icon(Icons.chevron_right_rounded, color: AppColors.muted, size: 20)),
+          ? Text(trailing!, style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.muted))
+          : (textColor != null ? null : Icon(Icons.chevron_right_rounded, color: AppColors.muted, size: r.sp(20))),
     );
   }
 }

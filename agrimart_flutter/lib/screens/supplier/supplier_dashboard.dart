@@ -35,7 +35,7 @@ class SupplierDashboard extends ConsumerWidget {
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
                   decoration: const BoxDecoration(gradient: AppColors.supplierGradient),
-                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
+                  padding: EdgeInsets.fromLTRB(r.rs(20), r.rh(60), r.rs(20), r.rh(20)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -45,33 +45,33 @@ class SupplierDashboard extends ConsumerWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Welcome back', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.8))),
-                                const SizedBox(height: 2),
-                                Text(bizName, style: GoogleFonts.spaceGrotesk(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white)),
+                                Text('Welcome back', style: GoogleFonts.inter(fontSize: r.sp(12), color: Colors.white.withValues(alpha: 0.8))),
+                                SizedBox(height: r.rh(2)),
+                                Text(bizName, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(22), fontWeight: FontWeight.w700, color: Colors.white)),
                               ],
                             ),
                           ),
                           if (!isVerified)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              padding: EdgeInsets.symmetric(horizontal: r.rs(10), vertical: r.rh(5)),
                               decoration: BoxDecoration(
                                 color: AppColors.warningTint,
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(r.rs(20)),
                               ),
                               child: Row(children: [
-                                const Icon(Icons.schedule_rounded, color: AppColors.warning, size: 14),
-                                const SizedBox(width: 4),
-                                Text('Pending', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.warning)),
+                                Icon(Icons.schedule_rounded, color: AppColors.warning, size: r.sp(14)),
+                                SizedBox(width: r.rs(4)),
+                                Text('Pending', style: GoogleFonts.inter(fontSize: r.sp(11), fontWeight: FontWeight.w600, color: AppColors.warning)),
                               ]),
                             )
                           else
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(color: AppColors.successTint, borderRadius: BorderRadius.circular(20)),
+                              padding: EdgeInsets.symmetric(horizontal: r.rs(10), vertical: r.rh(5)),
+                              decoration: BoxDecoration(color: AppColors.successTint, borderRadius: BorderRadius.circular(r.rs(20))),
                               child: Row(children: [
-                                const Icon(Icons.verified_rounded, color: AppColors.success, size: 14),
-                                const SizedBox(width: 4),
-                                Text('Verified', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.success)),
+                                Icon(Icons.verified_rounded, color: AppColors.success, size: r.sp(14)),
+                                SizedBox(width: r.rs(4)),
+                                Text('Verified', style: GoogleFonts.inter(fontSize: r.sp(11), fontWeight: FontWeight.w600, color: AppColors.success)),
                               ]),
                             ),
                         ],
@@ -121,11 +121,11 @@ class SupplierDashboard extends ConsumerWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    SizedBox(height: r.rh(24)),
 
                     // ── Quick Actions ─────────────────────────
                     Text('Quick Actions', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(16), fontWeight: FontWeight.w700, color: AppColors.ink)),
-                    const SizedBox(height: 12),
+                    SizedBox(height: r.rh(12)),
                     Row(
                       children: [
                         Expanded(
@@ -135,7 +135,7 @@ class SupplierDashboard extends ConsumerWidget {
                             onTap: () => context.push('/supplier/add-product'),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: r.rs(12)),
                         Expanded(
                           child: _QuickBtn(
                             emoji: '📦', label: 'View Orders',
@@ -146,7 +146,7 @@ class SupplierDashboard extends ConsumerWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 24),
+                    SizedBox(height: r.rh(24)),
 
                     // ── Recent Orders ─────────────────────────
                     SectionHeader(title: 'Recent Orders', actionLabel: 'View all', onAction: () => context.push('/supplier/orders')),
@@ -156,33 +156,33 @@ class SupplierDashboard extends ConsumerWidget {
                       data: (d) {
                         final orders = (d['recentOrders'] as List?) ?? [];
                         if (orders.isEmpty) return Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border)),
+                          padding: EdgeInsets.all(r.rs(24)),
+                          decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(r.rs(16)), border: Border.all(color: AppColors.border)),
                           child: const EmptyState(emoji: '📦', title: 'No orders yet', subtitle: 'Orders will appear here'),
                         );
                         return Container(
-                          decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border), boxShadow: AppColors.softShadow),
+                          decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(r.rs(16)), border: Border.all(color: AppColors.border), boxShadow: AppColors.softShadow),
                           child: Column(
                             children: List.generate(orders.take(2).length, (i) {
                               final o = orders[i] as Map;
                               return Column(children: [
                                 Padding(
-                                  padding: const EdgeInsets.all(14),
+                                  padding: EdgeInsets.all(r.rs(14)),
                                   child: Row(children: [
-                                    Container(width: 40, height: 40, decoration: BoxDecoration(color: AppColors.supplierTint, borderRadius: BorderRadius.circular(10)), child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(20))))),
-                                    const SizedBox(width: 12),
+                                    Container(width: 40, height: 40, decoration: BoxDecoration(color: AppColors.supplierTint, borderRadius: BorderRadius.circular(r.rs(10))), child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(20))))),
+                                    SizedBox(width: r.rs(12)),
                                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                      Text(o['farmerName'] ?? 'Farmer', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500)),
-                                      Text(o['productName'] ?? 'Product', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+                                      Text(o['farmerName'] ?? 'Farmer', style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w500)),
+                                      Text(o['productName'] ?? 'Product', style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
                                     ])),
                                     Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                                      Text(formatRupee((o['amount'] as num?) ?? 0), style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w700)),
-                                      const SizedBox(height: 4),
+                                      Text(formatRupee((o['amount'] as num?) ?? 0), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(13), fontWeight: FontWeight.w700)),
+                                      SizedBox(height: r.rh(4)),
                                       BadgeChip.status(o['status'] ?? 'Pending'),
                                     ]),
                                   ]),
                                 ),
-                                if (i < 1) const Divider(height: 1, color: AppColors.border),
+                                if (i < 1) Divider(height: r.rh(1), color: AppColors.border),
                               ]);
                             }),
                           ),
@@ -231,18 +231,18 @@ class _QuickBtn extends StatelessWidget {
     return GestureDetector(
     onTap: onTap,
     child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 18),
+      padding: EdgeInsets.symmetric(vertical: r.rh(18)),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(r.rs(16)),
         border: Border.all(color: AppColors.border),
         boxShadow: AppColors.softShadow,
       ),
       child: Column(
         children: [
-          Container(width: 40, height: 40, decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(12)), child: Center(child: Text(emoji, style: TextStyle(fontSize: r.sp(20))))),
-          const SizedBox(height: 8),
-          Text(label, style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.ink)),
+          Container(width: 40, height: 40, decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(r.rs(12))), child: Center(child: Text(emoji, style: TextStyle(fontSize: r.sp(20))))),
+          SizedBox(height: r.rh(8)),
+          Text(label, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(13), fontWeight: FontWeight.w600, color: AppColors.ink)),
         ],
       ),
     ),

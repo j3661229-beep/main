@@ -1,12 +1,13 @@
 const authService = require('../services/auth.service');
 const { success, error } = require('../utils/apiResponse');
+const { assessFarmerProfile } = require('../utils/farmerProfile.util');
 
 const sendOTP = async (req, res, next) => {
     try {
         const { phone, role } = req.body;
         if (!phone) return error(res, 'Phone number is required');
         const data = await authService.sendOTP(phone, role || 'FARMER');
-        success(res, data, 'OTP sent to WhatsApp');
+        success(res, data, 'OTP sent to your phone');
     } catch (err) { next(err); }
 };
 
@@ -15,7 +16,10 @@ const googleSignIn = async (req, res, next) => {
         const { email, googleId, name, photoUrl, role } = req.body;
         if (!email || !googleId) return error(res, 'Google ID and Email are required');
         const data = await authService.googleSignIn({ email, googleId, name, photoUrl, role });
-        success(res, data, 'Google Login successful');
+        const farmSetup = data.user?.role === 'FARMER' && data.user?.farmer
+            ? assessFarmerProfile(data.user.farmer)
+            : { isComplete: true };
+        success(res, { ...data, farmSetup }, 'Google Login successful');
     } catch (err) { next(err); }
 };
 
@@ -24,7 +28,10 @@ const verifyOTP = async (req, res, next) => {
         const { phone, otp, name, language, role } = req.body;
         if (!phone || !otp) return error(res, 'Phone and OTP are required');
         const data = await authService.verifyOTP({ phone, otp, name, language, role });
-        success(res, data, 'Login successful');
+        const farmSetup = data.user?.role === 'FARMER' && data.user?.farmer
+            ? assessFarmerProfile(data.user.farmer)
+            : { isComplete: true };
+        success(res, { ...data, farmSetup }, 'Login successful');
     } catch (err) { next(err); }
 };
 
@@ -46,14 +53,21 @@ const logout = async (req, res, next) => {
 
 const me = async (req, res, next) => {
     try {
-        success(res, { user: req.user });
+        const user = req.user;
+        const farmSetup = user?.role === 'FARMER' && user?.farmer
+            ? assessFarmerProfile(user.farmer)
+            : { isComplete: true };
+        success(res, { user, farmSetup });
     } catch (err) { next(err); }
 };
 
 const completeOnboarding = async (req, res, next) => {
     try {
-        const data = await authService.completeOnboarding(req.user.id, req.user.role, req.body);
-        success(res, data, 'Profile setup complete');
+        const user = await authService.completeOnboarding(req.user.id, req.user.role, req.body);
+        const farmSetup = user?.role === 'FARMER' && user?.farmer
+            ? assessFarmerProfile(user.farmer)
+            : { isComplete: true };
+        success(res, { user, farmSetup }, 'Profile setup complete');
     } catch (err) { next(err); }
 };
 
@@ -62,7 +76,10 @@ const login = async (req, res, next) => {
         const { emailOrPhone, password, role } = req.body;
         if (!emailOrPhone || !password) return error(res, 'Email/phone and password are required');
         const data = await authService.loginWithPassword({ emailOrPhone, password, role });
-        success(res, data, 'Login successful');
+        const farmSetup = data.user?.role === 'FARMER' && data.user?.farmer
+            ? assessFarmerProfile(data.user.farmer)
+            : { isComplete: true };
+        success(res, { ...data, farmSetup }, 'Login successful');
     } catch (err) { next(err); }
 };
 

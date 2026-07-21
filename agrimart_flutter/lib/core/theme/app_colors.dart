@@ -50,6 +50,12 @@ class AppColors {
   static const Color errorSurface  = dangerTint;
   static const Color successSurface = successTint;
 
+  // ── Extra legacy aliases (unused v1 screens still reference these) ──
+  static const Color amber          = warning;
+  static const Color amberSurface   = warningTint;
+  static const Color amberLight     = Color(0xFFFBBF24);
+  static const Color surfaceVariant = surfaceCard;
+
   // ── Gradients ────────────────────────────────────────────
   static const LinearGradient farmerGradient = LinearGradient(
     colors: [Color(0xFF2A4C25), Color(0xFF3D6B35), Color(0xFF5A9247)],

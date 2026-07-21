@@ -27,9 +27,9 @@ class MyOrdersScreen extends ConsumerWidget {
         onRefresh: () async => ref.invalidate(ordersProvider),
         child: orders.when(
           loading: () => ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(r.rs(16)),
             itemCount: 5,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            separatorBuilder: (_, __) => SizedBox(height: r.rh(12)),
             itemBuilder: (_, __) => const ShimmerBox(height: 90, radius: 16),
           ),
           error: (e, _) => EmptyState(
@@ -48,9 +48,9 @@ class MyOrdersScreen extends ConsumerWidget {
               );
             }
             return ListView.separated(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(r.rs(16)),
               itemCount: list.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, __) => SizedBox(height: r.rh(12)),
               itemBuilder: (_, i) => _OrderCard(order: list[i]),
             );
           },
@@ -77,41 +77,41 @@ class _OrderCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.push('/farmer/orders/$orderId/tracking'),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(r.rs(16)),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(r.rs(16)),
           border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
           boxShadow: AppColors.softShadow,
         ),
         child: Row(
           children: [
             Container(
-              width: 52, height: 52,
-              decoration: BoxDecoration(color: AppColors.farmerTint, borderRadius: BorderRadius.circular(14)),
+              width: r.rs(52), height: 52,
+              decoration: BoxDecoration(color: AppColors.farmerTint, borderRadius: BorderRadius.circular(r.rs(14))),
               child: Center(child: Text('📦', style: TextStyle(fontSize: r.sp(26)))),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: r.rs(14)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(productName, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 2),
-                  Text(supplierName, style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+                  Text(productName, style: GoogleFonts.inter(fontSize: r.sp(14), fontWeight: FontWeight.w600, color: AppColors.ink), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  SizedBox(height: r.rh(2)),
+                  Text(supplierName, style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
                   if (createdAt != null) ...[
-                    const SizedBox(height: 4),
-                    Text(_formatDate(createdAt), style: GoogleFonts.inter(fontSize: 11, color: AppColors.placeholder)),
+                    SizedBox(height: r.rh(4)),
+                    Text(_formatDate(createdAt), style: GoogleFonts.inter(fontSize: r.sp(11), color: AppColors.placeholder)),
                   ],
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: r.rs(8)),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(formatRupee(amount), style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.ink)),
-                const SizedBox(height: 6),
+                Text(formatRupee(amount), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(15), fontWeight: FontWeight.w700, color: AppColors.ink)),
+                SizedBox(height: r.rh(6)),
                 BadgeChip.status(status),
               ],
             ),

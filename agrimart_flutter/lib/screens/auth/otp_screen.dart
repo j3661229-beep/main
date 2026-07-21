@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/constants/indian_languages.dart';
+import '../../core/providers/locale_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/shared_widgets.dart';
 import '../../data/providers/auth_provider.dart';
@@ -31,7 +33,12 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   void initState() {
     super.initState();
     _startTimer();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+      if (IndianLanguages.isSupported(widget.language)) {
+        ref.read(localeProvider.notifier).setLocale(Locale(widget.language));
+      }
+    });
   }
 
   void _startTimer() {
@@ -67,6 +74,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
         role: widget.role,
         language: widget.language,
       );
+      if (!mounted) return;
+      final setupComplete = ref.read(authProvider).farmSetupComplete;
+      setState(() => _isLoading = false);
+      context.go(setupComplete ? '/farmer' : '/farmer/setup');
     } catch (e) {
       _otpCtrl.clear();
       _focusNode.requestFocus();
@@ -120,19 +131,19 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 GestureDetector(
                   onTap: () => context.pop(),
                   child: Container(
-                    width: 38, height: 38,
-                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
-                    child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+                    width: r.rs(38), height: 38,
+                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(r.rs(10))),
+                    child: Icon(Icons.arrow_back_rounded, color: Colors.white, size: r.sp(20)),
                   ),
                 ),
-                const SizedBox(height: 24),
-                const Text('📱', style: TextStyle(fontSize: 40)),
-                const SizedBox(height: 12),
+                SizedBox(height: r.rh(24)),
+                Text('📱', style: TextStyle(fontSize: r.sp(40))),
+                SizedBox(height: r.rh(12)),
                 Text('Verify your number',
                     style: GoogleFonts.spaceGrotesk(fontSize: r.sp(26), fontWeight: FontWeight.w700, color: Colors.white)),
-                const SizedBox(height: 4),
+                SizedBox(height: r.rh(4)),
                 Text('OTP sent to ${widget.phone}',
-                    style: GoogleFonts.inter(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
+                    style: GoogleFonts.inter(fontSize: r.sp(14), color: Colors.white.withValues(alpha: 0.8))),
               ],
             ),
           ),
@@ -141,19 +152,19 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               child: Transform.translate(
                 offset: const Offset(0, -20),
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  padding: const EdgeInsets.all(28),
+                  margin: EdgeInsets.symmetric(horizontal: r.rs(20)),
+                  padding: EdgeInsets.all(r.rs(28)),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(r.rs(24)),
                     boxShadow: AppColors.deepShadow,
                   ),
                   child: Column(
                     children: [
                       Text('Enter OTP', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(20), fontWeight: FontWeight.w700, color: AppColors.ink)),
-                      const SizedBox(height: 8),
-                      Text('6-digit code sent via SMS', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
-                      const SizedBox(height: 32),
+                      SizedBox(height: r.rh(8)),
+                      Text('6-digit code sent via SMS', style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.muted)),
+                      SizedBox(height: r.rh(32)),
 
                       // Hidden input + visual boxes
                       Stack(
@@ -179,8 +190,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                 final char = i < otp.length ? otp[i] : '';
                                 final isActive = i == otp.length || (otp.length == 6 && i == 5);
                                 return Container(
-                                  width: 48,
-                                  height: 56,
+                                  width: r.rs(48),
+                                  height: r.rh(56),
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                     border: Border.all(
@@ -189,7 +200,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                           : (isActive ? AppColors.farmerAccent : AppColors.border),
                                       width: isActive ? 2 : 1.5,
                                     ),
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius: BorderRadius.circular(r.rs(14)),
                                     color: AppColors.surface,
                                   ),
                                   child: Text(
@@ -204,21 +215,21 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       ),
 
                       if (_error != null) ...[
-                        const SizedBox(height: 16),
+                        SizedBox(height: r.rh(16)),
                         Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: AppColors.dangerTint, borderRadius: BorderRadius.circular(10)),
+                          padding: EdgeInsets.all(r.rs(12)),
+                          decoration: BoxDecoration(color: AppColors.dangerTint, borderRadius: BorderRadius.circular(r.rs(10))),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline_rounded, color: AppColors.danger, size: 16),
-                              const SizedBox(width: 8),
-                              Expanded(child: Text(_error!, style: GoogleFonts.inter(fontSize: 13, color: AppColors.danger))),
+                              Icon(Icons.error_outline_rounded, color: AppColors.danger, size: r.sp(16)),
+                              SizedBox(width: r.rs(8)),
+                              Expanded(child: Text(_error!, style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.danger))),
                             ],
                           ),
                         ),
                       ],
 
-                      const SizedBox(height: 32),
+                      SizedBox(height: r.rh(32)),
                       AppButton(
                         label: 'Verify & Continue',
                         onTap: _verify,
@@ -226,15 +237,15 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         color: AppColors.farmerAccent,
                         icon: Icons.verified_outlined,
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: r.rh(20)),
                       if (_resendSeconds > 0)
                         Text('Resend OTP in ${_resendSeconds}s',
-                            style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted))
+                            style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.muted))
                       else
                         GestureDetector(
                           onTap: _resend,
                           child: Text('Resend code',
-                              style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.farmerAccent)),
+                              style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w600, color: AppColors.farmerAccent)),
                         ),
                     ],
                   ),

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../core/providers/app_language_provider.dart';
+import '../../core/providers/locale_provider.dart';
 import '../../data/providers/app_providers.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../core/theme/app_colors.dart';
@@ -19,10 +21,18 @@ class MandiNewsScreen extends ConsumerWidget {
     final r = context.r;
     final newsAsync = ref.watch(mandiNewsProvider);
     final user = ref.watch(authProvider).user;
+    final lang = ref.watch(appLanguageProvider);
+    final district = user?.effectiveDistrict ?? 'Nashik';
+
+    String subtitle(String code) {
+      if (code == 'mr') return '$district • ${lang.aiName} बातम्या';
+      if (code == 'hi') return '$district • ${lang.aiName} समाचार';
+      return '$district • ${lang.aiName} news';
+    }
 
     return AgriScreen(
       title: 'Mandi News',
-      subtitle: 'Market updates and agriculture news',
+      subtitle: subtitle(ref.watch(localeProvider).languageCode),
       emoji: '📰',
       accent: AppColors.farmerAccent,
       onRefresh: () async => ref.invalidate(mandiNewsProvider),

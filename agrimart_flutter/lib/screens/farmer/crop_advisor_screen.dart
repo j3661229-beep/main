@@ -3,13 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../data/services/api_service.dart';
 import '../../data/providers/auth_provider.dart';
+import '../../core/providers/app_language_provider.dart';
 import '../../core/providers/locale_provider.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
 import '../../services/voice_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/utils/location_helper.dart';
+import '../../core/utils/farm_profile_utils.dart';
 import '../../core/errors/app_exceptions.dart';
+import '../../core/widgets/ai_analysis_progress.dart';
 import '../../core/utils/responsive.dart';
 
 class CropAdvisorScreen extends ConsumerStatefulWidget {
@@ -20,78 +22,60 @@ class CropAdvisorScreen extends ConsumerStatefulWidget {
 }
 
 class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
-  late final _locCtrl = TextEditingController();
-  final _soilCtrl = TextEditingController(text: 'Black Cotton Soil');
   final _seasonCtrl = TextEditingController(text: 'Kharif');
-  final _sizeCtrl = TextEditingController(text: '2');
   bool _loading = false;
-  bool _locating = false;
   List _recommendations = [];
+
+  String _t(String en, String hi, String mr) {
+    final code = ref.read(localeProvider).languageCode;
+    if (code == 'hi') return hi;
+    if (code == 'mr') return mr;
+    return en;
+  }
 
   @override
   void initState() {
     super.initState();
-    final user = ref.read(authProvider).user;
-    final farmer = user?.farmer as Map?;
-    _locCtrl.text = farmer?['district']?.toString() ?? farmer?['village']?.toString() ?? '';
-    if (farmer?['soilType'] != null) _soilCtrl.text = farmer!['soilType'].toString();
-    if (farmer?['farmSizeAcres'] != null) _sizeCtrl.text = farmer!['farmSizeAcres'].toString();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _fetchLocation(silent: true));
-  }
-
-  Future<void> _fetchLocation({bool silent = false}) async {
-    setState(() => _locating = true);
-    try {
-      final loc = await LocationHelper.getCurrent();
-      if (loc != null && mounted) {
-        setState(() {
-          if (loc.district.isNotEmpty) _locCtrl.text = loc.district;
-          else if (loc.village.isNotEmpty) _locCtrl.text = loc.village;
-        });
-      } else if (!silent && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not detect location. Enter manually.'), backgroundColor: AppColors.warning),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _locating = false);
-    }
+    final month = DateTime.now().month;
+    _seasonCtrl.text = month >= 6 && month <= 9 ? 'Kharif' : 'Rabi';
   }
 
   Future<void> _analyze() async {
     setState(() => _loading = true);
     try {
-      final locale = ref.read(localeProvider);
-      final langName = locale.languageCode == 'hi' ? 'Hindi' : locale.languageCode == 'mr' ? 'Marathi' : 'English';
+      final langName = ref.read(appLanguageProvider).aiName;
       final res = await ApiService.instance.getCropRecommend({
-        'location': _locCtrl.text,
-        'soilType': _soilCtrl.text,
-        'season': _seasonCtrl.text,
-        'farmSize': int.tryParse(_sizeCtrl.text) ?? 2,
+        'season': _seasonCtrl.text.trim(),
         'language': langName,
       });
       setState(() => _recommendations = res['crops'] ?? []);
       if (_recommendations.isEmpty && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No crop recommendations returned. Try again.'), backgroundColor: AppColors.warning),
+          SnackBar(
+            content: Text(_t('No recommendations returned. Try again.', 'कोई सुझाव नहीं।', 'शिफारसी मिळाल्या नाहीत.')),
+            backgroundColor: AppColors.warning,
+          ),
         );
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(extractUserFacingError(e)), backgroundColor: AppColors.error));
-      }
+      if (!mounted) return;
+      if (isRequestCancelled(e)) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(extractUserFacingError(e)), backgroundColor: AppColors.error));
     } finally {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
+  }
+
+  void _cancelAnalysis() {
+    ApiService.instance.cancelAiRequest();
+    if (mounted) setState(() => _loading = false);
   }
 
   @override
   void dispose() {
-    _locCtrl.dispose();
-    _soilCtrl.dispose();
+    ApiService.instance.cancelAiRequest();
     _seasonCtrl.dispose();
-    _sizeCtrl.dispose();
     super.dispose();
   }
 
@@ -99,6 +83,18 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
   Widget build(BuildContext context) {
     final r = context.r;
     final l10n = AppLocalizations.of(context)!;
+    final user = ref.watch(authProvider).user;
+    final farmer = user?.farmer as Map?;
+    final location = [
+      farmer?['village'],
+      farmer?['taluka'],
+      user?.effectiveDistrict ?? farmer?['district'],
+    ].where((e) => e != null && e.toString().isNotEmpty).join(', ');
+    final crops = FarmProfileUtils.cropsDisplay(farmer);
+    final acres = FarmProfileUtils.farmSizeDisplay(farmer);
+    final soil = farmer?['soilType']?.toString() ?? '—';
+    final water = farmer?['waterSource']?.toString() ?? '—';
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -107,18 +103,18 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
       body: _recommendations.isNotEmpty
           ? _buildResults()
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(r.rs(24)),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(r.rs(20)),
                         decoration: BoxDecoration(
                             gradient: AppColors.heroGradient,
-                            borderRadius: BorderRadius.circular(20)),
+                            borderRadius: BorderRadius.circular(r.rs(20))),
                         child: Row(children: [
-                          const Text('🌾', style: TextStyle(fontSize: 48)),
-                          const SizedBox(width: 16),
+                          Text('🌾', style: TextStyle(fontSize: r.sp(48))),
+                          SizedBox(width: r.rs(16)),
                           Expanded(
                               child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,73 +124,118 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                                         color: Colors.white,
                                         fontSize: r.sp(20),
                                         fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 4),
+                                SizedBox(height: r.rh(4)),
                                 Text(
-                                    'Tell us about your farm setup and our AI will recommend the top high-yield crops.',
+                                    _t(
+                                      'Recommendations based on your saved farm profile',
+                                      'आपके खेत प्रोफ़ाइल पर आधारित सुझाव',
+                                      'तुमच्या शेत प्रोफाइलवर आधारित शिफारसी',
+                                    ),
                                     style: TextStyle(
                                         color:
                                             Colors.white.withValues(alpha: 0.9),
-                                        fontSize: 13))
+                                        fontSize: r.sp(13)))
                               ]))
                         ])),
-                    const SizedBox(height: 28),
-                    Text(l10n.farmDetails, style: AppTextStyles.headingMD),
-                    const SizedBox(height: 16),
-                    _buildField(
-                        '${l10n.location} / District', _locCtrl, 'e.g. Pune, Nashik',
-                        suffix: IconButton(
-                          icon: _locating
-                              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                              : const Icon(Icons.my_location_rounded, color: AppColors.primary),
-                          onPressed: _locating ? null : () => _fetchLocation(),
-                          tooltip: 'Use my location',
-                        )),
-                    const SizedBox(height: 14),
-                    _buildField(
-                        l10n.soilType, _soilCtrl, 'e.g. Black, Red, Sandy'),
-                    const SizedBox(height: 14),
+                    SizedBox(height: r.rh(20)),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(r.rs(16)),
+                      decoration: BoxDecoration(
+                        color: AppColors.farmerTint,
+                        borderRadius: BorderRadius.circular(r.rs(16)),
+                        border: Border.all(color: AppColors.primaryBorder),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _t('Your farm', 'आपका खेत', 'तुमचे शेत'),
+                            style: AppTextStyles.labelLG.copyWith(color: AppColors.farmerAccent, fontWeight: FontWeight.w700),
+                          ),
+                          SizedBox(height: r.rh(10)),
+                          _profileRow(Icons.location_on_rounded, location.isEmpty ? '—' : location),
+                          _profileRow(Icons.grass_rounded, crops),
+                          _profileRow(Icons.square_foot_rounded, '$acres acres'),
+                          _profileRow(Icons.landslide_rounded, soil),
+                          _profileRow(Icons.water_drop_rounded, water),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: r.rh(24)),
+                    Text(l10n.season, style: AppTextStyles.headingMD),
+                    SizedBox(height: r.rh(8)),
+                    Text(
+                      _t('Choose season for recommendations', 'सुझाव के लिए मौसम चुनें', 'शिफारसीसाठी हंगाम निवडा'),
+                      style: AppTextStyles.labelLG.copyWith(color: AppColors.textSecondary),
+                    ),
+                    SizedBox(height: r.rh(12)),
                     _buildField(l10n.season, _seasonCtrl, 'Kharif, Rabi or Zaid'),
-                    const SizedBox(height: 14),
-                    _buildField('${l10n.farmSize} (Acres)', _sizeCtrl,
-                        'Enter farm size in acres',
-                        isNum: true),
-                    const SizedBox(height: 40),
+                    SizedBox(height: r.rh(32)),
                     SizedBox(
                         width: double.infinity,
-                        height: 56,
+                        height: r.rh(56),
                         child: ElevatedButton(
                           onPressed: _loading ? null : _analyze,
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16)),
+                                borderRadius: BorderRadius.circular(r.rs(16))),
                             elevation: 4,
                           ),
                           child: _loading
-                              ? const SizedBox(
-                                  height: 24,
-                                  width: 24,
+                              ? SizedBox(height: r.rh(24),
+                                  width: r.rs(24),
                                   child: CircularProgressIndicator(
-                                      color: Colors.white, strokeWidth: 3))
+                                      color: Colors.white, strokeWidth: r.rs(3)))
                               : Text(l10n.getAiRecommendations,
                                   style: TextStyle(
                                       fontSize: r.sp(16),
                                       fontWeight: FontWeight.bold)),
                         )),
-                    const SizedBox(height: 40),
+                    if (_loading) ...[
+                      SizedBox(height: r.rh(20)),
+                      AiAnalysisProgressCard(
+                        title: _t('Analyzing…', 'विश्लेषण…', 'विश्लेषण…'),
+                        subtitle: _t(
+                          'Finding best crops for your farm profile',
+                          'आपके खेत के लिए सर्वोत्तम फसलें खोज रहे हैं',
+                          'तुमच्या शेतासाठी सर्वोत्तम पिके शोधत आहोत',
+                        ),
+                        cancelLabel: l10n.cancel,
+                        onCancel: _cancelAnalysis,
+                        accentColor: AppColors.primary,
+                      ),
+                    ],
+                    SizedBox(height: r.rh(40)),
                   ]),
             ),
     );
   }
 
+  Widget _profileRow(IconData icon, String value) {
+    final r = context.r;
+    return Padding(
+      padding: EdgeInsets.only(bottom: r.rh(6)),
+      child: Row(
+        children: [
+          Icon(icon, size: r.sp(16), color: AppColors.muted),
+          SizedBox(width: r.rs(8)),
+          Expanded(child: Text(value, style: AppTextStyles.bodyMD)),
+        ],
+      ),
+    );
+  }
+
   Widget _buildField(String label, TextEditingController ctrl, String hint,
       {bool isNum = false, Widget? suffix}) {
+    final r = context.r;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
             style:
                 AppTextStyles.labelLG.copyWith(color: AppColors.textSecondary)),
-        const SizedBox(height: 8),
+        SizedBox(height: r.rh(8)),
         TextFormField(
           controller: ctrl,
           keyboardType: isNum ? TextInputType.number : TextInputType.text,
@@ -203,10 +244,10 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
             filled: true,
             fillColor: AppColors.surface,
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(r.rs(14)),
                 borderSide: const BorderSide(color: AppColors.border)),
             enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(r.rs(14)),
                 borderSide: const BorderSide(color: AppColors.border)),
             suffixIcon: suffix,
           ),
@@ -216,9 +257,10 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
   }
 
   Widget _buildResults() {
+    final r = context.r;
     return Column(children: [
       Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: r.rs(20), vertical: r.rh(16)),
           decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(bottom: BorderSide(color: AppColors.border))),
@@ -228,13 +270,13 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                 style: AppTextStyles.headingSM),
             TextButton.icon(
                 onPressed: () => setState(() => _recommendations = []),
-                icon: const Icon(Icons.refresh, size: 18),
+                icon: Icon(Icons.refresh, size: r.sp(18)),
                 label: const Text('New Analysis',
                     style: TextStyle(fontWeight: FontWeight.bold)))
           ])),
       Expanded(
         child: ListView.builder(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(r.rs(20)),
           itemCount: _recommendations.length,
           itemBuilder: (ctx, i) {
             final crop = _recommendations[i];
@@ -242,35 +284,35 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
               delay: Duration(milliseconds: i * 100),
               duration: const Duration(milliseconds: 600),
               child: Container(
-                margin: const EdgeInsets.only(bottom: 20),
+                margin: EdgeInsets.only(bottom: r.rh(20)),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Colors.white, Color(0xFFF8FAFC)],
                     begin: Alignment.topLeft, end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(r.rs(24)),
                   border: Border.all(color: AppColors.primary.withValues(alpha: 0.1), width: 2),
                   boxShadow: [
-                    BoxShadow(color: AppColors.primary.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 8))
+                    BoxShadow(color: AppColors.primary.withValues(alpha: 0.05), blurRadius: r.rs(20), offset: Offset(0, 8))
                   ]
                 ),
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(20),
+                      padding: EdgeInsets.all(r.rs(20)),
                       child: Row(
                         children: [
                           Container(
-                            height: 70, width: 70,
+                            height: r.rh(70), width: 70,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(colors: [AppColors.primary, AppColors.primaryDark]),
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))]
+                              borderRadius: BorderRadius.circular(r.rs(20)),
+                              boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: r.rs(10), offset: Offset(0, 4))]
                             ),
                             alignment: Alignment.center,
-                            child: Text(crop['emoji'] ?? '🌿', style: const TextStyle(fontSize: 36)),
+                            child: Text(crop['emoji'] ?? '🌿', style: TextStyle(fontSize: r.sp(36))),
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: r.rs(16)),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,31 +320,31 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(crop['crop'] ?? 'Unknown', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                                    Text(crop['crop'] ?? 'Unknown', style: TextStyle(fontSize: r.sp(22), fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
                                     IconButton(
-                                      icon: const Icon(Icons.volume_up_rounded, color: AppColors.primary, size: 24),
+                                      icon: Icon(Icons.volume_up_rounded, color: AppColors.primary, size: r.sp(24)),
                                       onPressed: () {
                                         VoiceService.instance.speak("${crop['crop']}. ${crop['reason']}", languageCode: ref.read(localeProvider).languageCode);
                                       },
                                     )
                                   ]
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: r.rh(8)),
                                 Row(
                                   children: [
                                     Expanded(
                                       child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(4),
+                                        borderRadius: BorderRadius.circular(r.rs(4)),
                                         child: LinearProgressIndicator(
                                           value: (crop['matchPercent'] ?? 0) / 100.0,
                                           backgroundColor: AppColors.border,
                                           valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                                          minHeight: 6,
+                                          minHeight: r.rh(6),
                                         ),
                                       )
                                     ),
-                                    const SizedBox(width: 12),
-                                    Text('${crop['matchPercent']}% Match', style: const TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w900, fontSize: 12)),
+                                    SizedBox(width: r.rs(12)),
+                                    Text('${crop['matchPercent']}% Match', style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w900, fontSize: r.sp(12))),
                                   ]
                                 )
                               ]
@@ -312,7 +354,7 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                       )
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      padding: EdgeInsets.symmetric(horizontal: r.rs(20), vertical: r.rh(16)),
                       decoration: BoxDecoration(
                         color: AppColors.primarySurface.withValues(alpha: 0.5),
                         borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24))
@@ -324,11 +366,11 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('💡', style: TextStyle(fontSize: context.r.sp(16))),
-                              const SizedBox(width: 8),
-                              Expanded(child: Text(crop['reason'] ?? '', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4, fontWeight: FontWeight.w500))),
+                              SizedBox(width: r.rs(8)),
+                              Expanded(child: Text(crop['reason'] ?? '', style: TextStyle(fontSize: r.sp(13), color: AppColors.textSecondary, height: 1.4, fontWeight: FontWeight.w500))),
                             ]
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: r.rh(16)),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -350,28 +392,30 @@ class _CropAdvisorState extends ConsumerState<CropAdvisorScreen> {
     ]);
   }
 
-  Widget _statInfo(String label, String val, {required String icon}) =>
-      Row(children: [
+  Widget _statInfo(String label, String val, {required String icon}) {
+    final r = context.r;
+    return Row(children: [
         Container(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(r.rs(8)),
             decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4)]),
-            child: Text(icon, style: const TextStyle(fontSize: 14))),
-        const SizedBox(width: 8),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: r.rs(4))]),
+            child: Text(icon, style: TextStyle(fontSize: r.sp(14)))),
+        SizedBox(width: r.rs(8)),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label,
-              style: const TextStyle(
-                  fontSize: 10,
+              style: TextStyle(
+                  fontSize: r.sp(10),
                   color: AppColors.textTertiary,
                   fontWeight: FontWeight.bold)),
           Text(val,
-              style: const TextStyle(
-                  fontSize: 13,
+              style: TextStyle(
+                  fontSize: r.sp(13),
                   fontWeight: FontWeight.w800,
                   color: AppColors.primaryDark))
         ])
       ]);
+  }
 }
 

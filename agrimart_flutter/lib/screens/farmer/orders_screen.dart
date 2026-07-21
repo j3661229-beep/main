@@ -39,7 +39,7 @@ class OrdersScreen extends ConsumerWidget {
                 onAction: () => context.push('/farmer/shop'),
               )
             : ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(r.rs(16)),
                 itemCount: list.length,
                 itemBuilder: (ctx, i) {
                   final o = list[i] as Map;
@@ -52,25 +52,25 @@ class OrdersScreen extends ConsumerWidget {
                   return GestureDetector(
                     onTap: () => context.push('/farmer/orders/${o['id']}/tracking'),
                     child: Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(16),
+                      margin: EdgeInsets.only(bottom: r.rh(16)),
+                      padding: EdgeInsets.all(r.rs(16)),
                       decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(r.rs(24)),
                           boxShadow: AppColors.softShadow,
                           border: Border.all(color: AppColors.border.withValues(alpha: 0.4))),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                              width: 56,
-                              height: 56,
+                              width: r.rs(56),
+                              height: r.rh(56),
                               decoration: BoxDecoration(
                                   color: AppColors.primarySurface,
-                                  borderRadius: BorderRadius.circular(16)),
+                                  borderRadius: BorderRadius.circular(r.rs(16))),
                               child: Center(
                                   child: Text('📦', style: TextStyle(fontSize: r.sp(28))))),
-                          const SizedBox(width: 16),
+                          SizedBox(width: r.rs(16)),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,15 +82,15 @@ class OrdersScreen extends ConsumerWidget {
                                         'Order #${(o['id'] as String).substring((o['id'] as String).length - 6).toUpperCase()}',
                                         style: AppTextStyles.headingSM.copyWith(letterSpacing: -0.4, fontWeight: FontWeight.w900)),
                                     Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                        padding: EdgeInsets.symmetric(horizontal: r.rs(10), vertical: r.rh(5)),
                                         decoration: BoxDecoration(
                                             color: statusColor.withValues(alpha: 0.12),
-                                            borderRadius: BorderRadius.circular(20)),
+                                            borderRadius: BorderRadius.circular(r.rs(20))),
                                         child: Text(status.replaceAll('_', ' '),
-                                            style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: statusColor, letterSpacing: 0.5))),
+                                            style: TextStyle(fontSize: r.sp(9), fontWeight: FontWeight.w900, color: statusColor, letterSpacing: 0.5))),
                                   ],
                                 ),
-                                const SizedBox(height: 12),
+                                SizedBox(height: r.rh(12)),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -98,8 +98,8 @@ class OrdersScreen extends ConsumerWidget {
                                     Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          const Text('TOTAL AMOUNT', style: TextStyle(fontSize: 9, color: AppColors.textTertiary, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
-                                          const SizedBox(height: 2),
+                                          Text('TOTAL AMOUNT', style: TextStyle(fontSize: r.sp(9), color: AppColors.textTertiary, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                                          SizedBox(height: r.rh(2)),
                                           Text('₹${o['totalAmount']}',
                                               style: AppTextStyles.priceSmall.copyWith(fontSize: r.sp(18), fontWeight: FontWeight.w900)),
                                         ]),
@@ -107,21 +107,21 @@ class OrdersScreen extends ConsumerWidget {
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
                                         Text(o['createdAt']?.toString().split('T').first ?? '',
-                                            style: TextStyle(fontSize: 11, color: AppColors.textTertiary, fontWeight: FontWeight.w600)),
-                                        const SizedBox(height: 6),
+                                            style: TextStyle(fontSize: r.sp(11), color: AppColors.textTertiary, fontWeight: FontWeight.w600)),
+                                        SizedBox(height: r.rh(6)),
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          padding: EdgeInsets.symmetric(horizontal: r.rs(12), vertical: r.rh(6)),
                                           decoration: BoxDecoration(
                                             color: AppColors.primary.withValues(alpha: 0.05),
-                                            borderRadius: BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(r.rs(10)),
                                             border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
                                           ),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
-                                            children: const [
-                                              Text('Track', style: TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.w900)),
-                                              SizedBox(width: 4),
-                                              Icon(Icons.arrow_forward_ios, size: 8, color: AppColors.primary),
+                                            children: [
+                                              Text('Track', style: TextStyle(fontSize: r.sp(11), color: AppColors.primary, fontWeight: FontWeight.w900)),
+                                              SizedBox(width: r.rs(4)),
+                                              Icon(Icons.arrow_forward_ios, size: r.sp(8), color: AppColors.primary),
                                             ],
                                           ),
                                         ),

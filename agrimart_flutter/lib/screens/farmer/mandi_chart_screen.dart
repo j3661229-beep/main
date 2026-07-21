@@ -40,7 +40,7 @@ class _MandiChartScreenState extends ConsumerState<MandiChartScreen> {
         elevation: 0,
         centerTitle: true,
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
+          preferredSize: Size.fromHeight(r.rh(1)),
           child: Container(color: AppColors.border, height: 1),
         ),
       ),
@@ -84,20 +84,20 @@ class _MandiChartScreenState extends ConsumerState<MandiChartScreen> {
               // ── Price Header (Trading Style) ──
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+                padding: EdgeInsets.fromLTRB(r.rs(24), r.rh(32), r.rs(24), r.rh(16)),
                 color: AppColors.background,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text('₹${currentPrice.toStringAsFixed(0)}', 
-                        style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -1.5, height: 1)),
-                    const SizedBox(height: 8),
+                        style: TextStyle(fontSize: r.sp(48), fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -1.5, height: 1)),
+                    SizedBox(height: r.rh(8)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(isUp ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded, 
-                             color: trendColor, size: 22),
-                        const SizedBox(width: 4),
+                             color: trendColor, size: r.sp(22)),
+                        SizedBox(width: r.rs(4)),
                         Text(
                           '${change.abs().toStringAsFixed(2)}% ($_selectedRange)',
                           style: TextStyle(
@@ -107,33 +107,33 @@ class _MandiChartScreenState extends ConsumerState<MandiChartScreen> {
                             letterSpacing: -0.5,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        const Text('• Per Quintal', style: TextStyle(color: AppColors.textTertiary, fontSize: 13, fontWeight: FontWeight.w500)),
+                        SizedBox(width: r.rs(8)),
+                        Text('• Per Quintal', style: TextStyle(color: AppColors.textTertiary, fontSize: r.sp(13), fontWeight: FontWeight.w500)),
                       ],
                     ),
                   ],
                 ),
               ),
               
-              const SizedBox(height: 12),
+              SizedBox(height: r.rh(12)),
               
               // ── Chart Area (Replaced with Custom Widget for precision) ──
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: r.rs(16)),
                 child: MandiPriceChart(history: history, cropName: cropName),
               ),
 
-              const SizedBox(height: 32),
+              SizedBox(height: r.rh(32)),
 
               // ── Timeframe Selector (Segmented Style) ──
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.symmetric(horizontal: r.rs(24)),
                 child: Container(
-                  height: 44,
-                  padding: const EdgeInsets.all(4),
+                  height: r.rh(44),
+                  padding: EdgeInsets.all(r.rs(4)),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(r.rs(22)),
                     border: Border.all(color: AppColors.border),
                   ),
                   child: Row(
@@ -147,15 +147,15 @@ class _MandiChartScreenState extends ConsumerState<MandiChartScreen> {
                             alignment: Alignment.center,
                             decoration: isSelected ? BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius: BorderRadius.circular(r.rs(18)),
                               boxShadow: [
-                                BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))
+                                BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: r.rs(8), offset: Offset(0, 2))
                               ],
                             ) : null,
                             child: Text(
                               range,
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: r.sp(13),
                                 fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                                 color: isSelected ? AppColors.textPrimary : AppColors.textTertiary,
                               ),
@@ -172,14 +172,14 @@ class _MandiChartScreenState extends ConsumerState<MandiChartScreen> {
               
               // ── Market Info ──
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                padding: EdgeInsets.symmetric(horizontal: r.rs(24), vertical: r.rh(24)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.storefront_rounded, color: AppColors.textTertiary, size: 16),
-                    const SizedBox(width: 8),
+                    Icon(Icons.storefront_rounded, color: AppColors.textTertiary, size: r.sp(16)),
+                    SizedBox(width: r.rs(8)),
                     Text('Trading strictly derived from ${widget.cropData['market']} (${widget.cropData['district']}) Mandi.', 
-                        style: const TextStyle(fontSize: 11, color: AppColors.textTertiary, fontWeight: FontWeight.w500)),
+                        style: TextStyle(fontSize: r.sp(11), color: AppColors.textTertiary, fontWeight: FontWeight.w500)),
                   ],
                 ),
               ),

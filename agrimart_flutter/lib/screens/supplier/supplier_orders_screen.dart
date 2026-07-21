@@ -29,23 +29,23 @@ class SupplierOrdersScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 8),
+          SizedBox(height: r.rh(8)),
           FilterChipRow(
             options: statuses,
             selected: status ?? 'All',
             onSelect: (v) => ref.read(_supplierOrderStatusProvider.notifier).state = v == 'All' ? null : v,
             accent: AppColors.supplierAccent,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: r.rh(12)),
           Expanded(
             child: RefreshIndicator(
               color: AppColors.supplierAccent,
               onRefresh: () async => ref.invalidate(supplierOrdersProvider),
               child: orders.when(
                 loading: () => ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(horizontal: r.rs(16)),
                   itemCount: 5,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, __) => SizedBox(height: r.rh(12)),
                   itemBuilder: (_, __) => const ShimmerBox(height: 100, radius: 16),
                 ),
                 error: (e, _) => EmptyState(
@@ -64,9 +64,9 @@ class SupplierOrdersScreen extends ConsumerWidget {
                     );
                   }
                   return ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: r.rs(16)),
                     itemCount: list.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, __) => SizedBox(height: r.rh(12)),
                     itemBuilder: (_, i) => _SupplierOrderCard(order: list[i]),
                   );
                 },
@@ -169,15 +169,16 @@ class _SupplierOrderCardState extends ConsumerState<_SupplierOrderCard> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final o = widget.order;
     final qty = o['quantity'] ?? o['qty'] ?? '-';
     final orderId = o['id']?.toString() ?? '';
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(r.rs(16)),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(r.rs(16)),
         border: Border.all(
           color: _status == 'PENDING'
               ? AppColors.supplierAccent.withValues(alpha: 0.4)
@@ -191,25 +192,25 @@ class _SupplierOrderCardState extends ConsumerState<_SupplierOrderCard> {
           Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(color: AppColors.supplierTint, borderRadius: BorderRadius.circular(12)),
-                child: const Center(child: Text('🌾', style: TextStyle(fontSize: 22))),
+                width: r.rs(44),
+                height: r.rh(44),
+                decoration: BoxDecoration(color: AppColors.supplierTint, borderRadius: BorderRadius.circular(r.rs(12))),
+                child: Center(child: Text('🌾', style: TextStyle(fontSize: r.sp(22)))),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: r.rs(12)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(_farmerName, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink)),
-                    Text(_productName, style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+                    Text(_farmerName, style: GoogleFonts.inter(fontSize: r.sp(14), fontWeight: FontWeight.w600, color: AppColors.ink)),
+                    Text(_productName, style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
                   ],
                 ),
               ),
               BadgeChip.status(_status),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: r.rh(12)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -219,13 +220,13 @@ class _SupplierOrderCardState extends ConsumerState<_SupplierOrderCard> {
             ],
           ),
           if (_nextAction != null) ...[
-            const SizedBox(height: 14),
+            SizedBox(height: r.rh(14)),
             AppButton(
               label: _actionLabel,
               onTap: () => _updateStatus(_nextAction!, 'Order updated to $_nextAction'),
               isLoading: _isUpdating,
               color: AppColors.supplierAccent,
-              height: 42,
+              height: r.rh(42),
               icon: Icons.check_circle_outline_rounded,
             ),
           ],
@@ -239,11 +240,14 @@ class _InfoChip extends StatelessWidget {
   final String label, value;
   const _InfoChip({required this.label, required this.value});
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: GoogleFonts.inter(fontSize: 11, color: AppColors.muted)),
-      Text(value, style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.ink)),
+      Text(label, style: GoogleFonts.inter(fontSize: r.sp(11), color: AppColors.muted)),
+      Text(value, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(13), fontWeight: FontWeight.w600, color: AppColors.ink)),
     ],
   );
+  }
 }

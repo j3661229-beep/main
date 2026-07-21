@@ -3,23 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../data/providers/auth_provider.dart';
 import '../core/providers/locale_provider.dart';
+import '../core/utils/farm_profile_utils.dart';
 
 // Auth
 import '../screens/auth/splash_screen.dart';
 import '../screens/auth/language_selection_screen.dart';
-import '../screens/auth/role_selection_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/otp_screen.dart';
-import '../screens/auth/signup_screen.dart';
-import '../screens/auth/pending_approval_screen.dart';
 
 // Farmer
+import '../screens/farmer/farm_setup_wizard.dart';
 import '../screens/farmer/farmer_home.dart';
-import '../screens/farmer/market_screen.dart';
-import '../screens/farmer/product_detail_screen.dart';
-import '../screens/farmer/cart_screen.dart';
-import '../screens/farmer/payment_screen.dart';
-import '../screens/farmer/my_orders_screen.dart';
 import '../screens/farmer/crop_doctor_screen.dart';
 import '../screens/farmer/advisory_screen.dart';
 import '../screens/farmer/orders_screen.dart';
@@ -38,6 +32,8 @@ import '../screens/farmer/pmfby_calculator_screen.dart';
 import '../screens/farmer/fpo_bulk_screen.dart';
 import '../screens/farmer/equipment_rental_screen.dart';
 import '../screens/farmer/farm_tools_screen.dart';
+import '../screens/farmer/krishi_tv_screen.dart';
+import '../screens/farmer/video_player_screen.dart';
 import '../screens/dealer/manage_rates_screen.dart';
 
 // Supplier
@@ -56,9 +52,7 @@ import '../screens/dealer/my_deals_screen.dart';
 import '../screens/shared/notifications_screen.dart';
 import '../screens/shared/webview_screen.dart';
 
-// Legacy auth screens still referenced
-import '../screens/auth/profile_setup_screen.dart';
-import '../screens/auth/doc_upload_screen.dart';
+// Legacy auth screens — not used in v1 farmer app
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
@@ -68,43 +62,50 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       if (state.matchedLocation == '/splash') return null;
 
+      // Wait for secure-storage bootstrap before routing decisions
+      if (!authState.isInitialized) return '/splash';
+
       final languageChosen = ref.read(languageChosenProvider);
       if (!languageChosen && state.matchedLocation != '/auth/language') {
         return '/auth/language';
       }
 
-      // Not authenticated → send to role selection
+      // Not authenticated → send directly to Farmer login (V1: farmer-only)
       if (!authState.isAuthenticated && authState.user == null) {
-        if (!state.matchedLocation.startsWith('/auth')) return '/auth/role';
+        if (!state.matchedLocation.startsWith('/auth')) return '/auth/login?role=FARMER';
         return null;
       }
 
       if (authState.isAuthenticated) {
         final user = authState.user!;
 
-        // Supplier/Dealer needing doc upload
-        final supplier    = user.supplier as Map?;
-        final dealer      = user.dealer   as Map?;
-        final hasDoc      = (supplier?['govtDocUrl'] != null) || (dealer?['govtDocUrl'] != null);
-        final needsDoc    = !user.isFarmer && !hasDoc;
-        final isPending   = !user.isVerified && hasDoc;
-        final needsSetup  = !user.isFarmer &&
-                            (supplier?['businessName'] == null || supplier?['businessName'] == 'My Agency') &&
-                            (dealer?['businessName']   == null || dealer?['businessName']   == 'My Agency');
+        // v1: farmer app only — non-farmers must use farmer login
+        if (!user.isFarmer && !state.matchedLocation.startsWith('/auth')) {
+          return '/auth/login';
+        }
 
-        // Allow the transition pages through
-        const allowedPaths = ['/auth/pending', '/auth/doc-upload', '/auth/setup', '/auth/otp'];
+        // Allow legacy transition pages (not OTP — authenticated users must leave auth flow)
+        const allowedPaths = ['/auth/pending', '/auth/doc-upload', '/auth/setup'];
         if (allowedPaths.any((p) => state.matchedLocation.startsWith(p))) return null;
 
-        if (needsDoc)   return '/auth/doc-upload';
-        if (isPending)  return '/auth/pending';
-        if (needsSetup) return '/auth/setup';
+        if (user.isFarmer) {
+          final setupComplete = authState.farmSetupComplete;
+          final loc = state.matchedLocation;
 
-        // Authenticated + verified → redirect away from auth pages
+          if (!setupComplete) {
+            if (loc == '/farmer/setup') return null;
+            if (isFarmSetupGuardedPath(loc)) return '/farmer/setup';
+            if (loc == '/farmer' || loc.startsWith('/auth') || loc == '/splash') {
+              return '/farmer/setup';
+            }
+          } else if (loc == '/farmer/setup') {
+            return '/farmer';
+          }
+        }
+
+        // Authenticated farmer → redirect away from auth pages
         if (state.matchedLocation.startsWith('/auth') || state.matchedLocation == '/splash') {
-          if (user.isFarmer) return '/farmer';
-          if (user.isDealer) return '/dealer';
-          return '/supplier';
+          return '/farmer';
         }
       }
       return null;
@@ -132,14 +133,11 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // ── Auth ──────────────────────────────────────────
       _faded('/auth/language', const LanguageSelectionScreen()),
-      _faded('/auth/role', const RoleSelectionScreen()),
+      _faded('/auth/login', const LoginScreen()),
 
       GoRoute(
-        path: '/auth/login',
-        pageBuilder: (ctx, state) {
-          final role = state.uri.queryParameters['role'] ?? 'FARMER';
-          return _fadedPage(LoginScreen(role: role));
-        },
+        path: '/auth/role',
+        redirect: (_, __) => '/auth/login',
       ),
 
       GoRoute(
@@ -156,37 +154,49 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       GoRoute(
         path: '/auth/signup',
-        pageBuilder: (ctx, state) {
-          final role = state.uri.queryParameters['role'] ?? 'FARMER';
-          return _fadedPage(SignupScreen(role: role));
-        },
+        redirect: (_, __) => '/auth/login',
       ),
 
-      _faded('/auth/setup',      const ProfileSetupScreen()),
-      _faded('/auth/doc-upload', const DocUploadScreen()),
-      _faded('/auth/pending',    const PendingApprovalScreen()),
+      GoRoute(
+        path: '/auth/setup',
+        redirect: (_, __) => '/auth/login',
+      ),
+      GoRoute(
+        path: '/auth/doc-upload',
+        redirect: (_, __) => '/auth/login',
+      ),
+      GoRoute(
+        path: '/auth/pending',
+        redirect: (_, __) => '/auth/login',
+      ),
 
       // ── Farmer ────────────────────────────────────────
       _faded('/farmer', const FarmerHome()),
+      _faded('/farmer/setup', const FarmSetupWizard()),
 
       GoRoute(
         path: '/farmer/market',
-        pageBuilder: (ctx, state) {
-          final tab = state.uri.queryParameters['tab'] == 'sell' ? 1 : 0;
-          return _fadedPage(MarketScreen(initialTab: tab));
-        },
+        redirect: (_, __) => '/farmer/dealer-rates',
       ),
 
       GoRoute(
         path: '/farmer/market/product/:id',
-        pageBuilder: (ctx, state) => _fadedPage(
-          ProductDetailScreen(productId: state.pathParameters['id']!),
-        ),
+        redirect: (_, __) => '/farmer',
       ),
 
-      _faded('/farmer/cart',       const CartScreen()),
-      _faded('/farmer/payment',    const PaymentScreen()),
-      _faded('/farmer/orders',     const MyOrdersScreen()),
+      GoRoute(
+        path: '/farmer/cart',
+        redirect: (_, __) => '/farmer',
+      ),
+
+      GoRoute(
+        path: '/farmer/payment',
+        redirect: (_, __) => '/farmer',
+      ),
+      GoRoute(
+        path: '/farmer/orders',
+        redirect: (_, __) => '/farmer',
+      ),
       _faded('/farmer/diagnose',   const CropDoctorScreen()),
       _faded('/farmer/advisory',   const AdvisoryScreen()),
       _faded('/farmer/news',       const MandiNewsScreen()),
@@ -202,6 +212,20 @@ final routerProvider = Provider<GoRouter>((ref) {
       _faded('/farmer/pmfby',       const PmfbyCalculatorScreen()),
       _faded('/farmer/fpo-bulk',   const FpoBulkScreen()),
       _faded('/farmer/equipment',  const EquipmentRentalScreen()),
+      _faded('/farmer/krishi-tv',   const KrishiTvScreen()),
+
+      GoRoute(
+        path: '/farmer/video-player',
+        pageBuilder: (ctx, state) {
+          final extra = state.extra as Map? ?? {};
+          return _fadedPage(VideoPlayerScreen(
+            videoId:      extra['videoId']?.toString()      ?? '',
+            title:        extra['title']?.toString()        ?? 'Farming Video',
+            channel:      extra['channel']?.toString()      ?? 'AgriChannel',
+            thumbnailUrl: extra['thumbnailUrl']?.toString(),
+          ));
+        },
+      ),
 
       GoRoute(
         path: '/farmer/trade/book',
@@ -267,12 +291,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ── Legacy / Fallback ─────────────────────────────
       GoRoute(
         path: '/farmer/shop',
-        redirect: (_, __) => '/farmer/market',
+        redirect: (_, __) => '/farmer',
       ),
 
       GoRoute(
         path: '/farmer/checkout',
-        redirect: (_, __) => '/farmer/payment',
+        redirect: (_, __) => '/farmer',
       ),
 
       // Legacy orders screen (the new one is /farmer/orders)
@@ -282,7 +306,9 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   ref.listen(authProvider, (previous, next) {
     if (previous?.isAuthenticated != next.isAuthenticated ||
-        previous?.user?.id != next.user?.id) {
+        previous?.user?.id != next.user?.id ||
+        previous?.farmSetupComplete != next.farmSetupComplete ||
+        previous?.isInitialized != next.isInitialized) {
       router.refresh();
     }
   });

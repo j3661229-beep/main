@@ -825,4 +825,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get acresUnit => 'acres';
+
+  @override
+  String get farmSetupTitle => 'Farm Setup';
+
+  @override
+  String get farmSetupCompleteBanner => 'Complete farm setup';
+
+  @override
+  String get farmSetupRequiredHint => 'Required for AI, weather & mandi advice';
+
+  @override
+  String get yourFarmSummary => 'Your farm';
 }

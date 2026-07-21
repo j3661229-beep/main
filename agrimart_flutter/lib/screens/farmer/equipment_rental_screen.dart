@@ -20,12 +20,12 @@ class EquipmentRentalScreen extends ConsumerWidget {
       emoji: '🚜',
       onRefresh: () async => ref.invalidate(equipmentProductsProvider),
       body: products.when(
-        loading: () => const Padding(
-          padding: EdgeInsets.all(40),
+        loading: () => Padding(
+          padding: EdgeInsets.all(r.rs(40)),
           child: Center(child: CircularProgressIndicator()),
         ),
         error: (e, _) => Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(r.rs(24)),
           child: Center(child: Text('Could not load: $e')),
         ),
         data: (list) {

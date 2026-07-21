@@ -57,32 +57,32 @@ class _ManageRatesScreenState extends ConsumerState<ManageRatesScreen> {
         backgroundColor: AppColors.primary,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(r.rs(24)),
         children: [
           Text('Update Daily Prices', style: AppTextStyles.headingLG),
-          const SizedBox(height: 8),
+          SizedBox(height: r.rh(8)),
           Text(
             'Set the rates at which you want to buy crops from farmers today.',
             style: AppTextStyles.bodySM.copyWith(color: AppColors.textSecondary),
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: r.rh(32)),
           Text('Crop Name', style: AppTextStyles.labelLG),
-          const SizedBox(height: 8),
+          SizedBox(height: r.rh(8)),
           TextField(controller: _cropCtrl, decoration: const InputDecoration(hintText: 'e.g. Onion, Soybean')),
-          const SizedBox(height: 24),
+          SizedBox(height: r.rh(24)),
           Text('Price per Quintal (₹)', style: AppTextStyles.labelLG),
-          const SizedBox(height: 8),
+          SizedBox(height: r.rh(8)),
           TextField(controller: _priceCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 4500')),
-          const SizedBox(height: 40),
+          SizedBox(height: r.rh(40)),
           ElevatedButton(
             onPressed: _loading ? null : _updateRate,
             child: _loading
-                ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                ? SizedBox(width: r.rs(22), height: r.rh(22), child: CircularProgressIndicator(strokeWidth: r.rs(2), color: Colors.white))
                 : const Text('Broadcast New Rate 📢'),
           ),
-          const SizedBox(height: 48),
+          SizedBox(height: r.rh(48)),
           Text('Your Active Rates', style: AppTextStyles.headingMD),
-          const SizedBox(height: 16),
+          SizedBox(height: r.rh(16)),
           rates.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Text('Error: $e'),
@@ -91,8 +91,8 @@ class _ManageRatesScreenState extends ConsumerState<ManageRatesScreen> {
                 return const Text('No rates set yet. Add your first buying rate above.');
               }
               return Column(
-                children: list.map((r) {
-                  final rate = r as Map;
+                children: list.map((item) {
+                  final rate = item as Map;
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
                     title: Text(rate['cropName'] ?? '', style: const TextStyle(fontWeight: FontWeight.w700)),
@@ -103,7 +103,7 @@ class _ManageRatesScreenState extends ConsumerState<ManageRatesScreen> {
                         Text('₹${rate['pricePerQuintal']}/qtl', style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.primary)),
                         if (rate['isActive'] != false)
                           IconButton(
-                            icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
+                            icon: Icon(Icons.delete_outline, color: AppColors.error, size: r.sp(20)),
                             onPressed: () async {
                               try {
                                 await ApiService.instance.deleteDealerRate(rate['id'].toString());

@@ -52,38 +52,38 @@ class _DealerWorkingDaysScreenState extends State<DealerWorkingDaysScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(title: const Text('Working Days & Hours'), backgroundColor: AppColors.primary),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(r.rs(20)),
         children: [
           // Summary
           Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(gradient: AppColors.primaryGradient, borderRadius: BorderRadius.circular(24), boxShadow: AppColors.primaryShadow),
+            padding: EdgeInsets.all(r.rs(20)),
+            decoration: BoxDecoration(gradient: AppColors.primaryGradient, borderRadius: BorderRadius.circular(r.rs(24)), boxShadow: AppColors.primaryShadow),
             child: Row(children: [
               Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(16)),
-                child: const Icon(Icons.schedule, color: Colors.white, size: 28),
+                padding: EdgeInsets.all(r.rs(14)),
+                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(r.rs(16))),
+                child: Icon(Icons.schedule, color: Colors.white, size: r.sp(28)),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: r.rs(16)),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Your Weekly Schedule', style: TextStyle(color: Colors.white, fontSize: r.sp(18), fontWeight: FontWeight.w800)),
-                const SizedBox(height: 4),
-                Text('$openDays days open • ${7 - openDays} days off', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13, fontWeight: FontWeight.w500)),
+                SizedBox(height: r.rh(4)),
+                Text('$openDays days open • ${7 - openDays} days off', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: r.sp(13), fontWeight: FontWeight.w500)),
               ])),
             ]),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: r.rh(24)),
 
           // Quick toggle row
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(r.rs(16)),
             decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(20),
+              color: Colors.white, borderRadius: BorderRadius.circular(r.rs(20)),
               boxShadow: AppColors.softShadow, border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Quick Toggle', style: AppTextStyles.labelMD),
-              const SizedBox(height: 12),
+              SizedBox(height: r.rh(12)),
               Row(children: List.generate(7, (i) {
                 final s = _schedule[i];
                 return Expanded(child: GestureDetector(
@@ -94,44 +94,44 @@ class _DealerWorkingDaysScreenState extends State<DealerWorkingDaysScreen> {
                     });
                   },
                   child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    margin: EdgeInsets.symmetric(horizontal: r.rs(2)),
+                    padding: EdgeInsets.symmetric(vertical: r.rh(12)),
                     decoration: BoxDecoration(
                       color: s.isOpen ? AppColors.primary : AppColors.background,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(r.rs(10)),
                       border: Border.all(color: s.isOpen ? AppColors.primary : AppColors.border),
                     ),
-                    child: Text(s.short, textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.isOpen ? Colors.white : AppColors.textTertiary)),
+                    child: Text(s.short, textAlign: TextAlign.center, style: TextStyle(fontSize: r.sp(11), fontWeight: FontWeight.w800, color: s.isOpen ? Colors.white : AppColors.textTertiary)),
                   ),
                 ));
               })),
             ]),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: r.rh(24)),
 
           // Day cards
           ...List.generate(7, (i) {
             final s = _schedule[i];
             return AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(18),
+              margin: EdgeInsets.only(bottom: r.rh(12)),
+              padding: EdgeInsets.all(r.rs(18)),
               decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(20),
+                color: Colors.white, borderRadius: BorderRadius.circular(r.rs(20)),
                 boxShadow: AppColors.softShadow,
                 border: Border.all(color: s.isOpen ? AppColors.primaryBorder : AppColors.border.withValues(alpha: 0.3)),
               ),
               child: Column(children: [
                 Row(children: [
                   Container(
-                    width: 44, height: 44,
+                    width: r.rs(44), height: 44,
                     decoration: BoxDecoration(
                       color: s.isOpen ? AppColors.primarySurface : AppColors.background,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(r.rs(12)),
                     ),
-                    child: Center(child: Text(s.short, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: s.isOpen ? AppColors.primary : AppColors.textTertiary))),
+                    child: Center(child: Text(s.short, style: TextStyle(fontSize: r.sp(13), fontWeight: FontWeight.w800, color: s.isOpen ? AppColors.primary : AppColors.textTertiary))),
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: r.rs(14)),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(s.day, style: AppTextStyles.headingSM.copyWith(color: s.isOpen ? AppColors.textPrimary : AppColors.textTertiary)),
                     Text(s.isOpen ? '${s.open.format(context)} — ${s.close.format(context)}' : 'Closed', style: AppTextStyles.caption),
@@ -145,17 +145,17 @@ class _DealerWorkingDaysScreenState extends State<DealerWorkingDaysScreen> {
                   ),
                 ]),
                 if (s.isOpen) ...[
-                  const SizedBox(height: 14),
+                  SizedBox(height: r.rh(14)),
                   Row(children: [
                     Expanded(child: GestureDetector(
                       onTap: () => _pickTime(i, true),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.border)),
+                        padding: EdgeInsets.symmetric(vertical: r.rh(12)),
+                        decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(r.rs(12)), border: Border.all(color: AppColors.border)),
                         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Icon(Icons.wb_sunny_outlined, size: 16, color: AppColors.warning),
-                          const SizedBox(width: 8),
-                          Text(s.open.format(context), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                          Icon(Icons.wb_sunny_outlined, size: r.sp(16), color: AppColors.warning),
+                          SizedBox(width: r.rs(8)),
+                          Text(s.open.format(context), style: TextStyle(fontWeight: FontWeight.w700, fontSize: r.sp(14))),
                         ]),
                       ),
                     )),
@@ -163,12 +163,12 @@ class _DealerWorkingDaysScreenState extends State<DealerWorkingDaysScreen> {
                     Expanded(child: GestureDetector(
                       onTap: () => _pickTime(i, false),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(color: AppColors.surfaceVariant, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.border)),
+                        padding: EdgeInsets.symmetric(vertical: r.rh(12)),
+                        decoration: BoxDecoration(color: AppColors.surfaceVariant, borderRadius: BorderRadius.circular(r.rs(12)), border: Border.all(color: AppColors.border)),
                         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          const Icon(Icons.nights_stay_outlined, size: 16, color: Color(0xFF7C3AED)),
-                          const SizedBox(width: 8),
-                          Text(s.close.format(context), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                          Icon(Icons.nights_stay_outlined, size: r.sp(16), color: Color(0xFF7C3AED)),
+                          SizedBox(width: r.rs(8)),
+                          Text(s.close.format(context), style: TextStyle(fontWeight: FontWeight.w700, fontSize: r.sp(14))),
                         ]),
                       ),
                     )),
@@ -178,7 +178,7 @@ class _DealerWorkingDaysScreenState extends State<DealerWorkingDaysScreen> {
             );
           }),
 
-          const SizedBox(height: 24),
+          SizedBox(height: r.rh(24)),
           SizedBox(
             width: double.infinity, height: 54,
             child: ElevatedButton.icon(
@@ -187,7 +187,7 @@ class _DealerWorkingDaysScreenState extends State<DealerWorkingDaysScreen> {
               label: Text('Save Schedule', style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.bold)),
             ),
           ),
-          const SizedBox(height: 40),
+          SizedBox(height: r.rh(40)),
         ],
       ),
     );

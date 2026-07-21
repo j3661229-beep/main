@@ -32,32 +32,32 @@ class ProduceBoardScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 8),
+          SizedBox(height: r.rh(8)),
           FilterChipRow(
             options: crops,
             selected: selectedCrop ?? 'All',
             onSelect: (v) => ref.read(_produceBoardCropProvider.notifier).state = v == 'All' ? null : v,
             accent: AppColors.dealerAccent,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: r.rh(12)),
           Expanded(
             child: RefreshIndicator(
               color: AppColors.dealerAccent,
               onRefresh: () async => ref.invalidate(_produceListingsProvider),
               child: listings.when(
                 loading: () => ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(horizontal: r.rs(16)),
                   itemCount: 5,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, __) => SizedBox(height: r.rh(12)),
                   itemBuilder: (_, __) => const ShimmerBox(height: 120, radius: 16),
                 ),
                 error: (_, __) => const EmptyState(emoji: '⚠️', title: 'Could not load listings', subtitle: 'Check your connection and try again'),
                 data: (list) {
                   if (list.isEmpty) return const EmptyState(emoji: '🌾', title: 'No listings available', subtitle: 'Farmers will list their produce here');
                   return ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: r.rs(16)),
                     itemCount: list.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, __) => SizedBox(height: r.rh(12)),
                     itemBuilder: (_, i) => _ProduceListing(listing: list[i]),
                   );
                 },
@@ -92,10 +92,10 @@ class _ProduceListing extends StatelessWidget {
     )['emoji'] ?? '🌾';
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(r.rs(18)),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(r.rs(18)),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.7)),
         boxShadow: AppColors.softShadow,
       ),
@@ -105,24 +105,24 @@ class _ProduceListing extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 52, height: 52,
-                decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(14)),
+                width: r.rs(52), height: 52,
+                decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(r.rs(14))),
                 child: Center(child: Text(cropEmoji, style: TextStyle(fontSize: r.sp(28)))),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: r.rs(14)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(crop, style: GoogleFonts.spaceGrotesk(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.ink)),
+                    Text(crop, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(17), fontWeight: FontWeight.w700, color: AppColors.ink)),
                     Row(
                       children: [
-                        const Icon(Icons.person_outline, size: 13, color: AppColors.muted),
-                        const SizedBox(width: 3),
-                        Text(farmerName, style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+                        Icon(Icons.person_outline, size: r.sp(13), color: AppColors.muted),
+                        SizedBox(width: r.rs(3)),
+                        Text(farmerName, style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
                         if (village.isNotEmpty) ...[
                           Text(' · ', style: GoogleFonts.inter(color: AppColors.muted)),
-                          Text(village, style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+                          Text(village, style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
                         ],
                       ],
                     ),
@@ -131,13 +131,13 @@ class _ProduceListing extends StatelessWidget {
               ),
               if (distance != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(20)),
-                  child: Text('${distance}km', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.dealerAccent)),
+                  padding: EdgeInsets.symmetric(horizontal: r.rs(8), vertical: r.rh(4)),
+                  decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(r.rs(20))),
+                  child: Text('${distance}km', style: GoogleFonts.inter(fontSize: r.sp(11), fontWeight: FontWeight.w600, color: AppColors.dealerAccent)),
                 ),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: r.rh(14)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -146,12 +146,12 @@ class _ProduceListing extends StatelessWidget {
               _Stat(label: 'Total Value', value: formatRupee((askingPrice as num) * (quantity as num))),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: r.rh(14)),
           AppButton(
             label: 'Make Offer',
             onTap: () => context.push('/dealer/make-offer', extra: listing),
             color: AppColors.dealerAccent,
-            height: 44,
+            height: r.rh(44),
             icon: Icons.handshake_outlined,
           ),
         ],
@@ -165,12 +165,15 @@ class _Stat extends StatelessWidget {
   final Color? valueColor;
   const _Stat({required this.label, required this.value, this.valueColor});
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: GoogleFonts.inter(fontSize: 11, color: AppColors.muted)),
-      Text(value, style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w700, color: valueColor ?? AppColors.ink)),
+      Text(label, style: GoogleFonts.inter(fontSize: r.sp(11), color: AppColors.muted)),
+      Text(value, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(14), fontWeight: FontWeight.w700, color: valueColor ?? AppColors.ink)),
     ],
   );
+  }
 }
 

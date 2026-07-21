@@ -819,4 +819,16 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get acresUnit => 'एकर';
+
+  @override
+  String get farmSetupTitle => 'शेत सेटअप';
+
+  @override
+  String get farmSetupCompleteBanner => 'शेत सेटअप पूर्ण करा';
+
+  @override
+  String get farmSetupRequiredHint => 'AI, हवामान व मंडी सल्ल्यासाठी आवश्यक';
+
+  @override
+  String get yourFarmSummary => 'तुमचे शेत';
 }

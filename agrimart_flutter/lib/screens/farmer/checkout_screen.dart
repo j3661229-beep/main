@@ -116,16 +116,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
           return Column(children: [
             Expanded(
-              child: ListView(padding: const EdgeInsets.all(20), children: [
+              child: ListView(padding: EdgeInsets.all(r.rs(20)), children: [
                 Text('Store Pickup Time', style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-                const SizedBox(height: 12),
+                SizedBox(height: r.rh(12)),
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
+                    borderRadius: BorderRadius.circular(r.rs(16)),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: r.rs(10), offset: Offset(0, 4))],
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rh(4)),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: _pickupTime,
@@ -141,21 +141,21 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: r.rh(32)),
                 Text('Payment Method', style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-                const SizedBox(height: 12),
+                SizedBox(height: r.rh(12)),
                 Row(
                   children: [
                     Expanded(child: _methodCard('UPI', Icons.account_balance_wallet_outlined, 'UPI Pay')),
-                    const SizedBox(width: 12),
+                    SizedBox(width: r.rs(12)),
                     Expanded(child: _methodCard('COD', Icons.local_shipping_outlined, 'Cash on Delivery')),
                   ],
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: r.rh(32)),
                 _orderSummary(items, total),
                 if (_error != null) ...[
-                  const SizedBox(height: 16),
-                  Text(_error!, style: const TextStyle(color: AppColors.error, fontSize: 13)),
+                  SizedBox(height: r.rh(16)),
+                  Text(_error!, style: TextStyle(color: AppColors.error, fontSize: r.sp(13))),
                 ],
               ]),
             ),
@@ -172,37 +172,38 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   Widget _buildUpiStep(double total) {
+    final r = context.r;
     final suppliers = (_upiDetails!['suppliers'] as List?) ?? [];
     return Column(
       children: [
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(r.rs(20)),
             children: [
               Text('Pay via UPI', style: TextStyle(fontSize: context.r.sp(18), fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
+              SizedBox(height: r.rh(8)),
               Text('Pay ₹${total.toStringAsFixed(0)} to the supplier UPI ID below, then enter your UTR number.',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
-              const SizedBox(height: 20),
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: r.sp(13))),
+              SizedBox(height: r.rh(20)),
               ...suppliers.map((s) => Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
+                margin: EdgeInsets.only(bottom: r.rh(12)),
+                padding: EdgeInsets.all(r.rs(16)),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(r.rs(14)),
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(s['businessName'] ?? 'Supplier', style: const TextStyle(fontWeight: FontWeight.w700)),
-                    const SizedBox(height: 6),
-                    Text('UPI: ${s['upiId'] ?? 'Not set — contact supplier'}', style: const TextStyle(fontSize: 14)),
-                    Text('Amount: ₹${(s['subtotal'] as num?)?.toStringAsFixed(0) ?? '0'}', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                    SizedBox(height: r.rh(6)),
+                    Text('UPI: ${s['upiId'] ?? 'Not set — contact supplier'}', style: TextStyle(fontSize: r.sp(14))),
+                    Text('Amount: ₹${(s['subtotal'] as num?)?.toStringAsFixed(0) ?? '0'}', style: TextStyle(fontSize: r.sp(13), color: AppColors.textSecondary)),
                   ],
                 ),
               )),
-              const SizedBox(height: 16),
+              SizedBox(height: r.rh(16)),
               TextField(
                 controller: _utrCtrl,
                 decoration: const InputDecoration(
@@ -212,8 +213,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 ),
               ),
               if (_error != null) ...[
-                const SizedBox(height: 12),
-                Text(_error!, style: const TextStyle(color: AppColors.error, fontSize: 13)),
+                SizedBox(height: r.rh(12)),
+                Text(_error!, style: TextStyle(color: AppColors.error, fontSize: r.sp(13))),
               ],
             ],
           ),
@@ -224,22 +225,23 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   Widget _methodCard(String method, IconData icon, String label) {
+    final r = context.r;
     final selected = _paymentMethod == method;
     return GestureDetector(
       onTap: _placing ? null : () => setState(() => _paymentMethod = method),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.symmetric(vertical: r.rh(16)),
         decoration: BoxDecoration(
           color: selected ? AppColors.primarySurface : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(r.rs(16)),
           border: Border.all(color: selected ? AppColors.primary : AppColors.border),
         ),
         child: Column(children: [
           Icon(icon, color: selected ? AppColors.primary : AppColors.textSecondary),
-          const SizedBox(height: 8),
+          SizedBox(height: r.rh(8)),
           Text(label, textAlign: TextAlign.center, style: TextStyle(
             color: selected ? AppColors.primaryDark : AppColors.textSecondary,
-            fontWeight: FontWeight.w700, fontSize: 12,
+            fontWeight: FontWeight.w700, fontSize: r.sp(12),
           )),
         ]),
       ),
@@ -247,31 +249,32 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   Widget _orderSummary(List items, double total) {
+    final r = context.r;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Order Summary', style: TextStyle(fontSize: context.r.sp(16), fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-        const SizedBox(height: 16),
+        SizedBox(height: r.rh(16)),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(r.rs(16)),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(r.rs(16)),
             border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
           ),
           child: Column(
             children: [
               ...items.map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: EdgeInsets.only(bottom: r.rh(12)),
                 child: Row(children: [
-                  Expanded(child: Text(item['product']?['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                  Text('${item['quantity']}×', style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-                  const SizedBox(width: 12),
+                  Expanded(child: Text(item['product']?['name'] ?? '', style: TextStyle(fontWeight: FontWeight.w600, fontSize: r.sp(13)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                  Text('${item['quantity']}×', style: TextStyle(color: AppColors.textSecondary, fontSize: r.sp(12))),
+                  SizedBox(width: r.rs(12)),
                   Text('₹${((item['product']?['price'] as num? ?? 0) * (item['quantity'] as num? ?? 1)).toStringAsFixed(0)}',
-                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: r.sp(14))),
                 ]),
               )),
-              const Divider(height: 24),
+              Divider(height: r.rh(24)),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 const Text('Total Amount', style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
                 Text('₹${total.toStringAsFixed(0)}', style: AppTextStyles.price),
@@ -284,26 +287,27 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   Widget _bottomBar({required String label, required VoidCallback onTap}) {
+    final r = context.r;
     return Container(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+      padding: EdgeInsets.fromLTRB(r.rs(24), r.rh(20), r.rs(24), r.rh(24)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, -10))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: r.rs(20), offset: Offset(0, -10))],
       ),
       child: SafeArea(
         child: SizedBox(
           width: double.infinity,
-          height: 54,
+          height: r.rh(54),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(r.rs(16))),
               elevation: 0,
             ),
             onPressed: _placing ? null : onTap,
             child: _placing
-                ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                ? SizedBox(width: r.rs(22), height: r.rh(22), child: CircularProgressIndicator(color: Colors.white, strokeWidth: r.rs(2)))
                 : Text(label, style: TextStyle(fontSize: context.r.sp(16), fontWeight: FontWeight.bold)),
           ),
         ),

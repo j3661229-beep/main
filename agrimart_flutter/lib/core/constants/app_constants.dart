@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class AppConstants {
   AppConstants._();
 
@@ -5,13 +7,15 @@ class AppConstants {
   static const String productionApiUrl =
       'https://agrimart-775670922011.europe-west1.run.app/api';
 
-  // Local dev override:
-  //   flutter run --dart-define=API_BASE_URL=http://YOUR_LAN_IP:3000/api
-  //   Android emulator: http://10.0.2.2:3000/api
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: productionApiUrl,
-  );
+  // Local backend (same Wi‑Fi as phone/emulator)
+  static const String localApiUrl = 'http://192.168.216.185:3000/api';
+
+  // Override at build time: flutter run --dart-define=API_BASE_URL=...
+  static String get baseUrl {
+    const fromEnv = String.fromEnvironment('API_BASE_URL');
+    if (fromEnv.isNotEmpty) return fromEnv;
+    return kDebugMode ? localApiUrl : productionApiUrl;
+  }
 
   /// Normalized base URL — always ends with `/api`.
   static String get apiBaseUrl {
@@ -24,6 +28,12 @@ class AppConstants {
     }
     return url;
   }
+
+  // YouTube Data API v3 (Krishi TV) — restrict key in Google Cloud Console to Android app + YouTube Data API v3 only
+  static const String youtubeApiKey = String.fromEnvironment(
+    'YOUTUBE_API_KEY',
+    defaultValue: 'AIzaSyAqyDXY0owpfN_VrMbv-XCNt9ziBnYG10A',
+  );
 
   // Storage keys
   static const String tokenKey = 'auth_token';

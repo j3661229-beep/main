@@ -271,13 +271,12 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Carousel / Hot Deals (Swiggy Horizontal Promos)
-                      const SizedBox(height: 16),
+                      SizedBox(height: r.rh(16)),
                       RepaintBoundary(
-                        child: SizedBox(
-                          height: 140,
+                        child: SizedBox(height: r.rh(140),
                           child: ListView(
                             scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: EdgeInsets.symmetric(horizontal: r.rs(16)),
                             physics: const BouncingScrollPhysics(),
                             children: [
                               _PromoBanner(
@@ -300,19 +299,19 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: r.rh(24)),
 
                       // "Explore By Category" Grid
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: r.rs(16)),
                         child: Text(l10n.exploreByCategory,
                             style: AppTextStyles.headingMD),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: r.rh(16)),
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: r.rs(16)),
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
@@ -343,9 +342,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           );
                         },
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: r.rh(16)),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: r.rs(16)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -355,7 +354,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                 color: AppColors.textSecondary,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: r.rh(8)),
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
@@ -398,35 +397,34 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: r.rh(24)),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: r.rs(16)),
                         child: Text(l10n.availableNearYou,
                             style: AppTextStyles.headingMD),
                       ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        height: 170,
+                      SizedBox(height: r.rh(12)),
+                      SizedBox(height: r.rh(170),
                         child: nearbySuppliers.when(
                           loading: () => ListView(
                             scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: EdgeInsets.symmetric(horizontal: r.rs(16)),
                             children: List.generate(
                               3,
                               (_) => Container(
-                                width: 220,
-                                margin: const EdgeInsets.only(right: 12),
+                                width: r.rs(220),
+                                margin: EdgeInsets.only(right: r.rs(12)),
                                 child: const AppShimmerCard(),
                               ),
                             ),
                           ),
                           error: (e, _) => Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: EdgeInsets.symmetric(horizontal: r.rs(16)),
                             child: Row(
                               children: [
                                 Icon(Icons.wifi_off_rounded,
-                                    color: AppColors.textSecondary, size: 20),
-                                const SizedBox(width: 8),
+                                    color: AppColors.textSecondary, size: r.sp(20)),
+                                SizedBox(width: r.rs(8)),
                                 Expanded(
                                   child: Text(
                                     'Could not load nearby suppliers',
@@ -452,7 +450,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                             return ListView.builder(
                               scrollDirection: Axis.horizontal,
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
+                                  EdgeInsets.symmetric(horizontal: r.rs(16)),
                               itemCount: suppliers.length,
                               itemBuilder: (context, i) => _NearbySupplierCard(
                                 supplier: suppliers[i] as Map,
@@ -461,7 +459,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           },
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: r.rh(10)),
                     ],
                   ),
                 ),
@@ -552,16 +550,15 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                       context.push('/farmer/cart');
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 16),
+                      padding: EdgeInsets.symmetric(horizontal: r.rs(20), vertical: r.rh(16)),
                       decoration: BoxDecoration(
                         color: const Color(0xFF10B981), // Swiggy green
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(r.rs(16)),
                         boxShadow: [
                           BoxShadow(
                               color: const Color(0xFF10B981)
                                   .withValues(alpha: 0.3),
-                              blurRadius: 15,
+                              blurRadius: r.rs(15),
                               offset: const Offset(0, 5))
                         ],
                       ),
@@ -574,9 +571,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                             children: [
                                Text(
                                   '$totalItems ${totalItems > 1 ? l10n.itemsCount : l10n.itemCount}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 13,
+                                      fontSize: r.sp(13),
                                       fontWeight: FontWeight.w600)),
                               Text('₹${totalPrice.toStringAsFixed(0)}',
                                   style: TextStyle(
@@ -593,9 +590,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                       color: Colors.white,
                                       fontSize: r.sp(16),
                                       fontWeight: FontWeight.bold)),
-                              SizedBox(width: 8),
+                              SizedBox(width: r.rs(8)),
                               Icon(Icons.arrow_forward_ios,
-                                  color: Colors.white, size: 16),
+                                  color: Colors.white, size: r.sp(16)),
                             ],
                           )
                         ],
@@ -661,11 +658,11 @@ class _ProductCardSwiggy extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(r.rs(24)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 15,
+                blurRadius: r.rs(15),
                 offset: const Offset(0, 10),
               )
             ],
@@ -691,13 +688,13 @@ class _ProductCardSwiggy extends StatelessWidget {
                               imageUrl: product['images'][0],
                               memCacheWidth: 400,
                               fit: BoxFit.cover,
-                              errorWidget: (_, __, ___) => const Center(
+                              errorWidget: (_, __, ___) => Center(
                                   child: Text('🌿',
-                                      style: TextStyle(fontSize: 40))),
+                                      style: TextStyle(fontSize: r.sp(40)))),
                             )
-                          : const Center(
+                          : Center(
                               child:
-                                  Text('🌿', style: TextStyle(fontSize: 40))),
+                                  Text('🌿', style: TextStyle(fontSize: r.sp(40)))),
                     ),
                   ),
                 ),
@@ -721,21 +718,20 @@ class _ProductCardSwiggy extends StatelessWidget {
                     top: 10,
                     left: 10,
                     child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                        padding: EdgeInsets.symmetric(horizontal: r.rs(8), vertical: r.rh(4)),
                         decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(r.rs(10)),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)
+                              BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: r.rs(4))
                             ]),
                         child: Row(
                           children: [
-                            const Text('🌱', style: TextStyle(fontSize: 10)),
-                            const SizedBox(width: 4),
+                            Text('🌱', style: TextStyle(fontSize: r.sp(10))),
+                            SizedBox(width: r.rs(4)),
                             Text(l10n.organic,
-                                style: const TextStyle(
-                                    fontSize: 8,
+                                style: TextStyle(
+                                    fontSize: r.sp(8),
                                     fontWeight: FontWeight.w900,
                                     color: AppColors.success,
                                     letterSpacing: 0.5)),
@@ -748,23 +744,23 @@ class _ProductCardSwiggy extends StatelessWidget {
 
           // Details Area
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(r.rs(16)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(product['name'] ?? '',
                     style: AppTextStyles.headingSM
-                        .copyWith(fontSize: 15, height: 1.2, fontWeight: FontWeight.w800),
+                        .copyWith(fontSize: r.sp(15), height: 1.2, fontWeight: FontWeight.w800),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 6),
+                SizedBox(height: r.rh(6)),
                 Text('${product['brand'] ?? 'Local'} • ${product['unit']}',
                     style: AppTextStyles.caption.copyWith(
-                      fontSize: 11, 
+                      fontSize: r.sp(11), 
                       fontWeight: FontWeight.w600,
                       color: AppColors.textTertiary,
                     )),
-                const SizedBox(height: 12),
+                SizedBox(height: r.rh(12)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -776,52 +772,51 @@ class _ProductCardSwiggy extends StatelessWidget {
                       GestureDetector(
                         onTap: () => onUpdateCart(1),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 6),
+                          padding: EdgeInsets.symmetric(horizontal: r.rs(14), vertical: r.rh(6)),
                           decoration: BoxDecoration(
                               border: Border.all(color: AppColors.primary.withValues(alpha: 0.5)),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(r.rs(10)),
                               color: Colors.white,
                               boxShadow: [
-                                BoxShadow(color: AppColors.primary.withValues(alpha: 0.1), blurRadius: 4, offset: const Offset(0, 2))
+                                BoxShadow(color: AppColors.primary.withValues(alpha: 0.1), blurRadius: r.rs(4), offset: Offset(0, 2))
                               ]),
                           child: Text(l10n.add,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: AppColors.primary,
                                   fontWeight: FontWeight.w900,
-                                  fontSize: 12,
+                                  fontSize: r.sp(12),
                                   letterSpacing: 0.5)),
                         ),
                       )
                     else
                       Container(
-                          height: 32,
+                          height: r.rh(32),
                           decoration: BoxDecoration(
                             color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(r.rs(10)),
                             boxShadow: [
-                              BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 3))
+                              BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: r.rs(6), offset: Offset(0, 3))
                             ]
                           ),
                           child: Row(children: [
                             GestureDetector(
                               onTap: () => onUpdateCart(cartQty - 1),
-                              child: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                              child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: r.rs(8)),
                                   child: Icon(Icons.remove,
-                                      color: Colors.white, size: 14)),
+                                      color: Colors.white, size: r.sp(14))),
                             ),
                             Text('$cartQty',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w900,
-                                    fontSize: 13)),
+                                    fontSize: r.sp(13))),
                             GestureDetector(
                               onTap: () => onUpdateCart(cartQty + 1),
-                              child: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                              child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: r.rs(8)),
                                   child: Icon(Icons.add,
-                                      color: Colors.white, size: 14)),
+                                      color: Colors.white, size: r.sp(14))),
                             ),
                           ]))
                   ],
@@ -857,8 +852,8 @@ class _CategoryGridItem extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              height: 64,
-              width: 64,
+              height: r.rh(64),
+              width: r.rs(64),
               decoration: BoxDecoration(
                   color: isSelected ? AppColors.primaryDark : color,
                   shape: BoxShape.circle,
@@ -869,17 +864,17 @@ class _CategoryGridItem extends StatelessWidget {
                       ? [
                           BoxShadow(
                               color: AppColors.primary.withValues(alpha: 0.3),
-                              blurRadius: 8)
+                              blurRadius: r.rs(8))
                         ]
                       : null),
               child: Center(
-                  child: Text(icon, style: const TextStyle(fontSize: 32))),
+                  child: Text(icon, style: TextStyle(fontSize: r.sp(32)))),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: r.rh(8)),
             Text(
               label,
               style: TextStyle(
-                  fontSize: 12,
+                  fontSize: r.sp(12),
                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   color: isSelected
                       ? AppColors.primaryDark
@@ -907,19 +902,19 @@ class _PromoBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = context.r;
     return Container(
-      width: 280,
-      margin: const EdgeInsets.only(right: 16),
-      padding: const EdgeInsets.all(20),
+      width: r.rs(280),
+      margin: EdgeInsets.only(right: r.rs(16)),
+      padding: EdgeInsets.all(r.rs(20)),
       decoration: BoxDecoration(
         gradient: LinearGradient(
             colors: colors,
             begin: Alignment.topLeft,
             end: Alignment.bottomRight),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(r.rs(20)),
         boxShadow: [
           BoxShadow(
               color: colors.last.withValues(alpha: 0.3),
-              blurRadius: 10,
+              blurRadius: r.rs(10),
               offset: const Offset(0, 4))
         ],
       ),
@@ -932,12 +927,12 @@ class _PromoBanner extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(title,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: Colors.white70,
                         fontWeight: FontWeight.w900,
-                        fontSize: 11,
+                        fontSize: r.sp(11),
                         letterSpacing: 1.2)),
-                const SizedBox(height: 4),
+                SizedBox(height: r.rh(4)),
                 Text(subtitle,
                     style: TextStyle(
                         color: Colors.white,
@@ -947,7 +942,7 @@ class _PromoBanner extends StatelessWidget {
               ],
             ),
           ),
-          Text(emoji, style: const TextStyle(fontSize: 48)),
+          Text(emoji, style: TextStyle(fontSize: r.sp(48))),
         ],
       ),
     );
@@ -966,28 +961,28 @@ class _NearbySupplierCard extends StatelessWidget {
 
     return FadeInLeft(
       child: Container(
-        width: 250,
-        margin: const EdgeInsets.only(right: 16),
+        width: r.rs(250),
+        margin: EdgeInsets.only(right: r.rs(16)),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(r.rs(24)),
           border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 20,
+              blurRadius: r.rs(20),
               offset: const Offset(0, 10),
             )
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(r.rs(24)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Supplier Info Header
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(r.rs(16)),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -1001,22 +996,22 @@ class _NearbySupplierCard extends StatelessWidget {
                 child: Row(
                   children: [
                     Container(
-                      width: 44,
-                      height: 44,
+                      width: r.rs(44),
+                      height: r.rh(44),
                       decoration: BoxDecoration(
                         color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(r.rs(14)),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.primary.withValues(alpha: 0.3),
-                            blurRadius: 8,
+                            blurRadius: r.rs(8),
                             offset: const Offset(0, 4),
                           )
                         ],
                       ),
                       child: Center(child: Text('🏬', style: TextStyle(fontSize: r.sp(20)))),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: r.rs(12)),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1025,7 +1020,7 @@ class _NearbySupplierCard extends StatelessWidget {
                             supplier['businessName']?.toString() ?? l10n.store,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: AppTextStyles.headingSM.copyWith(fontSize: 15),
+                            style: AppTextStyles.headingSM.copyWith(fontSize: r.sp(15)),
                           ),
                           Text(
                             '${supplier['distanceKm'] ?? '--'} km away',
@@ -1046,21 +1041,21 @@ class _NearbySupplierCard extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(r.horizontalPadding, 0, r.horizontalPadding, 16),
                 child: products.isNotEmpty
                     ? Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: r.rs(8),
+                        runSpacing: r.rs(8),
                         children: products.take(2).map((p) {
                           return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            padding: EdgeInsets.symmetric(horizontal: r.rs(10), vertical: r.rh(6)),
                             decoration: BoxDecoration(
                               color: AppColors.primarySurface.withValues(alpha: 0.5),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(r.rs(12)),
                               border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Text('🌱', style: TextStyle(fontSize: 12)),
-                                const SizedBox(width: 4),
+                                Text('🌱', style: TextStyle(fontSize: r.sp(12))),
+                                SizedBox(width: r.rs(4)),
                                 Text(
                                   p['name']?.toString() ?? 'Product',
                                   style: AppTextStyles.caption.copyWith(
@@ -1080,15 +1075,15 @@ class _NearbySupplierCard extends StatelessWidget {
               ),
               
               // View Button
-              const Spacer(),
+              Spacer(),
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(r.rs(16)),
                 child: Container(
                   width: double.infinity,
-                  height: 36,
+                  height: r.rh(36),
                   decoration: BoxDecoration(
                     color: AppColors.primarySurface,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(r.rs(12)),
                   ),
                   child: Center(
                     child: Text(
@@ -1121,7 +1116,7 @@ class _SortChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = context.r;
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
+      padding: EdgeInsets.only(right: r.rs(8)),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -1129,13 +1124,13 @@ class _SortChip extends StatelessWidget {
             HapticFeedback.selectionClick();
             onTap();
           },
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(r.rs(20)),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rh(8)),
             decoration: BoxDecoration(
               color: selected ? AppColors.primary : Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(r.rs(20)),
               border: Border.all(
                 color: selected ? AppColors.primary : AppColors.border,
               ),
@@ -1143,7 +1138,7 @@ class _SortChip extends StatelessWidget {
                   ? [
                       BoxShadow(
                         color: AppColors.primary.withValues(alpha: 0.3),
-                        blurRadius: 8,
+                        blurRadius: r.rs(8),
                         offset: const Offset(0, 4),
                       )
                     ]
@@ -1154,7 +1149,7 @@ class _SortChip extends StatelessWidget {
               style: TextStyle(
                 color: selected ? Colors.white : AppColors.textPrimary,
                 fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 13,
+                fontSize: r.sp(13),
               ),
             ),
           ),
@@ -1209,7 +1204,7 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
                     ? [
                         BoxShadow(
                             color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
+                            blurRadius: r.rs(10),
                             offset: const Offset(0, 4))
                       ]
                     : null,
@@ -1220,7 +1215,7 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
         
         SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rh(8)),
             child: Column(
               children: [
                 Row(
@@ -1232,7 +1227,7 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
                         size: 28
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: r.rs(8)),
                     Expanded(
                       child: GestureDetector(
                         onTap: onLocationTap,
@@ -1250,15 +1245,15 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
                                       fontWeight: FontWeight.w800,
                                       fontSize: r.sp(16))
                                 ),
-                                const Icon(Icons.keyboard_arrow_down,
-                                    color: Colors.white, size: 20),
+                                Icon(Icons.keyboard_arrow_down,
+                                    color: Colors.white, size: r.sp(20)),
                               ],
                             ),
                             Text(
                               locationName,
                               style: TextStyle(
                                   color: isCustomLocation ? const Color(0xFFFBBF24) : Colors.white70, 
-                                  fontSize: 12
+                                  fontSize: r.sp(12)
                               ),
                               overflow: TextOverflow.ellipsis
                             ),
@@ -1268,8 +1263,8 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
                     ),
                     FadeInRight(
                       child: Container(
-                        width: 42,
-                        height: 42,
+                        width: r.rs(42),
+                        height: r.rh(42),
                         decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.2), 
                             shape: BoxShape.circle,
@@ -1289,7 +1284,7 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
                       child: Center(
                         child: Text(
                           '', // Placeholder for potential tagline
-                          style: TextStyle(color: Colors.white, fontSize: 13),
+                          style: TextStyle(color: Colors.white, fontSize: r.sp(13)),
                         ),
                       ),
                     ),
@@ -1301,12 +1296,12 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
                 FadeInUp(
                   duration: const Duration(milliseconds: 600),
                   child: Container(
-                    height: 54,
+                    height: r.rh(54),
                     decoration: BoxDecoration(
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 20,
+                          blurRadius: r.rs(20),
                           offset: const Offset(0, 8),
                         )
                       ],
@@ -1318,25 +1313,25 @@ class _SwiggyHeaderDelegate extends SliverPersistentHeaderDelegate {
                         fillColor: Colors.white,
                         filled: true,
                         hintText: l10n.searchProducts,
-                        prefixIcon: const Icon(Icons.search,
-                            color: AppColors.primary, size: 24),
+                        prefixIcon: Icon(Icons.search,
+                            color: AppColors.primary, size: r.sp(24)),
                         suffixIcon: searchQuery.isNotEmpty
                             ? IconButton(
                                 icon: const Icon(Icons.clear, color: AppColors.textTertiary),
                                 onPressed: onClearSearch,
                               )
                             : null,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        contentPadding: EdgeInsets.symmetric(horizontal: r.rs(20), vertical: r.rh(16)),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(r.rs(16)),
                           borderSide: BorderSide.none,
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(r.rs(16)),
                           borderSide: BorderSide.none,
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(r.rs(16)),
                           borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
                         ),
                       ),
@@ -1401,69 +1396,69 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
       child: Column(
         children: [
           // Handle
-          const SizedBox(height: 12),
-          Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(4))),
-          const SizedBox(height: 20),
+          SizedBox(height: r.rh(12)),
+          Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(r.rs(4)))),
+          SizedBox(height: r.rh(20)),
 
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: r.rs(20)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Choose Location', style: AppTextStyles.headingXL),
-              const SizedBox(height: 4),
+              SizedBox(height: r.rh(4)),
               Text('Browse products from a different area', style: AppTextStyles.bodySM.copyWith(color: AppColors.textSecondary)),
             ]),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: r.rh(20)),
 
           // GPS option
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: r.rs(20)),
             child: GestureDetector(
               onTap: widget.onUseGPS,
               child: Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(r.rs(16)),
                 decoration: BoxDecoration(
                   color: widget.currentLocation == null ? AppColors.primarySurface : Colors.white,
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(r.rs(18)),
                   border: Border.all(color: widget.currentLocation == null ? AppColors.primary : AppColors.border),
                 ),
                 child: Row(children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(r.rs(10)),
                     decoration: BoxDecoration(color: widget.currentLocation == null ? AppColors.primary : AppColors.surfaceVariant, shape: BoxShape.circle),
-                    child: Icon(Icons.my_location, color: widget.currentLocation == null ? Colors.white : AppColors.textSecondary, size: 20),
+                    child: Icon(Icons.my_location, color: widget.currentLocation == null ? Colors.white : AppColors.textSecondary, size: r.sp(20)),
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: r.rs(14)),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('📍 Use Current Location', style: AppTextStyles.headingSM),
                     Text('Products near your GPS location', style: AppTextStyles.caption),
                   ])),
-                  if (widget.currentLocation == null) const Icon(Icons.check_circle, color: AppColors.primary, size: 22),
+                  if (widget.currentLocation == null) Icon(Icons.check_circle, color: AppColors.primary, size: r.sp(22)),
                 ]),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: r.rh(16)),
 
           // Search
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: r.rs(20)),
             child: TextField(
               controller: _filterCtrl,
               decoration: InputDecoration(
                 hintText: 'Search district...',
                 prefixIcon: const Icon(Icons.search, color: AppColors.textTertiary),
-                suffixIcon: _filter.isNotEmpty ? IconButton(icon: const Icon(Icons.clear, size: 18), onPressed: () { _filterCtrl.clear(); setState(() => _filter = ''); }) : null,
+                suffixIcon: _filter.isNotEmpty ? IconButton(icon: Icon(Icons.clear, size: r.sp(18)), onPressed: () { _filterCtrl.clear(); setState(() => _filter = ''); }) : null,
               ),
               onChanged: (v) => setState(() => _filter = v),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: r.rh(12)),
 
           // District list
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: r.rs(20)),
               itemCount: _filtered.length,
               itemBuilder: (context, i) {
                 final d = _filtered[i];
@@ -1471,18 +1466,18 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
                 return GestureDetector(
                   onTap: () => widget.onSelectDistrict(d),
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    margin: EdgeInsets.only(bottom: r.rh(8)),
+                    padding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rh(14)),
                     decoration: BoxDecoration(
                       color: isSelected ? AppColors.primarySurface : Colors.white,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(r.rs(14)),
                       border: Border.all(color: isSelected ? AppColors.primary : AppColors.border.withValues(alpha: 0.5)),
                     ),
                     child: Row(children: [
                       Text('📌', style: TextStyle(fontSize: r.sp(18))),
-                      const SizedBox(width: 12),
+                      SizedBox(width: r.rs(12)),
                       Expanded(child: Text(d['name'] as String, style: AppTextStyles.headingSM.copyWith(color: isSelected ? AppColors.primary : AppColors.textPrimary))),
-                      if (isSelected) const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
+                      if (isSelected) Icon(Icons.check_circle, color: AppColors.primary, size: r.sp(20)),
                     ]),
                   ),
                 );

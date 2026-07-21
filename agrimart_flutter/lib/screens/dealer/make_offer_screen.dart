@@ -66,7 +66,7 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
         leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(r.rs(16)),
         child: Form(
           key: _formKey,
           child: Column(
@@ -75,42 +75,42 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
 
               // ── Summary card ─────────────────────────────
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(r.rs(20)),
                 decoration: BoxDecoration(
                   gradient: AppColors.dealerGradient,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [BoxShadow(color: AppColors.dealerAccent.withValues(alpha: 0.3), blurRadius: 16, offset: const Offset(0, 8))],
+                  borderRadius: BorderRadius.circular(r.rs(20)),
+                  boxShadow: [BoxShadow(color: AppColors.dealerAccent.withValues(alpha: 0.3), blurRadius: r.rs(16), offset: Offset(0, 8))],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Produce Summary', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.8))),
-                    const SizedBox(height: 6),
+                    Text('Produce Summary', style: GoogleFonts.inter(fontSize: r.sp(12), color: Colors.white.withValues(alpha: 0.8))),
+                    SizedBox(height: r.rh(6)),
                     Text(crop, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(26), fontWeight: FontWeight.w800, color: Colors.white)),
-                    const SizedBox(height: 12),
+                    SizedBox(height: r.rh(12)),
                     Row(children: [
                       _SummaryChip(label: 'Farmer', value: farmerName),
-                      const SizedBox(width: 16),
+                      SizedBox(width: r.rs(16)),
                       if (village.isNotEmpty) _SummaryChip(label: 'Village', value: village),
                     ]),
-                    const SizedBox(height: 10),
+                    SizedBox(height: r.rh(10)),
                     Row(children: [
                       _SummaryChip(label: 'Quantity', value: '${_quantity.toInt()} qtl'),
-                      const SizedBox(width: 16),
+                      SizedBox(width: r.rs(16)),
                       _SummaryChip(label: 'Asking', value: '${formatRupee(_askingPrice)}/qtl'),
                     ]),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: r.rh(20)),
 
               // ── Offer form ────────────────────────────────
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(r.rs(20)),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(r.rs(20)),
                   border: Border.all(color: AppColors.border),
                   boxShadow: AppColors.softShadow,
                 ),
@@ -118,10 +118,10 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Your Offer', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(16), fontWeight: FontWeight.w700, color: AppColors.ink)),
-                    const SizedBox(height: 16),
+                    SizedBox(height: r.rh(16)),
 
-                    Text('Offer Price / quintal *', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.muted)),
-                    const SizedBox(height: 6),
+                    Text('Offer Price / quintal *', style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w500, color: AppColors.muted)),
+                    SizedBox(height: r.rh(6)),
                     TextFormField(
                       controller: _offerCtrl,
                       keyboardType: TextInputType.number,
@@ -131,7 +131,7 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
                         prefixText: '₹ ',
                         prefixStyle: GoogleFonts.spaceGrotesk(fontSize: r.sp(20), fontWeight: FontWeight.w700, color: AppColors.dealerAccent),
                         suffixText: '/qtl',
-                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.dealerAccent, width: 2)),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(r.rs(12)), borderSide: BorderSide(color: AppColors.dealerAccent, width: 2)),
                       ),
                       onChanged: (_) => setState(() {}),
                       validator: (v) {
@@ -141,37 +141,37 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
                       },
                     ),
 
-                    const SizedBox(height: 16),
+                    SizedBox(height: r.rh(16)),
 
-                    Text('Pickup Date *', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.muted)),
-                    const SizedBox(height: 6),
+                    Text('Pickup Date *', style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w500, color: AppColors.muted)),
+                    SizedBox(height: r.rh(6)),
                     GestureDetector(
                       onTap: _pickDate,
                       child: Container(
-                        padding: const EdgeInsets.all(14),
+                        padding: EdgeInsets.all(r.rs(14)),
                         decoration: BoxDecoration(
                           border: Border.all(color: _pickupDate != null ? AppColors.dealerAccent : AppColors.border, width: _pickupDate != null ? 2 : 1),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(r.rs(12)),
                           color: AppColors.surface,
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.calendar_today_outlined, color: AppColors.dealerAccent, size: 20),
-                            const SizedBox(width: 10),
+                            Icon(Icons.calendar_today_outlined, color: AppColors.dealerAccent, size: r.sp(20)),
+                            SizedBox(width: r.rs(10)),
                             Text(
                               _pickupDate != null
                                   ? '${_pickupDate!.day} ${_months[_pickupDate!.month - 1]} ${_pickupDate!.year}'
                                   : 'Select pickup date',
-                              style: GoogleFonts.inter(fontSize: 14, color: _pickupDate != null ? AppColors.ink : AppColors.placeholder),
+                              style: GoogleFonts.inter(fontSize: r.sp(14), color: _pickupDate != null ? AppColors.ink : AppColors.placeholder),
                             ),
                           ],
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    SizedBox(height: r.rh(20)),
                     const Divider(color: AppColors.border),
-                    const SizedBox(height: 16),
+                    SizedBox(height: r.rh(16)),
 
                     // Live total
                     Row(
@@ -180,8 +180,8 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Computed Total', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
-                            Text('${formatRupee(_offerPrice)}/qtl × ${_quantity.toInt()} qtl', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+                            Text('Computed Total', style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
+                            Text('${formatRupee(_offerPrice)}/qtl × ${_quantity.toInt()} qtl', style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
                           ],
                         ),
                         Text(formatRupee(_total), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(24), fontWeight: FontWeight.w800, color: AppColors.dealerAccent)),
@@ -191,7 +191,7 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              SizedBox(height: r.rh(24)),
               AppButton(
                 label: 'Send Offer & Pay Advance',
                 onTap: () {
@@ -210,7 +210,7 @@ class _MakeOfferScreenState extends ConsumerState<MakeOfferScreen> {
                 color: AppColors.dealerAccent,
                 icon: Icons.send_rounded,
               ),
-              const SizedBox(height: 80),
+              SizedBox(height: r.rh(80)),
             ],
           ),
         ),
@@ -225,12 +225,15 @@ class _SummaryChip extends StatelessWidget {
   final String label, value;
   const _SummaryChip({required this.label, required this.value});
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: GoogleFonts.inter(fontSize: 11, color: Colors.white.withValues(alpha: 0.7))),
-      Text(value, style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+      Text(label, style: GoogleFonts.inter(fontSize: r.sp(11), color: Colors.white.withValues(alpha: 0.7))),
+      Text(value, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(14), fontWeight: FontWeight.w600, color: Colors.white)),
     ],
   );
+  }
 }
 

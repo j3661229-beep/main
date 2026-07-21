@@ -32,21 +32,21 @@ class WeatherScreen extends ConsumerWidget {
             message: 'Could not load weather data from API',
             onRetry: () => ref.invalidate(weatherProvider)),
         data: (data) => SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(r.rs(16)),
             child: Column(children: [
               // Main weather card
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(r.rs(24)),
                 decoration: const BoxDecoration(
                     gradient: LinearGradient(
                         colors: [Color(0xFF4FC3F7), Color(0xFF0277BD)]),
                     borderRadius: BorderRadius.all(Radius.circular(20))),
                 child: Column(children: [
-                  const Text('☀️', style: TextStyle(fontSize: 64)),
-                  const SizedBox(height: 8),
+                  Text('☀️', style: TextStyle(fontSize: r.sp(64))),
+                  SizedBox(height: r.rh(8)),
                   Text('${data['main']?['temp']?.toStringAsFixed(0) ?? '--'}°C',
-                      style: const TextStyle(
-                          fontSize: 56,
+                      style: TextStyle(
+                          fontSize: r.sp(56),
                           fontWeight: FontWeight.w800,
                           color: Colors.white)),
                   Text('${data['weather']?[0]?['description'] ?? ''}',
@@ -55,9 +55,9 @@ class WeatherScreen extends ConsumerWidget {
                           color: Colors.white.withValues(alpha: 0.85))),
                   Text(data['name'] ?? 'Current Location',
                       style: TextStyle(
-                          fontSize: 14,
+                          fontSize: r.sp(14),
                           color: Colors.white.withValues(alpha: 0.65))),
-                  const SizedBox(height: 20),
+                  SizedBox(height: r.rh(20)),
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -71,7 +71,7 @@ class WeatherScreen extends ConsumerWidget {
                 ]),
               ),
 
-              const SizedBox(height: 16),
+              SizedBox(height: r.rh(16)),
               // Farm Advisory
               advisory.when(
                 loading: () => const AppShimmerCard(),
@@ -84,17 +84,17 @@ class WeatherScreen extends ConsumerWidget {
                   final list = adv['advisories'];
                   return Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(r.rs(16)),
                     decoration: BoxDecoration(
                         color: AppColors.amberSurface,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(r.rs(16)),
                         border: Border.all(color: AppColors.amberLight)),
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('🌾 ${l10n.farmAdvisory}',
                               style: AppTextStyles.headingMD),
-                          const SizedBox(height: 12),
+                          SizedBox(height: r.rh(12)),
                           if (list is List && list.isNotEmpty)
                             ...list.map((a) {
                               final tip = a is Map
@@ -105,14 +105,14 @@ class WeatherScreen extends ConsumerWidget {
                               final emoji =
                                   a is Map ? a['emoji']?.toString() : '🌱';
                               return Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
+                                padding: EdgeInsets.only(bottom: r.rh(12)),
                                 child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(emoji ?? '🌱',
                                           style: TextStyle(fontSize: r.sp(18))),
-                                      const SizedBox(width: 8),
+                                      SizedBox(width: r.rs(8)),
                                       Expanded(
                                           child: Text(tip ?? '',
                                               style: AppTextStyles.bodyMD)),
@@ -126,14 +126,14 @@ class WeatherScreen extends ConsumerWidget {
                   );
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: r.rh(16)),
 
               // Min/Max temps
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(r.rs(16)),
                 decoration: BoxDecoration(
                     color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(r.rs(16)),
                     border: Border.all(color: AppColors.border)),
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -165,7 +165,7 @@ class _WeatherStat extends StatelessWidget {
     final r = context.r;
     return Column(children: [
         Text(emoji, style: TextStyle(fontSize: r.sp(20))),
-        const SizedBox(height: 4),
+        SizedBox(height: r.rh(4)),
         Text(value,
             style: TextStyle(
                 fontSize: r.sp(16),
@@ -173,7 +173,7 @@ class _WeatherStat extends StatelessWidget {
                 color: Colors.white)),
         Text(label,
             style: TextStyle(
-                fontSize: 11, color: Colors.white.withValues(alpha: 0.65))),
+                fontSize: r.sp(11), color: Colors.white.withValues(alpha: 0.65))),
       ]);
   }
 }
@@ -187,7 +187,7 @@ class _TempCard extends StatelessWidget {
     final r = context.r;
     return Column(children: [
         Text(emoji, style: TextStyle(fontSize: r.sp(24))),
-        const SizedBox(height: 4),
+        SizedBox(height: r.rh(4)),
         Text(value,
             style: TextStyle(
                 fontSize: r.sp(20), fontWeight: FontWeight.w800, color: color)),

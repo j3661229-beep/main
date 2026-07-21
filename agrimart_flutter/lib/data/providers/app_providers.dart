@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import '../services/api_service.dart';
-import '../../core/utils/cache_manager.dart';
 import '../../core/storage/offline_cache.dart';
+import '../../core/utils/cache_manager.dart';
+import '../../core/providers/connectivity_provider.dart';
+import '../../core/providers/app_language_provider.dart';
 import 'auth_provider.dart';
-import 'package:geolocator/geolocator.dart';
 
 // ── Search & Trending ─────────────────────────────────────
 final searchQueryProvider = StateProvider<String>((ref) => '');
@@ -321,6 +322,7 @@ final farmerTradeBookingsProvider = FutureProvider<List>((ref) async {
 
 // ── Farmer Dashboard ──────────────────────────────────────
 final farmerDashboardProvider = FutureProvider<Map>((ref) async {
+  ref.keepAlive();
   const cacheKey = 'farmer_dashboard';
   final cached =
       CacheManager.get(cacheKey, maxAge: const Duration(minutes: 30));
@@ -345,30 +347,51 @@ void _refreshFarmerDashboard() async {
 // ── Weather ───────────────────────────────────────────────
 final weatherProvider = FutureProvider<Map>((ref) async {
   ref.keepAlive();
-  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled)
-    return ApiService.instance
-        .getWeather(lat: 20.0, lng: 73.78); // Default Nashik
+  const cacheKey = 'weather_current';
+  final online = ref.watch(isOnlineProvider);
 
-  LocationPermission permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      return ApiService.instance.getWeather(lat: 20.0, lng: 73.78);
-    }
+  if (!online) {
+    final offline = await OfflineCache.getWeather();
+    if (offline != null) return offline;
+    final cached = CacheManager.get(cacheKey, maxAge: const Duration(hours: 6));
+    if (cached != null) return Map<String, dynamic>.from(cached as Map);
   }
 
-  Position pos = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 15),
-      ));
-  return ApiService.instance.getWeather(lat: pos.latitude, lng: pos.longitude);
+  final cached = CacheManager.get(cacheKey, maxAge: const Duration(minutes: 30));
+  if (cached != null && online) {
+    _refreshWeather(cacheKey);
+    return Map<String, dynamic>.from(cached as Map);
+  }
+
+  final farmer = ref.watch(authProvider).user?.farmer;
+  final profileLat = (farmer?['latitude'] as num?)?.toDouble();
+  final profileLng = (farmer?['longitude'] as num?)?.toDouble();
+  final Map<String, dynamic> data;
+  if (profileLat != null && profileLng != null) {
+    data = Map<String, dynamic>.from(await ApiService.instance.getWeather(lat: profileLat, lng: profileLng));
+  } else {
+    data = Map<String, dynamic>.from(await ApiService.instance.getWeather(lat: 19.9975, lng: 73.7898));
+  }
+  await CacheManager.save(cacheKey, data);
+  await OfflineCache.saveWeather(data);
+  return data;
 });
+
+void _refreshWeather(String cacheKey) async {
+  try {
+    final cached = CacheManager.get(cacheKey);
+    if (cached is! Map) return;
+    final lat = (cached['lat'] as num?)?.toDouble() ?? 19.9975;
+    final lng = (cached['lng'] as num?)?.toDouble() ?? 73.7898;
+    final data = Map<String, dynamic>.from(await ApiService.instance.getWeather(lat: lat, lng: lng));
+    await CacheManager.save(cacheKey, data);
+    await OfflineCache.saveWeather(data);
+  } catch (_) {}
+}
 
 final weatherAdvisoryProvider =
     FutureProvider.family<Map, String>((ref, district) async {
+  ref.keepAlive();
   final weather = await ref.watch(weatherProvider.future);
   return ApiService.instance.getWeatherAdvisory(
     lat: (weather['lat'] as num?)?.toDouble(),
@@ -379,13 +402,34 @@ final weatherAdvisoryProvider =
 
 // ── Mandi News ──────────────────────────────────────────────
 final mandiNewsProvider = FutureProvider<List>((ref) async {
+  ref.keepAlive();
   final user = ref.watch(authProvider).user;
   if (user == null) return [];
-  final r = await ApiService.instance.getMandiNews(
-    district: user.effectiveDistrict,
-    state: user.state ?? 'Maharashtra',
-  );
-  return r['data'] as List? ?? [];
+  final language = ref.watch(appLanguageProvider).backendCode;
+  final district = user.effectiveDistrict;
+  final state = user.state ?? 'Maharashtra';
+  final online = ref.watch(isOnlineProvider);
+
+  if (!online) {
+    final cached = await OfflineCache.getNews(district, language);
+    if (cached != null) return cached;
+  }
+
+  try {
+    final r = await ApiService.instance.getMandiNews(
+      district: district,
+      state: state,
+      language: language,
+    );
+    final news = r['data'] as List? ?? [];
+    await OfflineCache.saveNews(district, language, news);
+    return news;
+  } catch (_) {
+    final cached = await OfflineCache.getNews(district, language);
+    if (cached != null) return cached;
+    if (!online) return [];
+    rethrow;
+  }
 });
 
 /// Top headlines for the home screen carousel.
@@ -396,6 +440,7 @@ final mandiNewsPreviewProvider = FutureProvider<List>((ref) async {
 
 /// Top mandi price rows for home ticker (no dedicated mandi prices screen).
 final mandiTickerProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  ref.keepAlive();
   final user = ref.watch(authProvider).user;
   final district = user?.effectiveDistrict ?? 'Nashik';
   final data = await ref.watch(mandiProvider(district).future);
@@ -407,7 +452,23 @@ final mandiTickerProvider = FutureProvider<List<Map<String, dynamic>>>((ref) asy
 final mandiProvider =
     FutureProvider.family<Map, String?>((ref, district) async {
   ref.keepAlive();
-  return ApiService.instance.getMandiPrices(district: district);
+  final cacheDistrict = district ?? 'default';
+  final online = ref.watch(isOnlineProvider);
+  if (!online) {
+    final cached = await OfflineCache.getMandiPrices(cacheDistrict);
+    if (cached != null) return cached;
+  }
+  try {
+    final data = Map<String, dynamic>.from(
+      await ApiService.instance.getMandiPrices(district: district),
+    );
+    await OfflineCache.saveMandiPrices(cacheDistrict, data);
+    return data;
+  } catch (_) {
+    final cached = await OfflineCache.getMandiPrices(cacheDistrict);
+    if (cached != null) return cached;
+    rethrow;
+  }
 });
 
 final cropHistoryProvider =
@@ -417,7 +478,21 @@ final cropHistoryProvider =
 
 // ── Schemes ───────────────────────────────────────────────
 final schemesProvider = FutureProvider<List>((ref) async {
-  return ApiService.instance.getSchemes();
+  ref.keepAlive();
+  final online = ref.watch(isOnlineProvider);
+  if (!online) {
+    final cached = await OfflineCache.getSchemes();
+    if (cached != null) return cached;
+  }
+  try {
+    final schemes = await ApiService.instance.getSchemes();
+    await OfflineCache.saveSchemes(schemes);
+    return schemes;
+  } catch (_) {
+    final cached = await OfflineCache.getSchemes();
+    if (cached != null) return cached;
+    rethrow;
+  }
 });
 
 final eligibleSchemesProvider = FutureProvider<List>((ref) async {
@@ -428,12 +503,28 @@ final priceAlertsProvider = FutureProvider<List>((ref) async {
   return ApiService.instance.getPriceAlerts();
 });
 
-final cropCalendarProvider = FutureProvider.family<Map, String>((ref, key) async {
-  final i = key.indexOf('|');
-  final district = i >= 0 ? key.substring(0, i) : key;
-  final crops = i >= 0 ? key.substring(i + 1) : null;
-  return ApiService.instance.getCropCalendar(district: district, crops: crops);
+/// Crop calendar keyed by month index (0–11). Farmer profile comes from auth token on backend.
+final cropCalendarProvider = FutureProvider.family<Map<String, dynamic>, int>((ref, monthIndex) async {
+  ref.keepAlive();
+  final language = ref.read(appLanguageProvider).aiName;
+  final cacheKey = 'crop_calendar_${monthIndex}_$language';
+  final cached = CacheManager.get(cacheKey, maxAge: const Duration(hours: 6));
+  if (cached != null) {
+    _refreshCropCalendar(monthIndex, language, cacheKey);
+    return Map<String, dynamic>.from(cached);
+  }
+  final data = await ApiService.instance.getCropCalendar(month: monthIndex, language: language);
+  final mapped = Map<String, dynamic>.from(data);
+  await CacheManager.save(cacheKey, mapped);
+  return mapped;
 });
+
+void _refreshCropCalendar(int monthIndex, String language, String cacheKey) async {
+  try {
+    final data = await ApiService.instance.getCropCalendar(month: monthIndex, language: language);
+    await CacheManager.save(cacheKey, Map<String, dynamic>.from(data));
+  } catch (_) {}
+}
 
 final equipmentProductsProvider = FutureProvider<List>((ref) async {
   final data = await ApiService.instance.getProducts(category: 'EQUIPMENT');

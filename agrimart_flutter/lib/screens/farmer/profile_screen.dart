@@ -34,18 +34,18 @@ class ProfileScreen extends ConsumerWidget {
       body: auth.isLoading && user == null
           ? const AppShimmerProfileLayout()
           : ListView(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(r.rs(20)),
               children: [
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(r.rs(24)),
                   decoration: BoxDecoration(
                       color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(r.rs(24)),
                       border: Border.all(color: AppColors.border),
                       boxShadow: [
                         BoxShadow(
                             color: AppColors.primary.withValues(alpha: 0.05),
-                            blurRadius: 20,
+                            blurRadius: r.rs(20),
                             offset: const Offset(0, 10))
                       ]),
                   child: Column(children: [
@@ -59,47 +59,46 @@ class ProfileScreen extends ConsumerWidget {
                           radius: 44,
                           backgroundColor: AppColors.background,
                           child: Text(user?.isFarmer == true ? '👨‍🌾' : '🚛',
-                              style: const TextStyle(fontSize: 40))),
+                              style: TextStyle(fontSize: r.sp(40)))),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: r.rh(16)),
                     Text(user?.name ?? 'AgriMart User',
                         style: AppTextStyles.headingXL),
-                    const SizedBox(height: 4),
+                    SizedBox(height: r.rh(4)),
                     Text(user?.phone ?? '+91 xxxxxx',
                         style: AppTextStyles.bodyMD
                             .copyWith(color: AppColors.textSecondary)),
-                    const SizedBox(height: 16),
+                    SizedBox(height: r.rh(16)),
                     Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 6),
+                        padding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rh(6)),
                         decoration: BoxDecoration(
                             color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(20)),
+                            borderRadius: BorderRadius.circular(r.rs(20))),
                         child: Text(
                             user?.isFarmer == true
                                 ? 'Verified Farmer'
                                 : 'Verified Supplier',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: AppColors.primaryDark,
-                                fontSize: 12,
+                                fontSize: r.sp(12),
                                 fontWeight: FontWeight.w800))),
                   ]),
                 ),
-                const SizedBox(height: 32),
-                _sectionHeader(l10n.accountManagement.toUpperCase()),
-                _buildItem(Icons.language, l10n.appLanguage, langName, () {
+                SizedBox(height: r.rh(32)),
+                _sectionHeader(r, l10n.accountManagement.toUpperCase()),
+                _buildItem(r, Icons.language, l10n.appLanguage, langName, () {
                   showLanguagePickerSheet(context, ref);
                 }),
-                _buildItem(Icons.location_on_outlined, 'My Farm Address',
+                _buildItem(r, Icons.location_on_outlined, 'My Farm Address',
                     'Manage saved locations', () {
                   _showStubSheet(context, '📍 Farm Locations', 
                       'Add or edit your village and operational pin codes for seamless order delivery and accurate weather alerts.');
                 }),
-                _buildItem(Icons.calendar_month_outlined, 'My Delivery Slots',
+                _buildItem(r, Icons.calendar_month_outlined, 'My Delivery Slots',
                     'View your booked slots with dealers', () {
                   context.push('/farmer/trade/bookings');
                 }),
-                _buildItem(
+                _buildItem(r,
                     Icons.notifications_outlined,
                     'Notification Settings',
                     'Manage SMS & WhatsApp alerts',
@@ -107,50 +106,50 @@ class ProfileScreen extends ConsumerWidget {
                   _showStubSheet(context, '🔔 Notification Preferences', 
                       'Toggle push notifications, Daily Mandi SMS alerts, and WhatsApp updates for your orders.');
                 }),
-                _buildItem(Icons.security, 'Privacy & Security',
+                _buildItem(r, Icons.security, 'Privacy & Security',
                     'Data controls & permissions', () {
                   _showStubSheet(context, '🛡️ Privacy & Security', 
                       'Manage data sharing settings, device permissions, and activity history.');
                 }),
-                const SizedBox(height: 24),
-                _sectionHeader(l10n.supportLegal.toUpperCase()),
-                _buildItem(Icons.help_outline, l10n.helpCenter,
+                SizedBox(height: r.rh(24)),
+                _sectionHeader(r, l10n.supportLegal.toUpperCase()),
+                _buildItem(r, Icons.help_outline, l10n.helpCenter,
                     'FAQs & Customer Support', () {
                    _showStubSheet(context, '💬 Need Help?', 
                       'Contact our 24/7 Kisan Helpline at 1800-120-120\nor email support@agrimart.in');
                 }),
-                _buildItem(Icons.article_outlined, l10n.termsOfService,
+                _buildItem(r, Icons.article_outlined, l10n.termsOfService,
                     'Platform agreements & legal', () {
                   _showStubSheet(context, '📄 ${l10n.termsOfService}', 
                       'By using AgriMart, you agree to our fair usage policy and zero-commission structure (for first year).');
                 }),
-                _buildItem(Icons.info_outline, l10n.aboutUs,
+                _buildItem(r, Icons.info_outline, l10n.aboutUs,
                     'Version 1.0.0 (Production)', () {
                   _showStubSheet(context, '🌾 ${l10n.aboutUs}', 
                       'AgriMart v1.0.0\nBuilt for the farmers of India to provide direct market access, AI crop tools, and transparent pricing.');
                 }),
-                const SizedBox(height: 40),
+                SizedBox(height: r.rh(40)),
                 SizedBox(
                   width: double.infinity,
-                  height: 56,
+                  height: r.rh(56),
                   child: TextButton.icon(
                     onPressed: () {
                       ref.read(authProvider.notifier).logout();
                     },
                     icon: const Icon(Icons.logout),
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(r.rs(16)),
                       backgroundColor: AppColors.error.withValues(alpha: 0.08),
                       foregroundColor: AppColors.error,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
+                          borderRadius: BorderRadius.circular(r.rs(16))),
                     ),
                     label: Text(l10n.logout,
                         style: TextStyle(
                             fontSize: r.sp(16), fontWeight: FontWeight.bold)),
                   ),
                 ),
-                const SizedBox(height: 64),
+                SizedBox(height: r.rh(64)),
               ],
             ),
     );
@@ -159,20 +158,21 @@ class ProfileScreen extends ConsumerWidget {
 
 
   void _showStubSheet(BuildContext context, String title, String body) {
+    final r = context.r;
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => SafeArea(
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(32),
+          padding: EdgeInsets.all(r.rs(32)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(title, style: AppTextStyles.headingLG, textAlign: TextAlign.center),
-              const SizedBox(height: 24),
+              SizedBox(height: r.rh(24)),
               Text(body, style: AppTextStyles.bodyLG.copyWith(height: 1.5), textAlign: TextAlign.center),
-              const SizedBox(height: 32),
+              SizedBox(height: r.rh(32)),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -187,12 +187,12 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _sectionHeader(String title) {
+  Widget _sectionHeader(Responsive r, String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 12),
+      padding: EdgeInsets.only(left: r.rs(4), bottom: r.rh(12)),
       child: Text(title,
-          style: const TextStyle(
-              fontSize: 12,
+          style: TextStyle(
+              fontSize: r.sp(12),
               fontWeight: FontWeight.w800,
               color: AppColors.textTertiary,
               letterSpacing: 1.5)),
@@ -200,29 +200,29 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildItem(
-      IconData icon, String title, String sub, VoidCallback onTap) {
+      Responsive r, IconData icon, String title, String sub, VoidCallback onTap) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: r.rh(12)),
       decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(r.rs(18)),
           border: Border.all(color: AppColors.border)),
       child: ListTile(
         onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        contentPadding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rh(4)),
         leading: Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(r.rs(10)),
             decoration: BoxDecoration(
                 color: AppColors.primarySurface,
-                borderRadius: BorderRadius.circular(12)),
-            child: Icon(icon, color: AppColors.primary, size: 22)),
+                borderRadius: BorderRadius.circular(r.rs(12))),
+            child: Icon(icon, color: AppColors.primary, size: r.sp(22))),
         title: Text(title,
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: r.sp(15))),
         subtitle: Text(sub,
             style:
-                const TextStyle(fontSize: 12, color: AppColors.textTertiary)),
-        trailing: const Icon(Icons.arrow_forward_ios,
-            size: 12, color: AppColors.textTertiary),
+                TextStyle(fontSize: r.sp(12), color: AppColors.textTertiary)),
+        trailing: Icon(Icons.arrow_forward_ios,
+            size: r.sp(12), color: AppColors.textTertiary),
       ),
     );
   }

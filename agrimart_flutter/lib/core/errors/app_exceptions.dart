@@ -25,9 +25,16 @@ class UnauthorizedException extends AppException {
   UnauthorizedException() : super('Session expired, please login again', 'UNAUTHORIZED');
 }
 
+/// True when the user cancelled an in-flight Dio request (AI cancel button).
+bool isRequestCancelled(Object e) {
+  if (e is DioException) return CancelToken.isCancel(e);
+  return false;
+}
+
 /// Global utility: extract a clean error message from any exception/error object.
 /// Prevents full DioClientException or SocketException stack traces leaking to users.
 String extractUserFacingError(Object e) {
+  if (isRequestCancelled(e)) return '';
   // If it's already an AppException, use it directly
   if (e is AppException) return e.message;
 

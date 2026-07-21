@@ -38,19 +38,19 @@ class DealerProfileScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: 80, height: 80,
+                        width: r.rs(80), height: 80,
                         decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)),
                         child: Center(child: Text(initials, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(28), fontWeight: FontWeight.w700, color: Colors.white))),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: r.rh(10)),
                       Text(bizName, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(20), fontWeight: FontWeight.w700, color: Colors.white)),
-                      const SizedBox(height: 4),
+                      SizedBox(height: r.rh(4)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(isVerified ? Icons.verified_rounded : Icons.schedule_rounded, color: Colors.white.withValues(alpha: 0.8), size: 14),
-                          const SizedBox(width: 4),
-                          Text(isVerified ? 'Verified Dealer' : 'Verification Pending', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.8))),
+                          SizedBox(width: r.rs(4)),
+                          Text(isVerified ? 'Verified Dealer' : 'Verification Pending', style: GoogleFonts.inter(fontSize: r.sp(12), color: Colors.white.withValues(alpha: 0.8))),
                         ],
                       ),
                     ],
@@ -73,7 +73,7 @@ class DealerProfileScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _CardHeader(emoji: '🤝', title: 'Business Details', accent: AppColors.dealerAccent, tint: AppColors.dealerTint),
-                        const SizedBox(height: 16),
+                        SizedBox(height: r.rh(16)),
                         _InfoRow('Business Name', bizName),
                         _InfoRow('Owner Name', ownerName),
                         _InfoRow('Mandi License', license),
@@ -83,17 +83,17 @@ class DealerProfileScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Text('Settings', style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.ink)),
-                  const SizedBox(height: 10),
+                  SizedBox(height: r.rh(20)),
+                  Text('Settings', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(15), fontWeight: FontWeight.w700, color: AppColors.ink)),
+                  SizedBox(height: r.rh(10)),
                   _Card(
                     child: Column(children: [
                       _SettingsTile(icon: Icons.business_outlined,   color: AppColors.dealerAccent, label: 'Business Settings', onTap: () {}),
-                      const Divider(height: 1, color: AppColors.border),
+                      Divider(height: r.rh(1), color: AppColors.border),
                       _SettingsTile(icon: Icons.account_balance_outlined, color: AppColors.success, label: 'Payout Details', onTap: () {}),
-                      const Divider(height: 1, color: AppColors.border),
+                      Divider(height: r.rh(1), color: AppColors.border),
                       _SettingsTile(icon: Icons.help_outline_rounded, color: AppColors.supplierAccent, label: 'Help & Support', onTap: () {}),
-                      const Divider(height: 1, color: AppColors.border),
+                      Divider(height: r.rh(1), color: AppColors.border),
                       _SettingsTile(icon: Icons.logout_rounded, color: AppColors.danger, label: 'Log Out', textColor: AppColors.danger, onTap: () => _confirmLogout(context, ref)),
                     ]),
                   ),
@@ -109,10 +109,11 @@ class DealerProfileScreen extends ConsumerWidget {
   }
 
   void _confirmLogout(BuildContext context, WidgetRef ref) async {
+    final r = context.r;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(r.rs(20))),
         title: Text('Log Out?', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700)),
         content: Text('You will be logged out.', style: GoogleFonts.inter()),
         actions: [
@@ -132,8 +133,8 @@ class _Card extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = context.r;
     return Container(
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.border), boxShadow: AppColors.softShadow),
+    padding: EdgeInsets.all(r.rs(20)),
+    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(r.rs(20)), border: Border.all(color: AppColors.border), boxShadow: AppColors.softShadow),
     child: child,
   );
   }
@@ -146,9 +147,9 @@ class _CardHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = context.r;
     return Row(children: [
-    Container(width: 36, height: 36, decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(10)), child: Center(child: Text(emoji, style: TextStyle(fontSize: r.sp(18))))),
-    const SizedBox(width: 12),
-    Text(title, style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.ink)),
+    Container(width: 36, height: 36, decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(r.rs(10))), child: Center(child: Text(emoji, style: TextStyle(fontSize: r.sp(18))))),
+    SizedBox(width: r.rs(12)),
+    Text(title, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(15), fontWeight: FontWeight.w700, color: AppColors.ink)),
   ]);
   }
 }
@@ -157,13 +158,16 @@ class _InfoRow extends StatelessWidget {
   final String label, value;
   const _InfoRow(this.label, this.value);
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 5),
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Padding(
+    padding: EdgeInsets.symmetric(vertical: r.rh(5)),
     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
-      Flexible(child: Text(value, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.ink), textAlign: TextAlign.right)),
+      Text(label, style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.muted)),
+      Flexible(child: Text(value, style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w500, color: AppColors.ink), textAlign: TextAlign.right)),
     ]),
   );
+  }
 }
 
 class _SettingsTile extends StatelessWidget {
@@ -174,9 +178,9 @@ class _SettingsTile extends StatelessWidget {
     final r = context.r;
     return ListTile(
     onTap: onTap,
-    leading: Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)), child: Icon(icon, color: color, size: 20)),
-    title: Text(label, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: textColor ?? AppColors.ink)),
-    trailing: textColor != null ? null : const Icon(Icons.chevron_right_rounded, color: AppColors.muted, size: 20),
+    leading: Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(r.rs(10))), child: Icon(icon, color: color, size: r.sp(20))),
+    title: Text(label, style: GoogleFonts.inter(fontSize: r.sp(14), fontWeight: FontWeight.w500, color: textColor ?? AppColors.ink)),
+    trailing: textColor != null ? null : Icon(Icons.chevron_right_rounded, color: AppColors.muted, size: r.sp(20)),
   );
   }
 }

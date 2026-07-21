@@ -10,17 +10,36 @@ const daysFromNow = (n) => {
 };
 
 async function upsertUser({ phone, email, name, role, language, isVerified = true, password }) {
-    const where = phone ? { phone } : { email };
     const passwordHash = password ? bcrypt.hashSync(password, 10) : undefined;
-    return prisma.user.upsert({
-        where,
-        update: {
-            name,
-            isVerified,
-            ...(email ? { email } : {}),
-            ...(passwordHash ? { passwordHash } : {}),
-        },
-        create: {
+
+    const orConditions = [];
+    if (email) orConditions.push({ email });
+    if (phone) orConditions.push({ phone });
+
+    const existing = orConditions.length
+        ? await prisma.user.findFirst({ where: { OR: orConditions } })
+        : null;
+
+    const updateData = {
+        name,
+        isVerified,
+        ...(passwordHash ? { passwordHash } : {}),
+    };
+
+    if (existing) {
+        if (email && existing.email !== email) {
+            const emailTaken = await prisma.user.findUnique({ where: { email } });
+            if (!emailTaken) updateData.email = email;
+        }
+        if (phone && existing.phone !== phone) {
+            const phoneTaken = await prisma.user.findUnique({ where: { phone } });
+            if (!phoneTaken) updateData.phone = phone;
+        }
+        return prisma.user.update({ where: { id: existing.id }, data: updateData });
+    }
+
+    return prisma.user.create({
+        data: {
             phone,
             email,
             name,

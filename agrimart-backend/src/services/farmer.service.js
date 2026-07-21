@@ -2,8 +2,9 @@ const prisma = require('../config/database');
 const axios = require('axios');
 const redis = require('../config/redis');
 const cache = require('../utils/cache');
+const { assessFarmerProfile } = require('../utils/farmerProfile.util');
 
-const DASHBOARD_CACHE_TTL = 60;
+const DASHBOARD_CACHE_TTL = 120;
 
 const getProfile = async (farmerId) => {
     return prisma.farmer.findUnique({ where: { id: farmerId }, include: { user: true } });
@@ -17,24 +18,41 @@ const updateProfile = async (farmerId, data) => {
 };
 
 const updateFarmDetails = async (farmerId, data) => {
-    return prisma.farmer.update({
+    const waterSource = data.irrigationType && data.waterSource
+        ? `${data.waterSource} (${data.irrigationType})`
+        : data.waterSource;
+
+    const updated = await prisma.farmer.update({
         where: { id: farmerId },
         data: {
             village: data.village,
             taluka: data.taluka,
             district: data.district,
+            state: data.state,
             pincode: data.pincode,
-            latitude: data.latitude ? parseFloat(data.latitude) : undefined,
-            longitude: data.longitude ? parseFloat(data.longitude) : undefined,
-            farmSizeAcres: data.farmSizeAcres ? parseFloat(data.farmSizeAcres) : undefined,
+            latitude: data.latitude != null ? parseFloat(data.latitude) : undefined,
+            longitude: data.longitude != null ? parseFloat(data.longitude) : undefined,
+            farmSizeAcres: data.farmSizeAcres != null ? parseFloat(data.farmSizeAcres) : undefined,
             soilType: data.soilType,
-            waterSource: data.waterSource,
+            waterSource,
             currentCrops: data.currentCrops,
             bankAccountNo: data.bankAccountNo,
             ifscCode: data.ifscCode,
         },
         include: { user: true },
     });
+
+    await cache.del(`farmer:dashboard:${farmerId}`);
+    return updated;
+};
+
+const getFarmSetupStatus = async (farmerId) => {
+    const farmer = await prisma.farmer.findUnique({
+        where: { id: farmerId },
+        include: { user: { select: { name: true, language: true } } },
+    });
+    if (!farmer) throw Object.assign(new Error('Farmer not found'), { statusCode: 404 });
+    return { farmer, ...assessFarmerProfile(farmer) };
 };
 
 const getDashboard = async (farmerId) => {
@@ -44,57 +62,35 @@ const getDashboard = async (farmerId) => {
 
     const farmer = await prisma.farmer.findUnique({ where: { id: farmerId }, include: { user: true } });
 
-    // Weather Promise
+    // Weather + price alerts only (v1 farmer app — no marketplace on dashboard)
     const weatherPromise = (async () => {
-        if (!farmer.latitude || !farmer.longitude) return null;
-        const cacheKey = `weather:${farmer.latitude.toFixed(2)},${farmer.longitude.toFixed(2)}`;
-        const cached = await redis.get(cacheKey);
-        if (cached) return JSON.parse(cached);
+        if (farmer.latitude == null || farmer.longitude == null) return null;
+        const wKey = `weather:${farmer.latitude.toFixed(2)},${farmer.longitude.toFixed(2)}`;
+        const cachedW = await redis.get(wKey);
+        if (cachedW) return typeof cachedW === 'string' ? JSON.parse(cachedW) : cachedW;
         if (process.env.OPENWEATHER_API_KEY) {
             try {
                 const base = process.env.OPENWEATHER_BASE_URL || 'https://api.openweathermap.org/data/2.5';
                 const resp = await axios.get(`${base}/weather`, {
                     params: { lat: farmer.latitude, lon: farmer.longitude, appid: process.env.OPENWEATHER_API_KEY, units: 'metric' },
-                    timeout: 10000,
+                    timeout: 8000,
                 });
-            try {
-                redis.setWithExpiry(cacheKey, 1800, JSON.stringify(resp.data)).catch(() => {});
-            } catch (e) {}
+                redis.setWithExpiry(wKey, 1800, JSON.stringify(resp.data)).catch(() => {});
                 return resp.data;
             } catch (e) { return null; }
         }
         return null;
     })();
 
-    // Nearby products Promise — lean select
-    const nearbyProductsPromise = prisma.product.findMany({
-        where: { isActive: true, isApproved: true, stockQuantity: { gt: 0 } },
-        take: 6,
-        select: {
-            id: true, name: true, price: true, unit: true, images: true, isOrganic: true, brand: true,
-            supplier: { select: { id: true, businessName: true, district: true, user: { select: { name: true } } } },
-        },
-        orderBy: { createdAt: 'desc' },
-    });
-
-    const recentOrdersPromise = prisma.order.findMany({
-        where: { farmerId },
+    const priceAlertsPromise = prisma.priceAlert.findMany({
+        where: { farmerId, isActive: true },
         take: 5,
-        orderBy: { createdAt: 'desc' },
-        include: { items: { include: { product: true } } },
+        select: { id: true, cropName: true, targetPrice: true, isActive: true },
     });
 
-    const priceAlertsPromise = prisma.priceAlert.findMany({ where: { farmerId, isActive: true }, take: 5 });
+    const [weather, priceAlerts] = await Promise.all([weatherPromise, priceAlertsPromise]);
 
-    // Execute in parallel (Fastest Response Time)
-    const [weather, nearbyProducts, recentOrders, priceAlerts] = await Promise.all([
-        weatherPromise,
-        nearbyProductsPromise,
-        recentOrdersPromise,
-        priceAlertsPromise
-    ]);
-
-    const result = { farmer, weather, nearbyProducts, recentOrders, priceAlerts };
+    const result = { farmer, weather, priceAlerts };
     await cache.set(cacheKey, result, DASHBOARD_CACHE_TTL);
     return result;
 };
@@ -162,4 +158,8 @@ const submitFpoInterest = async (farmerId, { cropName, approxQuintals, district,
     return { cropName, approxQuintals, district: district || farmer.district };
 };
 
-module.exports = { getProfile, updateProfile, updateFarmDetails, getDashboard, getOrders, getOrder, createPriceAlert, getPriceAlerts, deletePriceAlert, getSoilReports, getSoilReport, submitFpoInterest };
+module.exports = {
+    getProfile, updateProfile, updateFarmDetails, getFarmSetupStatus, getDashboard,
+    getOrders, getOrder, createPriceAlert, getPriceAlerts, deletePriceAlert,
+    getSoilReports, getSoilReport, submitFpoInterest,
+};

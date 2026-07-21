@@ -2,8 +2,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const prisma = require('../config/database');
 const redis = require('../config/redis');
+const { normalizeUserLanguage } = require('../utils/aiLanguage.util');
 const { generateOTP, formatPhone, useStaticOtp, DEV_OTP } = require('../utils/helpers');
 const logger = require('../utils/logger');
+const msg91 = require('./msg91.service');
 
 let twilioClient;
 if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
@@ -16,15 +18,40 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES_IN || '7d';
 const USER_CACHE_TTL = 300; // 5 minutes
 
 const sendWhatsAppOTP = async (phone, otp) => {
-    if (process.env.NODE_ENV === 'development' || !twilioClient) {
-        logger.warn(`[DEV ONLY] Bypassing WhatsApp message to save credits. OTP for ${phone}: ${otp}`);
-        return;
+    if (!twilioClient || !process.env.TWILIO_WHATSAPP_FROM) {
+        throw Object.assign(new Error('Twilio WhatsApp is not configured'), { statusCode: 503 });
     }
     await twilioClient.messages.create({
         from: process.env.TWILIO_WHATSAPP_FROM,
         to: `whatsapp:${phone}`,
         body: `🌾 AgriMart OTP: *${otp}*\nValid for 10 minutes.\nDo not share with anyone.`,
     });
+};
+
+/** Deliver OTP via MSG91 SMS (default) or Twilio WhatsApp fallback. */
+const deliverOTP = async (phone, otp) => {
+    const provider = (process.env.OTP_PROVIDER || 'msg91').toLowerCase();
+
+    if (provider === 'twilio') {
+        await sendWhatsAppOTP(phone, otp);
+        return;
+    }
+
+    if (msg91.isConfigured()) {
+        await msg91.sendOtpSms(phone, otp);
+        return;
+    }
+
+    if (twilioClient && process.env.TWILIO_WHATSAPP_FROM) {
+        logger.warn('[OTP] MSG91 not configured — falling back to Twilio WhatsApp');
+        await sendWhatsAppOTP(phone, otp);
+        return;
+    }
+
+    throw Object.assign(
+        new Error('OTP SMS not configured. Set MSG91_AUTH_KEY and MSG91_OTP_TEMPLATE_ID in .env'),
+        { statusCode: 503 },
+    );
 };
 
 const generateTokens = (userId, role) => {
@@ -42,12 +69,15 @@ const sendOTP = async (phone, role) => {
     await redis.setWithExpiry(otpKey, 600, otp);       // 10 min TTL
     await redis.setWithExpiry(roleKey, 600, role);
 
-    await sendWhatsAppOTP(formatted, otp);
+    if (useStaticOtp()) {
+        logger.warn(`[STATIC OTP] Skipping SMS. Use OTP ${DEV_OTP} for ${formatted}`);
+    } else {
+        await deliverOTP(formatted, otp);
+    }
 
     const result = { phone: formatted };
     if (useStaticOtp()) {
         result.otp = DEV_OTP;
-        logger.warn(`[STATIC OTP] Use OTP ${DEV_OTP} for ${formatted}`);
     }
     return result;
 };
@@ -63,7 +93,7 @@ const cacheUser = async (user) => {
 
 const invalidateUserCache = async (userId) => {
     try {
-        await redis.del(`user:${userId}`);
+        await redis.del(`user:${userId}`, `farmer_ai:${userId}`);
     } catch (e) {
         logger.warn(`Failed to invalidate user cache ${userId}: ${e.message}`);
     }
@@ -89,7 +119,12 @@ const verifyOTP = async ({ phone, otp, name, language, role }) => {
 
     if (!user) {
         user = await prisma.user.create({
-            data: { phone: formatted, name: name || 'AgriMart User', role: role || 'FARMER', language: language || 'marathi' },
+            data: {
+                phone: formatted,
+                name: name || 'AgriMart User',
+                role: role || 'FARMER',
+                language: normalizeUserLanguage(language || 'en'),
+            },
         });
         if (user.role === 'FARMER') {
             await prisma.farmer.create({
@@ -112,8 +147,13 @@ const verifyOTP = async ({ phone, otp, name, language, role }) => {
                 },
             });
         }
-    } else if (name) {
-        user = await prisma.user.update({ where: { id: user.id }, data: { name, language: language || user.language } });
+    } else {
+        const updateData = {};
+        if (name && name !== user.name) updateData.name = name;
+        // Do not overwrite stored language on every OTP login — locale is managed on device.
+        if (Object.keys(updateData).length > 0) {
+            user = await prisma.user.update({ where: { id: user.id }, data: updateData });
+        }
     }
 
     // Check if SUPPLIER/DEALER account is pending document verification
@@ -183,10 +223,19 @@ const completeOnboarding = async (userId, role, data) => {
             where: { userId },
             data: {
                 village: data.village || '',
+                taluka: data.taluka || '',
                 district: data.district || '',
                 state: data.state || 'Maharashtra',
+                pincode: data.pincode || '',
+                latitude: data.latitude != null ? parseFloat(data.latitude) : undefined,
+                longitude: data.longitude != null ? parseFloat(data.longitude) : undefined,
                 farmSizeAcres: data.farmSizeAcres != null ? parseFloat(data.farmSizeAcres) : 0,
-            }
+                soilType: data.soilType || undefined,
+                waterSource: data.irrigationType && data.waterSource
+                    ? `${data.waterSource} (${data.irrigationType})`
+                    : data.waterSource || undefined,
+                currentCrops: Array.isArray(data.currentCrops) ? data.currentCrops : undefined,
+            },
         });
     } else if (role === 'SUPPLIER') {
         await prisma.supplier.update({

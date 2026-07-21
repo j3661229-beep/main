@@ -38,16 +38,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               )),
               child: SafeArea(
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text(p['emoji'] as String, style: const TextStyle(fontSize: 100)),
-                  const SizedBox(height: 40),
+                  Text(p['emoji'] as String, style: TextStyle(fontSize: r.sp(100))),
+                  SizedBox(height: r.rh(40)),
                   Text(p['title'] as String, style: TextStyle(fontSize: r.sp(28), fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.5)),
-                  const SizedBox(height: 4),
-                  Text(p['subtitle'] as String, style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 20),
+                  SizedBox(height: r.rh(4)),
+                  Text(p['subtitle'] as String, style: TextStyle(fontSize: r.sp(15), color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w500)),
+                  SizedBox(height: r.rh(20)),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    padding: EdgeInsets.symmetric(horizontal: r.rs(40)),
                     child: Text(p['body'] as String, textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.75), height: 1.5)),
+                      style: TextStyle(fontSize: r.sp(15), color: Colors.white.withValues(alpha: 0.75), height: 1.5)),
                   ),
                 ]),
               ),
@@ -60,16 +60,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               width: _page == i ? 24 : 8, height: 8,
-              margin: const EdgeInsets.symmetric(horizontal: 3),
+              margin: EdgeInsets.symmetric(horizontal: r.rs(3)),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: _page == i ? 1 : 0.4),
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(r.rs(4)),
               ),
             )
           )),
-          const SizedBox(height: 32),
+          SizedBox(height: r.rh(32)),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
+            padding: EdgeInsets.symmetric(horizontal: r.rs(28)),
             child: ElevatedButton(
               onPressed: () {
                 if (_page < _pages.length - 1) {

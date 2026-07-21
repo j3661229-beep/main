@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/errors/app_exceptions.dart';
+import '../../core/utils/image_upload_helper.dart';
 
 class ApiService {
   static ApiService? _instance;
@@ -27,15 +29,47 @@ class ApiService {
   )
     ..interceptors.add(_AuthInterceptor(_storage))
     ..interceptors.add(ErrorInterceptor())
-    ..interceptors.add(PrettyDioLogger(
-      requestHeader: false,
-      requestBody: true,
-      responseBody: true,
-      error: true,
-      compact: true,
-    ));
+    ..interceptors.addAll(kDebugMode
+        ? [
+            PrettyDioLogger(
+              requestHeader: false,
+              requestBody: true,
+              responseBody: true,
+              error: true,
+              compact: true,
+            )
+          ]
+        : []);
 
   Dio get dio => _dio;
+
+  CancelToken? _aiCancelToken;
+
+  /// Starts a new cancellable AI request (cancels any previous in-flight AI call).
+  void beginAiRequest() {
+    cancelAiRequest();
+    _aiCancelToken = CancelToken();
+  }
+
+  void cancelAiRequest([String reason = 'Cancelled by user']) {
+    final token = _aiCancelToken;
+    if (token != null && !token.isCancelled) {
+      token.cancel(reason);
+    }
+    _aiCancelToken = null;
+  }
+
+  bool get isAiRequestInFlight =>
+      _aiCancelToken != null && !_aiCancelToken!.isCancelled;
+
+  CancelToken _activeAiCancelToken() {
+    beginAiRequest();
+    return _aiCancelToken!;
+  }
+
+  void _finishAiRequest(CancelToken token) {
+    if (_aiCancelToken == token) _aiCancelToken = null;
+  }
 
   // ── Auth ──────────────────────────────────────────────────
 
@@ -136,6 +170,14 @@ class ApiService {
 
   Future<Map> updateFarmDetails(Map<String, dynamic> data) async {
     final r = await _dio.put('/farmer/farm-details', data: data);
+    return r.data['data'];
+  }
+
+  Future<Map> updateUserProfile({String? name, String? language}) async {
+    final r = await _dio.put('/farmer/profile', data: {
+      if (name != null) 'name': name,
+      if (language != null) 'language': language,
+    });
     return r.data['data'];
   }
 
@@ -315,46 +357,84 @@ class ApiService {
   }
 
   Future<Map> analyzeSoil(String imagePath, {String? location, String? language}) async {
-    final formData = FormData.fromMap({
-      'image': await MultipartFile.fromFile(imagePath, filename: 'soil.jpg'),
-      if (location != null) 'location': location,
-      if (language != null) 'language': language,
-    });
-    final r = await _dio.post('/ai/soil-analysis', data: formData, options: Options(contentType: 'multipart/form-data'));
-    return r.data['data'];
+    final token = _activeAiCancelToken();
+    try {
+      final uploadPath = await ImageUploadHelper.prepareForUpload(imagePath);
+      final formData = FormData.fromMap({
+        'image': await MultipartFile.fromFile(uploadPath, filename: 'soil.jpg'),
+        if (location != null) 'location': location,
+        if (language != null) 'language': language,
+      });
+      final r = await _dio.post(
+        '/ai/soil-analysis',
+        data: formData,
+        cancelToken: token,
+        options: Options(
+          contentType: 'multipart/form-data',
+          sendTimeout: const Duration(seconds: 60),
+          receiveTimeout: const Duration(seconds: 90),
+        ),
+      );
+      return r.data['data'];
+    } finally {
+      _finishAiRequest(token);
+    }
   }
 
   Future<Map> detectDisease(String imagePath, {String? language}) async {
-    final formData = FormData.fromMap({
-      'image': await MultipartFile.fromFile(imagePath, filename: 'crop.jpg'),
-      if (language != null) 'language': language,
-    });
-    final r = await _dio.post('/ai/disease-detection', data: formData, options: Options(contentType: 'multipart/form-data'));
-    return r.data['data'];
+    final token = _activeAiCancelToken();
+    try {
+      final uploadPath = await ImageUploadHelper.prepareForUpload(imagePath);
+      final formData = FormData.fromMap({
+        'image': await MultipartFile.fromFile(uploadPath, filename: 'crop.jpg'),
+        if (language != null) 'language': language,
+      });
+      final r = await _dio.post(
+        '/ai/disease-detection',
+        data: formData,
+        cancelToken: token,
+        options: Options(
+          contentType: 'multipart/form-data',
+          sendTimeout: const Duration(seconds: 60),
+          receiveTimeout: const Duration(seconds: 90),
+        ),
+      );
+      return r.data['data'];
+    } finally {
+      _finishAiRequest(token);
+    }
   }
 
   Future<Map> getCropRecommend(Map<String, dynamic> data) async {
-    final r = await _dio.post('/ai/crop-recommend', data: data);
-    return r.data['data'];
+    final token = _activeAiCancelToken();
+    try {
+      final r = await _dio.post('/ai/crop-recommend', data: data, cancelToken: token);
+      return r.data['data'];
+    } finally {
+      _finishAiRequest(token);
+    }
   }
 
   Future<Map> kisanChat({required String message, List? history, String? language}) async {
-    final r = await _dio.post('/ai/chat', data: {
-      'message': message,
-      'history': history ?? [],
-      if (language != null) 'language': language,
-    });
-    return r.data['data'];
+    final token = _activeAiCancelToken();
+    try {
+      final r = await _dio.post('/ai/chat', data: {
+        'message': message,
+        'history': history ?? [],
+        if (language != null) 'language': language,
+      }, cancelToken: token);
+      return r.data['data'];
+    } finally {
+      _finishAiRequest(token);
+    }
   }
 
-  Future<Map> getCropCalendar({String? district, String? month, String? crops, String? language}) async {
+  Future<Map<String, dynamic>> getCropCalendar({int? month, String? language}) async {
     final r = await _dio.get('/ai/crop-calendar', queryParameters: {
-      if (district != null) 'district': district,
       if (month != null) 'month': month,
-      if (crops != null) 'crops': crops,
       if (language != null) 'language': language,
     });
-    return r.data['data'] ?? r.data;
+    return Map<String, dynamic>.from(r.data['data'] ?? r.data);
   }
 
   // ── Farmer price alerts ───────────────────────────────────
@@ -507,7 +587,13 @@ class ApiService {
 
   // ── Farmer Features ───────────────────────────────────────
 
-  Future<Map> getMandiNews({String? district, String? state, int page = 1, bool includeGoogle = true}) async {
+  Future<Map> getMandiNews({
+    String? district,
+    String? state,
+    String? language,
+    int page = 1,
+    bool includeGoogle = true,
+  }) async {
     try {
       final params = <String, dynamic>{
         'page': page,
@@ -515,6 +601,7 @@ class ApiService {
       };
       if (district != null) params['district'] = district;
       if (state != null) params['state'] = state;
+      if (language != null) params['language'] = language;
       final r = await _dio.get('/news', queryParameters: params);
       return r.data;
     } catch (_) { return {'success': false, 'data': []}; }
@@ -535,13 +622,8 @@ class ApiService {
   // ── Produce / Deals (via trade bookings) ──────────────────
 
   Future<List> getProduceListings({String? crop, String? district}) async {
-    final bookings = await getDealerMyBookings(status: 'PENDING');
-    return bookings.where((b) {
-      if (crop != null && crop.isNotEmpty && crop != 'All') {
-        if ((b['cropName'] ?? '').toString().toLowerCase() != crop.toLowerCase()) return false;
-      }
-      return true;
-    }).map((b) {
+    final bookings = await getDealerMyBookings(status: 'PENDING', crop: crop);
+    return bookings.map((b) {
       final farmer = b['farmer'] as Map?;
       return {
         'id': b['id'],
@@ -698,9 +780,10 @@ class ApiService {
     return r.data['rate'] ?? r.data['data'] ?? {};
   }
 
-  Future<List> getDealerMyBookings({String? status}) async {
+  Future<List> getDealerMyBookings({String? status, String? crop}) async {
     final r = await _dio.get('/dealer/bookings', queryParameters: {
       if (status != null) 'status': status,
+      if (crop != null && crop.isNotEmpty && crop != 'All') 'crop': crop,
     });
     return r.data['data'] ?? [];
   }

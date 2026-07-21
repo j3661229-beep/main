@@ -6,13 +6,14 @@ const newsService = require('../services/news.service');
  */
 exports.getNews = async (req, res) => {
     try {
-        const { district, state, limit = 20, page = 1, google } = req.query;
+        const { district, state, limit = 20, page = 1, google, language } = req.query;
         const result = await newsService.getNews({
             district,
             state,
             limit,
             page,
             includeGoogle: google !== 'false',
+            language: language || 'en',
         });
 
         res.status(200).json({
@@ -21,6 +22,7 @@ exports.getNews = async (req, res) => {
             scope: result.scope,
             isFallback: result.isFallback,
             sourceMix: result.sourceMix,
+            language: result.language,
         });
     } catch (error) {
         console.error('Error fetching Mandi news:', error);

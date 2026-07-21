@@ -125,7 +125,10 @@ const confirmCashOnDelivery = async (orderId, farmerId) => {
 
 // ── Get Payment ──────────────────────────────────────────────────────────────
 const getPayment = async (orderId) => {
-    const payment = await prisma.payment.findUnique({ where: { orderId }, include: { order: true } });
+    const payment = await prisma.payment.findUnique({
+        where: { orderId },
+        include: { order: { include: { items: { select: { supplierId: true } } } } },
+    });
     if (!payment) throw Object.assign(new Error('Payment not found'), { statusCode: 404 });
     return payment;
 };

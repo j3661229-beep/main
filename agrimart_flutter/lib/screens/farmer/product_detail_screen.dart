@@ -46,17 +46,17 @@ class ProductDetailScreen extends ConsumerWidget {
                 leading: GestureDetector(
                   onTap: () => context.pop(),
                   child: Container(
-                    margin: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(10)),
+                    margin: EdgeInsets.all(r.rs(8)),
+                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(r.rs(10))),
                     child: const Icon(Icons.arrow_back_rounded, color: AppColors.ink),
                   ),
                 ),
                 flexibleSpace: FlexibleSpaceBar(
                   background: imageUrl != null
                       ? CachedNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover,
-                          placeholder: (_, __) => Container(color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: 80)))),
-                          errorWidget: (_, __, ___) => Container(color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: 80)))))
-                      : Container(color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: 80)))),
+                          placeholder: (_, __) => Container(color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(80))))),
+                          errorWidget: (_, __, ___) => Container(color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(80))))))
+                      : Container(color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(80))))),
                 ),
               ),
 
@@ -66,11 +66,11 @@ class ProductDetailScreen extends ConsumerWidget {
                   children: [
                     // ── Details ───────────────────────────
                     Container(
-                      margin: const EdgeInsets.all(16),
-                      padding: const EdgeInsets.all(20),
+                      margin: EdgeInsets.all(r.rs(16)),
+                      padding: EdgeInsets.all(r.rs(20)),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(r.rs(20)),
                         border: Border.all(color: AppColors.border),
                         boxShadow: AppColors.softShadow,
                       ),
@@ -79,35 +79,35 @@ class ProductDetailScreen extends ConsumerWidget {
                         children: [
                           if (category.isNotEmpty)
                             Container(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(color: AppColors.farmerTint, borderRadius: BorderRadius.circular(20)),
-                              child: Text(category, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.farmerAccent)),
+                              margin: EdgeInsets.only(bottom: r.rh(8)),
+                              padding: EdgeInsets.symmetric(horizontal: r.rs(10), vertical: r.rh(4)),
+                              decoration: BoxDecoration(color: AppColors.farmerTint, borderRadius: BorderRadius.circular(r.rs(20))),
+                              child: Text(category, style: GoogleFonts.inter(fontSize: r.sp(11), fontWeight: FontWeight.w600, color: AppColors.farmerAccent)),
                             ),
-                          Text(name, style: GoogleFonts.spaceGrotesk(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.ink)),
-                          const SizedBox(height: 6),
+                          Text(name, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(22), fontWeight: FontWeight.w800, color: AppColors.ink)),
+                          SizedBox(height: r.rh(6)),
                           Row(
                             children: [
                               Text(formatRupee(price), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(28), fontWeight: FontWeight.w800, color: AppColors.farmerAccent)),
-                              const SizedBox(width: 6),
-                              Text('/ $unit', style: GoogleFonts.inter(fontSize: 14, color: AppColors.muted)),
+                              SizedBox(width: r.rs(6)),
+                              Text('/ $unit', style: GoogleFonts.inter(fontSize: r.sp(14), color: AppColors.muted)),
                             ],
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: r.rh(12)),
                           Row(
                             children: [
                               _InfoPill(label: 'Sold by', value: supplier),
-                              const SizedBox(width: 10),
+                              SizedBox(width: r.rs(10)),
                               _InfoPill(label: 'Stock', value: '$stock units', color: stock > 0 ? AppColors.success : AppColors.danger),
                             ],
                           ),
                           if (description.isNotEmpty) ...[
-                            const SizedBox(height: 16),
+                            SizedBox(height: r.rh(16)),
                             const Divider(color: AppColors.border),
-                            const SizedBox(height: 12),
-                            Text('Description', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.muted)),
-                            const SizedBox(height: 8),
-                            Text(description, style: GoogleFonts.inter(fontSize: 14, color: AppColors.ink, height: 1.6)),
+                            SizedBox(height: r.rh(12)),
+                            Text('Description', style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w600, color: AppColors.muted)),
+                            SizedBox(height: r.rh(8)),
+                            Text(description, style: GoogleFonts.inter(fontSize: r.sp(14), color: AppColors.ink, height: 1.6)),
                           ],
                         ],
                       ),
@@ -126,14 +126,14 @@ class ProductDetailScreen extends ConsumerWidget {
                                 content: Text('Added to cart ✓', style: GoogleFonts.inter(color: Colors.white)),
                                 backgroundColor: AppColors.farmerAccent,
                                 behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(r.rs(10))),
                                 duration: const Duration(seconds: 1),
                               ));
                             } : null,
                             color: AppColors.farmerAccent,
                             icon: Icons.add_shopping_cart_outlined,
                           ),
-                          const SizedBox(height: 10),
+                          SizedBox(height: r.rh(10)),
                           AppButton(
                             label: 'Buy Now',
                             onTap: stock > 0 ? () {
@@ -147,7 +147,7 @@ class ProductDetailScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    SizedBox(height: r.rh(40)),
                   ],
                 ),
               ),
@@ -167,17 +167,17 @@ class _InfoPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = context.r;
     return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    padding: EdgeInsets.symmetric(horizontal: r.rs(12), vertical: r.rh(6)),
     decoration: BoxDecoration(
       color: AppColors.background,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(r.rs(10)),
       border: Border.all(color: AppColors.border),
     ),
     child: RichText(
       text: TextSpan(
         children: [
-          TextSpan(text: '$label: ', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
-          TextSpan(text: value, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: color ?? AppColors.ink)),
+          TextSpan(text: '$label: ', style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
+          TextSpan(text: value, style: GoogleFonts.inter(fontSize: r.sp(12), fontWeight: FontWeight.w600, color: color ?? AppColors.ink)),
         ],
       ),
     ),

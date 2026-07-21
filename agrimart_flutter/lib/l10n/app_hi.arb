@@ -264,5 +264,9 @@
   "currentStep": "वर्तमान",
   "treatmentRecommendation": "उपचार सिफारिश",
   "noAdvisoryToday": "आज कोई सलाह उपलब्ध नहीं।",
-  "acresUnit": "एकड़"
+  "acresUnit": "एकड़",
+  "farmSetupTitle": "खेत सेटअप",
+  "farmSetupCompleteBanner": "खेत सेटअप पूरा करें",
+  "farmSetupRequiredHint": "AI, मौसम व मंडी सलाह के लिए जरूरी",
+  "yourFarmSummary": "आपका खेत"
 }

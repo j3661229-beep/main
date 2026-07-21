@@ -24,7 +24,7 @@ Future<void> showLanguagePickerSheet(BuildContext context, WidgetRef ref) async 
         container: container,
         child: _LanguagePickerSheet(
           onChanged: (locale) async {
-            await ref.read(localeProvider.notifier).setLocale(locale);
+            await ref.read(localeProvider.notifier).setLocale(locale, syncBackend: true);
             if (sheetContext.mounted) Navigator.of(sheetContext).pop();
             messenger?.showSnackBar(
               SnackBar(

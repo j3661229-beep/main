@@ -76,6 +76,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
   }
 
   Future<void> _submitBooking() async {
+    final r = context.r;
     final l10n = AppLocalizations.of(context)!;
     if (_selectedDealerId == null) return;
     if (_weightCtrl.text.isEmpty) {
@@ -101,21 +102,21 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
           context: context,
           barrierDismissible: false,
           builder: (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-            contentPadding: const EdgeInsets.all(32),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(r.rs(24))),
+            contentPadding: EdgeInsets.all(r.rs(32)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(r.rs(16)),
                   decoration: const BoxDecoration(color: AppColors.primarySurface, shape: BoxShape.circle),
-                  child: const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 48),
+                  child: Icon(Icons.check_circle_rounded, color: AppColors.primary, size: r.sp(48)),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: r.rh(24)),
                 Text(l10n.bookingConfirmed, style: TextStyle(fontSize: ctx.r.sp(20), fontWeight: FontWeight.w800)),
-                const SizedBox(height: 12),
+                SizedBox(height: r.rh(12)),
                 Text('${l10n.deliverySlotConfirmed} ${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}.', textAlign: TextAlign.center, style: const TextStyle(color: AppColors.textSecondary, height: 1.4)),
-                const SizedBox(height: 24),
+                SizedBox(height: r.rh(24)),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -123,7 +124,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                       Navigator.pop(ctx);
                       Navigator.pop(context);
                     },
-                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(r.rs(12)))),
                     child: Text(l10n.backToDashboard, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                 )
@@ -159,21 +160,21 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.storefront_outlined, size: 64, color: AppColors.textTertiary),
-                      const SizedBox(height: 16),
+                      Icon(Icons.storefront_outlined, size: r.sp(64), color: AppColors.textTertiary),
+                      SizedBox(height: r.rh(16)),
                       Text(l10n.noDealersFound(widget.cropName, widget.district), style: TextStyle(color: AppColors.textSecondary, fontSize: r.sp(16)), textAlign: TextAlign.center),
                     ],
                   ),
                 )
               : SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(r.rs(20)),
                   child: FadeInUp(
                     duration: const Duration(milliseconds: 500),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(l10n.selectLocalDealer, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textSecondary, letterSpacing: 0.5)),
-                        const SizedBox(height: 12),
+                        Text(l10n.selectLocalDealer, style: TextStyle(fontSize: r.sp(14), fontWeight: FontWeight.w800, color: AppColors.textSecondary, letterSpacing: 0.5)),
+                        SizedBox(height: r.rh(12)),
                         ..._dealers.map((dealer) {
                           final isSelected = dealer['supplierId'] == _selectedDealerId;
                           final rate = (dealer['pricePerQuintal'] as num).toDouble();
@@ -186,33 +187,33 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                             }),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(16),
+                              margin: EdgeInsets.only(bottom: r.rh(12)),
+                              padding: EdgeInsets.all(r.rs(16)),
                               decoration: BoxDecoration(
                                 color: isSelected ? AppColors.primarySurface : Colors.white,
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(r.rs(16)),
                                 border: Border.all(color: isSelected ? AppColors.primary : AppColors.border, width: isSelected ? 2 : 1),
-                                boxShadow: isSelected ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))] : [],
+                                boxShadow: isSelected ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.1), blurRadius: r.rs(10), offset: Offset(0, 4))] : [],
                               ),
                               child: Row(
                                 children: [
                                   Container(
-                                    width: 48, height: 48,
-                                    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)),
+                                    width: r.rs(48), height: 48,
+                                    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(r.rs(12))),
                                     child: const Icon(Icons.storefront_rounded, color: AppColors.primary),
                                   ),
-                                  const SizedBox(width: 16),
+                                  SizedBox(width: r.rs(16)),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(sName, style: TextStyle(fontWeight: FontWeight.w800, fontSize: r.sp(16), color: AppColors.textPrimary)),
-                                        const SizedBox(height: 4),
+                                        SizedBox(height: r.rh(4)),
                                         Row(
                                           children: [
-                                            const Icon(Icons.verified_rounded, color: AppColors.success, size: 14),
-                                            const SizedBox(width: 4),
-                                            Text('${widget.district} ${l10n.verifiedDistrict}', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+                                            Icon(Icons.verified_rounded, color: AppColors.success, size: r.sp(14)),
+                                            SizedBox(width: r.rs(4)),
+                                            Text('${widget.district} ${l10n.verifiedDistrict}', style: TextStyle(fontSize: r.sp(11), color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
                                           ],
                                         )
                                       ],
@@ -222,7 +223,7 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text('₹$rate', style: TextStyle(fontWeight: FontWeight.w900, fontSize: r.sp(18), color: AppColors.primaryDark)),
-                                      Text(l10n.perQuintalShort, style: const TextStyle(fontSize: 10, color: AppColors.textTertiary, fontWeight: FontWeight.bold)),
+                                      Text(l10n.perQuintalShort, style: TextStyle(fontSize: r.sp(10), color: AppColors.textTertiary, fontWeight: FontWeight.bold)),
                                     ],
                                   )
                                 ],
@@ -230,21 +231,21 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                             )
                           );
                         }).toList(),
-                        const SizedBox(height: 32),
-                        Text(l10n.bookingDetails, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textSecondary, letterSpacing: 0.5)),
-                        const SizedBox(height: 12),
+                        SizedBox(height: r.rh(32)),
+                        Text(l10n.bookingDetails, style: TextStyle(fontSize: r.sp(14), fontWeight: FontWeight.w800, color: AppColors.textSecondary, letterSpacing: 0.5)),
+                        SizedBox(height: r.rh(12)),
                         Container(
-                          padding: const EdgeInsets.all(20),
+                          padding: EdgeInsets.all(r.rs(20)),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(r.rs(20)),
                             border: Border.all(color: AppColors.border),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(l10n.approxWeightQuintals, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
-                              const SizedBox(height: 8),
+                              Text(l10n.approxWeightQuintals, style: TextStyle(fontSize: r.sp(12), fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+                              SizedBox(height: r.rh(8)),
                               TextField(
                                 controller: _weightCtrl,
                                 keyboardType: TextInputType.number,
@@ -252,38 +253,38 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                                   hintText: 'e.g., 50',
                                   filled: true,
                                   fillColor: AppColors.surface,
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(r.rs(12)), borderSide: BorderSide.none),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rh(14)),
                                 ),
                               ),
-                              const SizedBox(height: 20),
-                              Text(l10n.dropOffDate, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
-                              const SizedBox(height: 8),
+                              SizedBox(height: r.rh(20)),
+                              Text(l10n.dropOffDate, style: TextStyle(fontSize: r.sp(12), fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+                              SizedBox(height: r.rh(8)),
                               GestureDetector(
                                 onTap: () => _selectDate(context),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                                  decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)),
+                                  padding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rh(14)),
+                                  decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(r.rs(12))),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                                      const Icon(Icons.calendar_today_rounded, color: AppColors.primary, size: 20),
+                                      Text('${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}', style: TextStyle(fontSize: r.sp(15), fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                                      Icon(Icons.calendar_today_rounded, color: AppColors.primary, size: r.sp(20)),
                                     ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 20),
-                              Text(l10n.additionalNotesOptional, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
-                              const SizedBox(height: 8),
+                              SizedBox(height: r.rh(20)),
+                              Text(l10n.additionalNotesOptional, style: TextStyle(fontSize: r.sp(12), fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+                              SizedBox(height: r.rh(8)),
                               TextField(
                                 controller: _notesCtrl,
                                 decoration: InputDecoration(
                                   hintText: 'Any special instructions...',
                                   filled: true,
                                   fillColor: AppColors.surface,
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(r.rs(12)), borderSide: BorderSide.none),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rh(14)),
                                 ),
                               ),
                             ]
@@ -294,23 +295,22 @@ class _BookTradeSlotScreenState extends State<BookTradeSlotScreen> {
                   ),
                 ),
       bottomNavigationBar: _dealers.isEmpty ? null : Container(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(r.rs(20)),
         decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -4))],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: r.rs(10), offset: Offset(0, -4))],
         ),
         child: SafeArea(
-          child: SizedBox(
-            height: 56,
+          child: SizedBox(height: r.rh(56),
             child: ElevatedButton(
               onPressed: _isSubmitting ? null : _submitBooking,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(r.rs(16))),
               ),
               child: _isSubmitting 
-                ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
+                ? SizedBox(width: r.rs(24), height: r.rh(24), child: CircularProgressIndicator(color: Colors.white, strokeWidth: r.rs(3)))
                 : Text(l10n.confirmBookingSlot, style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.w800, letterSpacing: 0.5)),
             )
           )

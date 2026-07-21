@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/indian_languages.dart';
+import '../../core/utils/farmer_prefetch.dart';
 import '../../data/providers/auth_provider.dart';
-import '../../data/providers/app_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/utils/responsive.dart';
+
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
   @override
@@ -21,36 +22,34 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
     _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     _scale = Tween<double>(begin: 0.7, end: 1.0).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
     _controller.forward();
     _warmupAndNavigate();
   }
 
-  Future<void> _warmupAndNavigate() async {
-    // Pre-warm the API cache while the splash is showing
-    final auth = ref.read(authProvider);
-    if (auth.isAuthenticated && auth.user != null) {
-      try {
-        // Kick off parallel prefetch requests to fill the cache
-        await Future.wait([
-          ref.read(farmerDashboardProvider.future).catchError((_) => <String, dynamic>{}),
-          ref.read(weatherProvider.future).catchError((_) => <String, dynamic>{}),
-          ref.read(cartProvider.notifier).load(),
-        ]);
-      } catch (_) {}
-    } else {
-      // Eager load public APIs so they are ready after login
-      try {
-        ref.read(productsProvider('').future).catchError((_) => <String, dynamic>{});
-        ref.read(mandiNewsProvider.future).catchError((_) => <dynamic>[]);
-        ref.read(schemesProvider.future).catchError((_) => <dynamic>[]);
-      } catch (_) {}
+  Future<void> _waitForAuthInit() async {
+    const maxWait = Duration(seconds: 4);
+    final deadline = DateTime.now().add(maxWait);
+    while (!ref.read(authProvider).isInitialized && DateTime.now().isBefore(deadline)) {
+      await Future.delayed(const Duration(milliseconds: 40));
     }
-    // Ensure at least 2 seconds of splash visibility
-    await Future.delayed(const Duration(seconds: 2));
-    _navigate();
+  }
+
+  Future<void> _warmupAndNavigate() async {
+    final minSplash = Future.delayed(const Duration(milliseconds: 900));
+    await _waitForAuthInit();
+
+    final auth = ref.read(authProvider);
+    if (auth.isAuthenticated && auth.farmSetupComplete) {
+      prefetchFarmerHomeData(ref);
+    } else if (!auth.isAuthenticated) {
+      prefetchPublicData(ref);
+    }
+
+    await minSplash;
+    if (mounted) _navigate();
   }
 
   Future<void> _navigate() async {
@@ -65,20 +64,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
     final auth = ref.read(authProvider);
     if (auth.isAuthenticated && auth.user != null) {
       if (auth.user!.isFarmer) {
-        if (mounted) context.go('/farmer');
+        if (mounted) {
+          context.go(auth.farmSetupComplete ? '/farmer' : '/farmer/setup');
+        }
       } else if (auth.user!.isDealer) {
         if (mounted) context.go('/dealer');
       } else {
         if (mounted) context.go('/supplier');
       }
     } else {
-      if (mounted) context.go('/auth/role');
+      if (mounted) context.go('/auth/login?role=FARMER');
     }
   }
 
   @override
-  void dispose() { _controller.dispose(); super.dispose(); }
-
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,20 +98,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 100, height: 100,
+                    width: r.rs(100),
+                    height: r.rh(100),
                     decoration: BoxDecoration(
                       color: AppColors.farmerTint,
-                      borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: AppColors.farmerAccent.withValues(alpha: 0.4), blurRadius: 24, spreadRadius: 4)],
+                      borderRadius: BorderRadius.circular(r.rs(28)),
+                      boxShadow: [BoxShadow(color: AppColors.farmerAccent.withValues(alpha: 0.4), blurRadius: r.rs(24), spreadRadius: r.rs(4))],
                     ),
-                    child: Center(child: Text('🌾', style: TextStyle(fontSize: 52))),
+                    child: Center(child: Text('🌾', style: TextStyle(fontSize: r.sp(52)))),
                   ),
-                  const SizedBox(height: 24),
-                  const Text('AgriMart', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.5)),
-                  const SizedBox(height: 8),
-                  Text('शेतकऱ्यांचा विश्वासू साथीदार', style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 48),
-                  SizedBox(width: 32, height: 32, child: CircularProgressIndicator(color: Colors.white.withValues(alpha: 0.4), strokeWidth: 2)),
+                  SizedBox(height: r.rh(24)),
+                  Text('AgriMart', style: TextStyle(fontSize: r.sp(36), fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.5)),
+                  SizedBox(height: r.rh(8)),
+                  Text('शेतकऱ्यांचा विश्वासू साथीदार', style: TextStyle(fontSize: r.sp(15), color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w500)),
+                  SizedBox(height: r.rh(48)),
+                  SizedBox(width: r.rs(32), height: r.rh(32), child: CircularProgressIndicator(color: Colors.white.withValues(alpha: 0.4), strokeWidth: r.rs(2))),
                 ],
               ),
             ),
@@ -118,4 +122,3 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
     );
   }
 }
-

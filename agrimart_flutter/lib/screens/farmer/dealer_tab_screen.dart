@@ -3,15 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../data/services/api_service.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/widgets/app_fallback.dart';
-import '../../core/widgets/app_shimmer.dart';
+import '../../core/widgets/agri_ui.dart';
+import '../../core/widgets/shared_widgets.dart';
 import '../../core/utils/responsive.dart';
 
-// Provider for dealer crop rates — district only, all crops
 final dealerRatesProvider = FutureProvider.family<List, String>((ref, district) async {
   if (district.isEmpty) return [];
   return ApiService.instance.getDealerRates(district: district);
@@ -34,17 +33,11 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
     'Mumbai', 'Thane', 'Raigad', 'Ratnagiri', 'Sindhudurg', 'Other',
   ];
 
-  // Map known geocoding aliases to proper district names
   static const Map<String, String> _districtAliases = {
-    'konkan division': 'Mumbai',
-    'konkan': 'Mumbai',
-    'mumbai suburban': 'Mumbai',
-    'greater mumbai': 'Mumbai',
-    'brihan mumbai': 'Mumbai',
-    'navi mumbai': 'Thane',
-    'aurangabad': 'Aurangabad',
-    'parbhani': 'Aurangabad',
-    'osmanabad': 'Aurangabad',
+    'konkan division': 'Mumbai', 'konkan': 'Mumbai',
+    'mumbai suburban': 'Mumbai', 'greater mumbai': 'Mumbai',
+    'brihan mumbai': 'Mumbai', 'navi mumbai': 'Thane',
+    'aurangabad': 'Aurangabad', 'parbhani': 'Aurangabad', 'osmanabad': 'Aurangabad',
   };
 
   @override
@@ -53,63 +46,37 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _initDistrict());
   }
 
-  /// Auto-detect district from GPS, fallback to farmer profile, then default
   Future<void> _initDistrict() async {
-    // First use farmer's profile district if available
     final farmerDistrict = ref.read(authProvider).user?.farmer?['district'] as String?;
     if (farmerDistrict != null && farmerDistrict.isNotEmpty) {
       setState(() => _district = farmerDistrict);
     }
-
-    // Then try to get GPS-based district (overrides profile if successful)
     await _detectNearestDistrict();
   }
 
   Future<void> _detectNearestDistrict() async {
     setState(() => _isDetectingLocation = true);
     try {
-      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        _fallbackDistrict();
-        return;
-      }
+      if (!await Geolocator.isLocationServiceEnabled()) { _fallbackDistrict(); return; }
       var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
+      if (permission == LocationPermission.denied) permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-        _fallbackDistrict();
-        return;
+        _fallbackDistrict(); return;
       }
-
       final pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 15),
-        ),
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 15)),
       );
       final placemarks = await placemarkFromCoordinates(pos.latitude, pos.longitude);
-
       if (placemarks.isNotEmpty) {
-        final place = placemarks.first;
-        // subAdministrativeArea is typically the district
-        final rawDetected = (place.subAdministrativeArea ?? place.administrativeArea ?? '').trim();
-        final detected = rawDetected.toLowerCase();
-
-        // Check aliases first (fixes Konkan Division → Mumbai)
+        final detected = (placemarks.first.subAdministrativeArea ?? placemarks.first.administrativeArea ?? '').trim().toLowerCase();
         String? resolved;
         for (final alias in _districtAliases.entries) {
-          if (detected.contains(alias.key)) {
-            resolved = alias.value;
-            break;
-          }
+          if (detected.contains(alias.key)) { resolved = alias.value; break; }
         }
         resolved ??= _districts.firstWhere(
-          (d) => detected.contains(d.toLowerCase()) ||
-                 d.toLowerCase().contains(detected.split(' ').first),
+          (d) => detected.contains(d.toLowerCase()) || d.toLowerCase().contains(detected.split(' ').first),
           orElse: () => '',
         );
-
         if (resolved.isNotEmpty && _districts.contains(resolved) && mounted) {
           setState(() => _district = resolved!);
         } else {
@@ -138,178 +105,103 @@ class _DealerTabScreenState extends ConsumerState<DealerTabScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF283593),
-        foregroundColor: Colors.white,
-        title: const Text('Dealer Prices'),
-        elevation: 0,
-      ),
-      body: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        slivers: [
-          // Header
-          SliverToBoxAdapter(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF1A237E), Color(0xFF283593), Color(0xFF3949AB)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(32),
-                  bottomRight: Radius.circular(32),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Text('🏪', style: TextStyle(fontSize: r.sp(26))),
-                      ),
-                      const SizedBox(width: 14),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Dealer Prices', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -0.5)),
-                            Text('Nearby dealers • Live rates', style: TextStyle(fontSize: 13, color: Colors.white70, fontWeight: FontWeight.w500)),
-                          ],
-                        ),
-                      ),
-                      // Location detect button
-                      GestureDetector(
-                        onTap: _isDetectingLocation ? null : _detectNearestDistrict,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: _isDetectingLocation
-                              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                              : const Icon(Icons.my_location, color: Colors.white, size: 20),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // District selector
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _districts.contains(_effectiveDistrict) ? _effectiveDistrict : _districts.first,
-                        dropdownColor: const Color(0xFF283593),
-                        iconEnabledColor: Colors.white,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15),
-                        isExpanded: true,
-                        items: _districts.map((d) => DropdownMenuItem(value: d, child: Text(d))).toList(),
-                        onChanged: (v) {
-                          if (v != null) setState(() => _district = v);
-                        },
-                      ),
+      body: RefreshIndicator(
+        color: AppColors.farmerAccent,
+        onRefresh: () async => ref.invalidate(dealerRatesProvider(_effectiveDistrict)),
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          slivers: [
+            SliverToBoxAdapter(
+              child: FarmerTabHeader(
+                emoji: '🏪',
+                title: 'Dealer Prices',
+                subtitle: 'Live buy rates from nearby dealers',
+                actions: [
+                  GestureDetector(
+                    onTap: _isDetectingLocation ? null : _detectNearestDistrict,
+                    child: Container(
+                      padding: EdgeInsets.all(r.rs(10)),
+                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(r.rs(12))),
+                      child: _isDetectingLocation
+                          ? SizedBox(width: r.rs(20), height: r.rs(20), child: CircularProgressIndicator(strokeWidth: r.rs(2), color: Colors.white))
+                          : Icon(Icons.my_location_rounded, color: Colors.white, size: r.rs(22)),
                     ),
                   ),
-
-                  if (_isDetectingLocation) ...[
-                    const SizedBox(height: 10),
-                    const Row(
-                      children: [
-                        Icon(Icons.location_searching, color: Colors.white54, size: 14),
-                        SizedBox(width: 6),
-                        Text('Finding nearest dealers…', style: TextStyle(color: Colors.white54, fontSize: 12)),
-                      ],
-                    ),
-                  ],
                 ],
-              ),
-            ),
-          ),
-
-          // Content
-          SliverToBoxAdapter(
-            child: rates.when(
-              loading: () => Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: List.generate(5, (_) => _RateShimmer()),
+                bottom: Container(
+                  padding: EdgeInsets.symmetric(horizontal: r.rs(14), vertical: r.rs(4)),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(r.rs(14)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _districts.contains(_effectiveDistrict) ? _effectiveDistrict : _districts.first,
+                      dropdownColor: AppColors.farmerAccent,
+                      iconEnabledColor: Colors.white,
+                      style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w700, fontSize: r.sp(15)),
+                      isExpanded: true,
+                      items: _districts.map((d) => DropdownMenuItem(value: d, child: Text(d))).toList(),
+                      onChanged: (v) { if (v != null) setState(() => _district = v); },
+                    ),
+                  ),
                 ),
               ),
-              error: (e, _) => AppErrorState(
-                message: e.toString(),
-                onRetry: () => ref.invalidate(dealerRatesProvider(_effectiveDistrict)),
-              ),
-              data: (data) {
-                if (data.isEmpty) {
-                  return AppEmptyState(
-                    icon: '🏪',
-                    title: 'No Dealers in $_effectiveDistrict',
-                    subtitle: 'Try selecting a nearby district from the dropdown.',
-                  );
-                }
-
-                // Group by crop name
-                final Map<String, List<Map>> grouped = {};
-                for (final rate in data) {
-                  final crop = rate['cropName'] as String? ?? 'Unknown';
-                  grouped.putIfAbsent(crop, () => []).add(rate as Map);
-                }
-
-                return Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Container(
-                            width: 8, height: 8,
-                            decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Live rates • $_effectiveDistrict district',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textTertiary),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      ...grouped.entries.map((entry) => _CropRateCard(
-                        cropName: entry.key,
-                        rates: entry.value,
-                        district: _effectiveDistrict,
-                        onBookSlot: (dealerId, rate) {
-                          context.push('/farmer/trade/book', extra: {
-                            'cropName': entry.key,
-                            'district': _effectiveDistrict,
-                            'dealerId': dealerId,
-                          });
-                        },
-                      )),
-                      const SizedBox(height: 100),
-                    ],
-                  ),
-                );
-              },
             ),
-          ),
-        ],
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(r.horizontalPadding, r.rs(16), r.horizontalPadding, r.rs(100)),
+              sliver: rates.when(
+                loading: () => SliverList(delegate: SliverChildBuilderDelegate((_, __) => Padding(
+                  padding: EdgeInsets.only(bottom: r.rs(12)),
+                  child: ShimmerBox(height: r.rs(140), radius: 20),
+                ), childCount: 4)),
+                error: (e, _) => SliverToBoxAdapter(child: EmptyState(
+                  emoji: '⚠️',
+                  title: 'Could not load rates',
+                  subtitle: e.toString(),
+                  actionLabel: 'Retry',
+                  onAction: () => ref.invalidate(dealerRatesProvider(_effectiveDistrict)),
+                )),
+                data: (data) {
+                  if (data.isEmpty) {
+                    return SliverToBoxAdapter(child: EmptyState(
+                      emoji: '🏪',
+                      title: 'No Dealers in $_effectiveDistrict',
+                      subtitle: 'Try selecting a nearby district from the dropdown above.',
+                    ));
+                  }
+                  final Map<String, List<Map>> grouped = {};
+                  for (final rate in data) {
+                    final crop = rate['cropName'] as String? ?? 'Unknown';
+                    grouped.putIfAbsent(crop, () => []).add(rate as Map);
+                  }
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (ctx, i) {
+                        final entry = grouped.entries.elementAt(i);
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: r.rs(14)),
+                          child: _CropRateCard(
+                            cropName: entry.key,
+                            rates: entry.value,
+                            district: _effectiveDistrict,
+                            onBookSlot: (dealerId, _) => context.push('/farmer/trade/book', extra: {
+                              'cropName': entry.key,
+                              'district': _effectiveDistrict,
+                              'dealerId': dealerId,
+                            }),
+                          ),
+                        );
+                      },
+                      childCount: grouped.length,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -321,12 +213,7 @@ class _CropRateCard extends StatelessWidget {
   final String district;
   final Function(String, double) onBookSlot;
 
-  const _CropRateCard({
-    required this.cropName,
-    required this.rates,
-    required this.district,
-    required this.onBookSlot,
-  });
+  const _CropRateCard({required this.cropName, required this.rates, required this.district, required this.onBookSlot});
 
   String _cropEmoji(String crop) {
     final c = crop.toLowerCase();
@@ -347,117 +234,89 @@ class _CropRateCard extends StatelessWidget {
     final bestRate = (bestRateObj['pricePerQuintal'] as num).toDouble();
     final bestDealerId = bestRateObj['dealerId'] as String? ?? '';
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-        boxShadow: AppColors.softShadow,
-      ),
+    return AgriCard(
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Crop header
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(r.rs(16)),
             decoration: BoxDecoration(
-              color: AppColors.primarySurface,
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+              color: AppColors.farmerTint,
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(r.rs(18)), topRight: Radius.circular(r.rs(18))),
             ),
             child: Row(
               children: [
-                Text(_cropEmoji(cropName), style: TextStyle(fontSize: r.sp(28))),
-                const SizedBox(width: 12),
+                Text(_cropEmoji(cropName), style: TextStyle(fontSize: r.sp(32))),
+                SizedBox(width: r.rs(12)),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(cropName, style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                      Text('${rates.length} dealer${rates.length > 1 ? 's' : ''} buying'),
+                      Text(cropName, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(17), fontWeight: FontWeight.w800, color: AppColors.ink)),
+                      Text('${rates.length} dealer${rates.length > 1 ? 's' : ''} buying', style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
                     ],
                   ),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('₹${bestRate.toStringAsFixed(0)}', style: TextStyle(fontSize: r.sp(20), fontWeight: FontWeight.w900, color: AppColors.primary)),
-                    const Text('best/quintal', style: TextStyle(fontSize: 10, color: AppColors.textTertiary, fontWeight: FontWeight.w600)),
+                    Text(formatRupee(bestRate), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(22), fontWeight: FontWeight.w800, color: AppColors.farmerAccent)),
+                    Text('best/quintal', style: GoogleFonts.inter(fontSize: r.sp(10), color: AppColors.muted, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ],
             ),
           ),
-
-          // Dealer list
           ...rates.map((rate) {
             final dealerMap = rate['dealer'] as Map?;
-            final dealerName = dealerMap?['businessName'] as String?
-                ?? dealerMap?['user']?['name'] as String?
-                ?? 'Local Dealer';
+            final dealerName = dealerMap?['businessName'] as String? ?? dealerMap?['user']?['name'] as String? ?? 'Local Dealer';
             final price = (rate['pricePerQuintal'] as num).toDouble();
             final isBest = price == bestRate;
-
             return Padding(
-              padding: EdgeInsets.fromLTRB(r.horizontalPadding, 12, r.horizontalPadding, 0),
+              padding: EdgeInsets.fromLTRB(r.rs(16), r.rs(12), r.rs(16), 0),
               child: Row(
                 children: [
                   Container(
-                    width: 40, height: 40,
+                    width: r.rs(40), height: r.rs(40),
                     decoration: BoxDecoration(
-                      color: isBest ? AppColors.primarySurface : AppColors.surface,
-                      borderRadius: BorderRadius.circular(12),
+                      color: isBest ? AppColors.farmerTint : AppColors.background,
+                      borderRadius: BorderRadius.circular(r.rs(12)),
                     ),
                     child: Center(child: Text('🤝', style: TextStyle(fontSize: r.sp(20)))),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: r.rs(12)),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Flexible(child: Text(dealerName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary), overflow: TextOverflow.ellipsis)),
+                            Flexible(child: Text(dealerName, style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: r.sp(14), color: AppColors.ink), overflow: TextOverflow.ellipsis)),
                             if (isBest) ...[
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(8)),
-                                child: Text('BEST', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800)),
-                              ),
+                              SizedBox(width: r.rs(6)),
+                              BadgeChip(label: 'BEST', color: AppColors.farmerAccent, textColor: Colors.white),
                             ],
                           ],
                         ),
-                        const Text('Verified Dealer', style: TextStyle(fontSize: 11, color: AppColors.textTertiary)),
+                        Text('Verified Dealer', style: GoogleFonts.inter(fontSize: r.sp(11), color: AppColors.muted)),
                       ],
                     ),
                   ),
-                  Text('₹${price.toStringAsFixed(0)}/q', style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 15,
-                    color: isBest ? AppColors.primary : AppColors.textPrimary,
-                  )),
+                  Text(
+                    '${formatRupee(price)}/q',
+                    style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w800, fontSize: r.sp(15), color: isBest ? AppColors.farmerAccent : AppColors.ink),
+                  ),
                 ],
               ),
             );
           }),
-
-          // Book slot button
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => onBookSlot(bestDealerId, bestRate),
-                icon: Text('📅', style: TextStyle(fontSize: r.sp(16))),
-                label: const Text('Book Delivery Slot', style: TextStyle(fontWeight: FontWeight.w700)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
+            padding: EdgeInsets.all(r.rs(16)),
+            child: FarmerActionButton(
+              label: 'Book Delivery Slot',
+              emoji: '📅',
+              onTap: () => onBookSlot(bestDealerId, bestRate),
             ),
           ),
         ],
@@ -465,40 +324,3 @@ class _CropRateCard extends StatelessWidget {
     );
   }
 }
-
-class _RateShimmer extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final r = context.r;
-    return Container(
-      height: 120,
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.3)),
-      ),
-      child: const Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(children: [
-              AppShimmer(width: 40, height: 40, borderRadius: 12),
-              SizedBox(width: 12),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                AppShimmer(width: 100, height: 18, borderRadius: 6),
-                SizedBox(height: 6),
-                AppShimmer(width: 70, height: 14, borderRadius: 4),
-              ])),
-              AppShimmer(width: 60, height: 28, borderRadius: 8),
-            ]),
-            SizedBox(height: 16),
-            AppShimmer(width: double.infinity, height: 38, borderRadius: 12),
-          ],
-        ),
-      ),
-    );
-  }
-}
-

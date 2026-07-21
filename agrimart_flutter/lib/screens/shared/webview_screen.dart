@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/responsive.dart';
 
 class WebViewScreen extends StatefulWidget {
   final String url;
@@ -37,10 +38,11 @@ class _WebViewScreenState extends State<WebViewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+        title: Text(widget.title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: r.sp(16))),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         centerTitle: true,

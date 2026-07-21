@@ -9,6 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'core/storage/offline_cache.dart';
 import 'core/widgets/error_boundary.dart';
+import 'core/utils/responsive.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/constants/indian_languages.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -81,12 +82,13 @@ class AgriMartApp extends ConsumerWidget {
       supportedLocales: IndianLanguages.locales,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
+        final mq = MediaQuery.of(context);
         return Localizations.override(
           context: context,
           locale: locale,
           child: MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
-            child: child!,
+            data: mq.copyWith(textScaler: TextScaler.linear(1.0)),
+            child: ResponsivePage(child: child ?? const SizedBox.shrink()),
           ),
         );
       },

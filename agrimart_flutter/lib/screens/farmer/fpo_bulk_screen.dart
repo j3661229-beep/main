@@ -52,17 +52,17 @@ class _FpoBulkScreenState extends ConsumerState<FpoBulkScreen> {
         emoji: '✅',
         showBack: true,
         body: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: EdgeInsets.all(r.rs(32)),
           child: Column(
             children: [
-              const SizedBox(height: 40),
+              SizedBox(height: r.rh(40)),
               AgriCard(
                 child: Column(
                   children: [
-                    const Text('🎉', style: TextStyle(fontSize: 56)),
-                    const SizedBox(height: 16),
-                    Text('Interest registered!', style: GoogleFonts.spaceGrotesk(fontSize: 22, fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 8),
+                    Text('🎉', style: TextStyle(fontSize: r.sp(56))),
+                    SizedBox(height: r.rh(16)),
+                    Text('Interest registered!', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(22), fontWeight: FontWeight.w800)),
+                    SizedBox(height: r.rh(8)),
                     Text(
                       'We\'ll connect you with nearby FPOs and dealers for better bulk rates.',
                       textAlign: TextAlign.center,
@@ -94,7 +94,7 @@ class _FpoBulkScreenState extends ConsumerState<FpoBulkScreen> {
               tint: AppColors.dealerTint,
               icon: Icons.groups_outlined,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: r.rh(20)),
             AgriCard(
               child: Column(
                 children: [
@@ -106,7 +106,7 @@ class _FpoBulkScreenState extends ConsumerState<FpoBulkScreen> {
                         .toList(),
                     onChanged: (v) => setState(() => _crop = v),
                   ),
-                  const Divider(height: 1),
+                  Divider(height: r.rh(1)),
                   TextField(
                     controller: _qtyCtrl,
                     keyboardType: TextInputType.number,
@@ -116,7 +116,7 @@ class _FpoBulkScreenState extends ConsumerState<FpoBulkScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: r.rh(24)),
             AppButton(label: 'Register Interest', onTap: _submit, isLoading: _loading, color: AppColors.dealerAccent),
           ],
         ),

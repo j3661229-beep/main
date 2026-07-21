@@ -9,6 +9,7 @@ router.use(authenticate, requireFarmer, apiLimiter);
 router.get('/profile', farmerController.getProfile);
 router.put('/profile', farmerController.updateProfile);
 router.put('/farm-details', farmerController.updateFarmDetails);
+router.get('/setup-status', farmerController.getFarmSetupStatus);
 router.get('/dashboard', farmerController.getDashboard);
 router.get('/orders', farmerController.getOrders);
 router.get('/orders/:id', farmerController.getOrder);

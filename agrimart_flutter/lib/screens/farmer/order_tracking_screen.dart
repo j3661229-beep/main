@@ -76,7 +76,7 @@ class _TrackingBody extends StatelessWidget {
     final progressPercent = (data['progressPercent'] as num?)?.toInt() ?? 0;
 
     return ListView(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(r.rs(20)),
       children: [
         // ── Store / Pickup Location Card ──────────────────────────────
         _StoreLocationCard(
@@ -88,16 +88,16 @@ class _TrackingBody extends StatelessWidget {
           l10n: l10n,
         ),
 
-        const SizedBox(height: 20),
+        SizedBox(height: r.rh(20)),
 
         // ── Progress Bar ──────────────────────────────────────────────
         _ProgressCard(progressPercent: progressPercent, l10n: l10n),
 
-        const SizedBox(height: 24),
+        SizedBox(height: r.rh(24)),
 
         // ── Tracking Timeline ─────────────────────────────────────────
         Text(l10n.trackingHistory, style: AppTextStyles.headingLG),
-        const SizedBox(height: 16),
+        SizedBox(height: r.rh(16)),
 
         ...backendSteps.asMap().entries.map((e) {
           final step = e.value as Map;
@@ -115,16 +115,16 @@ class _TrackingBody extends StatelessWidget {
           );
         }),
 
-        const SizedBox(height: 24),
+        SizedBox(height: r.rh(24)),
 
         // ── Order Items Summary ───────────────────────────────────────
         if (items.isNotEmpty) ...[
           Text(l10n.orderItems, style: AppTextStyles.headingLG),
-          const SizedBox(height: 12),
+          SizedBox(height: r.rh(12)),
           ...items.map((item) => _OrderItemRow(item: item as Map)),
         ],
 
-        const SizedBox(height: 80),
+        SizedBox(height: r.rh(80)),
       ],
     );
   }
@@ -218,11 +218,11 @@ class _StoreLocationCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(r.rs(24)),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 20,
+            blurRadius: r.rs(20),
             offset: const Offset(0, 8),
           ),
         ],
@@ -231,32 +231,32 @@ class _StoreLocationCard extends StatelessWidget {
         children: [
           // Header
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            padding: EdgeInsets.fromLTRB(r.rs(20), r.rh(20), r.rs(20), r.rh(0)),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(r.rs(10)),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(r.rs(14)),
                   ),
                   child: Text('🏬', style: TextStyle(fontSize: r.sp(28))),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: r.rs(14)),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         l10n.pickupLocation,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white70,
-                          fontSize: 12,
+                          fontSize: r.sp(12),
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.5,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      SizedBox(height: r.rh(2)),
                       Text(
                         storeName,
                         style: TextStyle(
@@ -275,19 +275,19 @@ class _StoreLocationCard extends StatelessWidget {
 
           if (address.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+              padding: EdgeInsets.fromLTRB(r.rs(20), r.rh(12), r.rs(20), r.rh(0)),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.location_pin, color: Colors.white70, size: 16),
-                  const SizedBox(width: 6),
+                  Icon(Icons.location_pin, color: Colors.white70, size: r.sp(16)),
+                  SizedBox(width: r.rs(6)),
                   Expanded(
                     child: Text(
                       address,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white70,
-                        fontSize: 13,
-                        height: 1.4,
+                        fontSize: r.sp(13),
+                        height: r.rh(1.4),
                       ),
                     ),
                   ),
@@ -295,7 +295,7 @@ class _StoreLocationCard extends StatelessWidget {
               ),
             ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: r.rh(16)),
 
           // Navigate Button
           if (hasNavigation)
@@ -303,27 +303,27 @@ class _StoreLocationCard extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(r.horizontalPadding, 0, r.horizontalPadding, 16),
               child: Material(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(r.rs(14)),
                 child: InkWell(
                   onTap: () => _openMaps(context),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(r.rs(14)),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: r.rs(20), vertical: r.rh(14)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.directions, color: AppColors.primary, size: 22),
-                        const SizedBox(width: 10),
+                        Icon(Icons.directions, color: AppColors.primary, size: r.sp(22)),
+                        SizedBox(width: r.rs(10)),
                         Text(
                           l10n.navigateToStore,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.primary,
-                            fontSize: 15,
+                            fontSize: r.sp(15),
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.2,
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        SizedBox(width: r.rs(6)),
                         Text('🗺️', style: TextStyle(fontSize: r.sp(16))),
                       ],
                     ),
@@ -351,14 +351,14 @@ class _ProgressCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = context.r;
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(r.rs(20)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(r.rs(20)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 15,
+            blurRadius: r.rs(15),
             offset: const Offset(0, 5),
           ),
         ],
@@ -370,29 +370,29 @@ class _ProgressCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: r.rs(44),
+                height: r.rh(44),
                 decoration: BoxDecoration(
                   color: AppColors.primarySurface,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(r.rs(12)),
                 ),
-                child: Center(child: Text('📦', style: TextStyle(fontSize: 22))),
+                child: Center(child: Text('📦', style: TextStyle(fontSize: r.sp(22)))),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: r.rs(14)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       l10n.pickupProgress,
-                      style: const TextStyle(
-                        fontSize: 12,
+                      style: TextStyle(
+                        fontSize: r.sp(12),
                         fontWeight: FontWeight.w700,
                         color: AppColors.textSecondary,
                         letterSpacing: 0.3,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: r.rh(2)),
                     Text(
                       '$progressPercent% ${l10n.ready}',
                       style: TextStyle(
@@ -406,14 +406,14 @@ class _ProgressCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: r.rh(16)),
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(r.rs(8)),
             child: LinearProgressIndicator(
               value: progressPercent / 100,
               backgroundColor: AppColors.primarySurface,
               valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-              minHeight: 10,
+              minHeight: r.rh(10),
             ),
           ),
         ],
@@ -455,19 +455,18 @@ class _TimelineStep extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Timeline Column
-          SizedBox(
-            width: 32,
+          SizedBox(width: r.rs(32),
             child: Column(
               children: [
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: r.rs(32),
+                  height: r.rh(32),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: completed ? dotColor : Colors.transparent,
                     border: completed ? null : Border.all(color: AppColors.border, width: 2),
                     boxShadow: current
-                        ? [BoxShadow(color: dotColor.withValues(alpha: 0.3), blurRadius: 8, spreadRadius: 2)]
+                        ? [BoxShadow(color: dotColor.withValues(alpha: 0.3), blurRadius: r.rs(8), spreadRadius: r.rs(2))]
                         : null,
                   ),
                   child: Icon(
@@ -480,11 +479,11 @@ class _TimelineStep extends StatelessWidget {
                   Expanded(
                     child: Center(
                       child: Container(
-                        width: 2,
-                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        width: r.rs(2),
+                        margin: EdgeInsets.symmetric(vertical: r.rh(4)),
                         decoration: BoxDecoration(
                           color: completed ? AppColors.primary : AppColors.border.withValues(alpha: 0.4),
-                          borderRadius: BorderRadius.circular(1),
+                          borderRadius: BorderRadius.circular(r.rs(1)),
                         ),
                       ),
                     ),
@@ -493,55 +492,55 @@ class _TimelineStep extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 16),
+          SizedBox(width: r.rs(16)),
 
           // Label + timestamp
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(top: 6, bottom: isLast ? 0 : 24),
+              padding: EdgeInsets.only(top: r.rh(6), bottom: isLast ? 0 : 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     label.toUpperCase(),
                     style: current
-                        ? const TextStyle(
-                            fontSize: 14,
+                        ? TextStyle(
+                            fontSize: r.sp(14),
                             fontWeight: FontWeight.w900,
                             color: AppColors.primaryDark,
                             letterSpacing: 0.5,
                           )
                         : TextStyle(
-                            fontSize: 14,
+                            fontSize: r.sp(14),
                             fontWeight: FontWeight.w600,
                             color: completed ? AppColors.textPrimary : AppColors.textSecondary,
                             letterSpacing: 0.3,
                           ),
                   ),
                   if (timestamp != null && timestamp!.isNotEmpty) ...[
-                    const SizedBox(height: 4),
+                    SizedBox(height: r.rh(4)),
                     Text(
                       _formatTimestamp(timestamp!),
-                      style: const TextStyle(
-                        fontSize: 11,
+                      style: TextStyle(
+                        fontSize: r.sp(11),
                         color: AppColors.textTertiary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                   if (current) ...[
-                    const SizedBox(height: 6),
+                    SizedBox(height: r.rh(6)),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: EdgeInsets.symmetric(horizontal: r.rs(10), vertical: r.rh(4)),
                       decoration: BoxDecoration(
                         color: AppColors.primarySurface,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(r.rs(20)),
                         border: Border.all(color: AppColors.primaryBorder),
                       ),
                       child: Text(
                         '● ${l10n.currentStep}',
                         style: TextStyle(
-                          fontSize: 9,
+                          fontSize: r.sp(9),
                           fontWeight: FontWeight.w900,
                           color: AppColors.primary,
                           letterSpacing: 1,
@@ -589,25 +588,25 @@ class _OrderItemRow extends StatelessWidget {
     final unit = product['unit']?.toString() ?? '';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      margin: EdgeInsets.only(bottom: r.rh(10)),
+      padding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rh(14)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(r.rs(14)),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: r.rs(44),
+            height: r.rh(44),
             decoration: BoxDecoration(
               color: AppColors.primarySurface,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(r.rs(10)),
             ),
-            child: Center(child: Text('🌿', style: TextStyle(fontSize: 22))),
+            child: Center(child: Text('🌿', style: TextStyle(fontSize: r.sp(22)))),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: r.rs(14)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

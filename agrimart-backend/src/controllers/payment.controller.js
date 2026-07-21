@@ -20,7 +20,20 @@ const getUpiDetails = async (req, res, next) => {
 };
 
 const getPayment = async (req, res, next) => {
-    try { success(res, await paymentService.getPayment(req.params.orderId)); } catch (e) { next(e); }
+    try {
+        const payment = await paymentService.getPayment(req.params.orderId);
+        // Ensure the authenticated user owns this order (farmer, supplier, or admin)
+        const userId = req.user.id;
+        const role = req.user.role;
+        if (role !== 'ADMIN') {
+            const order = payment.order;
+            const isOwner =
+                (role === 'FARMER' && order?.farmerId === req.user?.farmer?.id) ||
+                (role === 'SUPPLIER' && order?.items?.some?.((i) => i.supplierId === req.user?.supplier?.id));
+            if (!isOwner) return error(res, 'Access denied', 403);
+        }
+        success(res, payment);
+    } catch (e) { next(e); }
 };
 
 const confirmCashOnDelivery = async (req, res, next) => {

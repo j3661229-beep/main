@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/indian_languages.dart';
 import '../../core/providers/locale_provider.dart';
 import '../../core/theme/app_colors.dart';
@@ -23,33 +24,26 @@ class LanguageSelectionScreen extends ConsumerWidget {
         child: SafeArea(
           child: Column(
             children: [
-              const SizedBox(height: 60),
+              SizedBox(height: r.rh(60)),
               // Header
-              const Text(
+              Text(
                 '🌐',
-                style: TextStyle(fontSize: 60),
+                style: TextStyle(fontSize: r.sp(60)),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: r.rh(24)),
               Text(
                 l10n.selectLanguage,
-                style: TextStyle(
-                  fontSize: r.sp(28),
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                ),
+                style: GoogleFonts.spaceGrotesk(fontSize: r.sp(28), fontWeight: FontWeight.w800, color: Colors.white),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: r.rh(12)),
               Text(
                 l10n.chooseLanguage,
-                style: TextStyle(
-                  fontSize: r.sp(16),
-                  color: Colors.white.withValues(alpha: 0.7),
-                ),
+                style: GoogleFonts.inter(fontSize: r.sp(16), color: Colors.white.withValues(alpha: 0.75)),
               ),
               const Spacer(),
               // Language Cards
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.symmetric(horizontal: r.rs(24)),
                 child: Column(
                   children: IndianLanguages.all.map((lang) {
                     final isLast = lang == IndianLanguages.all.last;
@@ -73,10 +67,10 @@ class LanguageSelectionScreen extends ConsumerWidget {
               const Spacer(),
               // Continue Button
               Padding(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(r.rs(24)),
                 child: SizedBox(
                   width: double.infinity,
-                  height: 60,
+                  height: r.rh(60),
                   child: ElevatedButton(
                     onPressed: () async {
                       final selected = ref.read(localeProvider);
@@ -84,22 +78,20 @@ class LanguageSelectionScreen extends ConsumerWidget {
                       if (!context.mounted) return;
                       final user = ref.read(authProvider).user;
                       if (user != null) {
-                        if (user.isFarmer) context.go('/farmer');
-                        else if (user.isDealer) context.go('/dealer');
-                        else context.go('/supplier');
+                        context.go('/farmer');
                       } else {
-                        context.go('/auth/role');
+                        context.go('/auth/login');
                       }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(r.rs(20))),
                       elevation: 0,
                     ),
                     child: Text(
                       l10n.continueBtn,
-                      style: TextStyle(fontSize: r.sp(18), fontWeight: FontWeight.bold),
+                      style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700),
                     ),
                   ),
                 ),
@@ -134,42 +126,42 @@ class _LanguageCard extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(r.rs(20)),
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(r.rs(24)),
           border: Border.all(
             color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.2),
-            width: 2,
+            width: r.rs(2),
           ),
         ),
         child: Row(
           children: [
-            Text(icon, style: const TextStyle(fontSize: 32)),
-            const SizedBox(width: 20),
+            Text(icon, style: TextStyle(fontSize: r.sp(32))),
+            SizedBox(width: r.rs(20)),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: GoogleFonts.spaceGrotesk(
                     fontSize: r.sp(18),
-                    fontWeight: FontWeight.bold,
-                    color: isSelected ? AppColors.primary : Colors.white,
+                    fontWeight: FontWeight.w700,
+                    color: isSelected ? AppColors.farmerAccent : Colors.white,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isSelected ? AppColors.primary.withValues(alpha: 0.7) : Colors.white.withValues(alpha: 0.6),
+                  style: GoogleFonts.inter(
+                    fontSize: r.sp(14),
+                    color: isSelected ? AppColors.farmerAccent.withValues(alpha: 0.7) : Colors.white.withValues(alpha: 0.65),
                   ),
                 ),
               ],
             ),
             const Spacer(),
             if (isSelected)
-              const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 28),
+              Icon(Icons.check_circle_rounded, color: AppColors.primary, size: r.sp(28)),
           ],
         ),
       ),

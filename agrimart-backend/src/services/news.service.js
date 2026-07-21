@@ -64,12 +64,18 @@ const detectCrop = (text = '') => {
     return hit.charAt(0).toUpperCase() + hit.slice(1);
 };
 
-const buildGoogleNewsRssUrl = (query) => {
+const buildGoogleNewsRssUrl = (query, language = 'en') => {
+    const langMap = {
+        en: { hl: 'en-IN', ceid: 'IN:en' },
+        hi: { hl: 'hi-IN', ceid: 'IN:hi' },
+        mr: { hl: 'mr-IN', ceid: 'IN:mr' },
+    };
+    const lang = langMap[language] || langMap.en;
     const params = new URLSearchParams({
         q: query,
-        hl: 'en-IN',
+        hl: lang.hl,
         gl: 'IN',
-        ceid: 'IN:en',
+        ceid: lang.ceid,
     });
     return `https://news.google.com/rss/search?${params.toString()}`;
 };
@@ -96,12 +102,12 @@ const normalizeItems = (rawItems) => {
     }).filter((item) => item.title.length > 0);
 };
 
-const fetchGoogleNewsRss = async (query) => {
-    const cacheKey = `google_rss:${query}`;
+const fetchGoogleNewsRss = async (query, language = 'en') => {
+    const cacheKey = `google_rss:${language}:${query}`;
     const cached = await safeRedisGet(cacheKey);
     if (cached) return cached;
 
-    const url = buildGoogleNewsRssUrl(query);
+    const url = buildGoogleNewsRssUrl(query, language);
     const { data: xml } = await axios.get(url, {
         timeout: 15000,
         headers: {
@@ -116,15 +122,39 @@ const fetchGoogleNewsRss = async (query) => {
     return items;
 };
 
-const buildLocationQueries = ({ district, state }) => {
+const buildLocationQueries = ({ district, state, language = 'en' }) => {
     const queries = [];
+    const lang = ['en', 'hi', 'mr'].includes(language) ? language : 'en';
+
     if (district && state) {
-        queries.push(`${district} agriculture mandi farmer crop ${state} India when:14d`);
-        queries.push(`${district} ${state} farmer crop market when:14d`);
+        if (lang === 'mr') {
+            queries.push(`${district} ${state} शेती मंडी शेतकरी when:14d`);
+            queries.push(`${district} ${state} शेतकरी बाजार भाव when:14d`);
+        } else if (lang === 'hi') {
+            queries.push(`${district} ${state} कृषि मंडी किसान when:14d`);
+            queries.push(`${district} ${state} किसान फसल बाजार when:14d`);
+        } else {
+            queries.push(`${district} agriculture mandi farmer crop ${state} India when:14d`);
+            queries.push(`${district} ${state} farmer crop market when:14d`);
+        }
     } else if (state) {
-        queries.push(`agriculture mandi farmer ${state} India when:14d`);
+        if (lang === 'mr') {
+            queries.push(`शेती मंडी ${state} भारत when:14d`);
+        } else if (lang === 'hi') {
+            queries.push(`कृषि मंडी ${state} भारत when:14d`);
+        } else {
+            queries.push(`agriculture mandi farmer ${state} India when:14d`);
+        }
     }
-    queries.push('agriculture mandi farmer crop India when:7d');
+
+    if (lang === 'mr') {
+        queries.push('शेती मंडी शेतकरी महाराष्ट्र when:7d');
+    } else if (lang === 'hi') {
+        queries.push('कृषि मंडी किसान भारत when:7d');
+    } else {
+        queries.push('agriculture mandi farmer crop India when:7d');
+    }
+
     return [...new Set(queries)];
 };
 
@@ -194,10 +224,10 @@ const fetchDbNews = async ({ district, state, take, skip }) => {
     };
 };
 
-const fetchLiveGoogleNews = async ({ district, state, take }) => {
-    const queries = buildLocationQueries({ district, state });
+const fetchLiveGoogleNews = async ({ district, state, take, language = 'en' }) => {
+    const queries = buildLocationQueries({ district, state, language });
     const batches = await Promise.allSettled(
-        queries.map((query) => fetchGoogleNewsRss(query)),
+        queries.map((query) => fetchGoogleNewsRss(query, language)),
     );
 
     const merged = [];
@@ -211,10 +241,11 @@ const fetchLiveGoogleNews = async ({ district, state, take }) => {
         .slice(0, take);
 };
 
-const getNews = async ({ district, state, limit = 20, page = 1, includeGoogle = true }) => {
+const getNews = async ({ district, state, limit = 20, page = 1, includeGoogle = true, language = 'en' }) => {
     const take = Number(limit);
     const skip = (Number(page) - 1) * take;
-    const cacheKey = `news_google:${district || 'all'}:${state || 'all'}:${page}:${take}`;
+    const lang = ['en', 'hi', 'mr'].includes(language) ? language : 'en';
+    const cacheKey = `news_google:${lang}:${district || 'all'}:${state || 'all'}:${page}:${take}`;
     const cached = await safeRedisGet(cacheKey);
     if (cached) return cached;
 
@@ -225,7 +256,7 @@ const getNews = async ({ district, state, limit = 20, page = 1, includeGoogle = 
 
     if (includeGoogle) {
         try {
-            const googleItems = await fetchLiveGoogleNews({ district, state, take: take * 3 });
+            const googleItems = await fetchLiveGoogleNews({ district, state, take: take * 3, language: lang });
             items = googleItems.slice(skip, skip + take);
         } catch (err) {
             logger.warn(`Google News RSS fetch failed: ${err.message}`);
@@ -241,7 +272,7 @@ const getNews = async ({ district, state, limit = 20, page = 1, includeGoogle = 
         sourceMix = 'database';
     }
 
-    const payload = { items, scope, isFallback, sourceMix };
+    const payload = { items, scope, isFallback, sourceMix, language: lang };
     await safeRedisSet(cacheKey, NEWS_CACHE_TTL, payload);
     return payload;
 };

@@ -645,10 +645,10 @@ class RoleBottomNav extends StatelessWidget {
     final r = context.r;
     return Container(
       margin: EdgeInsets.fromLTRB(r.horizontalPadding, 0, r.horizontalPadding, r.rs(12)),
-      padding: EdgeInsets.symmetric(horizontal: r.rs(6), vertical: r.rs(8)),
+      padding: EdgeInsets.symmetric(horizontal: r.rs(8), vertical: r.rs(10)),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(r.rs(24)),
+        borderRadius: BorderRadius.circular(r.rs(28)),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
         boxShadow: AppColors.deepShadow,
       ),
@@ -667,22 +667,39 @@ class RoleBottomNav extends StatelessWidget {
                   duration: const Duration(milliseconds: 220),
                   curve: Curves.easeOutCubic,
                   margin: EdgeInsets.symmetric(horizontal: r.rs(2)),
-                  padding: EdgeInsets.symmetric(vertical: r.rs(8)),
+                  padding: EdgeInsets.symmetric(vertical: r.rs(10), horizontal: r.rs(4)),
                   decoration: BoxDecoration(
-                    color: active ? accent.withValues(alpha: 0.12) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(r.rs(16)),
+                    color: active ? accent.withValues(alpha: 0.14) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(r.rs(18)),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(active ? item.activeIcon : item.icon, color: active ? accent : AppColors.muted, size: r.rs(22)),
-                      SizedBox(height: r.rs(4)),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 220),
+                        padding: EdgeInsets.all(active ? r.rs(4) : 0),
+                        decoration: active
+                            ? BoxDecoration(
+                                color: accent.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(r.rs(12)),
+                              )
+                            : null,
+                        child: Icon(
+                          active ? item.activeIcon : item.icon,
+                          color: active ? accent : AppColors.muted,
+                          size: r.rs(26),
+                        ),
+                      ),
+                      SizedBox(height: r.rs(5)),
                       Text(
                         item.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
-                          fontSize: r.sp(10),
+                          fontSize: r.sp(11),
                           fontWeight: active ? FontWeight.w700 : FontWeight.w500,
                           color: active ? accent : AppColors.muted,
+                          height: 1.1,
                         ),
                       ),
                     ],
@@ -702,4 +719,350 @@ class RoleNavItem {
   final IconData activeIcon;
   final String label;
   const RoleNavItem({required this.icon, required this.activeIcon, required this.label});
+}
+
+// ── Farmer-optimized components ─────────────────────────────
+
+/// Gradient header for tab screens (no back button)
+class FarmerTabHeader extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final String? emoji;
+  final List<Widget>? actions;
+  final Widget? bottom;
+  final bool showBack;
+
+  const FarmerTabHeader({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.emoji,
+    this.actions,
+    this.bottom,
+    this.showBack = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Container(
+      decoration: const BoxDecoration(gradient: AppColors.farmerGradient),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(showBack ? r.rs(4) : r.horizontalPadding, r.rs(12), r.horizontalPadding, r.rs(16)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  if (showBack)
+                    IconButton(
+                      icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: r.rs(24)),
+                      onPressed: () => Navigator.of(context).maybePop(),
+                    ),
+                  if (emoji != null) ...[
+                    Text(emoji!, style: TextStyle(fontSize: r.sp(32))),
+                    SizedBox(width: r.rs(12)),
+                  ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: r.sp(24),
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            height: 1.1,
+                          ),
+                        ),
+                        if (subtitle != null) ...[
+                          SizedBox(height: r.rs(4)),
+                          Text(
+                            subtitle!,
+                            style: GoogleFonts.inter(
+                              fontSize: r.sp(13),
+                              color: Colors.white.withValues(alpha: 0.85),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  if (actions != null) ...actions!,
+                ],
+              ),
+              if (bottom != null) ...[SizedBox(height: r.rs(14)), bottom!],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Large tap-friendly action button for farmers
+class FarmerActionButton extends StatelessWidget {
+  final String label;
+  final String? emoji;
+  final IconData? icon;
+  final VoidCallback? onTap;
+  final Color accent;
+  final bool isOutlined;
+  final bool isLoading;
+
+  const FarmerActionButton({
+    super.key,
+    required this.label,
+    this.emoji,
+    this.icon,
+    this.onTap,
+    this.accent = AppColors.farmerAccent,
+    this.isOutlined = false,
+    this.isLoading = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return SizedBox(
+      width: double.infinity,
+      height: r.rs(56),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isLoading ? null : onTap,
+          borderRadius: BorderRadius.circular(r.rs(16)),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: isOutlined ? Colors.transparent : accent,
+              border: isOutlined ? Border.all(color: accent, width: 2) : null,
+              borderRadius: BorderRadius.circular(r.rs(16)),
+              boxShadow: isOutlined ? null : [BoxShadow(color: accent.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 6))],
+            ),
+            child: Center(
+              child: isLoading
+                  ? SizedBox(width: r.rs(24), height: r.rs(24), child: CircularProgressIndicator(strokeWidth: 2.5, color: isOutlined ? accent : Colors.white))
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (emoji != null) ...[Text(emoji!, style: TextStyle(fontSize: r.sp(20))), SizedBox(width: r.rs(8))],
+                        if (icon != null) ...[Icon(icon, color: isOutlined ? accent : Colors.white, size: r.rs(22)), SizedBox(width: r.rs(8))],
+                        Text(
+                          label,
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: r.sp(16),
+                            fontWeight: FontWeight.w700,
+                            color: isOutlined ? accent : Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Chat bubble for Kisan AI
+class FarmerChatBubble extends StatelessWidget {
+  final String message;
+  final bool isUser;
+  final VoidCallback? onSpeak;
+  final bool isSpeaking;
+
+  const FarmerChatBubble({
+    super.key,
+    required this.message,
+    required this.isUser,
+    this.onSpeak,
+    this.isSpeaking = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Padding(
+      padding: EdgeInsets.only(bottom: r.rs(12)),
+      child: Row(
+        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (!isUser) ...[
+            Container(
+              width: r.rs(36),
+              height: r.rs(36),
+              decoration: BoxDecoration(
+                gradient: AppColors.farmerGradient,
+                borderRadius: BorderRadius.circular(r.rs(12)),
+              ),
+              child: Center(child: Text('🤖', style: TextStyle(fontSize: r.sp(18)))),
+            ),
+            SizedBox(width: r.rs(8)),
+          ],
+          Flexible(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rs(12)),
+              decoration: BoxDecoration(
+                color: isUser ? AppColors.farmerAccent : AppColors.surface,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(r.rs(18)),
+                  topRight: Radius.circular(r.rs(18)),
+                  bottomLeft: Radius.circular(isUser ? r.rs(18) : r.rs(4)),
+                  bottomRight: Radius.circular(isUser ? r.rs(4) : r.rs(18)),
+                ),
+                border: isUser ? null : Border.all(color: AppColors.border),
+                boxShadow: AppColors.softShadow,
+              ),
+              child: Text(
+                message,
+                style: GoogleFonts.inter(
+                  fontSize: r.sp(15),
+                  height: 1.5,
+                  fontWeight: FontWeight.w500,
+                  color: isUser ? Colors.white : AppColors.ink,
+                ),
+              ),
+            ),
+          ),
+          if (!isUser && onSpeak != null) ...[
+            SizedBox(width: r.rs(4)),
+            IconButton(
+              constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                isSpeaking ? Icons.stop_circle_rounded : Icons.volume_up_rounded,
+                color: isSpeaking ? AppColors.danger : AppColors.farmerAccent,
+                size: r.rs(22),
+              ),
+              onPressed: onSpeak,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Suggestion chip for quick prompts
+class FarmerPromptChip extends StatelessWidget {
+  final String text;
+  final VoidCallback onTap;
+
+  const FarmerPromptChip({super.key, required this.text, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        margin: EdgeInsets.only(bottom: r.rs(10)),
+        padding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rs(14)),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(r.rs(14)),
+          border: Border.all(color: AppColors.farmerAccent.withValues(alpha: 0.25)),
+          boxShadow: AppColors.softShadow,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                text,
+                style: GoogleFonts.inter(fontSize: r.sp(14), color: AppColors.ink, height: 1.4),
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded, size: r.rs(14), color: AppColors.farmerAccent),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Notification tile
+class FarmerNotificationTile extends StatelessWidget {
+  final String emoji;
+  final String title;
+  final String body;
+  final String date;
+  final bool isRead;
+  final VoidCallback? onTap;
+
+  const FarmerNotificationTile({
+    super.key,
+    required this.emoji,
+    required this.title,
+    required this.body,
+    required this.date,
+    this.isRead = false,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return AgriCard(
+      onTap: onTap,
+      color: isRead ? AppColors.surface : AppColors.farmerTint.withValues(alpha: 0.5),
+      padding: EdgeInsets.symmetric(horizontal: r.rs(14), vertical: r.rs(14)),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: r.rs(48),
+            height: r.rs(48),
+            decoration: BoxDecoration(
+              color: AppColors.farmerTint,
+              borderRadius: BorderRadius.circular(r.rs(14)),
+            ),
+            child: Center(child: Text(emoji, style: TextStyle(fontSize: r.sp(24)))),
+          ),
+          SizedBox(width: r.rs(12)),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: GoogleFonts.inter(
+                          fontSize: r.sp(15),
+                          fontWeight: isRead ? FontWeight.w500 : FontWeight.w700,
+                          color: AppColors.ink,
+                        ),
+                      ),
+                    ),
+                    if (!isRead)
+                      Container(
+                        width: r.rs(8),
+                        height: r.rs(8),
+                        decoration: const BoxDecoration(color: AppColors.farmerAccent, shape: BoxShape.circle),
+                      ),
+                  ],
+                ),
+                SizedBox(height: r.rs(4)),
+                Text(
+                  body,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.muted, height: 1.4),
+                ),
+                SizedBox(height: r.rs(6)),
+                Text(date, style: GoogleFonts.inter(fontSize: r.sp(11), color: AppColors.placeholder)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

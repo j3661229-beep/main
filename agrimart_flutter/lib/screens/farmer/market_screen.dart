@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/agri_ui.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/providers/app_providers.dart';
@@ -43,46 +44,62 @@ class _MarketScreenState extends ConsumerState<MarketScreen> with SingleTickerPr
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.farmerAccent,
-        foregroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        title: Text(l10n.market, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700, color: Colors.white)),
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                onPressed: () => context.push('/farmer/cart'),
-                icon: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
-              ),
-              if (cartCount > 0) Positioned(
-                right: 6, top: 6,
-                child: Container(
-                  width: 18, height: 18,
-                  decoration: const BoxDecoration(color: AppColors.danger, shape: BoxShape.circle),
-                  child: Center(child: Text('$cartCount', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white))),
-                ),
+      body: Column(
+        children: [
+          FarmerTabHeader(
+            emoji: '🛒',
+            title: l10n.market,
+            actions: [
+              Stack(
+                children: [
+                  IconButton(
+                    onPressed: () => context.push('/farmer/cart'),
+                    icon: Icon(Icons.shopping_cart_outlined, color: Colors.white, size: r.rs(24)),
+                  ),
+                  if (cartCount > 0) Positioned(
+                    right: 6, top: 6,
+                    child: Container(
+                      width: r.rs(18), height: 18,
+                      decoration: const BoxDecoration(color: AppColors.danger, shape: BoxShape.circle),
+                      child: Center(child: Text('$cartCount', style: GoogleFonts.inter(fontSize: r.sp(10), fontWeight: FontWeight.w700, color: Colors.white))),
+                    ),
+                  ),
+                ],
               ),
             ],
+            bottom: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(r.rs(14)),
+              ),
+              child: TabBar(
+                controller: _tab,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white.withValues(alpha: 0.6),
+                indicator: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(r.rs(12)),
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                labelStyle: GoogleFonts.spaceGrotesk(fontSize: r.sp(14), fontWeight: FontWeight.w700),
+                unselectedLabelStyle: GoogleFonts.spaceGrotesk(fontSize: r.sp(14), fontWeight: FontWeight.w500),
+                tabs: [
+                  Tab(text: l10n.buyInputsTab),
+                  Tab(text: l10n.sellProduceTab),
+                ],
+              ),
+            ),
           ),
-        ],
-        bottom: TabBar(
-          controller: _tab,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white.withValues(alpha: 0.6),
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          tabs: [
-            Tab(child: Text(l10n.buyInputsTab, style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w600))),
-            Tab(child: Text(l10n.sellProduceTab, style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w600))),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tab,
-        children: const [
-          _BuyTab(),
-          _SellTab(),
+          Expanded(
+            child: TabBarView(
+              controller: _tab,
+              children: const [
+                _BuyTab(),
+                _SellTab(),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -147,6 +164,7 @@ class _ProductCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final r = context.r;
     final List? images = product['images'] as List?;
     final imageUrl = product['imageUrl'] ?? (images != null && images.isNotEmpty ? images[0] : null);
     final name     = product['name'] ?? 'Product';
@@ -159,7 +177,7 @@ class _ProductCard extends ConsumerWidget {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(r.rs(16)),
           border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
           boxShadow: AppColors.softShadow,
         ),
@@ -168,22 +186,22 @@ class _ProductCard extends ConsumerWidget {
           children: [
             // Image
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(r.rs(16))),
               child: imageUrl != null
-                  ? CachedNetworkImage(imageUrl: imageUrl, height: 120, width: double.infinity, fit: BoxFit.cover,
-                      placeholder: (_, __) => const ShimmerBox(height: 120, radius: 0),
-                      errorWidget: (_, __, ___) => Container(height: 120, color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: 40)))))
-                  : Container(height: 120, color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: 40)))),
+                  ? CachedNetworkImage(imageUrl: imageUrl, height: r.rh(120), width: double.infinity, fit: BoxFit.cover,
+                      placeholder: (_, __) => ShimmerBox(height: r.rh(120), radius: 0),
+                      errorWidget: (_, __, ___) => Container(height: r.rh(120), color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(40))))))
+                  : Container(height: r.rh(120), color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(40))))),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(r.rs(10)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.ink), maxLines: 2, overflow: TextOverflow.ellipsis),
-                    const SizedBox(height: 2),
-                    Text(supplier, style: GoogleFonts.inter(fontSize: 11, color: AppColors.muted), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(name, style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w500, color: AppColors.ink), maxLines: 2, overflow: TextOverflow.ellipsis),
+                    SizedBox(height: r.rh(2)),
+                    Text(supplier, style: GoogleFonts.inter(fontSize: r.sp(11), color: AppColors.muted), maxLines: 1, overflow: TextOverflow.ellipsis),
                     const Spacer(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -191,8 +209,8 @@ class _ProductCard extends ConsumerWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(formatRupee(price), style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.ink)),
-                            Text('per $unit', style: GoogleFonts.inter(fontSize: 10, color: AppColors.muted)),
+                            Text(formatRupee(price), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(14), fontWeight: FontWeight.w700, color: AppColors.ink)),
+                            Text('per $unit', style: GoogleFonts.inter(fontSize: r.sp(10), color: AppColors.muted)),
                           ],
                         ),
                         GestureDetector(
@@ -204,13 +222,13 @@ class _ProductCard extends ConsumerWidget {
                               backgroundColor: AppColors.farmerAccent,
                               behavior: SnackBarBehavior.floating,
                               duration: const Duration(seconds: 1),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(r.rs(10))),
                             ));
                           },
                           child: Container(
-                            width: 32, height: 32,
-                            decoration: BoxDecoration(color: AppColors.farmerAccent, borderRadius: BorderRadius.circular(10)),
-                            child: const Icon(Icons.add, color: Colors.white, size: 20),
+                            width: r.rs(32), height: r.rh(32),
+                            decoration: BoxDecoration(color: AppColors.farmerAccent, borderRadius: BorderRadius.circular(r.rs(10))),
+                            child: Icon(Icons.add, color: Colors.white, size: r.sp(20)),
                           ),
                         ),
                       ],
@@ -247,18 +265,14 @@ class _SellTab extends ConsumerWidget {
           Container(
             padding: EdgeInsets.all(r.rs(24)),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF1A3A5C), Color(0xFF2E6B9E)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              gradient: AppColors.farmerGradient,
               borderRadius: BorderRadius.circular(r.rs(24)),
-              boxShadow: AppColors.deepShadow,
+              boxShadow: AppColors.primaryShadow,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('💰', style: TextStyle(fontSize: 48)),
+                Text('💰', style: TextStyle(fontSize: r.sp(48))),
                 SizedBox(height: r.rs(12)),
                 Text(l10n.sellTabTitle, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(22), fontWeight: FontWeight.w800, color: Colors.white)),
                 SizedBox(height: r.rs(8)),
@@ -309,9 +323,9 @@ class _SellTab extends ConsumerWidget {
             ),
           ),
           SizedBox(height: r.rs(24)),
-          AppButton(label: l10n.compareDealerRates, onTap: () => context.push('/farmer/dealer-rates'), color: AppColors.dealerAccent, icon: Icons.store_outlined),
+          AppButton(label: l10n.compareDealerRates, onTap: () => context.push('/farmer/dealer-rates'), color: AppColors.farmerAccent, icon: Icons.store_outlined),
           SizedBox(height: r.rs(12)),
-          AppButton(label: l10n.myTradeBookings, onTap: () => context.push('/farmer/trade/bookings'), color: AppColors.farmerAccent, icon: Icons.calendar_month_outlined, isOutlined: true),
+          FarmerActionButton(label: l10n.myTradeBookings, icon: Icons.calendar_month_outlined, onTap: () => context.push('/farmer/trade/bookings'), isOutlined: true),
           SizedBox(height: r.rs(80)),
         ],
       ),

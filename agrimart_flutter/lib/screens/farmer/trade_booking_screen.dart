@@ -100,16 +100,16 @@ class _TradeBookingScreenState extends ConsumerState<TradeBookingScreen> {
         elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(r.rs(24)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(r.rs(20)),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(r.rs(20)),
                 border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
                 boxShadow: AppColors.softShadow,
               ),
@@ -117,50 +117,50 @@ class _TradeBookingScreenState extends ConsumerState<TradeBookingScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Trading Details', style: AppTextStyles.headingMD),
-                  const Divider(height: 24),
+                  Divider(height: r.rh(24)),
                   _DetailRow(label: 'Crop', value: widget.cropName),
-                  const SizedBox(height: 12),
+                  SizedBox(height: r.rh(12)),
                   _DetailRow(label: 'Location', value: widget.district),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: r.rh(32)),
             Text('Booking Information', style: AppTextStyles.headingMD),
-            const SizedBox(height: 16),
+            SizedBox(height: r.rh(16)),
             
             Text('Approx. Quantity (Quintals) *', style: AppTextStyles.labelLG),
-            const SizedBox(height: 8),
+            SizedBox(height: r.rh(8)),
             TextField(
               controller: _qtyCtrl,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(hintText: 'e.g. 50'),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: r.rh(24)),
 
             Text('Expected Price per Quintal (₹) *', style: AppTextStyles.labelLG),
-            const SizedBox(height: 8),
+            SizedBox(height: r.rh(8)),
             TextField(
               controller: _priceCtrl,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(hintText: 'e.g. 4500'),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: r.rh(24)),
 
             Text('Select Delivery Date *', style: AppTextStyles.labelLG),
-            const SizedBox(height: 8),
+            SizedBox(height: r.rh(8)),
             InkWell(
               onTap: () => _selectDate(context),
               child: Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(r.rs(16)),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(r.rs(16)),
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.calendar_today, color: AppColors.primary, size: 20),
-                    const SizedBox(width: 12),
+                    Icon(Icons.calendar_today, color: AppColors.primary, size: r.sp(20)),
+                    SizedBox(width: r.rs(12)),
                     Text(
                       _selectedDate == null ? 'Tap to select date' : DateFormat('EEE, d MMM yyyy').format(_selectedDate!),
                       style: AppTextStyles.bodyLG.copyWith(
@@ -171,24 +171,24 @@ class _TradeBookingScreenState extends ConsumerState<TradeBookingScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: r.rh(24)),
 
             Text('Additional Notes (Optional)', style: AppTextStyles.labelLG),
-            const SizedBox(height: 8),
+            SizedBox(height: r.rh(8)),
             TextField(
               controller: _notesCtrl,
               maxLines: 3,
               decoration: const InputDecoration(hintText: 'Any special requirements or notes for the dealer...'),
             ),
-            const SizedBox(height: 40),
+            SizedBox(height: r.rh(40)),
 
             SizedBox(
               width: double.infinity,
-              height: 56,
+              height: r.rh(56),
               child: ElevatedButton(
                 onPressed: _loading ? null : _submitBooking,
                 child: _loading 
-                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
+                  ? SizedBox(width: r.rs(24), height: r.rh(24), child: CircularProgressIndicator(color: Colors.white, strokeWidth: r.rs(2.5)))
                   : Text('Confirm Booking', style: TextStyle(fontSize: r.sp(16), fontWeight: FontWeight.bold)),
               ),
             ),

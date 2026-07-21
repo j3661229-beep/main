@@ -93,7 +93,7 @@ class _FarmToolsScreenState extends ConsumerState<FarmToolsScreen> {
               onTap: () => ref.read(farmToolsPrefsProvider.notifier).toggleFavorite(tool.route),
               child: Icon(
                 isFav ? Icons.star_rounded : Icons.star_outline_rounded,
-                size: 18,
+                size: r.sp(18),
                 color: isFav ? AppColors.warning : AppColors.muted,
               ),
             ),
@@ -165,9 +165,9 @@ class _FarmToolsScreenState extends ConsumerState<FarmToolsScreen> {
                   Row(
                     children: [
                       Container(
-                        width: 4,
-                        height: 18,
-                        decoration: BoxDecoration(color: AppColors.farmerAccent, borderRadius: BorderRadius.circular(2)),
+                        width: r.rs(4),
+                        height: r.rh(18),
+                        decoration: BoxDecoration(color: AppColors.farmerAccent, borderRadius: BorderRadius.circular(r.rs(2))),
                       ),
                       SizedBox(width: r.rs(10)),
                       Text(
@@ -194,6 +194,7 @@ class _FarmToolsScreenState extends ConsumerState<FarmToolsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.r;
     final l10n = AppLocalizations.of(context)!;
     if (widget.embedded) {
       return Scaffold(

@@ -38,7 +38,7 @@ const getPrices = async ({ district, crop, page = 1, limit = 20 }) => {
             if (district) params.filters = JSON.stringify({ district });
             if (crop) params.filters = JSON.stringify({ ...(district ? { district } : {}), commodity: crop });
 
-            const { data } = await axios.get(apiUrl, { params, timeout: 12000 });
+            const { data } = await axios.get(apiUrl, { params, timeout: 8000 });
             const CROP_EMOJI = { onion: '🧅', tomato: '🍅', soybean: '🫘', maize: '🌽', wheat: '🌾', cotton: '🌿', grapes: '🍇', pomegranate: '🔴', potato: '🥔', rice: '🍚', sugarcane: '🎋', chilli: '🌶️', garlic: '🧄' };
             if (data.records?.length) {
                 const validRecords = data.records.filter(r => r.modal_price && r.modal_price !== '0');
@@ -74,7 +74,9 @@ const getPrices = async ({ district, crop, page = 1, limit = 20 }) => {
     const paginatedPrices = prices.slice(skip, skip + limit);
     const result = { prices: paginatedPrices, total: prices.length, updatedAt: new Date().toISOString(), source: process.env.AGMARKNET_API_KEY ? 'AGMARKNET (data.gov.in)' : 'Demo data (set AGMARKNET_API_KEY)' };
     try {
-        redis.setWithExpiry(cacheKey, 1800, JSON.stringify({ prices, total: prices.length, updatedAt: result.updatedAt, source: result.source })).catch(() => {});
+        // Cache 2 hours — mandi prices don't change per minute
+        redis.setWithExpiry(cacheKey, 7200, JSON.stringify({ prices, total: prices.length, updatedAt: result.updatedAt, source: result.source })).catch(() => {});
+        // Stale fallback cache kept for 24 hours
         redis.setWithExpiry(`${cacheKey}:stale`, 86400, JSON.stringify({ prices, total: prices.length, updatedAt: result.updatedAt, source: result.source })).catch(() => {});
     } catch (e) {}
     return result;

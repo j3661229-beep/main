@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../data/services/api_service.dart';
 import '../../data/providers/auth_provider.dart';
+import '../../core/providers/app_language_provider.dart';
 import '../../core/providers/locale_provider.dart';
 import '../../services/voice_service.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
@@ -38,8 +39,7 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
       _result = null;
     });
     try {
-      final locale = ref.read(localeProvider);
-      final langName = locale.languageCode == 'hi' ? 'Hindi' : locale.languageCode == 'mr' ? 'Marathi' : 'English';
+      final langName = ref.read(appLanguageProvider).aiName;
       final r = await ApiService.instance.detectDisease(_image!.path, language: langName);
       setState(() {
         _result = r;
@@ -63,18 +63,18 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
           title: Text('🔬 ${l10n.diseaseDetection}'),
           backgroundColor: AppColors.primary),
       body: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(r.rs(20)),
           child: Column(children: [
             Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(r.rs(16)),
                 decoration: BoxDecoration(
                     color: const Color(0xFFFEE2E2),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(r.rs(14)),
                     border: Border.all(
                         color: AppColors.error.withValues(alpha: 0.3))),
                 child: Row(children: [
                   Text('🔬', style: TextStyle(fontSize: r.sp(28))),
-                  SizedBox(width: 12),
+                  SizedBox(width: r.rs(12)),
                   Expanded(
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,7 +86,7 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                             style: AppTextStyles.bodySM),
                       ]))
                 ])),
-            const SizedBox(height: 24),
+            SizedBox(height: r.rh(24)),
             GestureDetector(
               onTap: () => showModalBottomSheet(
                   context: context,
@@ -111,11 +111,11 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                             }),
                       ]))),
               child: Container(
-                  height: 200,
+                  height: r.rh(200),
                   width: double.infinity,
                   decoration: BoxDecoration(
                       color: AppColors.primarySurface,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(r.rs(16)),
                       border: Border.all(
                           color: _image != null
                               ? AppColors.primary
@@ -123,53 +123,52 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                           width: _image != null ? 2 : 1)),
                   child: _image != null
                       ? ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(r.rs(15)),
                           child: Image.file(_image!, fit: BoxFit.cover))
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                              Text('🌿', style: TextStyle(fontSize: 48)),
-                              SizedBox(height: 8),
+                              Text('🌿', style: TextStyle(fontSize: r.sp(48))),
+                              SizedBox(height: r.rh(8)),
                               Text('Tap to capture affected plant',
                                   style: AppTextStyles.bodySM)
                             ])),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: r.rh(16)),
             if (_image != null)
               ElevatedButton.icon(
                   icon: const Icon(Icons.biotech),
                   label: Text(l10n.diseaseDetection),
                   onPressed: _analyzing ? null : _analyze),
             if (_analyzing) ...[
-              const SizedBox(height: 32),
+              SizedBox(height: r.rh(32)),
               const AppShimmerCard(),
-              const SizedBox(height: 12),
+              SizedBox(height: r.rh(12)),
               const AppShimmer(width: 200, height: 16),
-              const SizedBox(height: 24),
+              SizedBox(height: r.rh(24)),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2)),
-                SizedBox(width: 12),
+                SizedBox(width: r.rs(16),
+                    height: r.rh(16),
+                    child: CircularProgressIndicator(strokeWidth: r.rs(2))),
+                SizedBox(width: r.rs(12)),
                 Text('🔍 Analyzing crop health…',
                     style: AppTextStyles.headingSM),
               ]),
             ],
             if (_result != null) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: r.rh(24)),
               FadeInDown(
                 duration: const Duration(milliseconds: 600),
                 child: Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(r.rs(24)),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.red.shade50, Colors.white],
                       begin: Alignment.topLeft, end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(r.rs(24)),
                     border: Border.all(color: Colors.red.shade100, width: 2),
-                    boxShadow: [BoxShadow(color: Colors.red.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))],
+                    boxShadow: [BoxShadow(color: Colors.red.withValues(alpha: 0.05), blurRadius: r.rs(20), offset: Offset(0, 10))],
                   ),
                   child: Column(
                     children: [
@@ -177,23 +176,23 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: EdgeInsets.all(r.rs(16)),
                             decoration: BoxDecoration(color: Colors.red.shade100, shape: BoxShape.circle),
-                            child: Text('🦠', style: TextStyle(fontSize: 32)),
+                            child: Text('🦠', style: TextStyle(fontSize: r.sp(32))),
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: r.rs(16)),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('DETECTED DISEASE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.red.shade800, letterSpacing: 1.5)),
-                                const SizedBox(height: 4),
+                                Text('DETECTED DISEASE', style: TextStyle(fontSize: r.sp(10), fontWeight: FontWeight.w900, color: Colors.red.shade800, letterSpacing: 1.5)),
+                                SizedBox(height: r.rh(4)),
                                 Text(_result!['analysis']?['diseaseName'] ?? 'Unknown', style: AppTextStyles.headingMD.copyWith(color: AppColors.textPrimary, height: 1.1)),
-                                const SizedBox(height: 8),
+                                SizedBox(height: r.rh(8)),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(color: AppColors.error.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                                  child: Text('Severity: ${_result!['analysis']?['severity'] ?? 'Moderate'}', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w800, fontSize: 12)),
+                                  padding: EdgeInsets.symmetric(horizontal: r.rs(10), vertical: r.rh(4)),
+                                  decoration: BoxDecoration(color: AppColors.error.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(r.rs(12))),
+                                  child: Text('Severity: ${_result!['analysis']?['severity'] ?? 'Moderate'}', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w800, fontSize: r.sp(12))),
                                 )
                               ]
                             )
@@ -202,25 +201,25 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                       ),
                       const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Divider()),
                       _DiseaseDetailRow('Symptoms', (_result!['analysis']?['symptoms'] as List? ?? []).join(', '), '🤒'),
-                      const SizedBox(height: 16),
+                      SizedBox(height: r.rh(16)),
                       _DiseaseDetailRow('Prevention', (_result!['analysis']?['preventionTips'] as List? ?? []).join('. '), '🛡️'),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: r.rh(20)),
               if ((_result!['analysis']?['treatments'] as List? ?? []).isNotEmpty)
                 FadeInUp(
                   duration: const Duration(milliseconds: 700),
                   child: Container(
-                    padding: const EdgeInsets.all(24),
+                    padding: EdgeInsets.all(r.rs(24)),
                     decoration: BoxDecoration(
                         color: const Color(0xFF1E293B), // Premium dark theme for actions
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(r.rs(24)),
                         boxShadow: [
                           BoxShadow(
                             color: const Color(0xFF1E293B).withValues(alpha: 0.3),
-                            blurRadius: 15,
+                            blurRadius: r.rs(15),
                             offset: const Offset(0, 8),
                           )
                         ]),
@@ -233,11 +232,11 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                               Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.all(8),
+                                    padding: EdgeInsets.all(r.rs(8)),
                                     decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
                                     child: Text('💊', style: TextStyle(fontSize: r.sp(16))),
                                   ),
-                                  const SizedBox(width: 12),
+                                  SizedBox(width: r.rs(12)),
                                   Text('Treatment Plan', style: TextStyle(color: Colors.white, fontSize: r.sp(18), fontWeight: FontWeight.w800, letterSpacing: -0.5)),
                                 ],
                               ),
@@ -254,27 +253,27 @@ class _DiseaseDetectionState extends ConsumerState<DiseaseDetectionScreen> {
                               )
                             ],
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: r.rh(20)),
                           ...(_result!['analysis']?['treatments'] as List? ?? []).map((t) => 
                             Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(16),
+                              margin: EdgeInsets.only(bottom: r.rh(12)),
+                              padding: EdgeInsets.all(r.rs(16)),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.05),
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(r.rs(16)),
                                 border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                               ),
                               child: Row(
                                 children: [
                                   Text('🧪', style: TextStyle(fontSize: r.sp(24))),
-                                  const SizedBox(width: 16),
+                                  SizedBox(width: r.rs(16)),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(t['name'], style: TextStyle(color: Colors.white, fontSize: r.sp(16), fontWeight: FontWeight.bold)),
-                                        const SizedBox(height: 4),
-                                        Text('${t['dosage']} • ${t['application']}', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12)),
+                                        SizedBox(height: r.rh(4)),
+                                        Text('${t['dosage']} • ${t['application']}', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: r.sp(12))),
                                       ]
                                     )
                                   )
@@ -303,18 +302,18 @@ class _DiseaseDetailRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
+          padding: EdgeInsets.all(r.rs(8)),
+          decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(r.rs(8))),
           child: Text(emoji, style: TextStyle(fontSize: r.sp(16))),
         ),
-        const SizedBox(width: 16),
+        SizedBox(width: r.rs(16)),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
-              const SizedBox(height: 4),
-              Text(content, style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.4, fontWeight: FontWeight.w500)),
+              Text(title, style: TextStyle(fontSize: r.sp(12), fontWeight: FontWeight.bold, color: Colors.grey)),
+              SizedBox(height: r.rh(4)),
+              Text(content, style: TextStyle(fontSize: r.sp(14), color: Colors.black87, height: 1.4, fontWeight: FontWeight.w500)),
             ]
           )
         )

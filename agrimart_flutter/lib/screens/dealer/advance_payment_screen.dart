@@ -69,18 +69,18 @@ class _AdvancePaymentScreenState extends ConsumerState<AdvancePaymentScreen> {
         leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(r.rs(16)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
             // ── Advance summary ──────────────────────────
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(r.rs(20)),
               decoration: BoxDecoration(
                 gradient: AppColors.dealerGradient,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [BoxShadow(color: AppColors.dealerAccent.withValues(alpha: 0.3), blurRadius: 16, offset: const Offset(0, 8))],
+                borderRadius: BorderRadius.circular(r.rs(20)),
+                boxShadow: [BoxShadow(color: AppColors.dealerAccent.withValues(alpha: 0.3), blurRadius: r.rs(16), offset: Offset(0, 8))],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,53 +88,53 @@ class _AdvancePaymentScreenState extends ConsumerState<AdvancePaymentScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Advance Amount (20%)', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.8))),
-                      const SizedBox(height: 4),
-                      Text(formatRupee(_advance), style: GoogleFonts.spaceGrotesk(fontSize: 32, fontWeight: FontWeight.w800, color: Colors.white)),
-                      const SizedBox(height: 4),
-                      Text('Total Deal: ${formatRupee(_total)}', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.7))),
+                      Text('Advance Amount (20%)', style: GoogleFonts.inter(fontSize: r.sp(12), color: Colors.white.withValues(alpha: 0.8))),
+                      SizedBox(height: r.rh(4)),
+                      Text(formatRupee(_advance), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(32), fontWeight: FontWeight.w800, color: Colors.white)),
+                      SizedBox(height: r.rh(4)),
+                      Text('Total Deal: ${formatRupee(_total)}', style: GoogleFonts.inter(fontSize: r.sp(12), color: Colors.white.withValues(alpha: 0.7))),
                     ],
                   ),
                   Container(
-                    width: 60, height: 60,
-                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(16)),
-                    child: Center(child: Text('💰', style: TextStyle(fontSize: 30))),
+                    width: r.rs(60), height: 60,
+                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(r.rs(16))),
+                    child: Center(child: Text('💰', style: TextStyle(fontSize: r.sp(30)))),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: r.rh(20)),
 
             // ── UPI Payment section ──────────────────────
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(r.rs(20)),
               decoration: BoxDecoration(
                 color: AppColors.surface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(r.rs(20)),
                 border: Border.all(color: AppColors.border),
                 boxShadow: AppColors.softShadow,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Pay via UPI', style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.ink)),
-                  const SizedBox(height: 16),
+                  Text('Pay via UPI', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(15), fontWeight: FontWeight.w700, color: AppColors.ink)),
+                  SizedBox(height: r.rh(16)),
 
                   // Farmer UPI
                   Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(14)),
+                    padding: EdgeInsets.all(r.rs(16)),
+                    decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(r.rs(14))),
                     child: Row(
                       children: [
-                        Container(width: 44, height: 44, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)), child: Center(child: Text('📱', style: TextStyle(fontSize: 22)))),
-                        const SizedBox(width: 12),
+                        Container(width: 44, height: 44, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(r.rs(12))), child: Center(child: Text('📱', style: TextStyle(fontSize: r.sp(22))))),
+                        SizedBox(width: r.rs(12)),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(_farmerName, style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.dealerAccent)),
-                              Text(_farmerUpi, style: GoogleFonts.inter(fontSize: 13, color: AppColors.dealerAccent.withValues(alpha: 0.8))),
+                              Text(_farmerName, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(14), fontWeight: FontWeight.w700, color: AppColors.dealerAccent)),
+                              Text(_farmerUpi, style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.dealerAccent.withValues(alpha: 0.8))),
                             ],
                           ),
                         ),
@@ -144,32 +144,32 @@ class _AdvancePaymentScreenState extends ConsumerState<AdvancePaymentScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('UPI ID copied!'), behavior: SnackBarBehavior.floating));
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(color: AppColors.dealerAccent, borderRadius: BorderRadius.circular(10)),
-                            child: const Icon(Icons.copy_rounded, color: Colors.white, size: 16),
+                            padding: EdgeInsets.all(r.rs(8)),
+                            decoration: BoxDecoration(color: AppColors.dealerAccent, borderRadius: BorderRadius.circular(r.rs(10))),
+                            child: Icon(Icons.copy_rounded, color: Colors.white, size: r.sp(16)),
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  SizedBox(height: r.rh(16)),
 
                   // QR code placeholder
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(r.rs(20)),
                     decoration: BoxDecoration(
                       color: AppColors.background,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(r.rs(14)),
                       border: Border.all(color: AppColors.border),
                     ),
                     child: Column(
                       children: [
                         // Simulated QR
                         Container(
-                          width: 160, height: 160,
-                          decoration: BoxDecoration(color: Colors.white, border: Border.all(color: AppColors.border), borderRadius: BorderRadius.circular(12)),
+                          width: r.rs(160), height: 160,
+                          decoration: BoxDecoration(color: Colors.white, border: Border.all(color: AppColors.border), borderRadius: BorderRadius.circular(r.rs(12))),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -178,22 +178,22 @@ class _AdvancePaymentScreenState extends ConsumerState<AdvancePaymentScreen> {
                               Text('▪ ▪▪▪ ▪', style: TextStyle(fontSize: r.sp(18), letterSpacing: 4)),
                               Text('▪     ▪', style: TextStyle(fontSize: r.sp(18), letterSpacing: 6)),
                               Text('▪▪▪▪▪▪▪', style: TextStyle(fontSize: r.sp(18), letterSpacing: 4)),
-                              const SizedBox(height: 8),
-                              Text('QR Code', style: GoogleFonts.inter(fontSize: 11, color: AppColors.muted)),
+                              SizedBox(height: r.rh(8)),
+                              Text('QR Code', style: GoogleFonts.inter(fontSize: r.sp(11), color: AppColors.muted)),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        Text('Scan to pay ${formatRupee(_advance)}', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
+                        SizedBox(height: r.rh(12)),
+                        Text('Scan to pay ${formatRupee(_advance)}', style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.muted)),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  SizedBox(height: r.rh(20)),
 
                   // Upload screenshot
-                  Text('Upload Payment Screenshot *', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.muted)),
-                  const SizedBox(height: 8),
+                  Text('Upload Payment Screenshot *', style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w500, color: AppColors.muted)),
+                  SizedBox(height: r.rh(8)),
                   GestureDetector(
                     onTap: _pickScreenshot,
                     child: Container(
@@ -201,17 +201,17 @@ class _AdvancePaymentScreenState extends ConsumerState<AdvancePaymentScreen> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: AppColors.background,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(r.rs(14)),
                         border: Border.all(color: _screenshot != null ? AppColors.dealerAccent : AppColors.border, style: BorderStyle.solid),
                       ),
                       child: _screenshot != null
-                          ? ClipRRect(borderRadius: BorderRadius.circular(14), child: Image.file(_screenshot!, fit: BoxFit.cover))
+                          ? ClipRRect(borderRadius: BorderRadius.circular(r.rs(14)), child: Image.file(_screenshot!, fit: BoxFit.cover))
                           : Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.upload_file_outlined, color: AppColors.muted, size: 28),
-                                const SizedBox(height: 6),
-                                Text('Tap to upload screenshot', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
+                                Icon(Icons.upload_file_outlined, color: AppColors.muted, size: r.sp(28)),
+                                SizedBox(height: r.rh(6)),
+                                Text('Tap to upload screenshot', style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.muted)),
                               ],
                             ),
                     ),
@@ -221,19 +221,19 @@ class _AdvancePaymentScreenState extends ConsumerState<AdvancePaymentScreen> {
             ),
 
             if (_error != null) ...[
-              const SizedBox(height: 16),
+              SizedBox(height: r.rh(16)),
               Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: AppColors.dangerTint, borderRadius: BorderRadius.circular(12)),
+                padding: EdgeInsets.all(r.rs(12)),
+                decoration: BoxDecoration(color: AppColors.dangerTint, borderRadius: BorderRadius.circular(r.rs(12))),
                 child: Row(children: [
-                  const Icon(Icons.error_outline, color: AppColors.danger, size: 16),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(_error!, style: GoogleFonts.inter(fontSize: 13, color: AppColors.danger))),
+                  Icon(Icons.error_outline, color: AppColors.danger, size: r.sp(16)),
+                  SizedBox(width: r.rs(8)),
+                  Expanded(child: Text(_error!, style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.danger))),
                 ]),
               ),
             ],
 
-            const SizedBox(height: 24),
+            SizedBox(height: r.rh(24)),
             AppButton(
               label: 'Confirm Deal & Submit',
               onTap: _submitDeal,
@@ -241,13 +241,13 @@ class _AdvancePaymentScreenState extends ConsumerState<AdvancePaymentScreen> {
               color: AppColors.dealerAccent,
               icon: Icons.check_circle_outline_rounded,
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: r.rh(12)),
             Text(
               '⚠️ Payment confirmation is required. Upload screenshot after paying via UPI.',
-              style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted, height: 1.5),
+              style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted, height: 1.5),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 80),
+            SizedBox(height: r.rh(80)),
           ],
         ),
       ),
@@ -266,20 +266,20 @@ class _SuccessView extends StatelessWidget {
     backgroundColor: AppColors.background,
     body: Center(
       child: Padding(
-        padding: const EdgeInsets.all(40),
+        padding: EdgeInsets.all(r.rs(40)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 100, height: 100,
+              width: r.rs(100), height: 100,
               decoration: BoxDecoration(color: AppColors.successTint, shape: BoxShape.circle),
               child: Center(child: Text('✅', style: TextStyle(fontSize: r.sp(52)))),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: r.rh(24)),
             Text('Deal Sent!', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(28), fontWeight: FontWeight.w800, color: AppColors.success)),
-            const SizedBox(height: 8),
-            Text('Your offer has been sent to the farmer.\nAdvance payment recorded.', style: GoogleFonts.inter(fontSize: 14, color: AppColors.muted, height: 1.6), textAlign: TextAlign.center),
-            const SizedBox(height: 32),
+            SizedBox(height: r.rh(8)),
+            Text('Your offer has been sent to the farmer.\nAdvance payment recorded.', style: GoogleFonts.inter(fontSize: r.sp(14), color: AppColors.muted, height: 1.6), textAlign: TextAlign.center),
+            SizedBox(height: r.rh(32)),
             AppButton(label: 'Back to Dashboard', onTap: onDone, color: AppColors.dealerAccent, icon: Icons.home_rounded),
           ],
         ),

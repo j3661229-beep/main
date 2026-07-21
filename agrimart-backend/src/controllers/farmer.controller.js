@@ -99,4 +99,15 @@ const submitFpoInterest = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
-module.exports = { getProfile, updateProfile, updateFarmDetails, getDashboard, getOrders, getOrder, createPriceAlert, getPriceAlerts, deletePriceAlert, getSoilReports, getSoilReport, submitFpoInterest };
+const getFarmSetupStatus = async (req, res, next) => {
+    try {
+        const data = await farmerService.getFarmSetupStatus(await resolveFarmer(req));
+        success(res, data);
+    } catch (err) { next(err); }
+};
+
+module.exports = {
+    getProfile, updateProfile, updateFarmDetails, getFarmSetupStatus, getDashboard,
+    getOrders, getOrder, createPriceAlert, getPriceAlerts, deletePriceAlert,
+    getSoilReports, getSoilReport, submitFpoInterest,
+};

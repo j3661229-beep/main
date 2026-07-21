@@ -62,6 +62,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   }
 
   Future<void> _pay() async {
+    final r = context.r;
     if (_addrCtrl.text.trim().isEmpty) {
       setState(() => _error = 'Enter delivery address');
       return;
@@ -106,7 +107,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
           content: const Text('Order placed successfully!'),
           backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(r.rs(10))),
         ));
       }
     } catch (e) {
@@ -134,53 +135,53 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
           final items = (cart['items'] as List?) ?? [];
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(r.rs(16)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
                 // ── Order Summary ────────────────────────────
                 Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.border), boxShadow: AppColors.softShadow),
+                  padding: EdgeInsets.all(r.rs(20)),
+                  decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(r.rs(20)), border: Border.all(color: AppColors.border), boxShadow: AppColors.softShadow),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Order Summary', style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.ink)),
-                      const SizedBox(height: 16),
+                      Text('Order Summary', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(15), fontWeight: FontWeight.w700, color: AppColors.ink)),
+                      SizedBox(height: r.rh(16)),
                       ...items.take(3).map((item) {
                         final name  = item['product']?['name'] ?? 'Product';
                         final price = (item['product']?['price'] as num?) ?? 0;
                         final qty   = (item['quantity'] as num?) ?? 0;
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
+                          padding: EdgeInsets.only(bottom: r.rh(10)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Expanded(child: Text('$name × $qty', style: GoogleFonts.inter(fontSize: 13, color: AppColors.ink), overflow: TextOverflow.ellipsis)),
-                              Text(formatRupee(price * qty), style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.ink)),
+                              Expanded(child: Text('$name × $qty', style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.ink), overflow: TextOverflow.ellipsis)),
+                              Text(formatRupee(price * qty), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(13), fontWeight: FontWeight.w600, color: AppColors.ink)),
                             ],
                           ),
                         );
                       }),
-                      if (items.length > 3) Text('+ ${items.length - 3} more items', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
-                      const Divider(height: 20, color: AppColors.border),
+                      if (items.length > 3) Text('+ ${items.length - 3} more items', style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
+                      Divider(height: r.rh(20), color: AppColors.border),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('Total Amount', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(16), fontWeight: FontWeight.w700, color: AppColors.ink)),
-                          Text(formatRupee(total), style: GoogleFonts.spaceGrotesk(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.farmerAccent)),
+                          Text(formatRupee(total), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(22), fontWeight: FontWeight.w800, color: AppColors.farmerAccent)),
                         ],
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: r.rh(20)),
 
                 // ── Delivery Address ─────────────────────────
-                Text('Delivery Address', style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.ink)),
-                const SizedBox(height: 10),
+                Text('Delivery Address', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(15), fontWeight: FontWeight.w700, color: AppColors.ink)),
+                SizedBox(height: r.rh(10)),
                 TextFormField(
                   controller: _addrCtrl,
                   maxLines: 2,
@@ -191,13 +192,13 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: r.rh(20)),
 
                 // ── Payment Method ───────────────────────────
-                Text('Payment Method', style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.ink)),
-                const SizedBox(height: 12),
+                Text('Payment Method', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(15), fontWeight: FontWeight.w700, color: AppColors.ink)),
+                SizedBox(height: r.rh(12)),
                 Container(
-                  decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border), boxShadow: AppColors.softShadow),
+                  decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(r.rs(16)), border: Border.all(color: AppColors.border), boxShadow: AppColors.softShadow),
                   child: Column(
                     children: List.generate(_methods.length, (i) {
                       final m = _methods[i];
@@ -208,39 +209,39 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                           GestureDetector(
                             onTap: () => setState(() => _paymentMethod = m),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                              padding: EdgeInsets.symmetric(horizontal: r.rs(16), vertical: r.rh(14)),
                               child: Row(
                                 children: [
                                   Container(
-                                    width: 40, height: 40,
+                                    width: r.rs(40), height: 40,
                                     decoration: BoxDecoration(
                                       color: _paymentMethod == m ? AppColors.farmerTint : AppColors.background,
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(r.rs(10)),
                                     ),
                                     child: Center(child: Text(emojis[i], style: TextStyle(fontSize: r.sp(20)))),
                                   ),
-                                  const SizedBox(width: 12),
-                                  Expanded(child: Text(m, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.ink))),
+                                  SizedBox(width: r.rs(12)),
+                                  Expanded(child: Text(m, style: GoogleFonts.inter(fontSize: r.sp(14), fontWeight: FontWeight.w500, color: AppColors.ink))),
                                   AnimatedContainer(
                                     duration: const Duration(milliseconds: 200),
-                                    width: 22, height: 22,
+                                    width: r.rs(22), height: 22,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: _paymentMethod == m ? AppColors.farmerAccent : Colors.transparent,
                                       border: Border.all(
                                         color: _paymentMethod == m ? AppColors.farmerAccent : AppColors.border,
-                                        width: 2,
+                                        width: r.rs(2),
                                       ),
                                     ),
                                     child: _paymentMethod == m
-                                        ? const Icon(Icons.check, color: Colors.white, size: 14)
+                                        ? Icon(Icons.check, color: Colors.white, size: r.sp(14))
                                         : null,
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                          if (i < _methods.length - 1) const Divider(height: 1, color: AppColors.border),
+                          if (i < _methods.length - 1) Divider(height: r.rh(1), color: AppColors.border),
                         ],
                       );
                     }),
@@ -249,7 +250,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
 
                 // UPI ID field
                 if (_paymentMethod == 'UPI') ...[
-                  const SizedBox(height: 16),
+                  SizedBox(height: r.rh(16)),
                   TextFormField(
                     controller: _upiCtrl,
                     decoration: const InputDecoration(
@@ -262,19 +263,19 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
 
                 // Error
                 if (_error != null) ...[
-                  const SizedBox(height: 16),
+                  SizedBox(height: r.rh(16)),
                   Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: AppColors.dangerTint, borderRadius: BorderRadius.circular(12)),
+                    padding: EdgeInsets.all(r.rs(12)),
+                    decoration: BoxDecoration(color: AppColors.dangerTint, borderRadius: BorderRadius.circular(r.rs(12))),
                     child: Row(children: [
-                      const Icon(Icons.error_outline, color: AppColors.danger, size: 16),
-                      const SizedBox(width: 8),
-                      Expanded(child: Text(_error!, style: GoogleFonts.inter(fontSize: 13, color: AppColors.danger))),
+                      Icon(Icons.error_outline, color: AppColors.danger, size: r.sp(16)),
+                      SizedBox(width: r.rs(8)),
+                      Expanded(child: Text(_error!, style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.danger))),
                     ]),
                   ),
                 ],
 
-                const SizedBox(height: 32),
+                SizedBox(height: r.rh(32)),
                 AppButton(
                   label: 'Confirm & Pay ${formatRupee(total)}',
                   onTap: _pay,
@@ -282,16 +283,16 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                   color: AppColors.farmerAccent,
                   icon: Icons.lock_outlined,
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: r.rh(12)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.security, size: 14, color: AppColors.muted),
-                    const SizedBox(width: 6),
-                    Text('Secure payment — 256-bit SSL', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+                    Icon(Icons.security, size: r.sp(14), color: AppColors.muted),
+                    SizedBox(width: r.rs(6)),
+                    Text('Secure payment — 256-bit SSL', style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
                   ],
                 ),
-                const SizedBox(height: 80),
+                SizedBox(height: r.rh(80)),
               ],
             ),
           );

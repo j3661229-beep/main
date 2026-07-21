@@ -276,5 +276,9 @@
   "currentStep": "CURRENT",
   "treatmentRecommendation": "Treatment Recommendation",
   "noAdvisoryToday": "No advisory available today.",
-  "acresUnit": "acres"
+  "acresUnit": "acres",
+  "farmSetupTitle": "Farm Setup",
+  "farmSetupCompleteBanner": "Complete farm setup",
+  "farmSetupRequiredHint": "Required for AI, weather & mandi advice",
+  "yourFarmSummary": "Your farm"
 }

@@ -164,13 +164,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 children: [
                   GestureDetector(
                     onTap: () => context.pop(),
-                    child: Container(width: 38, height: 38, decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20)),
+                    child: Container(width: 38, height: 38, decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(r.rs(10))), child: Icon(Icons.arrow_back_rounded, color: Colors.white, size: r.sp(20))),
                   ),
-                  const SizedBox(height: 20),
-                  Text(_emoji, style: const TextStyle(fontSize: 40)),
-                  const SizedBox(height: 8),
+                  SizedBox(height: r.rh(20)),
+                  Text(_emoji, style: TextStyle(fontSize: r.sp(40))),
+                  SizedBox(height: r.rh(8)),
                   Text('Create Account', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(26), fontWeight: FontWeight.w700, color: Colors.white)),
-                  Text('Register as $_roleLabel', style: GoogleFonts.inter(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
+                  Text('Register as $_roleLabel', style: GoogleFonts.inter(fontSize: r.sp(14), color: Colors.white.withValues(alpha: 0.8))),
                 ],
               ),
             ),
@@ -179,11 +179,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             Transform.translate(
               offset: const Offset(0, -20),
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                padding: const EdgeInsets.all(24),
+                margin: EdgeInsets.symmetric(horizontal: r.rs(20)),
+                padding: EdgeInsets.all(r.rs(24)),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(r.rs(24)),
                   boxShadow: AppColors.deepShadow,
                 ),
                 child: Form(
@@ -193,22 +193,22 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     children: [
                       if (widget.role != 'FARMER') ...[
                         _buildField('Business Name *', _bizCtrl, 'Agro Traders Pvt Ltd', Icons.business_outlined),
-                        const SizedBox(height: 14),
+                        SizedBox(height: r.rh(14)),
                       ],
                       _buildField(widget.role == 'FARMER' ? 'Full Name *' : 'Owner Name *', _nameCtrl, 'Your name', Icons.person_outline_rounded),
-                      const SizedBox(height: 14),
+                      SizedBox(height: r.rh(14)),
                       _buildPhoneField(),
                       if (widget.role != 'FARMER') ...[
-                        const SizedBox(height: 14),
+                        SizedBox(height: r.rh(14)),
                         _buildField('Email *', _emailCtrl, 'you@example.com', Icons.email_outlined, type: TextInputType.emailAddress,
                           validator: (v) {
                             if (v == null || v.trim().isEmpty) return 'Enter your email';
                             if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v.trim())) return 'Enter a valid email';
                             return null;
                           }),
-                        const SizedBox(height: 14),
+                        SizedBox(height: r.rh(14)),
                         _buildPasswordField('Password *', _passCtrl, _obscurePass, () => setState(() => _obscurePass = !_obscurePass)),
-                        const SizedBox(height: 14),
+                        SizedBox(height: r.rh(14)),
                         _buildPasswordField('Confirm Password *', _confirmPassCtrl, _obscureConfirmPass, () => setState(() => _obscureConfirmPass = !_obscureConfirmPass),
                           validator: (v) {
                             if (v == null || v.isEmpty) return 'Confirm your password';
@@ -217,7 +217,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           }),
                       ],
                       if (widget.role == 'SUPPLIER') ...[
-                        const SizedBox(height: 14),
+                        SizedBox(height: r.rh(14)),
                         _buildField('GSTIN *', _gstinCtrl, '27AABCU9603R1ZX', Icons.receipt_long_outlined,
                           formatters: [UpperCaseFormatter()],
                           validator: (v) {
@@ -225,45 +225,45 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             if (!_validateGstin(v.toUpperCase())) return 'Invalid GSTIN format';
                             return null;
                           }),
-                        const SizedBox(height: 14),
+                        SizedBox(height: r.rh(14)),
                         _buildField('City *', _cityCtrl, 'Nashik', Icons.location_city_outlined),
                       ],
                       if (widget.role == 'DEALER') ...[
-                        const SizedBox(height: 14),
+                        SizedBox(height: r.rh(14)),
                         _buildField('Mandi License No. *', _licenseCtrl, 'MH-NAS-2023-001', Icons.badge_outlined),
-                        const SizedBox(height: 14),
+                        SizedBox(height: r.rh(14)),
                         _buildField('APMC Yard / Location *', _apmcCtrl, 'Nashik APMC', Icons.place_outlined),
                       ],
                       if (widget.role == 'FARMER') ...[
-                        const SizedBox(height: 14),
+                        SizedBox(height: r.rh(14)),
                         _buildField('Village / Taluka *', _villageCtrl, 'Chandwad, Nashik', Icons.villa_outlined),
-                        const SizedBox(height: 14),
+                        SizedBox(height: r.rh(14)),
                         _buildField('Land Size (acres)', _landCtrl, '5.5', Icons.landscape_outlined, type: TextInputType.number,
                           formatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))]),
                       ],
 
                       // District dropdown
-                      const SizedBox(height: 14),
+                      SizedBox(height: r.rh(14)),
                       Row(
                         children: [
                           Expanded(child: _Label('District${widget.role != 'FARMER' ? '' : ' *'}')),
                           TextButton.icon(
                             onPressed: _isLocating ? null : _useMyLocation,
                             icon: _isLocating
-                                ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
-                                : Icon(Icons.my_location_rounded, size: 16, color: _accent),
-                            label: Text('Use my location', style: GoogleFonts.inter(fontSize: 12, color: _accent)),
+                                ? SizedBox(width: r.rs(14), height: r.rh(14), child: CircularProgressIndicator(strokeWidth: r.rs(2)))
+                                : Icon(Icons.my_location_rounded, size: r.sp(16), color: _accent),
+                            label: Text('Use my location', style: GoogleFonts.inter(fontSize: r.sp(12), color: _accent)),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: r.rh(6)),
                       DropdownButtonFormField<String>(
                         value: _selectedDistrict,
                         hint: Text('Select district', style: GoogleFonts.inter(color: AppColors.placeholder)),
-                        items: AppConstants.maharashtraDistricts.map((d) => DropdownMenuItem(value: d, child: Text(d, style: GoogleFonts.inter(fontSize: 14)))).toList(),
+                        items: AppConstants.maharashtraDistricts.map((d) => DropdownMenuItem(value: d, child: Text(d, style: GoogleFonts.inter(fontSize: r.sp(14))))).toList(),
                         onChanged: (v) => setState(() => _selectedDistrict = v),
                         validator: widget.role == 'FARMER' ? (v) => v == null ? 'Select district' : null : null,
-                        decoration: InputDecoration(prefixIcon: Icon(Icons.map_outlined, color: _accent, size: 20)),
+                        decoration: InputDecoration(prefixIcon: Icon(Icons.map_outlined, color: _accent, size: r.sp(20))),
                       ),
 
                       // Chips for role-specific multi-select
@@ -272,26 +272,26 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       if (widget.role == 'DEALER') ..._buildCommodityChips(),
 
                       if (_error != null) ...[
-                        const SizedBox(height: 16),
+                        SizedBox(height: r.rh(16)),
                         Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: AppColors.dangerTint, borderRadius: BorderRadius.circular(10)),
+                          padding: EdgeInsets.all(r.rs(12)),
+                          decoration: BoxDecoration(color: AppColors.dangerTint, borderRadius: BorderRadius.circular(r.rs(10))),
                           child: Row(children: [
-                            const Icon(Icons.error_outline, color: AppColors.danger, size: 16),
-                            const SizedBox(width: 8),
-                            Expanded(child: Text(_error!, style: GoogleFonts.inter(fontSize: 13, color: AppColors.danger))),
+                            Icon(Icons.error_outline, color: AppColors.danger, size: r.sp(16)),
+                            SizedBox(width: r.rs(8)),
+                            Expanded(child: Text(_error!, style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.danger))),
                           ]),
                         ),
                       ],
 
-                      const SizedBox(height: 24),
+                      SizedBox(height: r.rh(24)),
                       AppButton(label: widget.role == 'FARMER' ? 'Send OTP & Register' : 'Create Account', onTap: _submit, isLoading: _isLoading, color: _accent, icon: Icons.check_circle_outline_rounded),
-                      const SizedBox(height: 16),
+                      SizedBox(height: r.rh(16)),
                       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Text('Already have an account? ', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
+                        Text('Already have an account? ', style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.muted)),
                         GestureDetector(
                           onTap: () => context.go('/auth/login?role=${widget.role}'),
-                          child: Text('Log In', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: _accent)),
+                          child: Text('Log In', style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w600, color: _accent)),
                         ),
                       ]),
                     ],
@@ -299,29 +299,31 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 40),
+            SizedBox(height: r.rh(40)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPasswordField(String label, TextEditingController ctrl, bool obscure, VoidCallback onToggle, {String? Function(String?)? validator}) => Column(
+  Widget _buildPasswordField(String label, TextEditingController ctrl, bool obscure, VoidCallback onToggle, {String? Function(String?)? validator}) {
+    final r = context.r;
+    return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       _Label(label),
-      const SizedBox(height: 6),
+      SizedBox(height: r.rh(6)),
       TextFormField(
         controller: ctrl,
         obscureText: obscure,
         decoration: InputDecoration(
           hintText: '••••••••',
-          prefixIcon: Icon(Icons.lock_outline_rounded, color: _accent, size: 20),
+          prefixIcon: Icon(Icons.lock_outline_rounded, color: _accent, size: r.sp(20)),
           suffixIcon: IconButton(
             onPressed: onToggle,
-            icon: Icon(obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: AppColors.muted, size: 20),
+            icon: Icon(obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: AppColors.muted, size: r.sp(20)),
           ),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _accent, width: 2)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(r.rs(12)), borderSide: BorderSide(color: _accent, width: 2)),
         ),
         validator: validator ?? (v) {
           if (v == null || v.isEmpty) return 'Enter a password';
@@ -330,36 +332,42 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         },
       ),
     ],
-  );
+    );
+  }
 
   Widget _buildField(String label, TextEditingController ctrl, String hint, IconData icon, {
     TextInputType type = TextInputType.text,
     List<TextInputFormatter>? formatters,
     String? Function(String?)? validator,
-  }) => Column(
+  }) {
+    final r = context.r;
+    return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       _Label(label),
-      const SizedBox(height: 6),
+      SizedBox(height: r.rh(6)),
       TextFormField(
         controller: ctrl,
         keyboardType: type,
         inputFormatters: formatters,
         decoration: InputDecoration(
           hintText: hint,
-          prefixIcon: Icon(icon, color: _accent, size: 20),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _accent, width: 2)),
+          prefixIcon: Icon(icon, color: _accent, size: r.sp(20)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(r.rs(12)), borderSide: BorderSide(color: _accent, width: 2)),
         ),
         validator: validator ?? (v) => (v == null || v.trim().isEmpty) ? 'This field is required' : null,
       ),
     ],
-  );
+    );
+  }
 
-  Widget _buildPhoneField() => Column(
+  Widget _buildPhoneField() {
+    final r = context.r;
+    return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       _Label('Phone *'),
-      const SizedBox(height: 6),
+      SizedBox(height: r.rh(6)),
       TextFormField(
         controller: _phoneCtrl,
         keyboardType: TextInputType.phone,
@@ -367,13 +375,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         decoration: InputDecoration(
           hintText: '9876543210',
           prefixIcon: Container(
-            margin: const EdgeInsets.all(12),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-            decoration: BoxDecoration(color: _tint, borderRadius: BorderRadius.circular(8)),
-            child: Text('+91', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, color: _accent, fontSize: 13)),
+            margin: EdgeInsets.all(r.rs(12)),
+            padding: EdgeInsets.symmetric(horizontal: r.rs(8), vertical: r.rh(5)),
+            decoration: BoxDecoration(color: _tint, borderRadius: BorderRadius.circular(r.rs(8))),
+            child: Text('+91', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, color: _accent, fontSize: r.sp(13))),
           ),
-          prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _accent, width: 2)),
+          prefixIconConstraints: BoxConstraints(minWidth: 0, minHeight: r.rh(0)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(r.rs(12)), borderSide: BorderSide(color: _accent, width: 2)),
         ),
         validator: (v) {
           if (v == null || v.isEmpty) return 'Enter phone number';
@@ -382,14 +390,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         },
       ),
     ],
-  );
+    );
+  }
 
-  List<Widget> _buildCropChips() => [
-    const SizedBox(height: 20),
+  List<Widget> _buildCropChips() {
+    final r = context.r;
+    return [
+    SizedBox(height: r.rh(20)),
     _Label('Primary Crops (select all that apply)'),
-    const SizedBox(height: 10),
+    SizedBox(height: r.rh(10)),
     Wrap(
-      spacing: 8, runSpacing: 8,
+      spacing: r.rs(8), runSpacing: r.rs(8),
       children: AppConstants.popularCrops.map((c) {
         final name = c['name']!;
         final sel  = _selectedCrops.contains(name);
@@ -397,25 +408,28 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           onTap: () => setState(() => sel ? _selectedCrops.remove(name) : _selectedCrops.add(name)),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: r.rs(14), vertical: r.rh(8)),
             decoration: BoxDecoration(
               color: sel ? _accent : AppColors.surface,
               border: Border.all(color: sel ? _accent : AppColors.border),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(r.rs(20)),
             ),
-            child: Text('${c['emoji']} $name', style: GoogleFonts.inter(fontSize: 13, fontWeight: sel ? FontWeight.w600 : FontWeight.w400, color: sel ? Colors.white : AppColors.ink)),
+            child: Text('${c['emoji']} $name', style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: sel ? FontWeight.w600 : FontWeight.w400, color: sel ? Colors.white : AppColors.ink)),
           ),
         );
       }).toList(),
     ),
-  ];
+    ];
+  }
 
-  List<Widget> _buildCategoryChips() => [
-    const SizedBox(height: 20),
+  List<Widget> _buildCategoryChips() {
+    final r = context.r;
+    return [
+    SizedBox(height: r.rh(20)),
     _Label('Categories Sold'),
-    const SizedBox(height: 10),
+    SizedBox(height: r.rh(10)),
     Wrap(
-      spacing: 8, runSpacing: 8,
+      spacing: r.rs(8), runSpacing: r.rs(8),
       children: AppConstants.categories.map((c) {
         final key = c['key']!; final label = c['label']!; final emoji = c['icon']!;
         final sel = _selectedCategories.contains(key);
@@ -423,27 +437,29 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           onTap: () => setState(() => sel ? _selectedCategories.remove(key) : _selectedCategories.add(key)),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(color: sel ? _accent : AppColors.surface, border: Border.all(color: sel ? _accent : AppColors.border), borderRadius: BorderRadius.circular(20)),
-            child: Text('$emoji $label', style: GoogleFonts.inter(fontSize: 13, fontWeight: sel ? FontWeight.w600 : FontWeight.w400, color: sel ? Colors.white : AppColors.ink)),
+            padding: EdgeInsets.symmetric(horizontal: r.rs(14), vertical: r.rh(8)),
+            decoration: BoxDecoration(color: sel ? _accent : AppColors.surface, border: Border.all(color: sel ? _accent : AppColors.border), borderRadius: BorderRadius.circular(r.rs(20))),
+            child: Text('$emoji $label', style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: sel ? FontWeight.w600 : FontWeight.w400, color: sel ? Colors.white : AppColors.ink)),
           ),
         );
       }).toList(),
     ),
-  ];
+    ];
+  }
 
   List<Widget> _buildCommodityChips() {
+    final r = context.r;
     const commodities = [
       {'name': 'Onion', 'emoji': '🧅'}, {'name': 'Tomato', 'emoji': '🍅'}, {'name': 'Wheat', 'emoji': '🌾'},
       {'name': 'Soybean', 'emoji': '🫘'}, {'name': 'Cotton', 'emoji': '🌿'}, {'name': 'Grapes', 'emoji': '🍇'},
       {'name': 'Sugarcane', 'emoji': '🍬'}, {'name': 'Maize', 'emoji': '🌽'}, {'name': 'Rice', 'emoji': '🍚'},
     ];
     return [
-      const SizedBox(height: 20),
+      SizedBox(height: r.rh(20)),
       _Label('Commodities Traded'),
-      const SizedBox(height: 10),
+      SizedBox(height: r.rh(10)),
       Wrap(
-        spacing: 8, runSpacing: 8,
+        spacing: r.rs(8), runSpacing: r.rs(8),
         children: commodities.map((c) {
           final name = c['name']!; final emoji = c['emoji']!;
           final sel = _selectedCommodities.contains(name);
@@ -451,9 +467,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             onTap: () => setState(() => sel ? _selectedCommodities.remove(name) : _selectedCommodities.add(name)),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(color: sel ? _accent : AppColors.surface, border: Border.all(color: sel ? _accent : AppColors.border), borderRadius: BorderRadius.circular(20)),
-              child: Text('$emoji $name', style: GoogleFonts.inter(fontSize: 13, fontWeight: sel ? FontWeight.w600 : FontWeight.w400, color: sel ? Colors.white : AppColors.ink)),
+              padding: EdgeInsets.symmetric(horizontal: r.rs(14), vertical: r.rh(8)),
+              decoration: BoxDecoration(color: sel ? _accent : AppColors.surface, border: Border.all(color: sel ? _accent : AppColors.border), borderRadius: BorderRadius.circular(r.rs(20))),
+              child: Text('$emoji $name', style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: sel ? FontWeight.w600 : FontWeight.w400, color: sel ? Colors.white : AppColors.ink)),
             ),
           );
         }).toList(),
@@ -466,7 +482,10 @@ class _Label extends StatelessWidget {
   final String text;
   const _Label(this.text);
   @override
-  Widget build(BuildContext context) => Text(text, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.muted));
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Text(text, style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w500, color: AppColors.muted));
+  }
 }
 
 class UpperCaseFormatter extends TextInputFormatter {

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:agrimart/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/agri_ui.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../../data/providers/app_providers.dart';
 import '../../core/utils/responsive.dart';
@@ -20,12 +21,15 @@ class CartScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        title: Text(l10n.myCart, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(18), fontWeight: FontWeight.w700)),
-        leading: GestureDetector(onTap: () => context.pop(), child: const Icon(Icons.arrow_back_rounded)),
-      ),
-      body: cartAsync.when(
+      body: Column(
+        children: [
+          FarmerTabHeader(
+            emoji: '🛒',
+            title: l10n.myCart,
+            showBack: true,
+          ),
+          Expanded(
+            child: cartAsync.when(
         loading: () => const Center(child: CircularProgressIndicator(color: AppColors.farmerAccent)),
         error: (e, _) => EmptyState(emoji: '⚠️', title: l10n.couldNotLoadOrders, subtitle: e.toString()),
         data: (cart) {
@@ -46,9 +50,9 @@ class CartScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: ListView.separated(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(r.rs(16)),
                   itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, __) => SizedBox(height: r.rh(12)),
                   itemBuilder: (_, i) => _CartItem(item: items[i]),
                 ),
               ),
@@ -69,16 +73,16 @@ class CartScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('${l10n.subtotal} (${items.length})', style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
-                          Text(formatRupee(total), style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink)),
+                          Text('${l10n.subtotal} (${items.length})', style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.muted)),
+                          Text(formatRupee(total), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(14), fontWeight: FontWeight.w600, color: AppColors.ink)),
                         ],
                       ),
                       SizedBox(height: r.rs(6)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(l10n.delivery, style: GoogleFonts.inter(fontSize: 13, color: AppColors.muted)),
-                          Text(total >= 500 ? l10n.free : formatRupee(50), style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.success)),
+                          Text(l10n.delivery, style: GoogleFonts.inter(fontSize: r.sp(13), color: AppColors.muted)),
+                          Text(total >= 500 ? l10n.free : formatRupee(50), style: GoogleFonts.inter(fontSize: r.sp(13), fontWeight: FontWeight.w500, color: AppColors.success)),
                         ],
                       ),
                       Divider(height: r.rs(20), color: AppColors.border),
@@ -103,6 +107,9 @@ class CartScreen extends ConsumerWidget {
             ],
           );
         },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -126,31 +133,31 @@ class _CartItem extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(r.rs(16)),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
         boxShadow: AppColors.softShadow,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: EdgeInsets.all(r.rs(14)),
         child: Row(
           children: [
             // Image
             ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(r.rs(12)),
               child: imageUrl != null
                   ? CachedNetworkImage(imageUrl: imageUrl, width: 70, height: 70, fit: BoxFit.cover,
                       errorWidget: (_, __, ___) => Container(width: 70, height: 70, color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(28))))))
                   : Container(width: 70, height: 70, color: AppColors.farmerTint, child: Center(child: Text('🌱', style: TextStyle(fontSize: r.sp(28))))),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: r.rs(12)),
             // Details
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.ink), maxLines: 2, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 4),
-                  Text(formatRupee(price), style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.farmerAccent)),
+                  Text(name, style: GoogleFonts.inter(fontSize: r.sp(14), fontWeight: FontWeight.w500, color: AppColors.ink), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  SizedBox(height: r.rh(4)),
+                  Text(formatRupee(price), style: GoogleFonts.spaceGrotesk(fontSize: r.sp(14), fontWeight: FontWeight.w700, color: AppColors.farmerAccent)),
                 ],
               ),
             ),
@@ -158,7 +165,7 @@ class _CartItem extends ConsumerWidget {
             Container(
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.border),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(r.rs(10)),
               ),
               child: Row(
                 children: [
@@ -173,9 +180,9 @@ class _CartItem extends ConsumerWidget {
                     },
                   ),
                   Container(
-                    width: 32,
+                    width: r.rs(32),
                     alignment: Alignment.center,
-                    child: Text('$qty', style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink)),
+                    child: Text('$qty', style: GoogleFonts.spaceGrotesk(fontSize: r.sp(14), fontWeight: FontWeight.w600, color: AppColors.ink)),
                   ),
                   _StepBtn(
                     icon: Icons.add,
@@ -196,13 +203,16 @@ class _StepBtn extends StatelessWidget {
   final VoidCallback onTap;
   const _StepBtn({required this.icon, required this.onTap});
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return GestureDetector(
     onTap: onTap,
     child: Container(
-      width: 32, height: 32,
+      width: r.rs(32), height: r.rh(32),
       alignment: Alignment.center,
-      child: Icon(icon, size: 18, color: AppColors.farmerAccent),
+      child: Icon(icon, size: r.sp(18), color: AppColors.farmerAccent),
     ),
   );
+  }
 }
 

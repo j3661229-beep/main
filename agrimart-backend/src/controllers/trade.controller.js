@@ -1,8 +1,11 @@
 const prisma = require('../config/database');
 const logger = require('../utils/logger');
+const cache = require('../utils/cache');
 const { getPagination } = require('../utils/helpers');
 const { paginated } = require('../utils/apiResponse');
 const { sendNotification } = require('../services/onesignal.service');
+
+const RATES_CACHE_TTL = 300;
 
 // Fetch dealers for a district (and optionally a specific crop)
 exports.getDealerRates = async (req, res) => {
@@ -13,6 +16,10 @@ exports.getDealerRates = async (req, res) => {
         }
 
         const { page, limit, skip } = getPagination(req.query);
+        const cacheKey = `trade:rates:${district.toLowerCase()}:${crop || 'all'}:${page}:${limit}`;
+        const cached = await cache.get(cacheKey);
+        if (cached) return res.json(cached);
+
         const whereClause = {
             district: { equals: district, mode: 'insensitive' },
             isActive: true,
@@ -24,17 +31,18 @@ exports.getDealerRates = async (req, res) => {
             prisma.dealerCropRate.findMany({
                 where: whereClause,
                 skip, take: limit,
-                include: {
-                    dealer: {
-                        include: { user: { select: { name: true, phone: true } } }
-                    }
+                select: {
+                    id: true, cropName: true, pricePerQuintal: true, district: true, dealerId: true,
+                    dealer: { select: { id: true, businessName: true, user: { select: { name: true } } } },
                 },
-                orderBy: { pricePerQuintal: 'desc' }
+                orderBy: { pricePerQuintal: 'desc' },
             }),
-            prisma.dealerCropRate.count({ where: whereClause })
+            prisma.dealerCropRate.count({ where: whereClause }),
         ]);
 
-        paginated(res, rates, page, limit, total);
+        const payload = { success: true, data: rates, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+        await cache.set(cacheKey, payload, RATES_CACHE_TTL);
+        res.json(payload);
     } catch (error) {
         logger.error(`Get dealer rates error: ${error.message}`);
         res.status(500).json({ success: false, message: error.message });

@@ -16,25 +16,25 @@ class DealerBookingsScreen extends StatelessWidget {
         backgroundColor: AppColors.primary,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(r.rs(16)),
         children: [
-          _buildSummaryCard(),
-          const SizedBox(height: 24),
-          _buildBookingTile(
+          _buildSummaryCard(r),
+          SizedBox(height: r.rh(24)),
+          _buildBookingTile(r, 
             farmerName: 'Nitin Gaikwad',
             crop: 'Soyabean',
             quantity: '50 Quintals',
             date: 'Today, 2:00 PM',
             status: 'PENDING',
           ),
-          _buildBookingTile(
+          _buildBookingTile(r, 
             farmerName: 'Rahul Patil',
             crop: 'Cotton',
             quantity: '35 Quintals',
             date: 'Tomorrow, 10:00 AM',
             status: 'ACCEPTED',
           ),
-          _buildBookingTile(
+          _buildBookingTile(r, 
             farmerName: 'Sanjay More',
             crop: 'Wheat',
             quantity: '100 Quintals',
@@ -46,12 +46,12 @@ class DealerBookingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryCard() {
+  Widget _buildSummaryCard(Responsive r) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(r.rs(20)),
       decoration: BoxDecoration(
         color: AppColors.primary,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(r.rs(24)),
         boxShadow: AppColors.primaryShadow,
       ),
       child: const Row(
@@ -65,7 +65,7 @@ class DealerBookingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBookingTile({
+  Widget _buildBookingTile(Responsive r, {
     required String farmerName,
     required String crop,
     required String quantity,
@@ -75,11 +75,11 @@ class DealerBookingsScreen extends StatelessWidget {
     final statusColor = status == 'ACCEPTED' ? AppColors.success : (status == 'PENDING' ? AppColors.amber : Colors.grey);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.only(bottom: r.rh(16)),
+      padding: EdgeInsets.all(r.rs(20)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(r.rs(20)),
         boxShadow: AppColors.softShadow,
       ),
       child: Column(
@@ -87,7 +87,7 @@ class DealerBookingsScreen extends StatelessWidget {
           Row(
             children: [
               const CircleAvatar(backgroundColor: AppColors.primarySurface, child: Text('👨‍🌾')),
-              const SizedBox(width: 12),
+              SizedBox(width: r.rs(12)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,13 +98,13 @@ class DealerBookingsScreen extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
-                child: Text(status, style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold)),
+                padding: EdgeInsets.symmetric(horizontal: r.rs(10), vertical: r.rh(4)),
+                decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(r.rs(20))),
+                child: Text(status, style: TextStyle(color: statusColor, fontSize: r.sp(10), fontWeight: FontWeight.bold)),
               ),
             ],
           ),
-          const Divider(height: 32),
+          Divider(height: r.rh(32)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -113,7 +113,7 @@ class DealerBookingsScreen extends StatelessWidget {
             ],
           ),
           if (status == 'PENDING') ...[
-            const SizedBox(height: 20),
+            SizedBox(height: r.rh(20)),
             Row(
               children: [
                 Expanded(
@@ -123,7 +123,7 @@ class DealerBookingsScreen extends StatelessWidget {
                     child: Text('Reject'),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: r.rs(12)),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {},
@@ -149,7 +149,7 @@ class _SummaryItem extends StatelessWidget {
     return Column(
     children: [
       Text(value, style: TextStyle(color: color, fontSize: r.sp(24), fontWeight: FontWeight.bold)),
-      Text(label, style: TextStyle(color: color.withValues(alpha: 0.7), fontSize: 12)),
+      Text(label, style: TextStyle(color: color.withValues(alpha: 0.7), fontSize: r.sp(12))),
     ],
   );
   }

@@ -176,6 +176,9 @@ const deactivateRate = async (dealerId, rateId) => {
 const getBookings = async (dealerId, { page, limit, skip }, filters) => {
     const where = { dealerId };
     if (filters.status) where.status = filters.status.toUpperCase();
+    if (filters.crop && filters.crop !== 'All') {
+        where.cropName = { contains: filters.crop, mode: 'insensitive' };
+    }
 
     const [bookings, total] = await Promise.all([
         prisma.tradeBooking.findMany({

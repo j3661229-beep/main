@@ -249,6 +249,7 @@ class AppTextStyles {
   // Additional semantic styles
   static final TextStyle caption    = GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w400, color: AppColors.muted);
   static final TextStyle priceSmall = GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.ink);
+  static final TextStyle price      = GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.farmerAccent);
   static final TextStyle priceLG    = GoogleFonts.spaceGrotesk(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.farmerAccent);
 }
 

@@ -32,9 +32,9 @@ class MyDealsScreen extends ConsumerWidget {
         onRefresh: () async => ref.invalidate(_myDealsProvider),
         child: deals.when(
           loading: () => ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(r.rs(16)),
             itemCount: 5,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            separatorBuilder: (_, __) => SizedBox(height: r.rh(12)),
             itemBuilder: (_, __) => const ShimmerBox(height: 110, radius: 16),
           ),
           error: (e, _) => EmptyState(
@@ -53,9 +53,9 @@ class MyDealsScreen extends ConsumerWidget {
               onAction: () => context.push('/dealer/produce-board'),
             );
             return ListView.separated(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(r.rs(16)),
               itemCount: list.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, __) => SizedBox(height: r.rh(12)),
               itemBuilder: (_, i) => _DealCard(deal: list[i]),
             );
           },
@@ -92,10 +92,10 @@ class _DealCard extends ConsumerWidget {
     final advance    = (deal['advanceAmount'] as num?) ?? 0;
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(r.rs(18)),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(r.rs(18)),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
         boxShadow: AppColors.softShadow,
       ),
@@ -105,20 +105,20 @@ class _DealCard extends ConsumerWidget {
           Row(
             children: [
               Container(
-                width: 50, height: 50,
-                decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(14)),
+                width: r.rs(50), height: 50,
+                decoration: BoxDecoration(color: AppColors.dealerTint, borderRadius: BorderRadius.circular(r.rs(14))),
                 child: Center(child: Text('🌾', style: TextStyle(fontSize: r.sp(26)))),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: r.rs(14)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(crop, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(16), fontWeight: FontWeight.w700, color: AppColors.ink)),
                     Row(children: [
-                      const Icon(Icons.person_outline, size: 13, color: AppColors.muted),
-                      const SizedBox(width: 3),
-                      Text(farmer, style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+                      Icon(Icons.person_outline, size: r.sp(13), color: AppColors.muted),
+                      SizedBox(width: r.rs(3)),
+                      Text(farmer, style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
                     ]),
                   ],
                 ),
@@ -126,9 +126,9 @@ class _DealCard extends ConsumerWidget {
               BadgeChip.status(_displayStatus(status)),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: r.rh(14)),
           const Divider(color: AppColors.border, height: 1),
-          const SizedBox(height: 14),
+          SizedBox(height: r.rh(14)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -138,34 +138,34 @@ class _DealCard extends ConsumerWidget {
             ],
           ),
           if (advance > 0) ...[
-            const SizedBox(height: 10),
+            SizedBox(height: r.rh(10)),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(color: AppColors.successTint, borderRadius: BorderRadius.circular(8)),
+              padding: EdgeInsets.symmetric(horizontal: r.rs(12), vertical: r.rh(6)),
+              decoration: BoxDecoration(color: AppColors.successTint, borderRadius: BorderRadius.circular(r.rs(8))),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.check_circle_outline, color: AppColors.success, size: 14),
-                  const SizedBox(width: 6),
-                  Text('Advance Paid: ${formatRupee(advance)}', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.success)),
+                  Icon(Icons.check_circle_outline, color: AppColors.success, size: r.sp(14)),
+                  SizedBox(width: r.rs(6)),
+                  Text('Advance Paid: ${formatRupee(advance)}', style: GoogleFonts.inter(fontSize: r.sp(12), fontWeight: FontWeight.w500, color: AppColors.success)),
                 ],
               ),
             ),
           ],
           if (pickupDate != null) ...[
-            const SizedBox(height: 8),
+            SizedBox(height: r.rh(8)),
             Row(children: [
-              const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.muted),
-              const SizedBox(width: 6),
-              Text('Pickup: ${_formatDate(pickupDate)}', style: GoogleFonts.inter(fontSize: 12, color: AppColors.muted)),
+              Icon(Icons.calendar_today_outlined, size: r.sp(14), color: AppColors.muted),
+              SizedBox(width: r.rs(6)),
+              Text('Pickup: ${_formatDate(pickupDate)}', style: GoogleFonts.inter(fontSize: r.sp(12), color: AppColors.muted)),
             ]),
           ],
           if (status.toString().toUpperCase() == 'ACCEPTED') ...[
-            const SizedBox(height: 14),
+            SizedBox(height: r.rh(14)),
             AppButton(
               label: 'Mark Completed',
               color: AppColors.dealerAccent,
-              height: 40,
+              height: r.rh(40),
               icon: Icons.check_rounded,
               onTap: () async {
                 try {
@@ -200,12 +200,15 @@ class _DealStat extends StatelessWidget {
   final String label, value;
   const _DealStat(this.label, this.value);
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: GoogleFonts.inter(fontSize: 11, color: AppColors.muted)),
-      Text(value, style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.ink)),
+      Text(label, style: GoogleFonts.inter(fontSize: r.sp(11), color: AppColors.muted)),
+      Text(value, style: GoogleFonts.spaceGrotesk(fontSize: r.sp(13), fontWeight: FontWeight.w700, color: AppColors.ink)),
     ],
   );
+  }
 }
 

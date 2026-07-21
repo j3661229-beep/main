@@ -11,6 +11,9 @@ enum ScreenSize {
 /// Design reference width (typical phone).
 const double _designWidth = 390.0;
 
+/// Design reference height (iPhone 14 / common Android).
+const double _designHeight = 844.0;
+
 class Responsive {
   Responsive(this.context);
 
@@ -21,6 +24,16 @@ class Responsive {
   double get height => size.height;
   EdgeInsets get safePadding => MediaQuery.paddingOf(context);
   Orientation get orientation => MediaQuery.orientationOf(context);
+
+  /// Usable viewport after system insets.
+  double get availableWidth => width;
+  double get availableHeight => height - safePadding.top - safePadding.bottom;
+
+  /// Fraction of screen width (0.0–1.0).
+  double wp(double fraction) => width * fraction.clamp(0.0, 1.0);
+
+  /// Fraction of screen height (0.0–1.0).
+  double hp(double fraction) => height * fraction.clamp(0.0, 1.0);
 
   ScreenSize get screenSize {
     if (width >= 1200) return ScreenSize.large;
@@ -36,20 +49,39 @@ class Responsive {
   bool get isTablet => width >= 600;
   bool get isWide => width >= 840;
   bool get isLandscape => orientation == Orientation.landscape;
+  bool get isShortScreen => height < 680;
+  bool get isTallScreen => height > 900;
 
-  /// Scale factor clamped so UI never breaks on tiny or huge screens.
-  double get scale {
+  /// Width-based scale factor.
+  double get widthScale {
     final raw = width / _designWidth;
     if (isCompact) return raw.clamp(0.82, 1.12);
     if (isMedium) return raw.clamp(0.95, 1.2);
     return raw.clamp(1.0, 1.35);
   }
 
-  /// Responsive font / icon size.
+  /// Height-based scale factor.
+  double get heightScale {
+    final raw = height / _designHeight;
+    if (isCompact) return raw.clamp(0.82, 1.12);
+    if (isMedium) return raw.clamp(0.95, 1.2);
+    return raw.clamp(1.0, 1.35);
+  }
+
+  /// Scale factor clamped so UI never breaks on tiny or huge screens.
+  /// Uses the smaller of width/height scale so short phones still fit content.
+  double get scale {
+    return widthScale < heightScale ? widthScale : heightScale;
+  }
+
+  /// Responsive font / icon size (considers both width and height).
   double sp(double value) => value * scale;
 
-  /// Responsive spacing, radius, icon box, etc.
-  double rs(double value) => value * scale;
+  /// Responsive horizontal spacing, radius, icon box (width-based).
+  double rs(double value) => value * widthScale;
+
+  /// Responsive vertical spacing, hero heights (height-based).
+  double rh(double value) => value * heightScale;
 
   /// Max content width — keeps tablet layouts readable.
   double get maxContentWidth {
@@ -100,15 +132,20 @@ class Responsive {
   int quickActionColumns() => gridColumns(compact: 2, medium: 2, expanded: 4, large: 4);
 
   double get appBarExpandedHeight {
-    if (isWide) return rs(180);
-    if (isTablet) return rs(168);
-    return rs(148);
+    if (isWide) return rh(180);
+    if (isTablet) return rh(168);
+    return rh(148);
   }
 
   double get heroHeaderHeight {
-    if (isWide) return rs(200);
-    if (isTablet) return rs(180);
-    return rs(168);
+    if (isWide) return rh(200);
+    if (isTablet) return rh(180);
+    return rh(168);
+  }
+
+  /// Scroll body height minus typical app bar (for embedded lists).
+  double bodyHeight({double appBarHeight = 56, double bottomBarHeight = 0}) {
+    return availableHeight - appBarHeight - bottomBarHeight;
   }
 
   SliverGridDelegate productGridDelegate() => SliverGridDelegateWithFixedCrossAxisCount(
@@ -149,6 +186,71 @@ class Responsive {
 
 extension ResponsiveContext on BuildContext {
   Responsive get r => Responsive(this);
+}
+
+/// Wraps every routed page — constrains width on tablets and exposes full viewport size.
+class ResponsivePage extends StatelessWidget {
+  final Widget child;
+
+  const ResponsivePage({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: r.maxContentWidth,
+              minHeight: constraints.maxHeight,
+              minWidth: constraints.maxWidth,
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Scaffold with responsive max-width body (use for standalone screens).
+class ResponsiveScaffold extends StatelessWidget {
+  final PreferredSizeWidget? appBar;
+  final Widget body;
+  final Widget? bottomNavigationBar;
+  final Widget? floatingActionButton;
+  final Color? backgroundColor;
+  final bool extendBody;
+  final bool resizeToAvoidBottomInset;
+  final bool constrainBody;
+
+  const ResponsiveScaffold({
+    super.key,
+    this.appBar,
+    required this.body,
+    this.bottomNavigationBar,
+    this.floatingActionButton,
+    this.backgroundColor,
+    this.extendBody = false,
+    this.resizeToAvoidBottomInset = true,
+    this.constrainBody = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final content = constrainBody ? ResponsiveLayout(applyPadding: false, child: body) : body;
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      appBar: appBar,
+      body: content,
+      bottomNavigationBar: bottomNavigationBar,
+      floatingActionButton: floatingActionButton,
+      extendBody: extendBody,
+      resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+    );
+  }
 }
 
 /// Centers content and caps width on tablets / desktops.

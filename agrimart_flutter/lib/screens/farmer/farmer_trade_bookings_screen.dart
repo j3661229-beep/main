@@ -38,13 +38,13 @@ class FarmerTradeBookingsScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(24),
+                        padding: EdgeInsets.all(r.rs(24)),
                         decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: AppColors.softShadow),
-                        child: Text('📅', style: TextStyle(fontSize: 64)),
+                        child: Text('📅', style: TextStyle(fontSize: r.sp(64))),
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: r.rh(24)),
                       Text('No Booked Slots yet', style: AppTextStyles.headingLG),
-                      const SizedBox(height: 8),
+                      SizedBox(height: r.rh(8)),
                       Text("You haven't booked any crop delivery\nslots with dealers.", 
                         style: AppTextStyles.bodyLG.copyWith(color: AppColors.textSecondary), textAlign: TextAlign.center),
                     ],
@@ -54,7 +54,7 @@ class FarmerTradeBookingsScreen extends ConsumerWidget {
             }
 
             return ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(r.rs(16)),
               itemCount: list.length,
               itemBuilder: (ctx, i) => _BookingCard(booking: list[i]),
             );
@@ -77,11 +77,11 @@ class _BookingCard extends StatelessWidget {
     final slotDate = DateTime.tryParse(booking['slotDate'] ?? '');
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.only(bottom: r.rh(16)),
+      padding: EdgeInsets.all(r.rs(20)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(r.rs(20)),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
         boxShadow: AppColors.softShadow,
       ),
@@ -91,11 +91,11 @@ class _BookingCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(12)),
+                padding: EdgeInsets.all(r.rs(10)),
+                decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(r.rs(12))),
                 child: Text('🌾', style: TextStyle(fontSize: r.sp(24))),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: r.rs(12)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,13 +106,13 @@ class _BookingCard extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
-                child: Text(booking['status'] ?? '', style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold)),
+                padding: EdgeInsets.symmetric(horizontal: r.rs(10), vertical: r.rh(4)),
+                decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(r.rs(20))),
+                child: Text(booking['status'] ?? '', style: TextStyle(color: statusColor, fontSize: r.sp(10), fontWeight: FontWeight.bold)),
               ),
             ],
           ),
-          const Divider(height: 32),
+          Divider(height: r.rh(32)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -137,7 +137,7 @@ class _DetailCol extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: AppTextStyles.caption),
-        const SizedBox(height: 2),
+        SizedBox(height: r.rh(2)),
         Text(value, style: AppTextStyles.labelMD),
       ],
     );
@@ -154,16 +154,16 @@ class _ErrorState extends StatelessWidget {
     final r = context.r;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.all(r.rs(32)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('⚠️', style: TextStyle(fontSize: 48)),
-            const SizedBox(height: 16),
+            Text('⚠️', style: TextStyle(fontSize: r.sp(48))),
+            SizedBox(height: r.rh(16)),
             Text('Oops! Something went wrong', style: AppTextStyles.headingMD),
-            const SizedBox(height: 8),
+            SizedBox(height: r.rh(8)),
             Text(message, style: AppTextStyles.bodySM, textAlign: TextAlign.center),
-            const SizedBox(height: 24),
+            SizedBox(height: r.rh(24)),
             ElevatedButton(onPressed: onRetry, child: Text('Try Again')),
           ],
         ),

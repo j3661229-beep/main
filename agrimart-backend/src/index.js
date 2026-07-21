@@ -67,7 +67,8 @@ app.set('trust proxy', 1);
 
 // Security + utility middleware
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(compression());
+app.use(compression({ threshold: 0 })); // compress all responses
+app.set('etag', 'strong'); // Enable ETag for client-side caching
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
   credentials: true,
@@ -106,6 +107,16 @@ app.get('/health', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', alias: true });
 });
+
+// Cache-control middleware for public read-heavy routes
+app.use('/api/v1/schemes', (req, res, next) => { if (req.method === 'GET') res.set('Cache-Control', 'public, max-age=3600'); next(); });
+app.use('/api/schemes',    (req, res, next) => { if (req.method === 'GET') res.set('Cache-Control', 'public, max-age=3600'); next(); });
+app.use('/api/v1/weather', (req, res, next) => { if (req.method === 'GET') res.set('Cache-Control', 'public, max-age=1800'); next(); });
+app.use('/api/weather',    (req, res, next) => { if (req.method === 'GET') res.set('Cache-Control', 'public, max-age=1800'); next(); });
+app.use('/api/v1/mandi',   (req, res, next) => { if (req.method === 'GET') res.set('Cache-Control', 'public, max-age=7200'); next(); });
+app.use('/api/mandi',      (req, res, next) => { if (req.method === 'GET') res.set('Cache-Control', 'public, max-age=7200'); next(); });
+app.use('/api/v1/news',    (req, res, next) => { if (req.method === 'GET') res.set('Cache-Control', 'public, max-age=1800'); next(); });
+app.use('/api/news',       (req, res, next) => { if (req.method === 'GET') res.set('Cache-Control', 'public, max-age=1800'); next(); });
 
 // API index — visiting /api in browser (Flutter base URL)
 app.get('/api', (req, res) => {
@@ -150,6 +161,17 @@ cron.schedule('0 * * * *', async () => {
     }
   } catch (err) {
     logger.error('Price alert cron failed', err);
+  }
+});
+
+// Clean up expired sessions every 6 hours
+cron.schedule('0 */6 * * *', async () => {
+  try {
+    const prisma = require('./config/database');
+    const deleted = await prisma.session.deleteMany({ where: { expiresAt: { lt: new Date() } } });
+    if (deleted.count > 0) logger.info(`Session cleanup: removed ${deleted.count} expired sessions`);
+  } catch (err) {
+    logger.error('Session cleanup cron failed', err);
   }
 });
 

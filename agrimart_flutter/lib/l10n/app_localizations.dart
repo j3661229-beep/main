@@ -1695,6 +1695,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'acres'**
   String get acresUnit;
+
+  /// No description provided for @farmSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm Setup'**
+  String get farmSetupTitle;
+
+  /// No description provided for @farmSetupCompleteBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete farm setup'**
+  String get farmSetupCompleteBanner;
+
+  /// No description provided for @farmSetupRequiredHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Required for AI, weather & mandi advice'**
+  String get farmSetupRequiredHint;
+
+  /// No description provided for @yourFarmSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Your farm'**
+  String get yourFarmSummary;
 }
 
 class _AppLocalizationsDelegate
